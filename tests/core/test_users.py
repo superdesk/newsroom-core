@@ -1,8 +1,8 @@
 from bson import ObjectId
 import pytz
 
-from flask import json
-from flask import url_for
+from quart import json
+from quart import url_for
 from eve.utils import str_to_date
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
@@ -16,27 +16,29 @@ from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.utils import mock_send_email, login
+from tests.utils import mock_send_email, login, logout
 
 
-def test_user_list_fails_for_anonymous_user(client, anonymous_user, public_user):
-    response = client.get("/users/search")
-    assert response.status_code == 302
-    assert response.headers.get("location") == "/login"
+async def test_user_list_fails_for_anonymous_user(app, public_user):
+    async with app.test_client() as client:
+        response = await client.get("/users/search")
+        assert response.status_code == 302
+        assert response.headers.get("location") == "/login"
 
-    login(client, public_user)
-    response = client.get("/users/search")
-    assert response.status_code == 403
-    assert b"Forbidden" in response.data
+    async with app.test_client() as client:
+        await login(client, public_user)
+        response = await client.get("/users/search")
+        assert response.status_code == 403
+        assert "Forbidden" in await response.get_data(as_text=True)
 
 
-def test_return_search_for_users(client, app):
+async def test_return_search_for_users(client, app):
     company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
 
     # Register a new account
-    response = client.post(
+    await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
@@ -47,13 +49,13 @@ def test_return_search_for_users(client, app):
         },
     )
 
-    response = client.get("/users/search?q=jo")
-    assert "John" in response.get_data(as_text=True)
-    user_data = response.get_json()[0]
+    response = await client.get("/users/search?q=jo")
+    assert "John" in await response.get_data(as_text=True)
+    user_data = (await response.get_json())[0]
     assert user_data.get("sections") is None
 
 
-def test_reset_password_token_sent_for_user_succeeds(app, client):
+async def test_reset_password_token_sent_for_user_succeeds(app, client):
     # Insert a new user
     app.data.insert(
         "users",
@@ -72,14 +74,14 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
         ],
     )
     # Resend the reset password token
-    response = client.post("/users/59b4c5c61d41c8d736852000/reset_password")
+    response = await client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 200
-    assert '"success": true' in response.get_data(as_text=True)
+    assert '"success": true' in await response.get_data(as_text=True)
     user = get_resource_service("auth_user").find_one(req=None, email="test@sourcefabric.org")
     assert user.get("token") is not None
 
 
-def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
+async def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
     # Insert a new user
     app.data.insert(
         "users",
@@ -98,18 +100,18 @@ def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client)
         ],
     )
     # Resend the reset password token
-    response = client.post("/users/59b4c5c61d41c8d736852000/reset_password")
+    response = await client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 400
-    assert '"message": "Token could not be sent"' in response.get_data(as_text=True)
+    assert '"message": "Token could not be sent"' in await response.get_data(as_text=True)
     user = get_resource_service("auth_user").find_one(req=None, email="test@sourcefabric.org")
     assert user.get("token") is None
 
 
-def test_new_user_has_correct_flags(client):
+async def test_new_user_has_correct_flags(client):
     # Register a new account
-    response = client.post(
+    response = await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
@@ -119,8 +121,6 @@ def test_new_user_has_correct_flags(client):
             "user_type": "public",
         },
     )
-
-    # print(response.get_data(as_text=True))
 
     assert response.status_code == 201
     user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
@@ -128,11 +128,11 @@ def test_new_user_has_correct_flags(client):
     assert not user["is_enabled"]
 
 
-def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
+async def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
     # Register a new account
-    response = client.post(
+    await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
@@ -143,9 +143,9 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         },
     )
 
-    response = client.post(
+    response = await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newUser@abc.org",
             "first_name": "John",
             "last_name": "Smith",
@@ -156,14 +156,12 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         },
     )
 
-    # print(response.get_data(as_text=True))
-
     assert response.status_code == 400
-    assert "Email address is already in use" in response.get_data(as_text=True)
+    assert "Email address is already in use" in await response.get_data(as_text=True)
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_create_new_user_succeeds(app, client):
+async def test_create_new_user_succeeds(app, client):
     company_ids = app.data.insert(
         "companies",
         [
@@ -178,9 +176,9 @@ def test_create_new_user_succeeds(app, client):
     )
     with app.mail.record_messages() as outbox:
         # Insert a new user
-        response = client.post(
+        response = await client.post(
             "/users/new",
-            data={
+            form={
                 "email": "New.User@abc.org",
                 "first_name": "John",
                 "last_name": "Doe",
@@ -200,12 +198,12 @@ def test_create_new_user_succeeds(app, client):
 
     # get reset password token
     user = get_auth_user_by_email("new.user@abc.org")
-    client.get(url_for("auth.reset_password", token=user["token"]))
+    await client.get(url_for("auth.reset_password", token=user["token"]))
 
     # change the password
-    response = client.post(
+    response = await client.post(
         url_for("auth.reset_password", token=user["token"]),
-        data={
+        form={
             "new_password": "abc123def",
             "new_password2": "abc123def",
         },
@@ -213,40 +211,39 @@ def test_create_new_user_succeeds(app, client):
     assert response.status_code == 302
 
     # Login with the new account succeeds
-    response = login(client, {"email": "new.user@abc.org", "password": "abc123def"}, follow_redirects=True)
+    response = await login(client, {"email": "new.user@abc.org", "password": "abc123def"}, follow_redirects=True)
     assert response.status_code == 200
-    assert "John" in response.get_data(as_text=True)
+    assert "John" in await response.get_data(as_text=True)
 
     # Logout
-    response = client.get(url_for("auth.logout"), follow_redirects=True)
-    txt = response.get_data(as_text=True)
+    response = await client.get(url_for("auth.logout"), follow_redirects=True)
+    txt = await response.get_data(as_text=True)
     assert "John" not in txt
     assert "Login" in txt
 
 
-def test_new_user_fails_if_fields_not_provided(client):
+async def test_new_user_fails_if_fields_not_provided(client):
     # Register a new account
-    response = client.post(
+    response = await client.post(
         url_for("users.create"),
-        data={
+        form={
             "phone": "1234567",
         },
     )
-    txt = response.get_data(as_text=True)
+    assert response.status_code == 400
+    errors = await response.get_json()
 
-    # print(txt)
+    for name in ["first_name", "last_name", "email"]:
+        assert "required" in errors[name][0], name
 
-    assert '"first_name"' in txt
-    assert '"last_name"' in txt
-    assert '"email"' in txt
-    assert "user_type" in txt
+    assert errors["user_type"][0] == "Not a valid choice."
 
 
-def test_new_user_can_be_deleted(client):
+async def test_new_user_can_be_deleted(client):
     # Register a new account
-    response = client.post(
+    response = await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
@@ -262,14 +259,14 @@ def test_new_user_can_be_deleted(client):
     assert response.status_code == 201
     user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
 
-    response = client.delete("/users/{}".format(user["_id"]))
+    response = await client.delete("/users/{}".format(user["_id"]))
     assert response.status_code == 200
 
     user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
     assert user is None
 
 
-def test_return_search_for_all_users(client, app):
+async def test_return_search_for_all_users(client, app):
     for i in range(250):
         app.data.insert(
             "users",
@@ -284,18 +281,18 @@ def test_return_search_for_all_users(client, app):
             ],
         )
 
-    resp = client.get("/users/search?q=fo")
-    data = json.loads(resp.get_data())
+    resp = await client.get("/users/search?q=fo")
+    data = json.loads(await resp.get_data())
     assert 250 <= len(data)
 
 
-def test_active_user(client, app):
-    resp = client.get("/users/search?q=admin")
-    data = json.loads(resp.get_data())
+async def test_active_user(client, app):
+    resp = await client.get("/users/search?q=admin")
+    data = json.loads(await resp.get_data())
     assert data[0].get("last_active")
 
 
-def test_active_users_and_active_companies(client, app):
+async def test_active_users_and_active_companies(client, app):
     app.data.insert(
         "users",
         [
@@ -360,7 +357,7 @@ def test_active_users_and_active_companies(client, app):
         ],
     )
 
-    with app.test_request_context():
+    async with app.test_request_context("/"):
         users = get_user_dict()
         companies = get_company_dict()
 
@@ -372,7 +369,7 @@ def test_active_users_and_active_companies(client, app):
         assert "2" not in companies
 
 
-def test_expired_company_does_not_restrict_activity(client, app):
+async def test_expired_company_does_not_restrict_activity(client, app):
     app.data.insert(
         "companies",
         [
@@ -387,7 +384,7 @@ def test_expired_company_does_not_restrict_activity(client, app):
         ],
     )
 
-    with app.test_request_context():
+    async with app.test_request_context("/"):
         companies = get_company_dict()
 
         assert "1" in companies
@@ -402,7 +399,7 @@ def test_expired_company_does_not_restrict_activity(client, app):
         assert "3" in companies
 
 
-def test_is_valid_user(client, app):
+async def test_is_valid_user(client, app):
     users = [
         {
             "email": "foo1@bar.com",
@@ -452,14 +449,14 @@ def test_is_valid_user(client, app):
         {"_id": "3", "name": "Expired", "is_enabled": True, "expiry_date": datetime.utcnow() - timedelta(days=1)},
     ]
 
-    with app.test_request_context():
-        assert is_valid_user(users[0], companies[0]) is True
-        assert is_valid_user(users[1], companies[0]) is False
-        assert is_valid_user(users[2], companies[1]) is False
-        assert is_valid_user(users[3], companies[2]) is False
+    async with app.test_request_context("/"):
+        assert await is_valid_user(users[0], companies[0]) is True
+        assert await is_valid_user(users[1], companies[0]) is False
+        assert await is_valid_user(users[2], companies[1]) is False
+        assert await is_valid_user(users[3], companies[2]) is False
 
 
-def test_account_manager_can_update_user(app, client):
+async def test_account_manager_can_update_user(app, client):
     company_ids = app.data.insert(
         "companies",
         [
@@ -487,18 +484,18 @@ def test_account_manager_can_update_user(app, client):
         "company": company_ids[0],
     }
     app.data.insert("users", [account_mgr])
-    response = login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
+    response = await login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
     account_mgr["first_name"] = "Updated Account"
-    response = client.post("users/5c5914275f627d5885fee6a8", data=account_mgr, follow_redirects=True)
+    response = await client.post("users/5c5914275f627d5885fee6a8", form=account_mgr, follow_redirects=True)
     assert response.status_code == 200
     # account manager can't promote themselves
     account_mgr["user_type"] = "administrator"
-    response = client.post("users/5c5914275f627d5885fee6a8", data=account_mgr, follow_redirects=True)
+    response = await client.post("users/5c5914275f627d5885fee6a8", form=account_mgr, follow_redirects=True)
     assert response.status_code == 401
 
 
-def test_signals(client, app):
+async def test_signals(client, app):
     created_listener = mock.Mock(return_value=None)
     updated_listener = mock.Mock(return_value=None)
     deleted_listener = mock.Mock(return_value=None)
@@ -516,11 +513,11 @@ def test_signals(client, app):
         "company": ObjectId("59b4c5c61d41c8d736852fbf"),
     }
 
-    resp = client.post(
+    resp = await client.post(
         "/users/new",
-        data=user,
+        form=user,
     )
-    assert resp.status_code == 201, resp.get_data(as_text=True)
+    assert resp.status_code == 201, await resp.get_data(as_text=True)
 
     created_listener.assert_called_once()
     assert "_id" in created_listener.call_args.kwargs["user"]
@@ -529,11 +526,11 @@ def test_signals(client, app):
     user["email"] = "foo@example.com"
     user["is_enabled"] = True
     user_id = created_listener.call_args.kwargs["user"]["_id"]
-    resp = client.post(
+    resp = await client.post(
         f"/users/{user_id}",
-        data=user,
+        form=user,
     )
-    assert resp.status_code == 200, resp.get_data(as_text=True)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     updated_listener.assert_called_once()
     assert user_id == updated_listener.call_args.kwargs["user"]["_id"]
@@ -542,52 +539,51 @@ def test_signals(client, app):
 
     token = app.data.find_one("auth_user", req=None, _id=user_id)["token"]
 
-    resp = client.get(f"/validate/{token}")
-    assert 302 == resp.status_code, resp.get_data(as_text=True)
+    resp = await client.get(f"/validate/{token}")
+    assert 302 == resp.status_code, await resp.get_data(as_text=True)
     updated_listener.assert_called_once()
     updated_listener.reset_mock()
 
     with mock.patch("newsroom.auth.utils.send_reset_password_email", autospec=True) as password_email:
-        resp = client.post(f"/users/{user_id}/reset_password")
-        assert 200 == resp.status_code, resp.get_data(as_text=True)
+        resp = await client.post(f"/users/{user_id}/reset_password")
+        assert 200 == resp.status_code, await resp.get_data(as_text=True)
         password_email.assert_called_once()
         reset_token = password_email.call_args.args[1]
         assert reset_token
 
     updated_listener.reset_mock()
-    resp = client.post(
-        f"/reset_password/{reset_token}", data={"new_password": "newpassword123", "new_password2": "newpassword123"}
+    resp = await client.post(
+        f"/reset_password/{reset_token}", form={"new_password": "newpassword123", "new_password2": "newpassword123"}
     )
-    assert 302 == resp.status_code, resp.get_data(as_text=True)
+    assert 302 == resp.status_code, await resp.get_data(as_text=True)
     updated_listener.assert_called_once()
 
-    resp = client.delete(
+    resp = await client.delete(
         f"/users/{user_id}",
     )
-    assert resp.status_code == 200, resp.get_data(as_text=True)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     deleted_listener.assert_called_once()
     assert user_id == deleted_listener.call_args.kwargs["user"]["_id"]
     assert user["email"] == deleted_listener.call_args.kwargs["user"]["email"]
 
 
-def test_user_can_update_notification_schedule(app, client):
-    def update_user_schedule(data):
-        response = client.post(
+async def test_user_can_update_notification_schedule(app, client):
+    async def update_user_schedule(data):
+        response = await client.post(
             f"/users/{ADMIN_USER_ID}/notification_schedules",
-            data=json.dumps(data),
-            content_type="application/json",
+            json=data,
         )
         assert response.status_code == 200
 
     # Start out with an undefined notification schedule
-    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     user["_id"] = ObjectId(user["_id"])
     assert user.get("notification_schedule") is None
 
     # Now update the schedule with timezone and times
-    update_user_schedule({"timezone": "Australia/Sydney", "times": ["08:00", "16:00", "20:00"]})
-    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    await update_user_schedule({"timezone": "Australia/Sydney", "times": ["08:00", "16:00", "20:00"]})
+    user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     user["_id"] = ObjectId(user["_id"])
     assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
     assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
@@ -596,14 +592,14 @@ def test_user_can_update_notification_schedule(app, client):
     # Update the schedules ``last_run_time``
     now = utcnow()
     get_resource_service("users").update_notification_schedule_run_time(user, now)
-    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
     assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
     assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now
 
     # Update the schedule's timezone and times
-    update_user_schedule({"timezone": "Europe/Prague", "times": ["09:00", "17:00", "21:00"]})
-    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    await update_user_schedule({"timezone": "Europe/Prague", "times": ["09:00", "17:00", "21:00"]})
+    user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     user["_id"] = ObjectId(user["_id"])
     # Make sure all attributes were retained, specifically the ``last_run_time``
     assert user["notification_schedule"]["timezone"] == "Europe/Prague"
@@ -611,11 +607,11 @@ def test_user_can_update_notification_schedule(app, client):
     assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now
 
 
-def test_check_etag_when_updating_user(client):
+async def test_check_etag_when_updating_user(client):
     # Register a new account
-    response = client.post(
+    await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
@@ -627,28 +623,28 @@ def test_check_etag_when_updating_user(client):
         },
     )
 
-    response = client.get("/users/search?q=jo")
-    assert "John" in response.get_data(as_text=True)
+    response = await client.get("/users/search?q=jo")
+    assert "John" in await response.get_data(as_text=True)
 
-    user_data = response.get_json()[0]
+    user_data = (await response.get_json())[0]
     patch_data = user_data.copy()
     patch_data["sections"] = "wire,agenda"
     patch_data["first_name"] = "Foo"
 
-    response = client.post(f"/users/{user_data['_id']}", data=patch_data, headers={"If-Match": "something random"})
+    response = await client.post(f"/users/{user_data['_id']}", form=patch_data, headers={"If-Match": "something random"})
 
     assert response.status_code == 412
 
-    response = client.post(
+    response = await client.post(
         f"/users/{user_data['_id']}",
-        data=patch_data,
+        form=patch_data,
         headers={"If-Match": user_data["_etag"]},
     )
 
     assert response.status_code == 200
 
 
-def test_create_user_inherit_sections(app):
+async def test_create_user_inherit_sections(app):
     company_ids = app.data.insert("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
     assert company_ids
     user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
@@ -657,47 +653,47 @@ def test_create_user_inherit_sections(app):
     assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
-def test_filter_and_sorting_user(app, client):
-    users = client.get("/users/search?q=").get_json()
+async def test_filter_and_sorting_user(app, client):
+    users = await (await client.get("/users/search?q=")).get_json()
     assert len(users) == 3
-    response = client.get("/users/search?q=admin")
-    assert "admin" in response.get_data(as_text=True)
-    user_data = response.get_json()[0]
+    response = await client.get("/users/search?q=admin")
+    assert "admin" in await response.get_data(as_text=True)
+    user_data = (await response.get_json())[0]
     patch_data = user_data.copy()
     patch_data["first_name"] = "Zoe"
     patch_data["last_name"] = "AAba"
-    response = client.post(
+    response = await client.post(
         f"/users/{user_data['_id']}",
-        data=patch_data,
+        form=patch_data,
         headers={"If-Match": user_data["_etag"]},
     )
     assert response.status_code == 200
 
     # sort by First_name
-    users = client.get("/users/search?q=&sort=[('first_name', 1)]").get_json()
+    users = await (await client.get("/users/search?q=&sort=[('first_name', 1)]")).get_json()
     assert users[0]["first_name"] == "Foo"
     assert users[2]["first_name"] == "Zoe"
 
     # sort by Last_name
-    users = client.get("/users/search?q=&sort=[('last_name', 1)]").get_json()
+    users = await (await client.get("/users/search?q=&sort=[('last_name', 1)]")).get_json()
     assert users[0]["last_name"] == "AAba"
     assert users[1]["last_name"] == "Bar"
 
     # filter by Company_id
-    users = client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    users = await (await client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}')).get_json()
     assert len(users) == 2
     assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
 
     # filter by company and search by name
-    users = client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    users = await (await client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}')).get_json()
     assert len(users) == 1
 
     # filter by products
-    users = client.get('/users/search?q=&where={"products._id":"random"}').get_json()
+    users = await (await client.get('/users/search?q=&where={"products._id":"random"}')).get_json()
     assert len(users) == 0
 
 
-def test_user_has_paused_notifications(app):
+async def test_user_has_paused_notifications(app):
     user = User(email="foo", user_type="public")
     assert not get_resource_service("users").user_has_paused_notifications(user)
 

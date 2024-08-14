@@ -1,11 +1,11 @@
-from flask import session as server_session
+from quart import session as server_session
 
 from newsroom.wire.views import get_home_data
 from newsroom.tests.fixtures import PUBLIC_USER_ID
 
 
 async def test_personal_dashboard_data(client, app, company_products):
-    with app.test_request_context():
+    async with app.test_request_context("/home"):
         server_session["user"] = str(PUBLIC_USER_ID)
         server_session["user_type"] = "public"
 

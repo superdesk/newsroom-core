@@ -1,5 +1,5 @@
 from bson import ObjectId
-from flask import json
+from quart import json
 from pytest import fixture
 
 from newsroom.tests.users import test_login_succeeds_for_admin
@@ -7,7 +7,7 @@ from tests import utils
 
 
 @fixture(autouse=True)
-def init(app):
+async def init(app):
     app.data.insert(
         "section_filters",
         [
@@ -21,103 +21,93 @@ def init(app):
     )
 
 
-def test_filter_list_fails_for_anonymous_user(client, anonymous_user, public_user):
-    response = client.get("/section_filters/search")
-    assert response.status_code == 302
-    assert response.headers.get("location") == "/login"
+async def test_filter_list_fails_for_anonymous_user(app, anonymous_user, public_user):
+    async with app.test_client() as client:
+        res = await client.get("/section_filters/search", follow_redirects=False)
+        assert res.status_code == 302
+        assert res.headers.get("location") == "/login"
 
-    utils.login(client, public_user)
-    response = client.get("/section_filters/search")
-    assert response.status_code == 403
-    assert b"Forbidden" in response.data
+    async with app.test_client() as client:
+        await utils.login(client, public_user)
+        response = await client.get("/section_filters/search")
+        assert response.status_code == 403
+        assert b"Forbidden" in await response.get_data()
 
 
-def test_return_search_for_filters(client):
-    test_login_succeeds_for_admin(client)
-    client.post(
+async def test_return_search_for_filters(client):
+    await test_login_succeeds_for_admin(client)
+    await client.post(
         "/section_filters/new",
-        data=json.dumps(
-            {
-                "name": "Breaking",
-                "description": "Breaking news",
-                "is_enabled": True,
-                "sd_product_id": "123",
-            }
-        ),
-        content_type="application/json",
+        json={
+            "name": "Breaking",
+            "description": "Breaking news",
+            "is_enabled": True,
+            "sd_product_id": "123",
+        }
     )
 
-    response = client.get("/section_filters/search?q=br")
-    assert "Breaking" in response.get_data(as_text=True)
+    response = await client.get("/section_filters/search?q=br")
+    assert "Breaking" in await response.get_data(as_text=True)
 
 
-def test_create_fails_in_validation(client):
-    test_login_succeeds_for_admin(client)
-    response = client.post(
+async def test_create_fails_in_validation(client):
+    await test_login_succeeds_for_admin(client)
+    response = await client.post(
         "/section_filters/new",
-        data=json.dumps(
-            {
-                "description": "Breaking news",
-                "is_enabled": True,
-            }
-        ),
-        content_type="application/json",
+        json={
+            "description": "Breaking news",
+            "is_enabled": True,
+        }
     )
 
     assert response.status_code == 400
-    assert "name" in response.get_data(as_text=True)
+    assert "name" in await response.get_data(as_text=True)
 
 
-def test_update_filters(client):
-    test_login_succeeds_for_admin(client)
+async def test_update_filters(client):
+    await test_login_succeeds_for_admin(client)
 
-    resp = client.post(
+    resp = await client.post(
         "/section_filters/59b4c5c61d41c8d736852fbf",
-        data=json.dumps(
-            {
-                "name": "Sport",
-                "description": "foo",
-                "is_enabled": True,
-                "sd_product_id": "123",
-            }
-        ),
-        content_type="application/json",
+        json={
+            "name": "Sport",
+            "description": "foo",
+            "is_enabled": True,
+            "sd_product_id": "123",
+        }
     )
 
     assert 200 == resp.status_code
 
-    response = client.get("/section_filters")
-    assert "foo" in response.get_data(as_text=True)
+    response = await client.get("/section_filters")
+    assert "foo" in await response.get_data(as_text=True)
 
 
-def test_delete_product(client):
-    test_login_succeeds_for_admin(client)
+async def test_delete_product(client):
+    await test_login_succeeds_for_admin(client)
 
-    client.post(
+    await client.post(
         "/section_filters/new",
-        data=json.dumps(
-            {
-                "name": "Breaking",
-                "description": "Breaking news",
-                "parents": "59b4c5c61d41c8d736852fbf",
-                "is_enabled": True,
-                "query": "bar",
-            }
-        ),
-        content_type="application/json",
+        json={
+            "name": "Breaking",
+            "description": "Breaking news",
+            "parents": "59b4c5c61d41c8d736852fbf",
+            "is_enabled": True,
+            "query": "bar",
+        }
     )
 
-    resp = client.delete("/section_filters/59b4c5c61d41c8d736852fbf")
+    resp = await client.delete("/section_filters/59b4c5c61d41c8d736852fbf")
     assert 200 == resp.status_code
 
-    response = client.get("/section_filters")
-    data = json.loads(response.get_data())
+    response = await client.get("/section_filters")
+    data = json.loads(await response.get_data())
     assert 1 == len(data)
     assert data[0]["name"] == "Breaking"
 
 
-def test_gets_all_products(client, app):
-    test_login_succeeds_for_admin(client)
+async def test_gets_all_products(client, app):
+    await test_login_succeeds_for_admin(client)
 
     for i in range(250):
         app.data.insert(
@@ -131,6 +121,6 @@ def test_gets_all_products(client, app):
             ],
         )
 
-    resp = client.get("/section_filters")
-    data = json.loads(resp.get_data())
+    resp = await client.get("/section_filters")
+    data = json.loads(await resp.get_data())
     assert 251 == len(data)

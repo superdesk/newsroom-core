@@ -1,10 +1,10 @@
-from flask import json
+from quart import json
 from urllib.parse import quote
 from tests.utils import get_json
 from datetime import datetime
 
 
-def test_wire_search_fields(client, app):
+async def test_wire_search_fields(client, app):
     app.data.insert(
         "items",
         [
@@ -12,14 +12,14 @@ def test_wire_search_fields(client, app):
         ],
     )
 
-    data = get_json(client, "/wire/search?q=foo")
+    data = await get_json(client, "/wire/search?q=foo")
     assert 1 == len(data["_items"])
 
-    data = get_json(client, "/wire/search?q=bar")
+    data = await get_json(client, "/wire/search?q=bar")
     assert 0 == len(data["_items"])
 
 
-def test_wire_search_cross_fields(client, app):
+async def test_wire_search_cross_fields(client, app):
     app.data.insert(
         "items",
         [
@@ -27,17 +27,17 @@ def test_wire_search_cross_fields(client, app):
         ],
     )
 
-    data = get_json(client, "/wire/search?q=foo+bar")
+    data = await get_json(client, "/wire/search?q=foo+bar")
     assert 1 == len(data["_items"])
 
-    data = get_json(client, f'/wire/search?advanced={quote(json.dumps({"all": "foo bar"}))}')
+    data = await get_json(client, f'/wire/search?advanced={quote(json.dumps({"all": "foo bar"}))}')
     assert 1 == len(data["_items"])
 
-    data = get_json(client, f'/wire/search?advanced={quote(json.dumps({"any": "foo bar"}))}')
+    data = await get_json(client, f'/wire/search?advanced={quote(json.dumps({"any": "foo bar"}))}')
     assert 1 == len(data["_items"])
 
 
-def test_agenda_search_fields(client, app):
+async def test_agenda_search_fields(client, app):
     app.data.insert(
         "agenda",
         [
@@ -45,8 +45,8 @@ def test_agenda_search_fields(client, app):
         ],
     )
 
-    data = get_json(client, "/agenda/search?q=foo")
+    data = await get_json(client, "/agenda/search?q=foo")
     assert 1 == len(data["_items"])
 
-    data = get_json(client, "/agenda/search?q=bar")
+    data = await get_json(client, "/agenda/search?q=bar")
     assert 0 == len(data["_items"])

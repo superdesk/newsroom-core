@@ -1,4 +1,4 @@
-from flask import json
+from quart import json
 from unittest import mock
 from pytest import fixture
 from copy import deepcopy
@@ -6,6 +6,7 @@ from copy import deepcopy
 from newsroom.topics.views import get_topic_url
 from ..fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
+    PUBLIC_USER_EMAIL,
     init_company,
     PUBLIC_USER_ID,
     TEST_USER_ID,
@@ -38,106 +39,86 @@ user_topic_folders_url = "/api/users/{}/topic_folders".format(TEST_USER_ID)
 company_topic_folders_url = "/api/companies/{}/topic_folders".format(COMPANY_1_ID)
 
 
-@fixture
-def auth_client(client, public_user):
-    utils.login(client, public_user)
-    yield client
+async def test_topics_no_session(app):
+    async with app.test_client() as client:
+        resp = await client.get(topics_url)
+        assert 302 == resp.status_code
+        resp = await client.post(topics_url, data=deepcopy(base_topic))
+        assert 302 == resp.status_code
 
 
-def test_topics_no_session(client, anonymous_user):
-    resp = client.get(topics_url)
-    assert 302 == resp.status_code
-    resp = client.post(topics_url, data=deepcopy(base_topic))
-    assert 302 == resp.status_code
+async def test_post_topic_user(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    resp = await client.post(topics_url, json=deepcopy(base_topic))
+    assert 201 == resp.status_code
+    resp = await client.get(topics_url)
+    assert 200 == resp.status_code
+    data = json.loads(await resp.get_data())
+    assert 1 == len(data["_items"])
 
 
-def test_post_topic_user(client):
-    with client as cli:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = PUBLIC_USER_NAME
-        resp = cli.post(topics_url, json=deepcopy(base_topic))
-        assert 201 == resp.status_code
-        resp = cli.get(topics_url)
-        assert 200 == resp.status_code
-        data = json.loads(resp.get_data())
-        assert 1 == len(data["_items"])
-
-
-def test_update_topic_fails_for_different_user(client):
-    with client as app:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=deepcopy(base_topic))
+async def test_update_topic_fails_for_different_user(app):
+    async with app.test_client() as client:
+        await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+        resp = await client.post(topics_url, json=deepcopy(base_topic))
         assert 201 == resp.status_code
 
-        resp = app.get(topics_url)
-        data = json.loads(resp.get_data())
+        resp = await client.get(topics_url)
+        data = json.loads(await resp.get_data())
         _id = data["_items"][0]["_id"]
 
-        with client.session_transaction() as session:
-            session["name"] = test_user_id
-            session["user"] = test_user_id
-        resp = app.post("topics/{}".format(_id), json={"label": "test123"})
+    async with app.test_client() as client:
+        await utils.login(client, {"email": "test@bar.com"})
+        resp = await client.post("topics/{}".format(_id), json={"label": "test123"})
         assert 403 == resp.status_code
 
 
-def test_update_topic(client):
-    with client as app:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=deepcopy(base_topic))
-        assert 201 == resp.status_code
+async def test_update_topic(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    resp = await client.post(topics_url, json=deepcopy(base_topic))
+    assert 201 == resp.status_code
 
-        resp = app.get(topics_url)
-        data = json.loads(resp.get_data())
-        _id = data["_items"][0]["_id"]
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
+    _id = data["_items"][0]["_id"]
 
-        resp = app.post(
-            "topics/{}".format(_id),
-            data=json.dumps({"label": "test123"}),
-            content_type="application/json",
-        )
-        assert 200 == resp.status_code
+    resp = await client.post(
+        "topics/{}".format(_id),
+        json={"label": "test123"},
+    )
+    assert 200 == resp.status_code
 
-        resp = app.get(topics_url)
-        data = json.loads(resp.get_data())
-        assert "test123" == data["_items"][0]["label"]
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
+    assert "test123" == data["_items"][0]["label"]
 
 
-def test_delete_topic(client):
-    with client as app:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=deepcopy(base_topic), content_type="application/json")
-        assert 201 == resp.status_code
+async def test_delete_topic(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    resp = await client.post(topics_url, json=deepcopy(base_topic))
+    assert 201 == resp.status_code
 
-        resp = app.get(topics_url)
-        data = json.loads(resp.get_data())
-        _id = data["_items"][0]["_id"]
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
+    _id = data["_items"][0]["_id"]
 
-        resp = app.delete("topics/{}".format(_id))
-        assert 200 == resp.status_code
+    resp = await client.delete("topics/{}".format(_id))
+    assert 200 == resp.status_code
 
-        resp = app.get(topics_url)
-        data = json.loads(resp.get_data())
-        assert 0 == len(data["_items"])
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
+    assert 0 == len(data["_items"])
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_share_wire_topics(client, app):
+async def test_share_wire_topics(client, app):
     topic = deepcopy(base_topic)
     topic_ids = app.data.insert("topics", [topic])
     topic["_id"] = topic_ids[0]
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
 
     with app.mail.record_messages() as outbox:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = "tester"
-        resp = client.post(
+        resp = await client.post(
             "/topic_share",
             json={
                 "items": topic,
@@ -159,15 +140,13 @@ def test_share_wire_topics(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_share_agenda_topics(client, app):
+async def test_share_agenda_topics(client, app):
     topic_ids = app.data.insert("topics", [agenda_topic])
     agenda_topic["_id"] = topic_ids[0]
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
 
     with app.mail.record_messages() as outbox:
-        with client.session_transaction() as session:
-            session["user"] = user_id
-            session["name"] = "tester"
-        resp = client.post(
+        resp = await client.post(
             "/topic_share",
             json={
                 "items": agenda_topic,
@@ -188,7 +167,7 @@ def test_share_agenda_topics(client, app):
         assert "/agenda" in outbox[0].body
 
 
-def test_get_topic_share_url(app):
+async def test_get_topic_share_url(app):
     topic = {"topic_type": "wire", "query": "art exhibition"}
     assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
@@ -236,29 +215,30 @@ def if_match(doc):
     return {"if-match": doc["_etag"]}
 
 
-def test_topic_folders_crud(auth_client):
+async def test_topic_folders_crud(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
     urls = (user_topic_folders_url, company_topic_folders_url)
     for folders_url in urls:
         folder = {"name": "test", "section": "wire"}
 
-        resp = auth_client.get(folders_url)
+        resp = await client.get(folders_url)
         assert 200 == resp.status_code
-        assert 0 == len(resp.json["_items"])
+        assert 0 == len((await resp.get_json())["_items"])
 
-        resp = auth_client.post(folders_url, json=folder)
-        assert 201 == resp.status_code, resp.data.decode()
-        parent_folder = resp.json
+        resp = await client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        parent_folder = await resp.get_json()
         assert "_id" in parent_folder
 
-        resp = auth_client.get(folders_url)
+        resp = await client.get(folders_url)
         assert 200 == resp.status_code
-        assert 1 == len(resp.json["_items"])
+        assert 1 == len((await resp.get_json())["_items"])
 
         folder["name"] = "test"
         folder["parent"] = parent_folder["_id"]
-        resp = auth_client.post(folders_url, json=folder)
-        assert 201 == resp.status_code, resp.data.decode()
-        child_folder = resp.json
+        resp = await client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        child_folder = await resp.get_json()
 
         topic = {
             "label": "Test",
@@ -267,71 +247,73 @@ def test_topic_folders_crud(auth_client):
             "folder": child_folder["_id"],
         }
 
-        resp = auth_client.post(topics_url, json=topic)
-        assert 201 == resp.status_code, resp.data.decode()
+        resp = await client.post(topics_url, json=topic)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-        resp = auth_client.patch(self_href(parent_folder), json={"name": "bar"}, headers=if_match(parent_folder))
+        resp = await client.patch(self_href(parent_folder), json={"name": "bar"}, headers=if_match(parent_folder))
         assert 200 == resp.status_code
 
-        parent_folder.update(resp.json)
+        parent_folder.update(await resp.get_json())
 
-        resp = auth_client.get(self_href(parent_folder))
+        resp = await client.get(self_href(parent_folder))
         assert 200 == resp.status_code
 
-        resp = auth_client.delete(self_href(parent_folder), headers=if_match(parent_folder))
+        resp = await client.delete(self_href(parent_folder), headers=if_match(parent_folder))
         assert 204 == resp.status_code
 
         # deleting parent will delete children
-        resp = auth_client.get(folders_url)
+        resp = await client.get(folders_url)
         assert 200 == resp.status_code
-        assert 0 == len(resp.json["_items"]), "child folders should be deleted"
+        assert 0 == len((await resp.get_json())["_items"]), "child folders should be deleted"
 
         # deleting folders will delete topics
-        resp = auth_client.get(topics_url)
+        resp = await client.get(topics_url)
         assert 200 == resp.status_code
-        assert 0 == len(resp.json["_items"]), "topics in folders should be deleted"
+        assert 0 == len((await resp.get_json())["_items"]), "topics in folders should be deleted"
 
 
-def test_topic_folders_unique_validation(auth_client):
+async def test_topic_folders_unique_validation(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
     folder = {"name": "test", "section": "wire"}
 
     # create user topic
-    resp = auth_client.post(user_topic_folders_url, json=folder)
-    assert 201 == resp.status_code, resp.data.decode()
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second one fails
-    resp = auth_client.post(user_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, resp.data.decode()
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, await resp.get_data(as_text=True)
 
     # create company topic with same name
-    resp = auth_client.post(company_topic_folders_url, json=folder)
-    assert 201 == resp.status_code, resp.data.decode()
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second fails
-    resp = auth_client.post(company_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, resp.data.decode()
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, await resp.get_data(as_text=True)
 
     # check is case insensitive
     folder["name"] = "Test"
-    resp = auth_client.post(user_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, resp.data.decode()
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, await resp.get_data(as_text=True)
 
     # for both
-    resp = auth_client.post(company_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, resp.data.decode()
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, await resp.get_data(as_text=True)
 
 
-def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
+async def test_topic_subscriber_auto_enable_user_emails(app, client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
     user = get_resource_by_id("users", PUBLIC_USER_ID)
     topic = deepcopy(base_topic)
 
-    def disable_user_emails():
+    async def disable_user_emails():
         user["receive_email"] = False
-        resp = auth_client.post(f"/users/{PUBLIC_USER_ID}", data=user)
-        assert resp.status_code == 200, resp.get_data(as_text=True)
+        resp = await client.post(f"/users/{PUBLIC_USER_ID}", form=user)
+        assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # Make sure we start with user emails disabled
-    disable_user_emails()
+    await disable_user_emails()
     user = get_resource_by_id("users", PUBLIC_USER_ID)
     assert user["receive_email"] is False
 
@@ -342,9 +324,9 @@ def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
             "notification_type": "real-time",
         }
     ]
-    resp = auth_client.post(topics_url, json=topic)
-    assert resp.status_code == 201, resp.get_data(as_text=True)
-    topic_id = resp.get_json()["_id"]
+    resp = await client.post(topics_url, json=topic)
+    assert resp.status_code == 201, await resp.get_data(as_text=True)
+    topic_id = (await resp.get_json())["_id"]
     topic = get_resource_by_id("topics", topic_id)
 
     # Make sure user emails are enabled after creating the topic
@@ -352,14 +334,14 @@ def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
     assert user["receive_email"] is True
 
     # Disable the user emails again
-    disable_user_emails()
+    await disable_user_emails()
     user = get_resource_by_id("users", PUBLIC_USER_ID)
     assert user["receive_email"] is False
 
     # Update the topic, this time removing the user as a subscriber
     topic["subscribers"] = []
-    resp = auth_client.post(f"/topics/{topic_id}", json=topic)
-    assert resp.status_code == 200, resp.get_data(as_text=True)
+    resp = await client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # Make sure user emails are still disabled
     user = get_resource_by_id("users", PUBLIC_USER_ID)
@@ -372,15 +354,15 @@ def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
             "notification_type": "real-time",
         }
     ]
-    resp = auth_client.post(f"/topics/{topic_id}", json=topic)
-    assert resp.status_code == 200, resp.get_data(as_text=True)
+    resp = await client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # And make sure user emails are re-enabled again
     user = get_resource_by_id("users", PUBLIC_USER_ID)
     assert user["receive_email"] is True
 
 
-def test_remove_user_topics_on_user_delete(client, app):
+async def test_remove_user_topics_on_user_delete(client, app):
     app.data.insert(
         "topics",
         [
@@ -434,10 +416,10 @@ def test_remove_user_topics_on_user_delete(client, app):
     folders, _ = app.data.find("user_topic_folders", req=None, lookup=None)
     assert 2 == folders.count()
 
-    client.delete(f"/users/{PUBLIC_USER_ID}")
+    await client.delete(f"/users/{PUBLIC_USER_ID}")
 
     # make sure it's editable later
-    resp = client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
     assert 200 == resp.status_code
 
     topics, _ = app.data.find("topics", req=None, lookup=None)

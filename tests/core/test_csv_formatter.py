@@ -1,5 +1,5 @@
 from .test_push_events import test_event
-from flask import json
+from quart import json
 import copy
 from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import CSVFormatter
@@ -58,8 +58,8 @@ def read_csv(data):
     return header, data_fields
 
 
-def test_csv_formatter_item(client, app):
-    client.post("/push", data=json.dumps(event), content_type="application/json")
+async def test_csv_formatter_item(client, app):
+    await client.post("/push", json=event)
     parsed = get_entity_or_404(event["guid"], "agenda")
 
     assert formatter.format_filename(parsed).endswith("new-press-conference.csv")
@@ -139,7 +139,7 @@ def test_csv_formatter_item(client, app):
             }
         ],
     }
-    client.post("/push", data=json.dumps(event2), content_type="application/json")
+    await client.post("/push", json=event2)
     parsed = get_entity_or_404(event2["guid"], "agenda")
 
     assert formatter.format_filename(parsed).endswith("latest-press-conference.csv")

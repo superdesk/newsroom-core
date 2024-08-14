@@ -1,5 +1,5 @@
 from typing import Dict, List
-import flask
+import quart
 
 from datetime import datetime, timedelta
 from bson import ObjectId
@@ -92,7 +92,7 @@ def test_get_queue_entries_for_section():
     ]
 
 
-def test_get_latest_item_from_topic_queue(app):
+async def test_get_latest_item_from_topic_queue(app):
     user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
     topic_id = app.data.insert(
         "topics",
@@ -133,7 +133,7 @@ def test_get_latest_item_from_topic_queue(app):
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["slugline"][0]
 
 
-def test_get_topic_entries_and_match_table(app):
+async def test_get_topic_entries_and_match_table(app):
     user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
     topic_ids: List[ObjectId] = app.data.insert(
         "topics",
@@ -187,7 +187,7 @@ def test_get_topic_entries_and_match_table(app):
     assert topic_match_table["wire"][1] == ("Onions", 1)
 
 
-def test_is_scheduled_to_run_for_user():
+async def test_is_scheduled_to_run_for_user():
     command = SendScheduledNotificationEmails()
     timezone = "Australia/Sydney"
 
@@ -224,7 +224,7 @@ def test_is_scheduled_to_run_for_user():
         assert command._is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
 
 
-def test_scheduled_notification_topic_matches_template():
+async def test_scheduled_notification_topic_matches_template():
     template = "scheduled_notification_topic_matches_email.txt"
 
     kwargs = {
@@ -264,7 +264,7 @@ def test_scheduled_notification_topic_matches_template():
         },
     }
 
-    output = flask.render_template(template, **kwargs)
+    output = await quart.render_template(template, **kwargs)
     assert output
     assert "Test Event" in output
     assert "Test Article" in output
