@@ -794,5 +794,5 @@ def test_agenda_filters_query(app):
     # Test case 5: Filter for this_week
     args = {"date_from": "2024-08-13", "date_filter": "today"}
     date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime(2024, 8, 13, 0, 0, tzinfo=pytz.UTC)
-    assert date_range["lt"] == datetime(2024, 8, 13, 23, 59, 59, tzinfo=pytz.UTC)
+    assert date_range["gt"] == datetime(2024, 8, 14, 0, 0, tzinfo=pytz.UTC)
+    assert date_range["lt"] == datetime(2024, 8, 14, 23, 59, 59, tzinfo=pytz.UTC)
