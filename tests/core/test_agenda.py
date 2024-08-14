@@ -21,7 +21,7 @@ from tests.utils import (
     get_admin_user_id,
     mock_send_email,
 )
-from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID, agenda_items
+from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
 from .utils import add_company_products
 
 from copy import deepcopy
