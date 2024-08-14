@@ -21,7 +21,7 @@ from tests.utils import (
     get_admin_user_id,
     mock_send_email,
 )
-from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
+from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID, agenda_items
 from .utils import add_company_products
 
 from copy import deepcopy
@@ -796,3 +796,123 @@ def test_agenda_filters_query(app):
     date_range = get_date_filters(args)
     assert date_range["gt"] == datetime(2024, 8, 14, 0, 0, tzinfo=pytz.UTC)
     assert date_range["lt"] == datetime(2024, 8, 14, 23, 59, 59, tzinfo=pytz.UTC)
+
+
+def test_agenda_filters_items(client, app):
+    app.config.update(
+        {
+            "AGENDA_TIME_FILTERS": [
+                {"name": "Next 7 days", "filter": "next_7_days", "query": "now+7d/d"},
+                {"name": "Next 30 days", "filter": "next_30_days", "query": "now+30d/d"},
+                {"name": "Next 12 months", "filter": "next_12_months", "query": "now+12M/d", "default": True},
+                {"name": "Last 7 days", "filter": "last_7_days", "query": "now-7d/d"},
+                {"name": "Today", "query": "now/d", "filter": "today"},
+            ]
+        }
+    )
+    app.data.remove("agenda")
+    agenda_items = [
+        {
+            "_id": "foo_one",
+            "guid": "foo_one",
+            "dates": {
+                "end": datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC),
+                "start": datetime(2023, 8, 12, 0, 0, tzinfo=pytz.UTC),
+                "all_day": True,
+            },
+        },
+        {
+            "_id": "foo_two",
+            "guid": "foo_two",
+            "dates": {
+                "end": datetime(2024, 8, 19, 23, 59, 59, tzinfo=pytz.UTC),
+                "start": datetime(2024, 8, 13, 0, 0, tzinfo=pytz.UTC),
+                "all_day": False,
+            },
+        },
+        {
+            "_id": "foo_three",
+            "guid": "foo_three",
+            "dates": {
+                "end": datetime(2024, 8, 26, 0, 0, tzinfo=pytz.UTC),
+                "start": datetime(2024, 8, 20, 0, 0, tzinfo=pytz.UTC),
+                "all_day": True,
+            },
+        },
+        {
+            "_id": "foo_four",
+            "guid": "foo_four",
+            "dates": {
+                "end": datetime(2024, 9, 12, 0, 0, tzinfo=pytz.UTC),
+                "start": datetime(2024, 9, 5, 0, 0, tzinfo=pytz.UTC),
+                "all_day": True,
+            },
+        },
+        {
+            "_id": "foo_five",
+            "guid": "foo_five",
+            "dates": {
+                "end": datetime(2024, 10, 12, 23, 59, 59, tzinfo=pytz.UTC),
+                "start": datetime(2024, 9, 13, 0, 0, tzinfo=pytz.UTC),
+                "all_day": False,
+            },
+        },
+        {
+            "_id": "foo_six",
+            "guid": "foo_six",
+            "dates": {
+                "end": datetime(2024, 8, 9, 0, 0, tzinfo=pytz.UTC),
+                "start": datetime(2023, 8, 7, 0, 0, tzinfo=pytz.UTC),
+                "all_day": True,
+            },
+        },
+        {
+            "_id": "foo_seven",
+            "guid": "foo_seven",
+            "dates": {
+                "end": datetime(2025, 8, 9, 0, 0, tzinfo=pytz.UTC),
+                "start": datetime(2025, 8, 7, 0, 0, tzinfo=pytz.UTC),
+                "all_day": True,
+            },
+        },
+    ]
+
+    app.data.insert("agenda", agenda_items)
+
+    # Scenario 1: Default query with only date_from
+    data = get_json(client, "/agenda/search?date_from=2024-08-11")
+    assert set([item["_id"] for item in data["_items"]]) == {
+        "foo_one",
+        "foo_two",
+        "foo_three",
+        "foo_four",
+        "foo_five",
+        "foo_seven",
+    }
+
+    # Scenario 2: Query with next_7_days filter
+    data = get_json(client, "/agenda/search?date_from=2024-08-11&date_filter=next_7_days")
+    assert set([item["_id"] for item in data["_items"]]) == {"foo_one", "foo_two"}
+
+    # Scenario 3: Query with next_30_days filter
+    data = get_json(client, "/agenda/search?date_from=2024-08-11&date_filter=next_30_days")
+    assert set([item["_id"] for item in data["_items"]]) == {"foo_one", "foo_two", "foo_three", "foo_four"}
+
+    # Scenario 4: Query with last_7_days filter
+    data = get_json(client, "/agenda/search?date_from=2024-08-11&date_filter=last_7_days")
+    assert set([item["_id"] for item in data["_items"]]) == {"foo_one", "foo_six"}
+
+    # Scenario 5: Query with next_12_months filter
+    data = get_json(client, "/agenda/search?date_from=2024-08-11&date_filter=next_12_months")
+    assert set([item["_id"] for item in data["_items"]]) == {
+        "foo_one",
+        "foo_two",
+        "foo_three",
+        "foo_four",
+        "foo_five",
+        "foo_seven",
+    }
+
+    # Scenario 6: Query with today filter
+    data = get_json(client, "/agenda/search?date_from=2024-08-11&date_filter=today")
+    assert set([item["_id"] for item in data["_items"]]) == {"foo_two"}

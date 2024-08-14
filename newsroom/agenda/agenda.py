@@ -386,91 +386,131 @@ def _set_event_date_range(search):
 
     should = []
 
+    # Scenario 1: Default query with only date_from
     if date_from and not date_to:
-        # Filter from a particular date onwards
-        should = gen_date_range_filter("dates.end", "gte", search.args.get("date_from"), date_from)
+        should.extend(
+            [
+                # Events that start after or on date_from
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_from}}},
+                            {"range": {"dates.end": {"gte": date_from}}},
+                        ],
+                        "must_not": {"term": {"dates.all_day": True}},
+                    }
+                },
+                # All-day events starting or ending after date_from
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_from}}},
+                            {"range": {"dates.end": {"gte": date_from}}},
+                        ],
+                        "filter": {"term": {"dates.all_day": True}},
+                    }
+                },
+            ]
+        )
+
+    # Scenario 2 and 3: Query with specific filters
     elif not date_from and date_to:
-        # Filter up to a particular date
-        should = gen_date_range_filter("dates.end", "lte", search.args.get("date_to"), date_to)
+        # Apply date range filters for next_7_days, next_30_days, etc.
+        should.extend(
+            [
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_range["gt"], "lte": date_range["lt"]}}},
+                        ],
+                        "must_not": {"term": {"dates.all_day": True}},
+                    }
+                },
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_range["gt"], "lte": date_range["lt"]}}},
+                        ],
+                        "filter": {"term": {"dates.all_day": True}},
+                    }
+                },
+            ]
+        )
+
     elif date_from and date_to:
-        # Filter based on the date range provided
-        should = [
-            {
-                # Both start/end dates are inside the range
-                "bool": {
-                    "filter": [
-                        {"range": {"dates.start": {"gte": date_from}}},
-                        {"range": {"dates.end": {"lte": date_to}}},
-                    ],
-                    "must_not": {"term": {"dates.all_day": True}},
+        # Filter based on both date_from and date_to
+        should.extend(
+            [
+                # Events that start and end within the range
+                {
+                    "bool": {
+                        "filter": [
+                            {"range": {"dates.start": {"gte": date_from}}},
+                            {"range": {"dates.end": {"lte": date_to}}},
+                        ],
+                        "must_not": {"term": {"dates.all_day": True}},
+                    }
                 },
-            },
-            {
-                # Both start/end dates are inside the range, all day version
-                "bool": {
-                    "filter": [
-                        {"range": {"dates.start": {"gte": search.args.get("date_from")}}},
-                        {"range": {"dates.end": {"lte": search.args.get("date_to")}}},
-                        {"term": {"dates.all_day": True}},
-                    ],
+                # All-day events that are contained within the range
+                {
+                    "bool": {
+                        "filter": [
+                            {"range": {"dates.start": {"gte": date_from}}},
+                            {"range": {"dates.end": {"lte": date_to}}},
+                            {"term": {"dates.all_day": True}},
+                        ]
+                    }
                 },
-            },
-            {
-                # Starts before date_from and finishes after date_to
-                "bool": {
-                    "filter": [
-                        {"range": {"dates.start": {"lt": date_from}}},
-                        {"range": {"dates.end": {"gt": date_to}}},
-                    ],
-                    "must_not": {"term": {"dates.all_day": True}},
+                # Events starting before date_from and ending after date_to
+                {
+                    "bool": {
+                        "filter": [
+                            {"range": {"dates.start": {"lt": date_from}}},
+                            {"range": {"dates.end": {"gt": date_to}}},
+                        ],
+                        "must_not": {"term": {"dates.all_day": True}},
+                    }
                 },
-            },
-            {
-                # Starts before date_from and finishes after date_to, all day version
-                "bool": {
-                    "filter": [
-                        {"range": {"dates.start": {"lt": search.args.get("date_from")}}},
-                        {"range": {"dates.end": {"gt": search.args.get("date_to")}}},
-                        {"term": {"dates.all_day": True}},
-                    ],
+                # All-day events starting before date_from and ending after date_to
+                {
+                    "bool": {
+                        "filter": [
+                            {"range": {"dates.start": {"lt": date_from}}},
+                            {"range": {"dates.end": {"gt": date_to}}},
+                            {"term": {"dates.all_day": True}},
+                        ]
+                    }
                 },
-            },
-            {
-                # Start date is within range OR End date is within range
-                "bool": {
-                    "should": [
-                        {"range": {"dates.start": {"gte": date_from, "lte": date_to}}},
-                        {"range": {"dates.end": {"gte": date_from, "lte": date_to}}},
-                    ],
-                    "must_not": {"term": {"dates.all_day": True}},
-                    "minimum_should_match": 1,
+                # Events that start or end within the range
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_from, "lte": date_to}}},
+                            {"range": {"dates.end": {"gte": date_from, "lte": date_to}}},
+                        ],
+                        "must_not": {"term": {"dates.all_day": True}},
+                        "minimum_should_match": 1,
+                    }
                 },
-            },
-            {
-                # Start date is within range OR End date is within range, all day version
-                "bool": {
-                    "should": [
-                        {
-                            "range": {
-                                "dates.start": {"gte": search.args.get("date_from"), "lte": search.args.get("date_to")}
-                            }
-                        },
-                        {
-                            "range": {
-                                "dates.end": {"gte": search.args.get("date_from"), "lte": search.args.get("date_to")}
-                            }
-                        },
-                    ],
-                    "filter": {"term": {"dates.all_day": True}},
-                    "minimum_should_match": 1,
+                # All-day events that start or end within the range
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"dates.start": {"gte": date_from, "lte": date_to}}},
+                            {"range": {"dates.end": {"gte": date_from, "lte": date_to}}},
+                        ],
+                        "filter": {"term": {"dates.all_day": True}},
+                        "minimum_should_match": 1,
+                    }
                 },
-            },
-        ]
+            ]
+        )
 
-    # Get events for extra dates for coverages and planning.
-    should.append({"range": {"display_dates.date": date_range}})
+    # Add filter for display dates based on the date range
+    if date_range:
+        should.append({"range": {"display_dates.date": date_range}})
 
-    if len(should):
+    if should:
         search.query["bool"]["filter"].append({"bool": {"should": should, "minimum_should_match": 1}})
 
 
