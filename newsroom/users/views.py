@@ -1,14 +1,18 @@
 import re
 import json
 from copy import deepcopy
+from typing import Dict, List, Optional
+from pydantic import BaseModel, field_validator
 
 from bson import ObjectId
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import jsonify, render_template, request, abort, session
+from newsroom.users.service import UsersService
 from superdesk import get_resource_service
+from superdesk.core.web import Request, Response
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import jsonify, request, abort, session
 
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email, get_company
@@ -25,7 +29,6 @@ from newsroom.auth.utils import (
 from newsroom.settings import get_setting
 from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
-    get_user_company_name,
     get_company_sections_monitoring_data,
 )
 from newsroom.notifications.notifications import get_notifications_with_items
@@ -41,6 +44,7 @@ from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabu
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
+from .module import users_endpoints
 from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user
 
 
@@ -89,49 +93,75 @@ async def get_view_data():
     return view_data
 
 
-@blueprint.route("/myprofile", methods=["GET"])
-@login_required
-async def user_profile():
-    data = await get_view_data()
-    return render_template("user_profile.html", data=data)
+class WhereParam(BaseModel):
+    company: Optional[str] = None
+    products_id: Optional[str] = None
+
+    @field_validator("company", "products_id", mode="after")
+    def convert_to_objectid(cls, value):
+        if value is not None:
+            return ObjectId(value)
+        return value
 
 
-@blueprint.route("/users/search", methods=["GET"])
+class ObjectIdListModel(BaseModel):
+    ids: Optional[str] = None
+
+    @field_validator("ids", mode="after")
+    def split_and_convert_ids(cls, value):
+        if isinstance(value, str):
+            return [ObjectId(id_str) for id_str in value.split(",")]
+        return value
+
+
+class SearchArgs(ObjectIdListModel):
+    q: Optional[str] = None
+    sort: Optional[str] = None
+    where: Optional[WhereParam] = None
+
+    @field_validator("where", mode="before")
+    def parse_where(cls, value):
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+
+@users_endpoints.endpoint("/users/search", methods=["GET"])
 @account_manager_or_company_admin_only
-def search():
+async def search(args: None, params: SearchArgs, request: Request) -> Response:
     lookup = {}
     sort = None
-    if request.args.get("q"):
-        regex = re.compile(re.escape(request.args.get("q")), re.IGNORECASE)
+
+    if params.q:
+        regex = re.compile(re.escape(params.q), re.IGNORECASE)
         lookup = {"$or": [{"first_name": regex}, {"last_name": regex}, {"email": regex}]}
 
-    if request.args.get("ids"):
-        lookup = {"_id": {"$in": (request.args.get("ids") or "").split(",")}}
+    if params.ids:
+        lookup = {"_id": {"$in": params.ids}}
 
-    if request.args.get("sort"):
-        sort = request.args.get("sort")
+    if params.sort:
+        sort = params.sort
 
-    where_param = request.args.get("where")
+    where_param = params.where
+
     if where_param:
-        try:
-            where = json.loads(where_param)
-            if where.get("company"):
-                lookup["company"] = where["company"]
-            if where.get("products._id"):
-                lookup["products._id"] = where["products._id"]
-        except json.JSONDecodeError as e:
-            return jsonify({"error": "Invalid 'where' parameter. JSON decoding failed: {}".format(str(e))}), 400
-    if is_current_user_company_admin():
-        # Make sure this request only searches for the current users company
-        company = get_company()
+        if where_param.company:
+            lookup["company"] = where_param.company
+        if where_param.products_id:
+            lookup["products._id"] = where_param.products_id
 
+    # Make sure this request only searches for the current users company
+    if is_current_user_company_admin():
+        company = get_company_from_user_or_session()
         if company is None:
-            abort(401)
+            request.abort(401)
 
         lookup["company"] = company["_id"]
 
-    users = list(query_resource("users", lookup=lookup, sort=sort))
-    return jsonify(users), 200
+    cursor = await UsersService().search(lookup)
+    users = await cursor.to_list_raw()
+
+    return Response(users, 200, ())
 
 
 @blueprint.route("/users/new", methods=["POST"])

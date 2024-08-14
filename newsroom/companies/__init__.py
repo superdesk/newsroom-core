@@ -30,13 +30,6 @@ async def get_company_sections_monitoring_data(company: CompanyResource, user: U
     return data
 
 
-def get_user_company_name(user) -> str:
-    company = get_company(user)
-    if company:
-        return company.get("name", "")
-    return ""
-
-
 def load_countries_list():
     with open(get_filepath("vocabularies.json")) as f:
         data = json.load(f)
@@ -52,7 +45,6 @@ def load_countries_list():
 
 def init_app(app):
     superdesk.register_resource("companies", CompaniesResource, CompaniesService, _app=app)
-    app.add_template_global(get_user_company_name)
     app.settings_app(
         "companies",
         lazy_gettext("Company Management"),
