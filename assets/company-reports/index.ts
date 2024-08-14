@@ -3,6 +3,7 @@ import companyReportReducer from './reducers';
 import {initData} from './actions';
 import CompanyReportsApp from './components/CompanyReportsApp';
 import {render} from 'render-utils';
+import 'user-profile';
 
 const store = createStore(companyReportReducer, 'CompanyReports');
 
