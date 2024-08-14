@@ -1,33 +1,29 @@
-import React, {useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {gettext} from 'utils';
 
 import NavGroup from './NavGroup';
-import {isEmpty} from 'lodash';
 
-function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters}: any) {
-    const [showCustomRange, setShowCustomRange] = useState(createdFilter.date_filter === 'custom_date');
+import {IDateFilter} from 'interfaces/common';
+import {ICreatedFilter} from 'interfaces/search';
 
-    useEffect(() => {
-        setShowCustomRange(createdFilter.date_filter === 'custom_date');
-        if (isEmpty(createdFilter) && context === 'wire'){
-            const defaultFilter = dateFilters.find((filter: {default: any}) => filter.default);
-            setCreatedFilter({...createdFilter, date_filter: defaultFilter?.filter});
-        }
-    }, [createdFilter.date_filter]);
+interface IProps {
+    context: 'wire' | 'agenda';
+    createdFilter: ICreatedFilter;
+    setCreatedFilter: (createdFilter: ICreatedFilter) => void;
+    dateFilters: IDateFilter[];
+}
 
-    const onDateFilterChange = (event: {target: {value: any}}) => {
+function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters}: IProps) {
+    const showCustomRange = createdFilter.date_filter === 'custom_date';
+    const getFilterValue = (filter: IDateFilter) => filter.filter;
+
+    const onDateFilterChange = (event: {target: {value: string}}) => {
         const value = event.target.value;
+
         if (value === 'custom_date') {
-            setShowCustomRange(true);
             setCreatedFilter({...createdFilter, date_filter: value, from: '', to: ''});
         } else {
-            setShowCustomRange(false);
-            if (context === 'agenda') {
-                setCreatedFilter({...createdFilter, date_filter: value, from: value, to: null});
-            } else {
-                setCreatedFilter({...createdFilter, date_filter: value, from: null, to: null});
-            }
+            setCreatedFilter({...createdFilter, date_filter: value, from: undefined, to: undefined});
         }
     };
 
@@ -46,15 +42,9 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters
                     onChange={onDateFilterChange}
                     data-test-id="date-filter-select"
                 >
-                    {context === 'agenda' ? (
-                        dateFilters.map((filter: {query: string, name: string}) => (
-                            <option key={filter.query} value={filter.query}>
-                                {filter.name}
-                            </option>
-                        ))
-                    ) : (
-                        dateFilters.map((filter: {filter: string, name: string}) => (
-                            <option key={filter.filter} value={filter.filter}>
+                    {(
+                        dateFilters.map((filter) => (
+                            <option key={getFilterValue(filter)} value={filter.default ? '' : getFilterValue(filter)}>
                                 {filter.name}
                             </option>
                         ))
@@ -93,12 +83,5 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters
         </NavGroup>
     );
 }
-
-NavCreatedPicker.propTypes = {
-    createdFilter: PropTypes.object.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
-    context: PropTypes.string,
-    dateFilters: PropTypes.array,
-};
 
 export default NavCreatedPicker;

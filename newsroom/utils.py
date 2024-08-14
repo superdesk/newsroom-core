@@ -536,6 +536,14 @@ def get_end_date(date_range, start_date):
         return start_date + relativedelta(months=+1) - timedelta(days=1)
     if date_range in ("now-24h/h", "now-7d/d", "now-30d/d"):
         start_date
+    if date_range == "now+7d/d":
+        return start_date + timedelta(days=7)
+    if date_range == "now+30d/d":
+        return start_date + timedelta(days=30)
+    if date_range == "now+3M/d":
+        return start_date + timedelta(days=90)
+    if date_range == "now+12M/d":
+        return start_date + timedelta(days=365)
     return start_date
 
 

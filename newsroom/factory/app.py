@@ -17,6 +17,7 @@ import sentry_sdk
 
 from flask_mail import Mail
 from flask_caching import Cache
+from eve.io.mongo import ensure_mongo_indexes
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder
@@ -43,6 +44,11 @@ class BaseNewsroomApp(eve.Eve):
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
+
+    def __getattr__(self, name):
+        if name.startswith("on_"):
+            return super(BaseNewsroomApp, self).__getattr__(name)
+        raise AttributeError("type object '%s' has no attribute '%s'" % (self.__class__.__name__, name))
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -269,3 +275,7 @@ class BaseNewsroomApp(eve.Eve):
             if "localhost" in self.config["CLIENT_URL"] or self.debug:
                 return "testing"
         return "production"
+
+    def init_indexes(self):
+        for resource in self.config["DOMAIN"]:
+            ensure_mongo_indexes(self, resource)

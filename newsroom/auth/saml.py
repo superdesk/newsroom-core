@@ -87,6 +87,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         company = superdesk.get_resource_service("companies").find_one(req=None, auth_domains=domain)
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
@@ -95,6 +97,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         )
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # last option is global env variable
     if app.config.get("SAML_COMPANY") and not userdata.get("company"):

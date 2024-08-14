@@ -27,12 +27,11 @@ RUN python3 -m pip install -U pip wheel setuptools
 
 # install requirements
 WORKDIR /opt/newsroom/
-COPY requirements.txt .
-RUN python3 -m pip install -Ur requirements.txt
+COPY requirements.txt setup.py /opt/newsroom/
+RUN python3 -m pip install -Ue .
 
-# install newsroom app
+# copy app
 COPY . .
-RUN python3 -m pip install -e .
 
 # setup entrypoint
 WORKDIR /opt/newsroom/e2e/server/
