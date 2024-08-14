@@ -7,7 +7,7 @@ export function render<T = any>(store: any, App: any, element?: any, props?: T) 
     return _render(
         <StrictMode>
             <Provider store={store}>
-                    <App {...props}/>
+                <App {...props}/>
             </Provider>
         </StrictMode>
         ,
