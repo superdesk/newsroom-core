@@ -39,9 +39,10 @@ CORE_APPS = [
 
 # TODO-ASYNC: commenting this out for now as it breaks with
 # ValueError: The name 'assets' is already registered for a different blueprint
-MODULES = [
-    "newsroom.assets.module" "newsroom.companies",
-]
+# MODULES = [
+#     "newsroom.assets.module",
+#     "newsroom.companies",
+# ]
 
 INSTALLED_APPS = []
 
