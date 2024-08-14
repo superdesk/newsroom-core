@@ -194,19 +194,21 @@ export function setView(view: any) {
  * @param {Object} searchParams
  */
 export function saveMyTopic(searchParams: any) {
-    const type = get(searchParams, 'topic_type') || 'wire';
+    return (dispatch: any) => {
+        const type = get(searchParams, 'topic_type') || 'wire';
 
-    const menu = type === 'agenda' ?
-        'events' :
-        'topics';
+        const menu = type === 'agenda' ?
+            'events' :
+            'topics';
 
-    if (!get(searchParams, 'label')) {
-        searchParams.label = get(searchParams, 'query.length', 0) > 0 ?
-            searchParams.query :
-            '';
-    }
+        if (!get(searchParams, 'label')) {
+            searchParams.label = get(searchParams, 'query.length', 0) > 0 ?
+                searchParams.query :
+                '';
+        }
 
-    createOrUpdateTopic(menu, searchParams, true);
+        createOrUpdateTopic(menu, searchParams, true);
+    };
 }
 
 export function followStory(item: any, type: any) {
