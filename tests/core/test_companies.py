@@ -19,7 +19,7 @@ async def test_delete_company_deletes_company_and_users(client):
             "name": "Press 2 Co.",
             "is_enabled": True,
             "contact_name": "Tom",
-        }
+        },
     )
 
     assert response.status_code == 201
@@ -60,17 +60,14 @@ async def test_company_name_is_unique(client):
             "name": "Press 2 Co.",
             "is_enabled": True,
             "contact_name": "Tom",
-        }
+        },
     )
 
     assert response.status_code == 201
     company_id = json.loads(await response.get_data()).get("_id")
     assert company_id
 
-    duplicate_response = await client.post(
-        "/companies/new",
-        json={"name": "PRESS 2 Co."}
-    )
+    duplicate_response = await client.post("/companies/new", json={"name": "PRESS 2 Co."})
 
     assert duplicate_response.status_code == 400
     assert json.loads(await duplicate_response.get_data()).get("name") == "Value must be unique"
@@ -135,7 +132,7 @@ async def test_save_company_permissions(client, app):
             "archive_access": True,
             "sections": {"wire": True},
             "products": [{"_id": sports_id, "section": "wire"}],
-        }
+        },
     )
 
     updated = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)

@@ -18,7 +18,7 @@ from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
 from newsroom.auth import get_company
-from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
+from newsroom.gettext import get_session_timezone
 from enum import Enum
 
 from newsroom.types import User
@@ -127,7 +127,6 @@ async def format_event_datetime(item: dict) -> str:
     tz = date_info.get("tz", await get_session_timezone())
     # Set the session timezone
     with template_locale(timezone=tz):
-
         start = parse_date(date_info.get("start"))
         end = parse_date(date_info.get("end")) if date_info.get("end") else None
         all_day = date_info.get("all_day")

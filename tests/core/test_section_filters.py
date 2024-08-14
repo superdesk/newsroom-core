@@ -43,7 +43,7 @@ async def test_return_search_for_filters(client):
             "description": "Breaking news",
             "is_enabled": True,
             "sd_product_id": "123",
-        }
+        },
     )
 
     response = await client.get("/section_filters/search?q=br")
@@ -57,7 +57,7 @@ async def test_create_fails_in_validation(client):
         json={
             "description": "Breaking news",
             "is_enabled": True,
-        }
+        },
     )
 
     assert response.status_code == 400
@@ -74,7 +74,7 @@ async def test_update_filters(client):
             "description": "foo",
             "is_enabled": True,
             "sd_product_id": "123",
-        }
+        },
     )
 
     assert 200 == resp.status_code
@@ -94,7 +94,7 @@ async def test_delete_product(client):
             "parents": "59b4c5c61d41c8d736852fbf",
             "is_enabled": True,
             "query": "bar",
-        }
+        },
     )
 
     resp = await client.delete("/section_filters/59b4c5c61d41c8d736852fbf")

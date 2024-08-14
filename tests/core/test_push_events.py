@@ -822,7 +822,7 @@ async def test_push_event_with_files(client, app):
     resp = await client.post(
         "/push_binary",
         form=dict(media_id=media_id),
-        files=dict(media=FileStorage(io.BytesIO(b"foo"), filename=media_id, content_type="text/plain"))
+        files=dict(media=FileStorage(io.BytesIO(b"foo"), filename=media_id, content_type="text/plain")),
     )
     assert resp.status_code == 201
 

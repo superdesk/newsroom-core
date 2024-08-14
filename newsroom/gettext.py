@@ -1,5 +1,5 @@
 from babel import core
-from quart_babel import Babel, format_datetime, get_domain, get_locale
+from quart_babel import Babel, format_datetime, get_domain
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, session

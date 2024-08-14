@@ -93,7 +93,7 @@ async def test_push_binary(client):
     resp = await client.post(
         "/push_binary",
         form=dict(media_id=media_id),
-        files={"media": FileStorage(io.BytesIO(b"binary"), filename=media_id)}
+        files={"media": FileStorage(io.BytesIO(b"binary"), filename=media_id)},
     )
     assert 201 == resp.status_code
 
@@ -113,9 +113,7 @@ async def upload_binary(fixture, client, media_id=None):
         media_id = str(bson.ObjectId())
     with open(get_fixture_path(fixture), mode="rb") as pic:
         resp = await client.post(
-            "/push_binary",
-            form=dict(media_id=media_id),
-            files=dict(media=FileStorage(pic, filename="picture.jpg"))
+            "/push_binary", form=dict(media_id=media_id), files=dict(media=FileStorage(pic, filename="picture.jpg"))
         )
 
         assert 201 == resp.status_code, await resp.get_data(as_text=True)
@@ -168,7 +166,6 @@ async def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
-@pytest.mark.skip(reason="Fix once other views are moved to async")
 async def test_push_update_removes_featuremedia(client):
     media_id = str(bson.ObjectId())
     await upload_binary("picture.jpg", client, media_id=media_id)
@@ -268,7 +265,7 @@ async def test_push_binary_invalid_signature(client, app):
     resp = await client.post(
         "/push_binary",
         form=dict(media_id=str(bson.ObjectId())),
-        files={"media": FileStorage(io.BytesIO(b"foo"), filename="foo")}
+        files={"media": FileStorage(io.BytesIO(b"foo"), filename="foo")},
     )
     assert 403 == resp.status_code
 
@@ -332,9 +329,7 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
-    data = {
-        "guid": "syd_weather_1", "type": "text", "headline": "today", "body_html": "This is the weather for sydney"
-    }
+    data = {"guid": "syd_weather_1", "type": "text", "headline": "today", "body_html": "This is the weather for sydney"}
     headers = get_signature_headers(json.dumps(data), key)
     resp = await client.post("/push", json=data, headers=headers)
     assert 200 == resp.status_code
@@ -673,7 +668,7 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
     with app.mail.record_messages() as outbox:
         key = b"something random"
         app.config["PUSH_KEY"] = key
-        data ={
+        data = {
             "guid": "foo",
             "type": "text",
             "headline": "this is a test",
@@ -730,7 +725,7 @@ async def test_send_notification_emails(client, app):
     with app.mail.record_messages() as outbox:
         key = b"something random"
         app.config["PUSH_KEY"] = key
-        data ={
+        data = {
             "guid": "foo",
             "type": "text",
             "headline": "this is a test headline",

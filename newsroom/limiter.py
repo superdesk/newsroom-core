@@ -1,6 +1,11 @@
 from quart_rate_limiter import RateLimiter, rate_limit
 from superdesk.flask import request
 
+__all__ = [
+    "rate_limit",
+    "limiter"
+]
+
 
 async def get_remote_address():
     # Copied from flask_limiter.util.get_remote_address

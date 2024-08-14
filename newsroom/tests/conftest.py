@@ -19,13 +19,14 @@ from newsroom.limiter import limiter
 root = (Path(__file__).parent / "..").resolve()
 
 
-class Task311(asyncio.tasks._PyTask):
+class Task311(asyncio.tasks.Task):
     """
     This is backport of Task from CPython 3.11
     It's needed to allow context passing
     """
+
     def __init__(self, coro, *, loop=None, name=None, context=None):
-        super(asyncio.tasks._PyTask, self).__init__(loop=loop)
+        super(asyncio.tasks.Task, self).__init__(loop=loop)
         if self._source_traceback:
             del self._source_traceback[-1]
         if not asyncio.coroutines.iscoroutine(coro):
@@ -35,7 +36,7 @@ class Task311(asyncio.tasks._PyTask):
             raise TypeError(f"a coroutine was expected, got {coro!r}")
 
         if name is None:
-            self._name = f'Task-{asyncio.tasks._task_name_counter()}'
+            self._name = f"Task-{asyncio.tasks._task_name_counter()}"
         else:
             self._name = str(name)
 
@@ -56,8 +57,8 @@ def task_factory(loop, coro, context=None):
     stack = traceback.extract_stack()
     for frame in stack[-2::-1]:
         package_name = Path(frame.filename).parts[-2]
-        if package_name != 'asyncio':
-            if package_name == 'pytest_asyncio':
+        if package_name != "asyncio":
+            if package_name == "pytest_asyncio":
                 # This function was called from pytest_asyncio, use shared context
                 break
             else:
@@ -154,11 +155,11 @@ async def app(request):
 
     # Clean up blueprints, so they can be re-registered
     import importlib
+
     for name in app.config["BLUEPRINTS"]:
         mod = importlib.import_module(name)
         if getattr(mod, "blueprint"):
             mod.blueprint._got_registered_once = False
-
 
 
 @fixture

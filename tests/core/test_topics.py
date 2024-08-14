@@ -1,6 +1,5 @@
 from quart import json
 from unittest import mock
-from pytest import fixture
 from copy import deepcopy
 
 from newsroom.topics.views import get_topic_url

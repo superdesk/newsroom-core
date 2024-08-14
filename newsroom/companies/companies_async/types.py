@@ -42,10 +42,7 @@ class CompanyResource(NewshubResourceModel):
     products: Optional[list[CompanyProduct]] = None
 
     auth_domain: Optional[str] = None  # Deprecated
-    auth_domains: Annotated[
-        Optional[list[str]],
-        validate_iunique_value_async("companies", "auth_domains")
-    ] = None
+    auth_domains: Annotated[Optional[list[str]], validate_iunique_value_async("companies", "auth_domains")] = None
     auth_provider: Annotated[Optional[str], validate_auth_provider()] = None
     company_size: Optional[str] = None
     referred_by: Optional[str] = None

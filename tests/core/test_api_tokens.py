@@ -19,7 +19,7 @@ async def test_api_tokens_create_expired(client):
         json={
             "company": "5b504318975bd5227e5ea0b9",
             "expiry": "1999-08-22T04:23:06+0000",
-        }
+        },
     )
     data = json.loads(await response.get_data())
     assert "error" in data

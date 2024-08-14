@@ -35,7 +35,9 @@ async def test_to_json():
     assert '{"foo":"foo"}' == str(await quart.render_template_string("{{ obj | tojson }}", obj=dict(foo="foo")))
 
     assert "foo" == str(await quart.render_template_string("{{ foo | tojson }}", foo=lazy_gettext("foo")))
-    assert '{"foo":"foo"}' == str(await quart.render_template_string("{{ obj | tojson }}", obj=dict(foo=lazy_gettext("foo"))))
+    assert '{"foo":"foo"}' == str(
+        await quart.render_template_string("{{ obj | tojson }}", obj=dict(foo=lazy_gettext("foo")))
+    )
 
     assert str(object_id) == str(await quart.render_template_string("{{ _id | tojson }}", _id=object_id))
     assert '{"_id":"%s"}' % (str(object_id),) == str(
@@ -90,8 +92,9 @@ async def test_format_event_datetime():
             "_time_to_be_confirmed": True,
         },
     }
-    assert "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)" == await format_event_datetime(
-        event3
+    assert (
+        "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)"
+        == await format_event_datetime(event3)
     )
 
     # Case 4: Event with no end time

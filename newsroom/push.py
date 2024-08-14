@@ -296,9 +296,7 @@ def publish_event(event, orig):
         if updates:
             updated = orig.copy()
             updated.update(updates)
-            signals.publish_event.send(
-                app.as_any(), item=updated, updates=updates, orig=orig, is_new=False
-            )
+            signals.publish_event.send(app.as_any(), item=updated, updates=updates, orig=orig, is_new=False)
             service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
             superdesk.get_resource_service("agenda").notify_agenda_update(updates, orig)
@@ -839,7 +837,9 @@ async def notify_new_item(item, check_topics=True):
         logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
 
-async def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
+async def notify_user_matches(
+    item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription
+):
     """Send notification to users who have downloaded or bookmarked the provided item"""
 
     related_items = item.get("ancestors", [])

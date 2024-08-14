@@ -1,5 +1,4 @@
 from .test_push_events import test_event
-from quart import json
 import copy
 from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import CSVFormatter

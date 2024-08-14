@@ -16,7 +16,7 @@ from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.utils import mock_send_email, login, logout
+from tests.utils import mock_send_email, login
 
 
 async def test_user_list_fails_for_anonymous_user(app, public_user):
@@ -631,7 +631,9 @@ async def test_check_etag_when_updating_user(client):
     patch_data["sections"] = "wire,agenda"
     patch_data["first_name"] = "Foo"
 
-    response = await client.post(f"/users/{user_data['_id']}", form=patch_data, headers={"If-Match": "something random"})
+    response = await client.post(
+        f"/users/{user_data['_id']}", form=patch_data, headers={"If-Match": "something random"}
+    )
 
     assert response.status_code == 412
 

@@ -110,7 +110,7 @@ async def test_share_items(client, app):
                 "items": [item["_id"] for item in items],
                 "users": [str(user_ids[0])],
                 "message": "Some info message",
-            }
+            },
         )
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
@@ -147,18 +147,12 @@ async def test_bookmarks(client, app):
 
     assert 0 == await get_bookmarks_count(client, user_id)
 
-    resp = await client.post(
-        "/wire_bookmark",
-        json={"items": [items[0]["_id"]]}
-    )
+    resp = await client.post("/wire_bookmark", json={"items": [items[0]["_id"]]})
     assert resp.status_code == 200
 
     assert 1 == await get_bookmarks_count(client, user_id)
 
-    await client.delete(
-        "/wire_bookmark",
-        json={"items": [items[0]["_id"]]}
-    )
+    await client.delete("/wire_bookmark", json={"items": [items[0]["_id"]]})
     assert resp.status_code == 200
 
     assert 0 == await get_bookmarks_count(client, user_id)
@@ -184,18 +178,12 @@ async def test_bookmarks_by_section(client, app):
 
     assert 0 == await get_bookmarks_count(client, PUBLIC_USER_ID)
 
-    resp = await client.post(
-        "/wire_bookmark",
-        json={"items": [items[0]["_id"]]}
-    )
+    resp = await client.post("/wire_bookmark", json={"items": [items[0]["_id"]]})
     assert resp.status_code == 200
 
     assert 1 == await get_bookmarks_count(client, PUBLIC_USER_ID)
 
-    await client.delete(
-        "/wire_bookmark",
-        json={"items": [items[0]["_id"]]}
-    )
+    await client.delete("/wire_bookmark", json={"items": [items[0]["_id"]]})
     assert resp.status_code == 200
 
     assert 0 == await get_bookmarks_count(client, PUBLIC_USER_ID)
@@ -756,10 +744,7 @@ async def test_wire_delete(client, app):
         assert get_resource_service("items").find_one(req=None, _id=doc["_id"]) is not None
         assert get_resource_service("items_versions").find_one(req=None, _id_document=doc["_id"]) is not None
 
-    resp = await client.delete(
-        "/wire",
-        json={"items": [docs[0]["_id"]]}
-    )
+    resp = await client.delete("/wire", json={"items": [docs[0]["_id"]]})
     assert resp.status_code == 200
 
     for doc in docs:
@@ -996,6 +981,7 @@ async def test_date_filters_query(client, app):
     app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
 
     async with app.test_request_context("/"):
+
         def _set_search_query(user_id, args):
             server_session["user"] = user_id
             search = SearchQuery()

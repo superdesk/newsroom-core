@@ -12,6 +12,11 @@ from .companies_async import CompanyService as CompanyServiceAsync, CompanyResou
 
 from .module import module  # noqa
 
+__all__ = [
+    "CompanyServiceAsync",
+    "CompanyResource",
+]
+
 
 def get_company_sections_monitoring_data(company_id, user):
     """get the section configured for the company"""

@@ -71,7 +71,7 @@ class NewsroomWebpack(Webpack):
         try:
             with open(os.path.join(app.root_path, webpack_stats), "r") as stats_json:
                 self.assets = json.load(stats_json)
-        except IOError as e:
+        except IOError:
             if request:
                 raise RuntimeError(
                     "Flask-Webpack requires 'WEBPACK_MANIFEST_PATH' to be set and "

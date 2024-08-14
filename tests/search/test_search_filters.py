@@ -281,16 +281,16 @@ async def test_apply_request_filter__versioncreated(client, app):
     search = SearchQuery()
     search.args = {"created_from": "2020-03-27"}
     service.apply_request_filter(search)
-    assert {"range": {"versioncreated": {"gte": get_local_date("2020-03-27", "00:00:00", 0)}}} in search.query[
-        "bool"
-    ]["must"]
+    assert {"range": {"versioncreated": {"gte": get_local_date("2020-03-27", "00:00:00", 0)}}} in search.query["bool"][
+        "must"
+    ]
 
     search = SearchQuery()
     search.args = {"created_to": "2020-03-27"}
     service.apply_request_filter(search)
-    assert {"range": {"versioncreated": {"lte": get_local_date("2020-03-27", "23:59:59", 0)}}} in search.query[
-        "bool"
-    ]["must"]
+    assert {"range": {"versioncreated": {"lte": get_local_date("2020-03-27", "23:59:59", 0)}}} in search.query["bool"][
+        "must"
+    ]
 
     search = SearchQuery()
     search.args = {

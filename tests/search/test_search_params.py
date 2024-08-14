@@ -285,6 +285,4 @@ async def test_prefill_search_items(client, app):
     assert {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}} in search.query["bool"]["must_not"]
 
     search = get_search_instance(args={"ignore_latest": True})
-    assert {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}} not in search.query["bool"][
-        "must_not"
-    ]
+    assert {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}} not in search.query["bool"]["must_not"]

@@ -109,7 +109,7 @@ async def test_non_admin_actions_fail(client, app):
             "alert_type": "full_text",
             "query": "hgnhgnhg",
             "schedule": {"interval": "immediate"},
-        }
+        },
     )
     assert response.status_code == 403
 
@@ -160,7 +160,7 @@ async def test_post_monitoring(client):
             "alert_type": "full_text",
             "query": "hgnhgnhg",
             "schedule": {"interval": "immediate"},
-        }
+        },
     )
     assert response.status_code == 201
     response = await client.get("/monitoring/all")
@@ -189,7 +189,7 @@ async def test_always_send_override_for_immediate_monitoring(client):
             "query": "hgnhgnhg",
             "always_send": True,
             "schedule": {"interval": "immediate"},
-        }
+        },
     )
     assert response.status_code == 201
     response = await client.get("/monitoring/all")

@@ -162,18 +162,12 @@ async def test_bookmarks(client, app):
 
     assert 0 == await get_bookmarks_count(client, user_id)
 
-    resp = await client.post(
-        "/agenda_bookmark",
-        json={"items": ["urn:conference"]}
-    )
+    resp = await client.post("/agenda_bookmark", json={"items": ["urn:conference"]})
     assert resp.status_code == 200
 
     assert 1 == await get_bookmarks_count(client, user_id)
 
-    await client.delete(
-        "/agenda_bookmark",
-        json={"items": ["urn:conference"]}
-    )
+    await client.delete("/agenda_bookmark", json={"items": ["urn:conference"]})
     assert resp.status_code == 200
 
     assert 0 == await get_bookmarks_count(client, user_id)
@@ -214,7 +208,7 @@ async def test_share_items(client, app, mocker):
                 "items": ["urn:conference"],
                 "users": [str(user_ids[0])],
                 "message": "Some info message",
-            }
+            },
         )
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
@@ -310,7 +304,7 @@ async def test_coverage_request(client, app):
             json={
                 "item": "urn:conference",
                 "message": "Some info message",
-            }
+            },
         )
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
