@@ -15,7 +15,7 @@ class ProfileToggle extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        if (!isTouchDevice() && this.elem) {
+        if (!isTouchDevice() && this.elem && !this.tooltip) {
             this.tooltip = new Tooltip(this.elem);
         }
     }

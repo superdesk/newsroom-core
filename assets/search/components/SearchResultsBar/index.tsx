@@ -17,6 +17,7 @@ import {
     clearAdvancedSearchParams,
     resetFilter,
     deselectMyTopic,
+    saveMyTopic,
 } from '../../actions';
 
 import {Dropdown} from './../../../components/Dropdown';
@@ -301,6 +302,7 @@ const mapDispatchToProps = {
     clearAdvancedSearchParams,
     deselectMyTopic,
     resetFilter,
+    saveMyTopic,
 };
 
 export const SearchResultsBar = connect<

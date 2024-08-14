@@ -433,6 +433,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query: any) => dispatch(setQuery(query)),
     setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
+    saveMyTopic: (params: any) => dispatch(saveMyTopic(params)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
