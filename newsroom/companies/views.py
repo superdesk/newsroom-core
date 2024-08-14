@@ -3,7 +3,7 @@ import re
 
 from bson import ObjectId
 from datetime import datetime
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import NotFound, BadRequest
 from pydantic import BaseModel, ValidationError
 
@@ -110,7 +110,7 @@ def get_company_updates(data, original=None):
         "contact_email": data.get("contact_email") or original.get("contact_email"),
         "phone": data.get("phone") or original.get("phone"),
         "country": data.get("country") or original.get("country"),
-        "is_enabled": data.get("is_enabled", original.get("is_enabled")),
+        "is_enabled": data.get("is_enabled", original.get("is_enabled", True)),
         "company_type": data.get("company_type") or original.get("company_type"),
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
@@ -225,6 +225,6 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     # TODO-ASYNC: Convert to users async service
     users_service = get_resource_service("users")
     for user in users_service.get(req=None, lookup={"company": original.id, "is_approved": {"$ne": True}}):
-        users_service.approve_user(user)
+        await users_service.approve_user(user)
 
     return Response({"success": True}, 200, ())

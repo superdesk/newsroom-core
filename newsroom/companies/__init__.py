@@ -1,4 +1,4 @@
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 import superdesk
 from superdesk.core import json, get_current_app
@@ -8,6 +8,8 @@ from newsroom.auth import get_company
 from newsroom.user_roles import UserRole
 
 from .companies import CompaniesResource, CompaniesService
+from .companies_async import CompanyService as CompanyServiceAsync, CompanyResource
+
 from .module import module  # noqa
 
 
@@ -61,8 +63,7 @@ def init_app(app):
     )
 
     # Populate countries data based on superdesk-core vocabularies.json file.
-    with app.app_context():
-        app.countries = load_countries_list()
+    app.countries = load_countries_list()
 
 
 from . import views  # noqa

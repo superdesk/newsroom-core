@@ -11,21 +11,21 @@ from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.auth import get_company
 
 
-def send_coverage_notification_email(user, agenda, wire_item):
+async def send_coverage_notification_email(user, agenda, wire_item):
     if user.get("receive_email"):
         template_kwargs = dict(
             agenda=agenda,
             item=wire_item,
             section="agenda",
         )
-        send_user_email(
+        await send_user_email(
             user,
             template="agenda_new_coverage_email",
             template_kwargs=template_kwargs,
         )
 
 
-def send_agenda_notification_email(
+async def send_agenda_notification_email(
     user,
     agenda,
     message,
@@ -56,14 +56,14 @@ def send_agenda_notification_email(
             time_updated=time_updated,
             coverage_modified=coverage_modified,
         )
-        send_user_email(
+        await send_user_email(
             user,
             template="agenda_updated_email",
             template_kwargs=template_kwargs,
         )
 
 
-def send_coverage_request_email(user, message, item):
+async def send_coverage_request_email(user, message, item):
     """
     Forms and sends coverage request email
     :param user: User that makes the request
@@ -99,7 +99,7 @@ def send_coverage_request_email(user, message, item):
         item=item,
     )
 
-    send_template_email(
+    await send_template_email(
         to=recipients,
         template="coverage_request_email",
         template_kwargs=template_kwargs,

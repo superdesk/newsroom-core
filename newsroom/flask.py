@@ -1,4 +1,4 @@
-from flask import flash, send_from_directory
+from quart import flash, send_from_directory
 
 __all__ = [
     "flash",

@@ -1,6 +1,7 @@
 from copy import deepcopy
+import asyncio
+import logging
 
-from superdesk.core import json
 from superdesk.flask import Config
 from superdesk.tests.steps import get_prefixed_url
 from newsroom.tests.conftest import drop_mongo, reset_elastic, root
@@ -11,6 +12,7 @@ from newsroom.agenda.agenda import aggregations as agenda_aggs
 from tests.search.fixtures import USERS, COMPANIES
 
 
+logger = logging.getLogger(__name__)
 orig_agenda_aggs = deepcopy(agenda_aggs)
 
 
@@ -19,6 +21,16 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(before_scenario_async(context, scenario))
+    except Exception as e:
+        # Make sure exceptions raised are printed to the console
+        logger.exception(e)
+        raise e
+
+
+async def before_scenario_async(context, scenario):
     if "skip" in scenario.tags:
         scenario.skip("Marked with @skip")
         return
@@ -81,25 +93,25 @@ def before_scenario(context, scenario):
     drop_mongo(config)
 
     context.app = get_app(config=config, testing=True)
-    with context.app.app_context():
-        reset_elastic(context.app)
+    async with context.app.app_context():
+        await reset_elastic(context.app)
 
     context.headers = [("Content-Type", "application/json"), ("Origin", "localhost")]
     context.client = context.app.test_client()
 
     if scenario.status != "skipped":
         if "auth" in scenario.tags:
-            setup_users(context)
-            login_user(context, scenario)
+            await setup_users(context)
+            await login_user(context, scenario)
 
 
-def setup_users(context):
-    with context.app.test_request_context():
+async def setup_users(context):
+    async with context.app.test_request_context("/login"):
         context.app.data.insert("companies", COMPANIES)
         context.app.data.insert("users", USERS)
 
 
-def login_user(context, scenario):
+async def login_user(context, scenario):
     data = None
 
     if "admin" in scenario.tags:
@@ -111,10 +123,10 @@ def login_user(context, scenario):
     if data:
         url = "/login"
 
-        with context.app.test_request_context():
-            response = context.client.post(
+        async with context.app.test_request_context("/login"):
+            response = await context.client.post(
                 get_prefixed_url(context.app, url),
-                data=json.dumps(data),
+                form=data,
                 headers=context.headers,
             )
             assert response.status_code == 302, response.status_code

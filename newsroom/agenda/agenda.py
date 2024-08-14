@@ -5,7 +5,7 @@ from copy import deepcopy
 from bson import ObjectId
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.core import json, get_current_app
 from superdesk.flask import abort
@@ -1352,15 +1352,15 @@ class AgendaService(BaseSearchService):
             if c.get("watches"):
                 c["watches"] = [ObjectId(u) for u in c["watches"]]
 
-    def notify_new_coverage(self, agenda, wire_item):
+    async def notify_new_coverage(self, agenda, wire_item):
         user_dict = get_user_dict()
         company_dict = get_company_dict()
         notify_user_ids = filter_active_users(agenda.get("watches", []), user_dict, company_dict, events_only=True)
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
-            send_coverage_notification_email(user, agenda, wire_item)
+            await send_coverage_notification_email(user, agenda, wire_item)
 
-    def notify_agenda_update(
+    async def notify_agenda_update(
         self,
         update_agenda,
         original_agenda,
@@ -1589,7 +1589,7 @@ class AgendaService(BaseSearchService):
                 )
 
                 for user in users:
-                    send_agenda_notification_email(
+                    await send_agenda_notification_email(
                         user,
                         agenda,
                         message,

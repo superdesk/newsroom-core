@@ -14,7 +14,7 @@ import pathlib
 import superdesk
 
 from urllib.parse import urlparse
-from flask_babel import _
+from quart_babel import gettext
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 
 from superdesk.core import get_app_config
@@ -59,7 +59,7 @@ def init_saml_auth(req):
     return auth
 
 
-def prepare_flask_request(request):
+async def prepare_flask_request(request):
     url_data = urlparse(request.url)
     return {
         "https": "off" if "http://localhost" in get_app_config("CLIENT_URL", "") else "on",
@@ -67,7 +67,7 @@ def prepare_flask_request(request):
         "server_port": url_data.port,
         "script_name": request.path,
         "get_data": request.args.copy(),
-        "post_data": request.form.copy(),
+        "post_data": (await request.form).copy(),
     }
 
 
@@ -111,8 +111,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
 
 
 @blueprint.route("/login/saml", methods=["GET", "POST"])
-def saml():
-    req = prepare_flask_request(request)
+async def saml():
+    req = await prepare_flask_request(request)
     auth = init_saml_auth(req)
     errors = []
 
@@ -133,7 +133,7 @@ def saml():
             session[SESSION_USERDATA_KEY] = auth.get_attributes()
         else:
             logger.error("SAML %s reason=%s", errors, auth.get_last_error_reason())
-            flash(_("There was an error when using SSO"), "danger")
+            await flash(gettext("There was an error when using SSO"), "danger")
             return redirect(url_for("auth.login", user_error=1))
     elif "sls" in request.args:
 
@@ -147,7 +147,7 @@ def saml():
                 return redirect(url)
 
     if session.get(SESSION_NAME_ID):
-        return sign_user_by_email(
+        return await sign_user_by_email(
             session[SESSION_NAME_ID],
             auth_type=AuthProviderType.SAML,
             create_missing=True,
@@ -159,8 +159,8 @@ def saml():
 
 
 @blueprint.route("/login/saml_metadata")
-def saml_metadata():
-    req = prepare_flask_request(request)
+async def saml_metadata():
+    req = await prepare_flask_request(request)
     auth = init_saml_auth(req)
     settings = auth.get_settings()
     metadata = settings.get_sp_metadata()
@@ -175,8 +175,8 @@ def saml_metadata():
 
 
 @blueprint.route("/login/<client>", methods=["GET"])
-def client_login(client):
+async def client_login(client):
     if not client or client not in get_app_config("SAML_CLIENTS"):
         return abort(404)
     session[SESSION_SAML_CLIENT] = client
-    return render_template("login_client.html", client=client)
+    return await render_template("login_client.html", client=client)

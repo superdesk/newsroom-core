@@ -6,8 +6,10 @@ import hashlib
 import logging
 
 from eve.utils import str_to_date
-from flask_babel import format_time, format_date, format_datetime, get_locale, lazy_gettext
-from flask_babel.speaklater import LazyString
+
+from quart_babel import format_time, format_date, format_datetime, get_locale, lazy_gettext
+from quart_babel.speaklater import LazyString
+
 from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 
 from superdesk.core import get_app_config, get_current_app
@@ -21,6 +23,7 @@ from enum import Enum
 
 from newsroom.types import User
 from newsroom.user_roles import UserRole
+from .template_loaders import template_locale
 
 
 logger = logging.getLogger(__name__)
@@ -115,16 +118,15 @@ def is_item_tbc(item: dict) -> bool:
     return event_tbc or (planning and planning[0].get("_time_to_be_confirmed", False))
 
 
-def format_event_datetime(item: dict) -> str:
+async def format_event_datetime(item: dict) -> str:
     date_info = item.get("dates", {})
 
     if not date_info:
         return ""
 
-    tz = date_info.get("tz", get_session_timezone())
-    try:
-        # Set the session timezone
-        set_session_timezone(tz)
+    tz = date_info.get("tz", await get_session_timezone())
+    # Set the session timezone
+    with template_locale(timezone=tz):
 
         start = parse_date(date_info.get("start"))
         end = parse_date(date_info.get("end")) if date_info.get("end") else None
@@ -167,10 +169,6 @@ def format_event_datetime(item: dict) -> str:
                 end_date=notification_date(end),
                 tz=tz,
             )
-
-    finally:
-        # clear session timezone
-        clear_session_timezone()
 
 
 def datetime_short(datetime):

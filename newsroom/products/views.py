@@ -2,7 +2,7 @@ import re
 from typing import List
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_current_app
 from superdesk.flask import jsonify, request
@@ -43,7 +43,7 @@ def get_product_ref(product: Product, seats=0) -> ProductRef:
 
 @blueprint.route("/products", methods=["GET"])
 @admin_only
-def index():
+async def index():
     lookup = None
     if request.args.get("q"):
         lookup = request.args.get("q")
@@ -53,7 +53,7 @@ def index():
 
 @blueprint.route("/products/search", methods=["GET"])
 @account_manager_or_company_admin_only
-def search():
+async def search():
     lookup = None
     if request.args.get("q"):
         regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
@@ -69,8 +69,8 @@ def validate_product(product):
 
 @blueprint.route("/products/new", methods=["POST"])
 @admin_only
-def create():
-    product = get_json_or_400()
+async def create():
+    product = await get_json_or_400()
 
     validation = validate_product(product)
     if validation:
@@ -87,9 +87,9 @@ def create():
 
 @blueprint.route("/products/<id>", methods=["POST"])
 @admin_only
-def edit(id):
+async def edit(id):
     get_entity_or_404(ObjectId(id), "products")
-    data = get_json_or_400()
+    data = await get_json_or_400()
     updates = {
         "name": data.get("name"),
         "description": data.get("description"),
@@ -111,8 +111,8 @@ def edit(id):
 
 @blueprint.route("/products/<id>/companies", methods=["POST"])
 @account_manager_only
-def update_companies(id):
-    updates = request.get_json()
+async def update_companies(id):
+    updates = await request.get_json()
     product = get_entity_or_404(id, "products")
     selected_companies = updates.get("companies") or []
     for company in get_resource_service("companies").get_all():
@@ -146,8 +146,8 @@ def update_companies(id):
 
 @blueprint.route("/products/<id>/navigations", methods=["POST"])
 @admin_only
-def update_navigations(id):
-    updates = request.get_json()
+async def update_navigations(id):
+    updates = await request.get_json()
     if updates.get("navigations"):
         updates["navigations"] = [ObjectId(nav_id) for nav_id in updates["navigations"]]
     get_resource_service("products").patch(id=ObjectId(id), updates=updates)
@@ -156,7 +156,7 @@ def update_navigations(id):
 
 @blueprint.route("/products/<id>", methods=["DELETE"])
 @admin_only
-def delete(id):
+async def delete(id):
     """Deletes the products by given id"""
     get_entity_or_404(ObjectId(id), "products")
     get_resource_service("products").delete_action({"_id": ObjectId(id)})

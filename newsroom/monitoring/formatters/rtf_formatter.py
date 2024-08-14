@@ -191,7 +191,7 @@ class MonitoringRTFFormatter(BaseFormatter):
         attachment_filename = "%s-monitoring-export.rtf" % utcnow().strftime("%Y%m%d%H%M%S")
         return secure_filename(attachment_filename)
 
-    def get_monitoring_file(self, date_items_dict, monitoring_profile=None):
+    async def get_monitoring_file(self, date_items_dict, monitoring_profile=None):
         _file = tempfile.NamedTemporaryFile()
         if not date_items_dict:
             return _file

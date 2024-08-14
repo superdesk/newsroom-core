@@ -5,7 +5,7 @@ blueprint = Blueprint("design", __name__)
 
 
 @blueprint.route("/design/detail")
-def detail():
+async def detail():
     item = {
         "headline": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
         "slugline": "Slugline",
@@ -36,14 +36,14 @@ def detail():
             "body_html": "<p>foo bar</p>",
         },
     ]
-    return render_template("wire_item.html", item=item, previous_versions=previous_versions)
+    return await render_template("wire_item.html", item=item, previous_versions=previous_versions)
 
 
 @blueprint.route("/design/")
-def index():
-    return render_template("design_index.html")
+async def index():
+    return await render_template("design_index.html")
 
 
 @blueprint.route("/design/<page>")
-def page(page):
-    return render_template("design_%s.html" % page)
+async def page(page):
+    return await render_template("design_%s.html" % page)

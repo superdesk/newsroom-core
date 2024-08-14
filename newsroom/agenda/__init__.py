@@ -1,5 +1,5 @@
 import superdesk
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.flask import Blueprint
 from newsroom.utils import url_for_agenda

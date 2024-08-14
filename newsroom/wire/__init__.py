@@ -1,4 +1,4 @@
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 from content_api.items.resource import code_mapping
 
 import superdesk

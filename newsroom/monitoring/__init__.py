@@ -1,5 +1,5 @@
 from os import path
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.flask import Blueprint
 import superdesk

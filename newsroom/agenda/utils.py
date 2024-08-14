@@ -1,7 +1,7 @@
 from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_app_config
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
@@ -93,11 +93,11 @@ def get_coverage_scheduled(coverage):
     return coverage.get("scheduled") or (coverage.get("planning") or {}).get("scheduled")
 
 
-def get_coverage_content_type_name(coverage, language):
+async def get_coverage_content_type_name(coverage, language):
     coverage_types = get_app_config("COVERAGE_TYPES")
     content_type = coverage.get("coverage_type") or coverage.get("planning", {}).get("g2_content_type", "")
     coverage_type = coverage_types.get(content_type, {})
-    locale = (language or get_session_locale() or "en").lower()
+    locale = (language or await get_session_locale() or "en").lower()
 
     return coverage_type.get("translations", {}).get(locale) or coverage_type.get("name")
 
@@ -134,8 +134,8 @@ def get_coverage_status_text(coverage):
         )
 
 
-def get_coverage_email_text(coverage, default_state="", language=None):
-    content_type = get_coverage_content_type_name(coverage, language)
+async def get_coverage_email_text(coverage, default_state="", language=None):
+    content_type = await get_coverage_content_type_name(coverage, language)
     status = default_state or get_coverage_status_text(coverage)
     slugline = coverage.get("slugline") or coverage.get("planning", {}).get("slugline", "")
 

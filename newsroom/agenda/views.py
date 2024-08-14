@@ -1,7 +1,7 @@
 import json
 from typing import Dict
 
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
 from eve.utils import ParsedRequest
@@ -47,7 +47,7 @@ from newsroom.users import get_user_profile_data
 async def index():
     user_profile_data = await get_user_profile_data()
     data = await get_view_data()
-    return render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_agenda")
@@ -56,7 +56,7 @@ async def bookmarks():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/agenda/<_id>")
@@ -92,7 +92,7 @@ async def item(_id):
         get_resource_service("history").create_history_record(
             [item], "print", get_user(), request.args.get("type", "agenda")
         )
-        return render_template(
+        return await render_template(
             template,
             item=item,
             map=map,
@@ -106,7 +106,7 @@ async def item(_id):
 
     data = await get_view_data()
     data["item"] = item
-    return render_template(
+    return await render_template(
         "agenda_index.html",
         data=data,
         title=item.get("name", item.get("headline")),
@@ -117,14 +117,14 @@ async def item(_id):
 @blueprint.route("/agenda/search")
 @login_required
 @section("agenda")
-def search():
-    response = get_internal("agenda")
+async def search():
+    response = await get_internal("agenda")
     if len(response):
         if restrict_coverage_info(get_company()):
             remove_restricted_coverage_info(response[0].get("_items") or [])
         if response[0].get("_aggregations"):
             merge_planning_aggs(response[0]["_aggregations"])
-    return send_response("agenda", response)
+    return await send_response("agenda", response)
 
 
 async def get_view_data() -> Dict:
@@ -161,20 +161,20 @@ async def get_view_data() -> Dict:
 
 @blueprint.route("/agenda/request_coverage", methods=["POST"])
 @login_required
-def request_coverage():
+async def request_coverage():
     user = get_user(required=True)
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("item")
     assert data.get("message")
     item = get_entity_or_404(data.get("item"), "agenda")
-    send_coverage_request_email(user, data.get("message"), item)
+    await send_coverage_request_email(user, data.get("message"), item)
     return jsonify(), 201
 
 
 @blueprint.route("/agenda_bookmark", methods=["POST", "DELETE"])
 @login_required
-def bookmark():
-    data = get_json_or_400()
+async def bookmark():
+    data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="agenda")
     push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
@@ -183,8 +183,8 @@ def bookmark():
 
 @blueprint.route("/agenda_watch", methods=["POST", "DELETE"])
 @login_required
-def follow():
-    data = get_json_or_400()
+async def follow():
+    data = await get_json_or_400()
     assert data.get("items")
     for item_id in data.get("items"):
         user_id = get_user_id()
@@ -216,9 +216,9 @@ def follow():
 
 @blueprint.route("/agenda_coverage_watch", methods=["POST", "DELETE"])
 @login_required
-def watch_coverage():
+async def watch_coverage():
     user_id = get_user_id()
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("item_id")
     assert data.get("coverage_id")
     response = update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
@@ -274,7 +274,7 @@ def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=Fa
 
 @blueprint.route("/agenda/wire_items/<wire_id>")
 @login_required
-def related_wire_items(wire_id):
+async def related_wire_items(wire_id):
     elastic = get_current_app().data._search_backend("agenda")
     source = {}
     must_terms = [{"term": {"coverages.delivery_id": {"value": wire_id}}}]
@@ -327,7 +327,7 @@ def related_wire_items(wire_id):
 
 @blueprint.route("/agenda/search_locations")
 @login_required
-def search_locations():
+async def search_locations():
     query = request.args.get("q") or ""
     apply_filters = len(query) > 0
 

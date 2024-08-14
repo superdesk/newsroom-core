@@ -49,17 +49,17 @@ class NewsroomWebpack(Webpack):
             self._refresh_webpack_stats()
 
     def _set_asset_paths(self, app):
-        webpack_stats = app.config["WEBPACK_MANIFEST_PATH"]
-        self.assets_url = app.config["WEBPACK_ASSETS_URL"]
+        webpack_stats = get_app_config("WEBPACK_MANIFEST_PATH")
+        self.assets_url = get_app_config("WEBPACK_ASSETS_URL")
 
         if app.testing:
             self.assets = {}
             return
 
-        if app.config.get("WEBPACK_SERVER_URL") and not app.config.get("WEBPACK_IGNORE_SERVER"):
+        if get_app_config("WEBPACK_SERVER_URL") and not get_app_config("WEBPACK_IGNORE_SERVER"):
             try:
                 self.assets = session.get(
-                    urljoin(app.config["WEBPACK_SERVER_URL"], "manifest.json"),
+                    urljoin(get_app_config("WEBPACK_SERVER_URL"), "manifest.json"),
                     timeout=5,
                 ).json()
                 return
@@ -69,9 +69,9 @@ class NewsroomWebpack(Webpack):
                 )
 
         try:
-            with app.open_resource(webpack_stats, "r") as stats_json:
+            with open(os.path.join(app.root_path, webpack_stats), "r") as stats_json:
                 self.assets = json.load(stats_json)
-        except IOError:
+        except IOError as e:
             if request:
                 raise RuntimeError(
                     "Flask-Webpack requires 'WEBPACK_MANIFEST_PATH' to be set and "

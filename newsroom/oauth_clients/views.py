@@ -2,7 +2,7 @@ import re
 import bcrypt
 from typing import Optional
 
-from flask_babel import gettext
+from quart_babel import gettext
 from pydantic import BaseModel
 from werkzeug.exceptions import NotFound
 

@@ -1,7 +1,8 @@
 import os
 import bson.errors
+from datetime import datetime, timezone, timedelta
+from io import BytesIO
 
-from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
 
 from superdesk.core import get_current_app, get_app_config
@@ -18,8 +19,8 @@ ASSETS_RESOURCE = "upload"
 blueprint = Blueprint(ASSETS_RESOURCE, __name__)
 
 
-def get_file(key):
-    file = request.files.get(key)
+async def get_file(key):
+    file = (await request.files).get(key)
     if file:
         filename = secure_filename(file.filename)
         get_current_app().media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
@@ -27,9 +28,9 @@ def get_file(key):
 
 
 @blueprint.route("/assets/<path:media_id>", methods=["GET"])
-def get_upload(media_id, filename=None):
+async def get_upload(media_id, filename=None):
     # Allow access to ``/assets/<media_id>`` if PUBLIC_DASHBOARD is enabled or is a valid session
-    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
+    if not get_app_config("PUBLIC_DASHBOARD") and not await is_valid_session():
         return clear_session_and_redirect_to_login()
 
     app = get_current_app()
@@ -41,17 +42,18 @@ def get_upload(media_id, filename=None):
     if not media_file:
         abort(404)
 
-    data = wrap_file(request.environ, media_file, buffer_size=1024 * 256)
-    response = app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
+    file_body = app.as_any().response_class.io_body_class(BytesIO(media_file.read()))
+    response = app.response_class(file_body, mimetype=media_file.content_type)
     response.content_length = media_file.length
     response.last_modified = media_file.upload_date
     response.set_etag(media_file.md5)
     response.cache_control.max_age = cache_for
     response.cache_control.s_max_age = cache_for
     response.cache_control.public = True
+    response.expires = datetime.now(timezone.utc) + timedelta(seconds=cache_for)
 
     # Add ``accept_ranges`` & ``complete_length`` so video seeking is supported
-    response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
+    await response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
 
     if filename is None and request.args.get("filename"):
         filename = request.args.get("filename")

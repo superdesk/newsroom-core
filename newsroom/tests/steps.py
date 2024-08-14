@@ -2,7 +2,9 @@ import json
 import lxml.etree
 
 from behave import when, then
+from behave.api.async_step import async_run_until_complete
 from wooper.general import get_body
+
 from superdesk.tests import set_placeholder
 from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 
@@ -47,12 +49,14 @@ def we_get_text_in_response(context, text):
 
 
 @then('we "{get}" "{text}" in atom xml response')
-def we_get_text_in_atom_xml_response(context, get, text):
-    with context.app.test_request_context(context.app.config["URL_PREFIX"]):
-        assert isinstance(get_body(context.response), str)
-        tree = lxml.etree.fromstring(get_body(context.response).encode("utf-8"))
+@async_run_until_complete
+async def we_get_text_in_atom_xml_response(context, get, text):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        body = await context.response.get_data()
+        tree = lxml.etree.fromstring(body)
         assert "{http://www.w3.org/2005/Atom}feed" == tree.tag
+        body = await context.response.get_data(as_text=True)
         if get == "get":
-            assert text in get_body(context.response)
+            assert text in body
         else:
-            assert text not in get_body(context.response)
+            assert text not in body

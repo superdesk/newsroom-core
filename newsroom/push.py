@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Set
 from contextlib import contextmanager
 
-from flask_babel import gettext
+from quart_babel import gettext
 from bson import ObjectId
 
 from superdesk.core import json, get_app_config, get_current_app
@@ -56,20 +56,20 @@ blueprint = Blueprint("push", __name__)
 KEY = "PUSH_KEY"
 
 
-def test_signature(request):
+async def test_signature(request):
     """Test if request is signed using app PUSH_KEY."""
     key = get_app_config(KEY)
     if not key:
         if not get_app_config("TESTING"):
             logger.warning("PUSH_KEY is not configured, can not verify incoming data.")
         return True
-    payload = request.get_data()
+    payload = await request.get_data()
     mac = hmac.new(key, payload, "sha1")
     return hmac.compare_digest(request.headers.get("x-superdesk-signature", ""), "sha1=%s" % mac.hexdigest())
 
 
-def assert_test_signature(request):
-    if not test_signature(request):
+async def assert_test_signature(request):
+    if not await test_signature(request):
         logger.warning("signature invalid on push from %s", request.referrer or request.remote_addr)
         abort(403)
 
@@ -85,15 +85,14 @@ def fix_hrefs(doc):
 
 
 @blueprint.route("/push", methods=["POST"])
-def push():
-    assert_test_signature(request)
-    item = json.loads(request.get_data())
+async def push():
+    await assert_test_signature(request)
+    item = json.loads(await request.get_data())
     assert "guid" in item or "_id" in item, {"guid": 1}
     assert "type" in item, {"type": 1}
 
     app = get_current_app()
-
-    signals.push.send(app.as_any()._get_current_object(), item=item)
+    signals.push.send(app.as_any(), item=item)
 
     if item.get("type") == "event":
         orig = app.data.find_one("agenda", req=None, _id=item["guid"])
@@ -204,7 +203,7 @@ def publish_item(doc, original):
             if subject.get("scheme") in get_app_config("WIRE_SUBJECT_SCHEME_WHITELIST")
         ]
 
-    signals.publish_item.send(app._get_current_object(), item=doc, is_new=original is None)
+    signals.publish_item.send(app.as_any(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
     if "associations" not in doc and original is not None and bool(original.get("associations", {})):
         service.patch(_id, updates={"associations": None})
@@ -247,7 +246,7 @@ def publish_event(event, orig):
                 # This can happen when pushing a Planning item before linking to an Event
                 service.system_update(plan["_id"], {"event_id": _id}, plan)
 
-        signals.publish_event.send(app.as_any()._get_current_object(), item=agenda, is_new=True)
+        signals.publish_event.send(app.as_any(), item=agenda, is_new=True)
         _id = service.post([agenda])[0]
     else:
         # replace the original document
@@ -299,7 +298,7 @@ def publish_event(event, orig):
             updated = orig.copy()
             updated.update(updates)
             signals.publish_event.send(
-                app.as_any()._get_current_object(), item=updated, updates=updates, orig=orig, is_new=False
+                app.as_any(), item=updated, updates=updates, orig=orig, is_new=False
             )
             service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
@@ -348,11 +347,11 @@ def publish_planning_item(planning, orig):
         # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
         agenda.setdefault("_id", planning["guid"])
         agenda.setdefault("guid", planning["guid"])
-        signals.publish_planning.send(app.as_any()._get_current_object(), item=agenda, is_new=new_plan)
+        signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
         return service.post([agenda])[0]
     else:
         # Replace the original
-        signals.publish_planning.send(app.as_any()._get_current_object(), item=agenda, is_new=new_plan)
+        signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
         service.patch(agenda["_id"], agenda)
         return agenda["_id"]
 
@@ -775,15 +774,15 @@ def locked(_id: str, service: str):
 
 
 @celery.task
-def notify_new_wire_item(_id, check_topics=True):
+async def notify_new_wire_item(_id, check_topics=True):
     with locked(_id, "wire"):
         item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
         if item:
-            notify_new_item(item, check_topics=check_topics)
+            await notify_new_item(item, check_topics=check_topics)
 
 
 @celery.task
-def notify_new_agenda_item(_id, check_topics=True, is_new=False):
+async def notify_new_agenda_item(_id, check_topics=True, is_new=False):
     with locked(_id, "agenda"):
         app = get_current_app()
         agenda = app.data.find_one("agenda", req=None, _id=_id)
@@ -793,10 +792,10 @@ def notify_new_agenda_item(_id, check_topics=True, is_new=False):
                 return
 
             superdesk.get_resource_service("agenda").enhance_items([agenda])
-            notify_new_item(agenda, check_topics=check_topics)
+            await notify_new_item(agenda, check_topics=check_topics)
 
 
-def notify_new_item(item, check_topics=True):
+async def notify_new_item(item, check_topics=True):
     if not item or item.get("type") == "composite":
         return
 
@@ -816,9 +815,9 @@ def notify_new_item(item, check_topics=True):
 
         if check_topics:
             if item_type == "text":
-                users_with_realtime_subscription = notify_wire_topic_matches(item, user_dict, company_dict)
+                users_with_realtime_subscription = await notify_wire_topic_matches(item, user_dict, company_dict)
             else:
-                users_with_realtime_subscription = notify_agenda_topic_matches(item, user_dict, company_dict)
+                users_with_realtime_subscription = await notify_agenda_topic_matches(item, user_dict, company_dict)
 
         if get_app_config("NOTIFY_MATCHING_USERS") == "never":
             return
@@ -826,7 +825,7 @@ def notify_new_item(item, check_topics=True):
         if get_app_config("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
             return
 
-        notify_user_matches(
+        await notify_user_matches(
             item,
             user_dict,
             company_dict,
@@ -839,7 +838,7 @@ def notify_new_item(item, check_topics=True):
         logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
 
-def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
+async def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
     """Send notification to users who have downloaded or bookmarked the provided item"""
 
     related_items = item.get("ancestors", [])
@@ -878,7 +877,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
         # Remove duplicates and return the list
         return list(set(user_list))
 
-    def _send_notification(section, users_ids):
+    async def _send_notification(section, users_ids):
         if not users_ids:
             return
 
@@ -895,12 +894,12 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
             ]
         )
 
-        send_user_notification_emails(item, users_ids, users_dict, section)
+        await send_user_notification_emails(item, users_ids, users_dict, section)
 
     # First add users for the 'wire' section and send the notification
     # As this takes precedence over all other sections
     # (in case items appear in multiple sections)
-    _send_notification("wire", _get_users("wire"))
+    await _send_notification("wire", _get_users("wire"))
 
     # Next iterate over the registered sections (excluding wire and api)
     app = get_current_app().as_any()
@@ -910,20 +909,20 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
         if section["_id"] != "wire" and section["group"] not in ["api", "monitoring"]
     ]:
         # Add the users for those sections and send the notification
-        _send_notification(section_id, _get_users(section_id))
+        await _send_notification(section_id, _get_users(section_id))
 
 
-def send_user_notification_emails(item, user_matches, users, section):
+async def send_user_notification_emails(item, user_matches, users, section):
     for user_id in user_matches:
         user = users.get(str(user_id))
         if is_canceled(item):
-            send_item_killed_notification_email(user, item=item)
+            await send_item_killed_notification_email(user, item=item)
         else:
             if user.get("receive_email"):
-                send_history_match_notification_email(user, item=item, section=section)
+                await send_history_match_notification_email(user, item=item, section=section)
 
 
-def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
+async def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
     topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
@@ -931,12 +930,12 @@ def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]
 
     if topic_matches:
         push_notification("topic_matches", item=item, topics=topic_matches)
-        return send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return await send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
     else:
         return set()
 
 
-def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
+async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
     topics = get_topics_with_subscribers("agenda")
     topic_matches = superdesk.get_resource_service("agenda").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
@@ -953,12 +952,12 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectI
 
     if topic_matches:
         push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
-        return send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return await send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
     else:
         return set()
 
 
-def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
+async def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
     users_processed: Set[ObjectId] = set()
     users_with_realtime_subscription: Set[ObjectId] = set()
 
@@ -1015,7 +1014,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
                 if len(items) > 0:
                     highlighted_item = items[0]
 
-                send_new_item_notification_email(
+                await send_new_item_notification_email(
                     user,
                     topic["label"],
                     item=highlighted_item,
@@ -1027,17 +1026,17 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
 
 # keeping this for testing
 @blueprint.route("/notify", methods=["POST"])
-def notify():
-    data = json.loads(request.get_data())
-    notify_new_item(data["item"])
+async def notify():
+    data = json.loads(await request.get_data())
+    await notify_new_item(data["item"])
     return jsonify({"status": "OK"}), 200
 
 
 @blueprint.route("/push_binary", methods=["POST"])
-def push_binary():
-    assert_test_signature(request)
-    media = request.files["media"]
-    media_id = request.form["media_id"]
+async def push_binary():
+    await assert_test_signature(request)
+    media = (await request.files)["media"]
+    media_id = (await request.form)["media_id"]
     app = get_current_app()
     app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return jsonify({"status": "OK"}), 201

@@ -27,7 +27,7 @@ def init_app(app):
 
 
 @blueprint.route("/atom", methods=["GET"])
-def get_atom():
+async def get_atom():
     def _format_date(date):
         iso8601 = date.isoformat()
         if date.tzinfo:
@@ -64,7 +64,7 @@ def get_atom():
         attrib={"href": url_for("atom.get_atom", _external=True), "rel": "self"},
     )
 
-    response = get_internal("news/search")
+    response = await get_internal("news/search")
     #    req = ParsedRequest()
     #    req.args = {'include_fields': 'abstract'}
     #    response = superdesk.get_resource_service('news/search').get(req=req, lookup=None)
@@ -163,6 +163,8 @@ def get_atom():
                 image = (
                     ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions").get("16-9")
                 )
+                if not image or not complete_item:
+                    continue
                 metadata = (complete_item.get("associations") or {}).get("featuremedia") or {}
 
                 url = url_for("assets.get_item", _external=True, asset_id=image.get("media"))

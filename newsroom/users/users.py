@@ -4,7 +4,7 @@ from datetime import datetime, date
 from copy import deepcopy
 
 from typing import Dict, Optional, List, TypedDict
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import BadRequest
 
 import superdesk
@@ -384,7 +384,7 @@ class UsersService(newsroom.Service):
 
         abort(403)
 
-    def approve_user(self, user: User):
+    async def approve_user(self, user: User):
         """Approves & enables the supplied user, and sends an account validation email"""
 
         company = get_company(user)
@@ -409,7 +409,7 @@ class UsersService(newsroom.Service):
         if auth_provider.features["verify_email"]:
             updated_user: User = deepcopy(user)
             updated_user.update(user_updates)
-            send_token(updated_user, token_type="new_account", update_token=False)
+            await send_token(updated_user, token_type="new_account", update_token=False)
 
     def user_has_paused_notifications(self, user: User) -> bool:
         schedule = user.get("notification_schedule") or {}

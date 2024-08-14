@@ -23,7 +23,6 @@ from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
-from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.factory.app import SuperdeskEve
 
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -68,7 +67,6 @@ class BaseNewsroomApp(SuperdeskEve):
             config = {}
 
         self.json_provider_class = SuperdeskFlaskJSONProvider
-        self.async_app = SuperdeskAsyncApp(self)
 
         super(BaseNewsroomApp, self).__init__(
             import_name=import_name,
@@ -140,6 +138,9 @@ class BaseNewsroomApp(SuperdeskEve):
             self.media = SuperdeskGridFSMediaStorage(self)
 
     def setup_babel(self):
+        # TODO-ASYNC: Add support to quart_babel to support multiple directories on the domain
+        # Set `root_path` to `NEWSROOM_DIR`, so quart-babel imports translations from newsroom.translations
+        self.root_path = str(NEWSROOM_DIR)
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))
 
         if self.config.get("TRANSLATIONS_PATH"):
@@ -182,12 +183,12 @@ class BaseNewsroomApp(SuperdeskEve):
         def assertion_error(err):
             return jsonify({"error": err.args[0] if err.args else 1}), 400
 
-        def render_404(err):
+        async def render_404(err):
             if request and is_json_request(request):
                 return jsonify({"code": 404}), 404
-            return render_template("404.html"), 404
+            return await render_template("404.html"), 404
 
-        def render_403(err):
+        async def render_403(err):
             if request and is_json_request(request):
                 return (
                     jsonify(
@@ -199,14 +200,14 @@ class BaseNewsroomApp(SuperdeskEve):
                     ),
                     403,
                 )
-            return render_template("403.html"), 403
+            return await render_template("403.html"), 403
 
         def superdesk_api_error(err):
             error_code = err.status_code or 500
             return jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
 
-        def authorization_error(err: AuthorizationError):
-            return render_template("authorization_error.html", message=err.message), err.code
+        async def authorization_error(err: AuthorizationError):
+            return await render_template("authorization_error.html", message=err.message), err.code
 
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)

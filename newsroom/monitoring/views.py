@@ -1,7 +1,7 @@
 import base64
 from bson import ObjectId
 
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
 from eve.render import send_response
@@ -92,8 +92,8 @@ def get_monitoring_for_company(user):
 
 @blueprint.route("/monitoring/<id>/users", methods=["POST"])
 @account_manager_only
-def update_users(id):
-    updates = request.get_json()
+async def update_users(id):
+    updates = await request.get_json()
     if "users" in updates:
         updates["users"] = [ObjectId(u_id) for u_id in updates["users"]]
         get_resource_service("monitoring").patch(id=ObjectId(id), updates=updates)
@@ -102,7 +102,7 @@ def update_users(id):
 
 @blueprint.route("/monitoring/schedule_companies", methods=["GET"])
 @account_manager_only
-def monitoring_companies():
+async def monitoring_companies():
     monitoring_list = list(query_resource("monitoring", lookup={"schedule.interval": {"$ne": None}}))
     companies = get_items_by_id([ObjectId(m["company"]) for m in monitoring_list], "companies")
     return jsonify(companies), 200
@@ -110,8 +110,8 @@ def monitoring_companies():
 
 @blueprint.route("/monitoring/<id>/schedule", methods=["POST"])
 @account_manager_only
-def update_schedule(id):
-    updates = request.get_json()
+async def update_schedule(id):
+    updates = await request.get_json()
     get_resource_service("monitoring").patch(id=ObjectId(id), updates=updates)
     return jsonify({"success": True}), 200
 
@@ -123,23 +123,23 @@ def search_all():
 
 
 @blueprint.route("/monitoring/search", methods=["GET"])
-def search():
-    response = get_internal("monitoring_search")
-    return send_response("monitoring_search", response)
+async def search():
+    response = await get_internal("monitoring_search")
+    return await send_response("monitoring_search", response)
 
 
 @blueprint.route("/monitoring/new", methods=["POST"])
 @account_manager_only
-def create():
-    form = MonitoringForm()
-    if form.validate():
+async def create():
+    form = await MonitoringForm.create_form()
+    if await form.validate():
         new_data = form.data
         if form.company.data:
             new_data["company"] = ObjectId(form.company.data)
             company_users = list(query_resource("users", lookup={"company": new_data["company"]}))
             new_data["users"] = [ObjectId(u["_id"]) for u in company_users]
 
-        request_updates = request.get_json()
+        request_updates = await request.get_json()
         process_form_request(new_data, request_updates, form)
 
         set_original_creator(new_data)
@@ -153,7 +153,7 @@ def create():
 
 @blueprint.route("/monitoring/<_id>", methods=["GET", "POST"])
 @login_required
-def edit(_id):
+async def edit(_id):
     if request.args.get("context", "") == "wire":
         items = get_items_for_user_action([_id], "items")
         if not items:
@@ -178,10 +178,10 @@ def edit(_id):
         return NotFound(gettext("monitoring Profile not found"))
 
     if request.method == "POST":
-        form = MonitoringForm(monitoring=profile)
-        if form.validate_on_submit():
+        form = await MonitoringForm.create_form(monitoring=profile)
+        if await form.validate_on_submit():
             updates = form.data
-            request_updates = request.get_json()
+            request_updates = await request.get_json()
 
             # If the updates have anything other than 'users', only admin or monitoring_admin can update
             if len(request_updates.keys()) == 1 and "users" not in request_updates:
@@ -203,7 +203,7 @@ def edit(_id):
 
 @blueprint.route("/monitoring/<_id>", methods=["DELETE"])
 @admin_only
-def delete(_id):
+async def delete(_id):
     """Deletes the monitoring profile by given id"""
     get_resource_service("monitoring").delete_action({"_id": ObjectId(_id)})
     return jsonify({"success": True}), 200
@@ -215,12 +215,12 @@ def delete(_id):
 async def index():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
-    return render_template("monitoring_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("monitoring_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/monitoring/export/<_ids>")
 @login_required
-def export(_ids):
+async def export(_ids):
     user = get_user(required=True)
     _format = request.args.get("format")
     if not _format:
@@ -235,7 +235,7 @@ def export(_ids):
 
     if len(items) > 0:
         try:
-            _file = get_monitoring_file(monitoring_profile, items)
+            _file = await get_monitoring_file(monitoring_profile, items)
         except Exception as e:
             logger.exception(e)
             return jsonify({"message": "Error exporting items to file"}), 400
@@ -256,8 +256,8 @@ def export(_ids):
 
 @blueprint.route("/monitoring/share", methods=["POST"])
 @login_required
-def share():
-    data = get_json_or_400()
+async def share():
+    data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")
     assert data.get("monitoring_profile")
@@ -277,10 +277,10 @@ def share():
         }
         formatter = get_current_app().as_any().download_formatters["monitoring_pdf"]["formatter"]
         monitoring_profile["format_type"] = "monitoring_pdf"
-        _file = get_monitoring_file(monitoring_profile, items)
+        _file = await get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(_file.read())
 
-        send_user_email(
+        await send_user_email(
             user,
             template="share_items",
             template_kwargs=template_kwargs,
@@ -301,13 +301,13 @@ def share():
 
 @blueprint.route("/monitoring_bookmark", methods=["POST", "DELETE"])
 @login_required
-def bookmark():
+async def bookmark():
     """Bookmark an item.
 
     Stores user id into item.bookmarks array.
     Uses mongodb to update the array and then pushes updated array to elastic.
     """
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
@@ -321,4 +321,4 @@ async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
     user_profile_data = await get_user_profile_data()
-    return render_template("monitoring_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("monitoring_bookmarks.html", data=data, user_profile_data=user_profile_data)
