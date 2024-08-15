@@ -46,7 +46,6 @@ class UserResourceModel(NewshubResourceModel):
     user_type: UserRole = Field(default=UserRole.PUBLIC)
 
     country: Optional[str] = None
-    signup_details: Optional[Dict[str, Any]] = None
 
     is_validated: bool = False
     is_enabled: bool = True

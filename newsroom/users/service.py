@@ -19,10 +19,12 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         Override method to avoid validation issues with `signup_details` coming as string
         from already existing items in database. Also removing weird empty string "id" attribute
         """
-        if data.get("signup_details") == "":
-            data["signup_details"] = {}
 
-        # removes emptry string attribute `id` that breaks validation
+        # remove legacy fields no longer user
+        if "signup_details" in data:
+            data.pop("signup_details")
+
+        # removes attribute `id` that comes empty and breaks validation
         try:
             data.pop("id")
         except:

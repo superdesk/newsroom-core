@@ -1,19 +1,19 @@
 import re
 import json
+import pymongo
 from copy import deepcopy
-from typing import Dict, List, Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, field_validator
 
 from bson import ObjectId
 from flask_babel import gettext
-import pymongo
 from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.users.service import UsersService
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import jsonify, request, abort, session
+from superdesk.flask import jsonify, abort, session
 
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email, get_company
@@ -41,7 +41,7 @@ from newsroom.users.users import (
     COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES,
     USER_PROFILE_UPDATES,
 )
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
+from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary, success_response
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
@@ -130,7 +130,7 @@ class SearchArgs(ObjectIdListModel):
 @users_endpoints.endpoint("/users/search", methods=["GET"])
 @account_manager_or_company_admin_only
 async def search(args: None, params: SearchArgs, request: Request) -> Response:
-    lookup = {}
+    lookup: Dict[str, Any] = {}
     sort = None
 
     if params.q:
@@ -153,11 +153,11 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
 
     # Make sure this request only searches for the current users company
     if is_current_user_company_admin():
-        company = get_company_from_user_or_session()
-        if company is None:
+        company = await get_company_from_user_or_session()
+        if company:
+            lookup["company"] = company.id
+        else:
             request.abort(401)
-
-        lookup["company"] = company["_id"]
 
     mongo_cursor = await UsersService().search(lookup, use_mongo=True)
 
@@ -172,7 +172,7 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
     return Response(users, 200, ())
 
 
-@blueprint.route("/users/new", methods=["POST"])
+@users_endpoints.endpoint("/users/new", methods=["POST"])
 @account_manager_or_company_admin_only
 def create():
     form = UserForm()
@@ -242,57 +242,59 @@ def resent_invite(_id):
 
 
 def _is_email_address_valid(email):
+    # TODO-ASYNC: update once `auth` is migrated to async
     existing_user = get_user_by_email(email)
     return not existing_user
 
 
-@blueprint.route("/users/<_id>", methods=["GET", "POST"])
+class RouteArguments(BaseModel):
+    user_id: str
+
+
+@users_endpoints.endpoint("/users/<string:user_id>", methods=["GET", "POST"])
 @login_required
-def edit(_id):
+async def edit(args: RouteArguments, params: None, request: Request):
     user_is_company_admin = is_current_user_company_admin()
     user_is_admin = is_current_user_admin()
     user_is_account_mgr = is_current_user_account_mgr()
     user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
-    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(_id):
-        abort(401)
+    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(args.user_id):
+        request.abort(401)
 
-    user = find_one("users", _id=ObjectId(_id))
-    company = get_company()
+    user = await UsersService().find_by_id(args.user_id)
+    company = await get_company_from_user_or_session()
 
-    if user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
-        abort(403)
+    if user_is_company_admin and (company is None or user.company != company._id):
+        request.abort(403)
 
     if not user:
         return NotFound(gettext("User not found"))
 
-    etag = request.headers.get("If-Match")
-    if etag and user["_etag"] != etag:
-        return abort(412)
+    etag = request.get_header("If-Match")
+    if etag and user.etag != etag:
+        request.abort(412)
 
     if request.method == "POST":
         form = UserForm(user=user)
+
         if form.validate_on_submit():
-            if form.email.data != user["email"] and not _is_email_address_valid(form.email.data):
-                return (
-                    jsonify({"email": [gettext("Email address is already in use")]}),
-                    400,
-                )
+            if form.email.data != user.email and not _is_email_address_valid(form.email.data):
+                return Response({"email": [gettext("Email address is already in use")]}, 400, ())
+
             elif not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
-                return (
-                    jsonify({"company": [gettext("Company is required for non administrators")]}),
-                    400,
-                )
+                return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
 
             updates = get_updates_from_form(form)
 
-            if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
-                abort(401)
+            if not user_is_admin and updates.get("user_type", "") != (user.user_type or ""):
+                request.abort(401)
 
             allowed_fields = None
             if user_is_non_admin:
                 allowed_fields = USER_PROFILE_UPDATES
             elif user_is_company_admin:
+                # TODO-ASYNC: adjust when `get_setting` is migrated to async
                 allowed_fields = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
                     if not get_setting("allow_companies_to_manage_products")
@@ -304,10 +306,13 @@ def edit(_id):
                     if field not in allowed_fields:
                         updates.pop(field, None)
 
-            get_resource_service("users").patch(ObjectId(_id), updates=updates)
-            return jsonify({"success": True}), 200
-        return jsonify(form.errors), 400
-    return jsonify(user), 200
+            await UsersService().update(args.user_id, updates=updates)
+
+            return success_response({"success": True})
+
+        return Response(form.errors, 400, ())
+
+    return success_response(user)
 
 
 def get_updates_from_form(form: UserForm, on_create=False):
