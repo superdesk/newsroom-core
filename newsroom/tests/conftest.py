@@ -7,7 +7,6 @@ import traceback
 import functools
 
 from bson import ObjectId
-from pymongo import MongoClient
 from quart import Quart, Config
 
 from superdesk.cache import cache
@@ -15,6 +14,8 @@ from superdesk.cache import cache
 from newsroom.web.factory import get_app
 from newsroom.tests import markers
 from newsroom.limiter import limiter
+
+from .db import reset_elastic, drop_mongo
 
 root = (Path(__file__).parent / "..").resolve()
 
@@ -110,22 +111,6 @@ def get_mongo_uri(key, dbname):
     env_uri = os.environ.get(key, "mongodb://localhost/test")
     env_host = env_uri.rsplit("/", 1)[0]
     return "/".join([env_host, dbname])
-
-
-async def reset_elastic(app):
-    indices = "%s*" % app.config["CONTENTAPI_ELASTICSEARCH_INDEX"]
-    es = app.data.elastic.es
-    es.indices.delete(indices, ignore=[404])
-    await app.data.init_elastic(app)
-
-
-def drop_mongo(config: Config):
-    client: MongoClient = MongoClient(config["CONTENTAPI_MONGO_URI"])
-    client.drop_database(config["CONTENTAPI_MONGO_DBNAME"])
-
-    # Also drop mongo using older app.data
-    client = MongoClient(config["MONGO_URI"])
-    client.drop_database(config["MONGO_DBNAME"])
 
 
 @fixture

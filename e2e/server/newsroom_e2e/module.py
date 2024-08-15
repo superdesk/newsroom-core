@@ -8,7 +8,7 @@ from superdesk.cache import cache
 from superdesk.timer import timer
 
 from newsroom.auth.utils import start_user_session
-from newsroom.tests.conftest import drop_mongo, reset_elastic
+from newsroom.tests.db import drop_mongo, reset_elastic
 
 from .utils import create_default_user
 
@@ -30,7 +30,6 @@ async def reset_dbs():
         await reset_elastic(app)
         cache.clean()
         app.init_indexes()
-        app.data.init_elastic(app)
 
 
 @endpoint("e2e/populate_resources", methods=["POST"])
