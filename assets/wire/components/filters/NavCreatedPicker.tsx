@@ -15,7 +15,7 @@ interface IProps {
 
 function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters}: IProps) {
     const showCustomRange = createdFilter.date_filter === 'custom_date';
-    const getFilterValue = (filter: IDateFilter) => context === 'agenda' ? filter.query : filter.filter;
+    const getFilterValue = (filter: IDateFilter) => filter.filter;
 
     const onDateFilterChange = (event: {target: {value: string}}) => {
         const value = event.target.value;
@@ -23,11 +23,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters
         if (value === 'custom_date') {
             setCreatedFilter({...createdFilter, date_filter: value, from: '', to: ''});
         } else {
-            if (context === 'agenda') {
-                setCreatedFilter({...createdFilter, date_filter: value, from: value, to: undefined});
-            } else {
-                setCreatedFilter({...createdFilter, date_filter: value, from: undefined, to: undefined});
-            }
+            setCreatedFilter({...createdFilter, date_filter: value, from: undefined, to: undefined});
         }
     };
 

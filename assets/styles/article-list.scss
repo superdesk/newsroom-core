@@ -678,7 +678,7 @@
 } 
 
 @container contentListItem (max-width: 399px) {
-    &.wire-articles__item--wire {
+    .wire-articles__item--wire {
         flex-direction: column;
         padding: var(--content-list-item-padding--mobile) !important;
         row-gap: var(--space--1);

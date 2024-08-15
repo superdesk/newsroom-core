@@ -45,6 +45,7 @@ import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
 import {ILocation} from 'interfaces/agenda';
+import {IDateFilter} from 'interfaces/common';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -234,6 +235,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
         featured,
         fromDate,
         toDate,
+        date_filter
     } = getAgendaSearchParamsFromState(state);
 
     const params: any = {
@@ -245,6 +247,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
         from: fetchFrom,
         date_from: fromDate,
         date_to: toDate,
+        date_filter: date_filter,
         timezone_offset: getTimezoneOffset(),
         featured: featured,
         itemType: itemType,
@@ -290,6 +293,8 @@ interface AgendaSearchParams {
     featured: boolean;
     fromDate?: string;
     toDate?: string;
+    date_filter?: string;
+    agendaFilters: IDateFilter | any;
 }
 
 function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams {
@@ -324,6 +329,8 @@ function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams
         searchParams: searchParams,
         featured: featuredFilter,
         fromDate: fromDate,
+        agendaFilters: state.dateFilters,
+        date_filter: state?.search?.createdFilter?.date_filter,
         toDate: createdFilter.from?.startsWith('now/') ?
             createdFilter.from :
             createdFilter.to,
@@ -336,31 +343,46 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
         // If there are groups shown, then load the hidden items for those groups
         const state = getState();
         const {activeGrouping, featuredOnly} = state.agenda;
-        const {fromDate, toDate, searchParams} = getAgendaSearchParamsFromState(state);
+        const {fromDate, toDate, searchParams, date_filter, agendaFilters} = getAgendaSearchParamsFromState(state);
 
         let minDate: moment.Moment | undefined;
         let maxDate: moment.Moment | undefined;
+
+        const activeFilter = agendaFilters?.find((item:IDateFilter)=> item?.filter==date_filter || item.default);
+        const activeFilterQuery = activeFilter?.query || null;
 
         if (state.bookmarks !== true) {
             if (toDate != null && fromDate?.startsWith('now/') != true) {
                 maxDate = moment(toDate);
             }
-            if (fromDate?.startsWith('now')) {
-                if (fromDate === 'now/w') {
+            if (activeFilterQuery?.startsWith('now')) {
+                if (activeFilterQuery === 'now/w') {
                     minDate = moment().startOf('week');
                     maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
-                } else if (fromDate === 'now/M') {
+                } else if (activeFilterQuery === 'now/M') {
                     minDate = moment().startOf('month');
                     maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
-                } else if (fromDate == 'now-24h/h') {
+                } else if (activeFilterQuery == 'now-24h/h') {
                     minDate = moment().subtract(24, 'hours').startOf('hour');
                     maxDate = moment().startOf('hour');
-                } else if (fromDate === 'now-7d/d') {
+                } else if (activeFilterQuery === 'now-7d/d') {
                     minDate = moment().subtract(7, 'days').startOf('day');
                     maxDate = moment().startOf('day');
-                } else if (fromDate === 'now-30d/d') {
+                } else if (activeFilterQuery === 'now-30d/d') {
                     minDate = moment().subtract(30, 'days').startOf('day');
                     maxDate = moment().startOf('day');
+                }else if (activeFilterQuery === 'now+7d/d') { 
+                    minDate = moment().startOf('day');
+                    maxDate = moment().add(7, 'days').endOf('day');
+                } else if (activeFilterQuery === 'now+30d/d') {
+                    minDate = moment().startOf('day');
+                    maxDate = moment().add(30, 'days').endOf('day');
+                } else if (activeFilterQuery === 'now+3M/d') {
+                    minDate = moment().startOf('day');
+                    maxDate = moment().add(90, 'days').endOf('day');
+                } else if (activeFilterQuery === 'now+12M/d') {
+                    minDate = moment().startOf('day');
+                    maxDate = moment().add(12, 'months').endOf('day');
                 } else {
                     minDate = moment().startOf('day');
                     maxDate = minDate.clone();
@@ -375,7 +397,7 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             }
         }
 
-        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '_score') === '_score' ?
+        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '') === '' ?
             groupItems(items, minDate, maxDate, activeGrouping, featuredOnly) :
             [{
                 date: '',
