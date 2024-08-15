@@ -123,6 +123,10 @@ def drop_mongo(config: Config):
     client: MongoClient = MongoClient(config["CONTENTAPI_MONGO_URI"])
     client.drop_database(config["CONTENTAPI_MONGO_DBNAME"])
 
+    # Also drop mongo using older app.data
+    client = MongoClient(config["MONGO_URI"])
+    client.drop_database(config["MONGO_DBNAME"])
+
 
 @fixture
 async def app(request):

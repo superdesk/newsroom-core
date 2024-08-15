@@ -17,6 +17,7 @@ from datetime import datetime
 from newsroom.types import User
 from newsroom.email import send_user_email
 from tests.fixtures import agenda_items
+from newsroom.tests import markers
 
 
 async def test_item_notification_template(client, app, mocker):
@@ -246,6 +247,7 @@ async def test_send_user_email(app):
         assert "at 13:00 PM" in send_email_mock.call_args[1]["subject"]  # default timezone Europe/Prague
 
 
+@markers.requires_async_celery
 async def test_item_killed_notification_email(app):
     user = User(
         email="foo@example.com",
