@@ -1,8 +1,12 @@
 from typing import Any, Dict
+from newsroom.users.utils import get_user_async
+from superdesk.core import get_app_config
 from superdesk.flask import request, abort
+from superdesk.utils import is_hashed, get_hash
 from superdesk.core.resources.service import ResourceModelType
 
 from newsroom.auth import get_user
+from newsroom.signals import user_created
 from newsroom.settings import get_setting
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
 from newsroom.core.resources.service import NewshubAsyncResourceService
@@ -32,13 +36,35 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
         return super().get_model_instance_from_dict(data)
 
-    def check_permissions(self, doc, updates=None):
+    async def on_create(self, docs):
+        await super().on_create(docs)
+
+        for doc in docs:
+            await self.check_permissions(doc)
+
+            if doc.password and not is_hashed(doc.password):
+                doc.password = self._get_password_hash(doc.password)
+
+    async def on_created(self, docs):
+        await super().on_created(docs)
+        for doc in docs:
+            user_created.send(self, user=doc)
+
+    async def check_permissions(self, user: UserResourceModel, updates=None):
         """Check if current user has permissions to edit user."""
+
         if not request or request.method == "GET":  # in behave there is test request context
             return
 
+        # convert to dict first
+        doc = user.model_dump(by_alias=True, exclude_unset=True)
+
         if is_current_user_admin() or is_current_user_account_mgr():
             return
+
+        if request.url_rule and request.url_rule.rule:
+            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
+                return
 
         # Only check against metadata that has changed from the original
         updated_fields = (
@@ -47,13 +73,9 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             else [field for field in updates.keys() if updates[field] != doc.get(field) and field != "id"]
         )
 
-        if request.url_rule and request.url_rule.rule:
-            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
-                return
-
         if is_current_user_company_admin():
-            manager = get_user()
-            if doc.get("company") and doc["company"] == manager.get("company"):
+            manager = await get_user_async()
+            if manager and manager.company == user.company:
                 allowed_updates = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
                     if not get_setting("allow_companies_to_manage_products")
@@ -73,3 +95,6 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             return
 
         abort(403)
+
+    def _get_password_hash(self, password):
+        return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))

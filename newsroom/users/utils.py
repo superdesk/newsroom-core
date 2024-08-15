@@ -1,6 +1,10 @@
-from typing import Optional
 from bson import ObjectId
+from datetime import datetime, timedelta
+from typing import Optional, TypedDict
 
+from superdesk.utc import utcnow
+from superdesk.core import get_app_config
+from newsroom.utils import get_random_string
 from superdesk.flask import request, session, abort, g
 
 from newsroom.companies.companies_async import CompanyService, CompanyResource
@@ -85,3 +89,21 @@ async def get_company_from_user_or_session(
         return await CompanyService().find_by_id(g.company_id)
 
     return None
+
+
+class TokenData(TypedDict):
+    token: str
+    token_expiry_date: datetime
+
+
+def get_token_data() -> TokenData:
+    return {
+        "token": get_random_string(),
+        "token_expiry_date": utcnow() + timedelta(days=get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE")),
+    }
+
+
+def add_token_data(user: UserResourceModel):
+    updates = get_token_data()
+    user.token = updates.get("token")
+    user.token_expiry_date = updates.get("token_expiry_date")

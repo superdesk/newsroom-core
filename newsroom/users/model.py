@@ -35,9 +35,9 @@ class NotificationSchedule:
 
 
 class UserResourceModel(NewshubResourceModel):
-    password: Annotated[str, validate_minlength(8)]
     first_name: str
     last_name: str
+    password: Optional[Annotated[str, validate_minlength(8)]] = None
     email: Annotated[str, validate_email(), validate_iunique_value_async("users", "email")]
     phone: Optional[str] = None
     mobile: Optional[str] = None
@@ -61,7 +61,7 @@ class UserResourceModel(NewshubResourceModel):
     receive_email: bool = True
     receive_app_notifications: bool = True
 
-    locale: str
+    locale: Optional[str] = None
     manage_company_topics: bool = False
     last_active: Optional[datetime] = None
 

@@ -155,6 +155,8 @@ def send_token(user: User, token_type="validate", update_token=True):
     return False
 
 
+# TODO-ASYNC: Remove `TokenData`, `get_token_data` and `add_token_data`
+# once auth app is migrated. These 3 methods have been moved into newsroom.users.utils
 class TokenData(TypedDict):
     token: str
     token_expiry_date: datetime

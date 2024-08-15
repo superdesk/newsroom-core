@@ -9,6 +9,7 @@ from bson import ObjectId
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
+from newsroom.users.model import UserResourceModel
 from newsroom.users.service import UsersService
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
@@ -20,7 +21,6 @@ from newsroom.auth import get_user_by_email, get_company
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
-    add_token_data,
     is_current_user_admin,
     is_current_user,
     is_current_user_account_mgr,
@@ -46,7 +46,7 @@ from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import users_endpoints
-from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user
+from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user, add_token_data
 
 
 def get_settings_data():
@@ -174,48 +174,47 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
 
 @users_endpoints.endpoint("/users/new", methods=["POST"])
 @account_manager_or_company_admin_only
-def create():
+async def create(request: Request):
     form = UserForm()
     if form.validate():
         if not _is_email_address_valid(form.email.data):
-            return jsonify({"email": [gettext("Email address is already in use")]}), 400
+            return Response({"email": [gettext("Email address is already in use")]}, 400, ())
 
-        new_user = get_updates_from_form(form, on_create=True)
-        user_is_company_admin = is_current_user_company_admin()
-        if user_is_company_admin:
-            company = get_company()
-            if company is None:
-                abort(401)
+        creation_data = get_updates_from_form(form, on_create=True)
+        new_user = UserResourceModel(**creation_data, id=ObjectId())
+
+        if is_current_user_company_admin():
+            company_from_admin = await get_company_from_user_or_session()
+            if not company_from_admin:
+                return request.abort(401)
 
             # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
-            new_user["company"] = company["_id"]
-            new_user["user_type"] = UserRole.PUBLIC.value
+            new_user.company = company_from_admin.id
+            new_user.user_type = UserRole.PUBLIC
         elif form.company.data:
-            new_user["company"] = ObjectId(form.company.data)
-        elif new_user["user_type"] != "administrator":
-            return (
-                jsonify({"company": [gettext("Company is required for non administrators")]}),
-                400,
-            )
+            new_user.company = ObjectId(form.company.data)
+        elif new_user.user_type != "administrator":
+            return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
 
-        # Flask form won't accept default value if any form data was passed in the request.
-        # So, we need to set this explicitly here.
-        new_user["receive_email"] = True
-        new_user["receive_app_notifications"] = True
+        new_user.receive_email = True
+        new_user.receive_app_notifications = True
 
-        company = get_company(new_user)
-        auth_provider = get_company_auth_provider(company)
+        company = await get_company_from_user_or_session(new_user)
+        if company:
+            auth_provider = get_company_auth_provider(company.model_dump(by_alias=True))
 
         if auth_provider.features["verify_email"]:
             add_token_data(new_user)
 
-        ids = get_resource_service("users").post([new_user])
+        ids = await UsersService().create([new_user])
 
         if auth_provider.features["verify_email"]:
-            send_token(new_user, token_type="new_account", update_token=False)
+            user_dict = new_user.model_dump(by_alias=True, exclude_unset=True)
+            send_token(user_dict, token_type="new_account", update_token=False)
 
-        return jsonify({"success": True, "_id": ids[0]}), 201
-    return jsonify(form.errors), 400
+        return Response({"success": True, "_id": ids[0]}, 201, ())
+
+    return Response(form.errors, 400, ())
 
 
 @blueprint.route("/users/<_id>/resend_invite", methods=["POST"])

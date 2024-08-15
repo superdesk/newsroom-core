@@ -1,5 +1,8 @@
 import pytz
 import bcrypt
+import newsroom
+import superdesk
+
 from datetime import datetime, date
 from copy import deepcopy
 
@@ -7,22 +10,21 @@ from typing import Dict, Optional, List, TypedDict
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-import superdesk
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import session, abort, request
-
-import newsroom
 from newsroom.products.types import PRODUCT_TYPES
 from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
-from newsroom.auth.utils import get_company, get_company_auth_provider, add_token_data, send_token
+from newsroom.auth.utils import get_company, get_company_auth_provider, send_token
 from newsroom.settings import get_setting
-from newsroom.utils import set_original_creator, set_version_creator
-from superdesk.utils import is_hashed, get_hash
+from newsroom.utils import set_version_creator
+from superdesk.utils import get_hash
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
 from newsroom.user_roles import UserRole
-from newsroom.signals import user_created, user_updated, user_deleted
+from newsroom.signals import user_updated, user_deleted
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
+
+# from .utils import add_token_data
 
 
 class UserAuthentication(SessionAuth):
@@ -270,19 +272,6 @@ class UsersService(newsroom.Service):
     Serves mainly as a proxy to the data layer.
     """
 
-    def on_create(self, docs):
-        super().on_create(docs)
-        for doc in docs:
-            self.check_permissions(doc)
-            set_original_creator(doc)
-            if doc.get("password", None) and not is_hashed(doc.get("password")):
-                doc["password"] = self._get_password_hash(doc["password"])
-
-    def on_created(self, docs):
-        super().on_created(docs)
-        for doc in docs:
-            user_created.send(self, user=doc)
-
     def on_update(self, updates, original):
         self.check_permissions(original, updates)
         set_version_creator(updates)
@@ -401,8 +390,9 @@ class UsersService(newsroom.Service):
             "is_enabled": True,
             "is_approved": True,
         }
-        if auth_provider.features["verify_email"]:
-            add_token_data(user_updates)
+        # if auth_provider.features["verify_email"]:
+        #     add_token_data(user_updates)
+
         self.patch(user["_id"], updates=user_updates)
 
         # Send new account / password reset email
