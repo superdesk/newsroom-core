@@ -1,5 +1,6 @@
 from babel import core
 from quart_babel import Babel, format_datetime, get_domain
+from quart_babel.typing import ASGIRequest
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, session
@@ -27,7 +28,7 @@ def get_client_locales():
     return client_locales
 
 
-async def get_session_locale(_req=None):
+async def get_session_locale(_req: ASGIRequest | None = None):
     try:
         if session.get("locale"):
             return session["locale"]
@@ -48,10 +49,7 @@ async def get_session_locale(_req=None):
     except AttributeError:
         pass
 
-    if get_template_locale():
-        return get_template_locale()
-
-    return default_language
+    return get_template_locale() or default_language
 
 
 def get_user_timezone(user: User) -> str:
@@ -62,7 +60,7 @@ def get_user_timezone(user: User) -> str:
     return get_app_config("BABEL_DEFAULT_TIMEZONE") or get_app_config("DEFAULT_TIMEZONE")
 
 
-async def get_session_timezone(_req=None):
+async def get_session_timezone(_req: ASGIRequest | None = None):
     try:
         if session.get("timezone"):
             return session["timezone"]
@@ -76,7 +74,7 @@ async def get_session_timezone(_req=None):
         app = get_current_app().as_any()
         if getattr(app, "session_timezone", None) is not None:
             return app.session_timezone
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         pass
 
     return get_app_config("BABEL_DEFAULT_TIMEZONE") or get_app_config("DEFAULT_TIMEZONE")

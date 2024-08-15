@@ -15,7 +15,10 @@ def set_template_locale(language: Optional[str] = None) -> None:
 
 
 def get_template_locale() -> Optional[str]:
-    return getattr(g, TEMPLATE_LOCALE, None)
+    try:
+        return getattr(g, TEMPLATE_LOCALE, None)
+    except RuntimeError:
+        return None
 
 
 def noop():
