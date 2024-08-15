@@ -37,12 +37,10 @@ CORE_APPS = [
     "newsroom.history",
 ]
 
-# TODO-ASYNC: commenting this out for now as it breaks with
-# ValueError: The name 'assets' is already registered for a different blueprint
-# MODULES = [
-#     "newsroom.assets.module",
-#     "newsroom.companies",
-# ]
+MODULES = [
+    "newsroom.assets.module",
+    "newsroom.companies",
+]
 
 INSTALLED_APPS = []
 
@@ -61,3 +59,7 @@ CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBN
 FILTER_AGGREGATIONS = False
 ELASTIC_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ELASTICSEARCH_FIX_QUERY = False
+
+# Disable upload endpoint from ``newsroom.assets.module``,
+# as NewsAPI will implement a custom one
+ASSETS_REGISTER_UPLOAD_ENDPOINT = False

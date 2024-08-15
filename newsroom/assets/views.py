@@ -24,15 +24,10 @@ class UrlParams(BaseModel):
     filename: str | None = None
 
 
-@assets_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
-async def get_upload(args: RouteArguments, params: UrlParams, request: Request) -> Response:
-    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
-        return clear_session_and_redirect_to_login()
-
-    # TODO-ASYNC: Create new FileResponse type in superdesk-core, and use that where file downloads are requested
-    media_file = await get_media_file(args.media_id)
+async def get_upload(media_id: str, filename: str | None = None):
+    media_file = await get_media_file(media_id)
     if not media_file:
-        return await request.abort(404)
+        return None
 
     content = await media_file.read()
 
@@ -44,7 +39,7 @@ async def get_upload(args: RouteArguments, params: UrlParams, request: Request) 
     response.content_length = media_file.length
     response.last_modified = media_file.upload_date
 
-    # TODO-ASYNC: Set etag from ``media_file`` (as it's curre
+    # TODO-ASYNC: Set etag from ``media_file`` (as `md5` attribute is not defined in newer PyMongo)
     if getattr(media_file, "md5", None):
         response.set_etag(media_file.md5)
 
@@ -56,8 +51,8 @@ async def get_upload(args: RouteArguments, params: UrlParams, request: Request) 
     # Add ``accept_ranges`` & ``complete_length`` so video seeking is supported
     await response.make_conditional(flask_request, accept_ranges=True, complete_length=media_file.length)
 
-    if params.filename:
-        _filename, ext = path.splitext(params.filename)
+    if filename:
+        _filename, ext = path.splitext(filename)
         if not ext:
             ext = guess_media_extension(mimetype)
         filename = secure_filename(f"{_filename}{ext}")
@@ -67,3 +62,12 @@ async def get_upload(args: RouteArguments, params: UrlParams, request: Request) 
         response.headers["Content-Disposition"] = "inline"
 
     return response
+
+
+@assets_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
+async def download_file(args: RouteArguments, params: UrlParams, request: Request) -> Response:
+    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
+        return clear_session_and_redirect_to_login()
+
+    response = await get_upload(args.media_id, params.filename)
+    return response if response else await request.abort(404)
