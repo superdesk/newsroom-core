@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any, Dict, TypedDict
 
 from superdesk.core import get_app_config
 from superdesk.flask import request, abort
@@ -7,7 +8,13 @@ from superdesk.core.resources.service import ResourceModelType
 
 from newsroom.signals import user_created
 from newsroom.settings import get_setting
-from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
+from newsroom.auth.utils import (
+    get_company_auth_provider,
+    is_current_user_admin,
+    is_current_user_account_mgr,
+    is_current_user_company_admin,
+    send_token,
+)
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
 from .model import UserResourceModel
@@ -54,6 +61,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
         from .utils import get_user_async
 
+        # TODO-ASYNC: figure out how to avoid accessing request here
         if not request or request.method == "GET":  # in behave there is test request context
             return
 
@@ -96,6 +104,30 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             return
 
         abort(403)
+
+    async def approve_user(self, user: UserResourceModel):
+        """Approves & enables the supplied user, and sends an account validation email"""
+        from .utils import get_company_from_user_or_session, get_token_data
+
+        company = await get_company_from_user_or_session(user)
+        auth_provider = get_company_auth_provider(company)
+
+        user_updates: Dict[str, Any] = {
+            "is_enabled": True,
+            "is_approved": True,
+        }
+
+        if auth_provider.features["verify_email"]:
+            token_data = get_token_data()
+            user_updates["token"] = token_data.get("token") or ""
+            user_updates["token_expiry_date"] = token_data.get("token_expiry_date")
+
+        await self.update(user.id, user_updates)
+
+        # Send new account / password reset email
+        if auth_provider.features["verify_email"]:
+            updated_user = user.model_copy(update=user_updates)
+            send_token(updated_user, token_type="new_account", update_token=False)
 
     def _get_password_hash(self, password):
         return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))

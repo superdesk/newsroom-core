@@ -29,9 +29,9 @@ class Dashboard:
 class NotificationSchedule:
     timezone: str
     times: List[str]
-    last_run_time: datetime
-    pause_from: str
-    pause_to: str
+    last_run_time: Optional[datetime] = None
+    pause_from: Optional[str] = None
+    pause_to: Optional[str] = None
 
 
 class UserResourceModel(NewshubResourceModel):

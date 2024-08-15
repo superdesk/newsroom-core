@@ -9,6 +9,7 @@ from bson import ObjectId
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
+from newsroom.companies.companies_async.types import CompanyResource
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
@@ -39,7 +40,14 @@ from newsroom.users.users import (
     COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES,
     USER_PROFILE_UPDATES,
 )
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary, success_response
+from newsroom.utils import (
+    get_json_or_400_async,
+    query_resource,
+    find_one,
+    get_json_or_400,
+    get_vocabulary,
+    success_response,
+)
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
@@ -51,6 +59,10 @@ from .utils import get_company_from_user_or_session, get_user_or_abort, get_comp
 
 class RouteArguments(BaseModel):
     user_id: str
+
+
+class NotificationRouteArguments(RouteArguments):
+    notification_id: str
 
 
 def get_settings_data():
@@ -221,27 +233,33 @@ async def create(request: Request):
     return Response(form.errors, 400, ())
 
 
-@blueprint.route("/users/<_id>/resend_invite", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/resend_invite", methods=["POST"])
 @account_manager_or_company_admin_only
-def resent_invite(_id):
-    user = find_one("users", _id=ObjectId(_id))
-    company = get_company()
+async def resent_invite(args: RouteArguments, params: None, request: Request):
+    user = await UsersService().find_by_id(args.user_id)
+    company = await get_company_from_user_or_session()
     user_is_company_admin = is_current_user_company_admin()
-    auth_provider = get_company_auth_provider(get_company(user))
+
+    user_company = await get_company_from_user_or_session(user)
+    if not user_company:
+        return request.abort(403)
+
+    auth_provider = get_company_auth_provider(user_company.model_dump(by_alias=True))
 
     if not user:
         return NotFound(gettext("User not found"))
-    elif user.get("is_validated"):
-        return jsonify({"is_validated": gettext("User is already validated")}), 400
-    elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
+    elif user.is_validated:
+        return Response({"is_validated": gettext("User is already validated")}, 400, ())
+    elif user_is_company_admin and (company is None or user.company != company.id):
         # Company admins can only resent invites for members of their company only
-        abort(403)
+        request.abort(403)
     elif not auth_provider.features["verify_email"]:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
-        abort(403)
+        request.abort(403)
 
-    send_token(user, token_type="new_account")
-    return jsonify({"success": True}), 200
+    send_token(user.model_dump(byalias=True), token_type="new_account")
+
+    return success_response({"success": True})
 
 
 def _is_email_address_valid(email):
@@ -338,59 +356,56 @@ def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
     return updates
 
 
-@blueprint.route("/users/<_id>/profile", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/profile", methods=["POST"])
 @login_required
-def edit_user_profile(_id):
-    if not is_current_user(_id):
-        abort(403)
+async def edit_user_profile(args: RouteArguments, params: None, request: Request):
+    if not is_current_user(args.user_id):
+        request.abort(403)
 
-    user_id = ObjectId(_id)
-    user = find_one("users", _id=user_id)
-
+    user = await UsersService().find_by_id(args.user_id)
     if not user:
         return NotFound(gettext("User not found"))
 
     form = UserForm(user=user)
     if form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
-        get_resource_service("users").patch(user_id, updates=updates)
-        return jsonify({"success": True}), 200
-    return jsonify(form.errors), 400
+        await UsersService().update(args.user_id, updates)
+        return success_response({"success": True})
+
+    return Response(form.errors, 400, ())
 
 
-@blueprint.route("/users/<_id>/notification_schedules", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/notification_schedules", methods=["POST"])
 @login_required
-def edit_user_notification_schedules(_id):
-    if not is_current_user(_id):
-        abort(403)
+async def edit_user_notification_schedules(args: RouteArguments, params: None, request: Request):
+    if not is_current_user(args.user_id):
+        request.abort(403)
 
-    user_id = ObjectId(_id)
-    user = find_one("users", _id=user_id)
-
+    user = await UsersService().find_by_id(args.user_id)
     if not user:
         return NotFound(gettext("User not found"))
 
-    data = get_json_or_400()
-
-    updates = {"notification_schedule": deepcopy(user.get("notification_schedule") or {})}
+    data = await get_json_or_400_async(request)
+    updates = {"notification_schedule": deepcopy(user.notification_schedule or {})}
     updates["notification_schedule"].update(data)
-    get_resource_service("users").patch(user_id, updates=updates)
-    return jsonify({"success": True}), 200
+
+    await UsersService().update(args.user_id, updates)
+    return success_response({"success": True})
 
 
-@blueprint.route("/users/<_id>/validate", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/validate", methods=["POST"])
 @admin_only
-def validate(_id):
-    return _resend_token(_id, token_type="validate")
+async def validate(args: RouteArguments, params: None, request: None):
+    return await _resend_token(args.user_id, token_type="validate")
 
 
-@blueprint.route("/users/<_id>/reset_password", methods=["POST"])
+@users_endpoints.endpoint("/users/<_id>/reset_password", methods=["POST"])
 @account_manager_or_company_admin_only
-def resend_token(_id):
-    return _resend_token(_id, token_type="reset_password")
+async def resend_token(args: RouteArguments, params: None, request: None):
+    return await _resend_token(args.user_id, token_type="reset_password")
 
 
-def _resend_token(user_id, token_type):
+async def _resend_token(user_id, token_type):
     """
     Sends a new token for a given user_id
     :param user_id: Id of the user to send the token
@@ -400,15 +415,14 @@ def _resend_token(user_id, token_type):
     if not user_id:
         return BadRequest(gettext("User id not provided"))
 
-    user = find_one("users", _id=ObjectId(user_id))
-
+    user = await UsersService().find_by_id(user_id)
     if not user:
         return NotFound(gettext("User not found"))
 
     if send_token(user, token_type):
-        return jsonify({"success": True}), 200
+        return success_response({"success": True})
 
-    return jsonify({"message": "Token could not be sent"}), 400
+    return Response({"message": "Token could not be sent"}, 400, ())
 
 
 @users_endpoints.endpoint("/users/<string:user_id>", methods=["DELETE"])
@@ -421,47 +435,50 @@ async def delete(args: RouteArguments, params: None, request: Request):
     return success_response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/notifications", methods=["GET"])
+@users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["GET"])
 @login_required
-def get_notifications(user_id):
-    if session["user"] != str(user_id):
-        abort(403)
+async def get_notifications(args: RouteArguments, params: None, request: Request):
+    if not is_current_user(args.user_id):
+        request.abort(403)
 
-    return jsonify(get_notifications_with_items()), 200
+    # TODO-ASYNC: migrate `get_notifications_with_items` to async
+    return success_response(get_notifications_with_items())
 
 
-@blueprint.route("/users/<user_id>/notifications", methods=["DELETE"])
+@users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["DELETE"])
 @login_required
-def delete_all(user_id):
+async def delete_all(args: RouteArguments, params: None, request: Request):
     """Deletes all notification by given user id"""
-    if session["user"] != str(user_id):
-        abort(403)
+    if not is_current_user(args.user_id):
+        request.abort(403)
 
-    get_resource_service("notifications").delete_action({"user": ObjectId(user_id)})
-    return jsonify({"success": True}), 200
+    # TODO-ASYNC: adjust when notifications app is migrated to async
+    get_resource_service("notifications").delete_action({"user": ObjectId(args.user_id)})
+    return success_response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/notifications/<notification_id>", methods=["DELETE"])
+@users_endpoints.endpoint("/users/<string:user_id>/notifications/<string:notification_id>", methods=["DELETE"])
 @login_required
-def delete_notification(user_id, notification_id):
+async def delete_notification(args: NotificationRouteArguments, params: None, request: Request):
     """Deletes the notification by given id"""
-    if session["user"] != str(user_id):
-        abort(403)
+    if not is_current_user(args.user_id):
+        request.abort(403)
 
-    get_resource_service("notifications").delete_action({"_id": notification_id})
-    return jsonify({"success": True}), 200
+    # TODO-ASYNC: adjust when notifications app is migrated to async
+    get_resource_service("notifications").delete_action({"_id": args.notification_id})
+    return success_response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/approve", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/approve", methods=["POST"])
 @account_manager_or_company_admin_only
-def approve_user(user_id):
-    users_service = get_resource_service("users")
-    user = users_service.find_one(req=None, _id=ObjectId(user_id))
+async def approve_user(args: RouteArguments, params: None, request: Request):
+    users_service = UsersService()
+    user = await users_service.find_by_id(args.user_id)
     if not user:
         return NotFound(gettext("User not found"))
 
-    if user.get("is_approved"):
-        return jsonify({"error": gettext("User is already approved")}), 403
+    if user.is_approved:
+        return Response({"error": gettext("User is already approved")}, 403, ())
 
-    users_service.approve_user(user)
-    return jsonify({"success": True}), 200
+    # users_service.approve_user(user)
+    return success_response({"success": True})
