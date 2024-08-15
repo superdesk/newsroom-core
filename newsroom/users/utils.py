@@ -7,7 +7,7 @@ from superdesk.core import get_app_config
 from newsroom.utils import get_random_string
 from superdesk.flask import request, session, abort, g
 
-from newsroom.companies.companies_async import CompanyService, CompanyResource
+from newsroom.companies.companies_async import CompanyResource, CompanyService
 
 from .model import UserResourceModel
 from .service import UsersService

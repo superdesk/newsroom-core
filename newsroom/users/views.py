@@ -9,8 +9,6 @@ from bson import ObjectId
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from newsroom.users.model import UserResourceModel
-from newsroom.users.service import UsersService
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
@@ -45,8 +43,14 @@ from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabu
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
+from .service import UsersService
 from .module import users_endpoints
+from .model import UserResourceModel
 from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user, add_token_data
+
+
+class RouteArguments(BaseModel):
+    user_id: str
 
 
 def get_settings_data():
@@ -246,10 +250,6 @@ def _is_email_address_valid(email):
     return not existing_user
 
 
-class RouteArguments(BaseModel):
-    user_id: str
-
-
 @users_endpoints.endpoint("/users/<string:user_id>", methods=["GET", "POST"])
 @login_required
 async def edit(args: RouteArguments, params: None, request: Request):
@@ -314,7 +314,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
     return success_response(user)
 
 
-def get_updates_from_form(form: UserForm, on_create=False):
+def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
@@ -411,12 +411,14 @@ def _resend_token(user_id, token_type):
     return jsonify({"message": "Token could not be sent"}), 400
 
 
-@blueprint.route("/users/<_id>", methods=["DELETE"])
+@users_endpoints.endpoint("/users/<string:user_id>", methods=["DELETE"])
 @account_manager_or_company_admin_only
-def delete(_id):
+async def delete(args: RouteArguments, params: None, request: Request):
     """Deletes the user by given id"""
-    get_resource_service("users").delete_action({"_id": ObjectId(_id)})
-    return jsonify({"success": True}), 200
+    service = UsersService()
+    user = await service.find_by_id(args.user_id)
+    await service.delete(user)
+    return success_response({"success": True})
 
 
 @blueprint.route("/users/<user_id>/notifications", methods=["GET"])

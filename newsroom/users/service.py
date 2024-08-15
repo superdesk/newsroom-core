@@ -1,11 +1,10 @@
 from typing import Any, Dict
-from newsroom.users.utils import get_user_async
+
 from superdesk.core import get_app_config
 from superdesk.flask import request, abort
 from superdesk.utils import is_hashed, get_hash
 from superdesk.core.resources.service import ResourceModelType
 
-from newsroom.auth import get_user
 from newsroom.signals import user_created
 from newsroom.settings import get_setting
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
@@ -52,6 +51,8 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
     async def check_permissions(self, user: UserResourceModel, updates=None):
         """Check if current user has permissions to edit user."""
+
+        from .utils import get_user_async
 
         if not request or request.method == "GET":  # in behave there is test request context
             return
