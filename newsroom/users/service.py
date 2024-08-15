@@ -22,8 +22,11 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         if data.get("signup_details") == "":
             data["signup_details"] = {}
 
-        # removes emptry string attribute `id`
-        data.pop("id")
+        # removes emptry string attribute `id` that breaks validation
+        try:
+            data.pop("id")
+        except:
+            pass
 
         return super().get_model_instance_from_dict(data)
 

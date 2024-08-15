@@ -6,6 +6,7 @@ from pydantic import BaseModel, field_validator
 
 from bson import ObjectId
 from flask_babel import gettext
+import pymongo
 from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.users.service import UsersService
@@ -158,8 +159,15 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
 
         lookup["company"] = company["_id"]
 
-    cursor = await UsersService().search(lookup)
-    users = await cursor.to_list_raw()
+    mongo_cursor = await UsersService().search(lookup, use_mongo=True)
+
+    # TODO-ASYNC: we need to implement the sorting somehow within the base service
+    # When using mongo, the `AsyncIOMotorCollection.find` supports an additional
+    # parameter `sort` for sorting.
+    if sort:
+        mongo_cursor.cursor.sort(sort, pymongo.ASCENDING)
+
+    users = await mongo_cursor.to_list_raw()
 
     return Response(users, 200, ())
 
