@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Any, Dict, TypedDict
+from typing import Any, Dict
 
 from superdesk.core import get_app_config
 from superdesk.flask import request, abort

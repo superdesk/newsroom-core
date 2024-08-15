@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from bson import ObjectId
 from pydantic import Field
-from typing import Annotated, Any, Dict, List, Optional, Union
+from typing import Annotated, List, Optional
 
 from newsroom.user_roles import UserRole
 from newsroom.companies.companies_async import CompanyProduct

@@ -9,14 +9,12 @@ from bson import ObjectId
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from newsroom.companies.companies_async.types import CompanyResource
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import jsonify, abort, session
 
 from newsroom.user_roles import UserRole
-from newsroom.auth import get_user_by_email, get_company
+from newsroom.auth import get_user_by_email
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
@@ -33,7 +31,6 @@ from newsroom.companies import (
 )
 from newsroom.notifications.notifications import get_notifications_with_items
 from newsroom.topics import get_user_topics
-from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
     COMPANY_ADMIN_ALLOWED_UPDATES,
@@ -43,8 +40,6 @@ from newsroom.users.users import (
 from newsroom.utils import (
     get_json_or_400_async,
     query_resource,
-    find_one,
-    get_json_or_400,
     get_vocabulary,
     success_response,
 )

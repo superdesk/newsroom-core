@@ -8,7 +8,6 @@ from newsroom.users.model import UserResourceModel
 from superdesk.core import json, get_current_app
 from apps.prepopulate.app_initialize import get_filepath
 
-from newsroom.auth import get_company
 from newsroom.user_roles import UserRole
 
 from .companies import CompaniesResource, CompaniesService

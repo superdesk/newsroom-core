@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_babel import gettext
-from wtforms import StringField, HiddenField, BooleanField, TextAreaField, Field
+from wtforms import StringField, HiddenField, BooleanField, Field
 from wtforms import SelectField
 from wtforms.validators import DataRequired, Email
 from wtforms.widgets import TextInput
