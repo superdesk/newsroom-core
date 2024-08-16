@@ -5,7 +5,7 @@ import elasticsearch.exceptions
 
 from collections import OrderedDict
 
-from flask.cli import with_appcontext
+from quart.cli import with_appcontext
 
 from superdesk.core import get_current_app
 from apps.prepopulate.app_initialize import (

@@ -55,13 +55,13 @@ def get_public_cards() -> List[DashboardCard]:
 
 
 @blueprint.route("/page/<path:template>")
-def page(template):
-    return render_template("page-{template}.html".format(template=secure_filename(template)))
+async def page(template):
+    return await render_template("page-{template}.html".format(template=secure_filename(template)))
 
 
 async def render_public_dashboard():
     user_profile_data = await get_user_profile_data()
-    return render_template(
+    return await render_template(
         "public_dashboard.html",
         data={
             "cards": get_public_cards(),
@@ -74,7 +74,7 @@ async def render_public_dashboard():
 
 
 @blueprint.route("/public/card_items")
-def public_card_items():
-    if not is_valid_session() and not get_app_config("PUBLIC_DASHBOARD"):
+async def public_card_items():
+    if not await is_valid_session() and not get_app_config("PUBLIC_DASHBOARD"):
         return {"_items": []}
     return {"_items": get_public_items_by_cards()}

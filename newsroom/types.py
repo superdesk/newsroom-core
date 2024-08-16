@@ -2,7 +2,7 @@ from bson import ObjectId
 from typing import Dict, List, Literal, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
-from flask_babel import LazyString
+from quart_babel.speaklater import LazyString
 
 
 def assert_never(value: NoReturn) -> NoReturn:

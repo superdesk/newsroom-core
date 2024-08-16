@@ -7,7 +7,7 @@
     <pre>{{ item.slugline }}</pre>
 
     <h1>{{ item.headline }}</h1>
-    <p>{{ _('By:') }} <b>{{ item.byline }}</b> {{ _('On:') }} {{ item.versioncreated|datetime_long }}</p>
+    <p>{{ gettext('By:') }} <b>{{ item.byline }}</b> {{ gettext('On:') }} {{ item.versioncreated|datetime_long }}</p>
 
     <div class="row">
         <div class="col-9">
@@ -18,14 +18,14 @@
             {{ item.body_html | safe }}
         </div>
         <div class="col">
-            <h3>{{ _('Metadata') }}</h3>
+            <h3>{{ gettext('Metadata') }}</h3>
             <dl>
                 {% if item.subject %}
-                <dt>{{ _('Category') }}</dt>
+                <dt>{{ gettext('Category') }}</dt>
                 <dd>{{ item.subject|join(', ', attribute='name')}}</dd>
                 {% endif %}
                 {% if item.genre %}
-                <dt>{{ _('Content Type') }}</dt>
+                <dt>{{ gettext('Content Type') }}</dt>
                 <dd>{{ item.genre|join(', ', attribute='name')}}</dd>
                 {% endif %}
             </dl>

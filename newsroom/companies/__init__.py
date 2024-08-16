@@ -1,6 +1,5 @@
 import superdesk
-
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from newsroom.companies.companies_async.types import CompanyResource
 from newsroom.users.model import UserResourceModel
@@ -11,7 +10,14 @@ from apps.prepopulate.app_initialize import get_filepath
 from newsroom.user_roles import UserRole
 
 from .companies import CompaniesResource, CompaniesService
+from .companies_async import CompanyService as CompanyServiceAsync, CompanyResource
+
 from .module import module  # noqa
+
+__all__ = [
+    "CompanyServiceAsync",
+    "CompanyResource",
+]
 
 
 async def get_company_sections_monitoring_data(company: CompanyResource, user: UserResourceModel):
@@ -53,8 +59,7 @@ def init_app(app):
     )
 
     # Populate countries data based on superdesk-core vocabularies.json file.
-    with app.app_context():
-        app.countries = load_countries_list()
+    app.countries = load_countries_list()
 
 
 from . import views  # noqa

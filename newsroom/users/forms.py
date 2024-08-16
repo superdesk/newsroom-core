@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm
-from flask_babel import gettext
+from quart_wtf import QuartForm
+from quart_babel import gettext
 from wtforms import StringField, HiddenField, BooleanField, Field
 from wtforms import SelectField
 from wtforms.validators import DataRequired, Email
@@ -16,7 +16,9 @@ class CommaSeparatedListField(Field):
             return ""
 
     def process_formdata(self, valuelist):
-        if valuelist == [""] or valuelist == [None]:  # An empty string from the client is equal to an empty array
+        if (
+            valuelist == [""] or valuelist == [None] or valuelist == ["None"]
+        ):  # An empty string from the client is equal to an empty array
             self.data = []
         elif len(valuelist):
             self.data = [x.strip() for x in valuelist[0].split(",")]
@@ -28,7 +30,7 @@ class CommaSeparatedListField(Field):
 BooleanField.false_values = {False, "false", "", "False"}
 
 
-class UserForm(FlaskForm):
+class UserForm(QuartForm):
     class Meta:
         csrf = False
 

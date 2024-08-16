@@ -1,4 +1,4 @@
-from flask_babel import gettext
+from quart_babel import gettext
 from content_api import MONGO_PREFIX
 
 from superdesk.core import get_current_app, get_app_config

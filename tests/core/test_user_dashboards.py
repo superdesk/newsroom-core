@@ -5,7 +5,7 @@ from newsroom.wire.views import get_personal_dashboards_data
 from datetime import datetime
 
 
-def test_user_dashboards(app, client, public_user, public_company, company_products):
+async def test_user_dashboards(app, client, public_user, public_company, company_products):
     topics = [{"label": "test", "user": public_user["_id"], "query": "bar"}]
     app.data.insert("topics", topics)
 
@@ -35,9 +35,9 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
         ],
     )
 
-    utils.login(client, public_user)
+    await utils.login(client, public_user)
 
-    utils.patch_json(
+    await utils.patch_json(
         client,
         f"/api/_users/{public_user['_id']}",
         {
@@ -45,7 +45,7 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
         },
     )
 
-    data = utils.get_json(
+    data = await utils.get_json(
         client,
         f"/api/_users/{public_user['_id']}",
     )
@@ -61,12 +61,12 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
     assert 1 == len(topic_items)
     assert "test4" == topic_items[0]["guid"]
 
-    utils.delete_json(
+    await utils.delete_json(
         client,
         f"/topics/{topics[0]['_id']}",
     )
 
-    data = utils.get_json(
+    data = await utils.get_json(
         client,
         f"/api/_users/{public_user['_id']}",
     )
@@ -75,7 +75,7 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
     assert data["dashboards"][0]["topic_ids"] == []
 
 
-def test_dashboard_data_for_user_without_wire_section(app):
+async def test_dashboard_data_for_user_without_wire_section(app):
     products = [
         {"product_type": "wire"},
     ]

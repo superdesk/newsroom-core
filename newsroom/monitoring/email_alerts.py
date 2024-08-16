@@ -34,9 +34,11 @@ logger = logging.getLogger(__name__)
 
 
 class MonitoringEmailAlerts(Command):
-    def run(self, immediate=False):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.log_msg = "Monitoring Scheduled Alerts: {}".format(utcnow())
 
+    async def run(self, immediate=False):
         try:
             get_resource_service("monitoring")
         except KeyError:
@@ -62,9 +64,9 @@ class MonitoringEmailAlerts(Command):
             now_to_minute = now_local.replace(second=0, microsecond=0)
 
             if immediate:
-                self.immediate_worker(now_to_minute)
+                await self.immediate_worker(now_to_minute)
             else:
-                self.scheduled_worker(now_to_minute)
+                await self.scheduled_worker(now_to_minute)
         except Exception as e:
             logger.exception(e)
         finally:
@@ -72,10 +74,10 @@ class MonitoringEmailAlerts(Command):
 
         logger.info("{} Completed sending Monitoring Scheduled Alerts.".format(self.log_msg))
 
-    def immediate_worker(self, now):
+    async def immediate_worker(self, now):
         last_minute = now - datetime.timedelta(minutes=1)
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
-        self.send_alerts(
+        await self.send_alerts(
             self.get_immediate_monitoring_list(),
             local_to_utc(default_timezone, last_minute).strftime("%Y-%m-%d"),
             local_to_utc(default_timezone, last_minute).strftime("%H:%M:%S"),
@@ -97,7 +99,7 @@ class MonitoringEmailAlerts(Command):
             get_resource_service("monitoring").find(where={"schedule.interval": "immediate", "is_enabled": True})
         )
 
-    def scheduled_worker(self, now):
+    async def scheduled_worker(self, now):
         monitoring_list = self.get_scheduled_monitoring_list()
 
         one_hour_ago = now - datetime.timedelta(hours=1)
@@ -154,7 +156,7 @@ class MonitoringEmailAlerts(Command):
             )
 
         for key, value in alert_monitoring.items():
-            self.send_alerts(value["w_lists"], value["created_from"], value["created_from_time"], now)
+            await self.send_alerts(value["w_lists"], value["created_from"], value["created_from_time"], now)
 
     def is_within_five_minutes(self, new_scheduled_time, now):
         return new_scheduled_time and (new_scheduled_time - now).total_seconds() < 300
@@ -231,7 +233,7 @@ class MonitoringEmailAlerts(Command):
                 alert_monitoring["four"]["w_lists"].append(profile)
                 return
 
-    def send_alerts(self, monitoring_list, created_from, created_from_time, now):
+    async def send_alerts(self, monitoring_list, created_from, created_from_time, now):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
         if general_settings and general_settings["values"].get("system_alerts_recipients"):
@@ -261,12 +263,12 @@ class MonitoringEmailAlerts(Command):
                             }
                         )
                         truncate_article_body(items, m)
-                        _file = get_monitoring_file(m, items)
+                        _file = await get_monitoring_file(m, items)
                         attachment = base64.b64encode(_file.read())
                         formatter = get_current_app().as_any().download_formatters[m["format_type"]]["formatter"]
 
                         for user in users:
-                            send_user_email(
+                            await send_user_email(
                                 user,
                                 template="monitoring_email",
                                 template_kwargs=template_kwargs,
@@ -295,14 +297,14 @@ class MonitoringEmailAlerts(Command):
                                 "company": company["name"],
                                 "run_time": now,
                             }
-                            send_template_email(
+                            await send_template_email(
                                 to=error_recipients,
                                 template="monitoring_error",
                                 template_kwargs=template_kwargs,
                             )
                 elif m["schedule"].get("interval") != "immediate" and m.get("always_send"):
                     for user in users:
-                        send_user_email(
+                        await send_user_email(
                             user,
                             template="monitoring_email_no_updates",
                             template_kwargs=template_kwargs,

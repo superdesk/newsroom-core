@@ -1,4 +1,6 @@
 import superdesk
+
+from quart_babel import lazy_gettext
 from inspect import iscoroutine
 from flask_babel import lazy_gettext
 

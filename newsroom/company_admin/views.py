@@ -2,7 +2,7 @@ from typing import List
 from bson import ObjectId
 
 from werkzeug.exceptions import NotFound
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import render_template, jsonify
@@ -23,7 +23,7 @@ from newsroom.users import get_user_profile_data
 @company_admin_only
 async def index():
     user_profile_data = await get_user_profile_data()
-    return render_template("company_admin_index.html", data=get_view_data(), user_profile_data=user_profile_data)
+    return await render_template("company_admin_index.html", data=get_view_data(), user_profile_data=user_profile_data)
 
 
 def filter_disabled_products(company: Company, products: List[Product]) -> Company:
@@ -55,14 +55,14 @@ def get_view_data():
 @blueprint.route("/company_admin/send_product_seat_request", methods=["POST"])
 @login_required
 @company_admin_only
-def send_product_seat_request_email():
+async def send_product_seat_request_email():
     user = get_user()
     company = get_company(user) or {}
 
     if not company:
         return NotFound(gettext("Company not found"))
 
-    data = get_json_or_400()
+    data = await get_json_or_400()
 
     errors = []
     if not len(data.get("product_ids", [])):
@@ -92,7 +92,7 @@ def send_product_seat_request_email():
     if not len(recipients):
         return NotFound(gettext("Product Seat Request recipients not configured"))
 
-    send_template_email(
+    await send_template_email(
         to=recipients,
         template="additional_product_seat_request_email",
         template_kwargs=dict(

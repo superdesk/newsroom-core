@@ -1,9 +1,9 @@
 from io import StringIO
 import csv
 
-from flask_babel import gettext, current_app as app
+from quart_babel import gettext
 
-from superdesk.core import get_current_app
+from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.decorator import account_manager_or_company_admin_only
 from newsroom.reports import blueprint
@@ -15,7 +15,7 @@ from newsroom.users import get_user_profile_data
 
 @blueprint.route("/reports/print/<report>", methods=["GET"])
 @account_manager_or_company_admin_only
-def print_reports(report):
+async def print_reports(report):
     reports = get_current_user_reports()
     func = reports.get(report)
 
@@ -23,7 +23,7 @@ def print_reports(report):
         abort(400, gettext("Unknown report {}".format(report)))
 
     data = func()
-    return render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
+    return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
 @blueprint.route("/reports/company_reports", methods=["GET"])
@@ -34,17 +34,17 @@ async def company_reports():
     data = {
         "companies": companies,
         "sections": get_current_app().as_any().sections,
-        "api_enabled": app.config.get("NEWS_API_ENABLED", False),
+        "api_enabled": get_app_config("NEWS_API_ENABLED", False),
         "current_user_type": session.get("user_type"),
     }
-    return render_template(
+    return await render_template(
         "company_reports.html", setting_type="company_reports", data=data, user_profile_data=user_profile_data
     )
 
 
 @blueprint.route("/reports/<report>", methods=["GET"])
 @account_manager_or_company_admin_only
-def get_report(report):
+async def get_report(report):
     reports = get_current_user_reports()
     func = reports.get(report)
 
@@ -57,7 +57,7 @@ def get_report(report):
 
 @blueprint.route("/reports/export/<report>", methods=["GET"])
 @account_manager_or_company_admin_only
-def export_reports(report):
+async def export_reports(report):
     reports = get_current_user_reports()
     func = reports.get(report)
 

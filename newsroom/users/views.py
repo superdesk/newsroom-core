@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, field_validator
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
 from superdesk import get_resource_service
@@ -221,7 +221,7 @@ async def create(request: Request):
 
         if auth_provider.features["verify_email"]:
             user_dict = new_user.model_dump(by_alias=True, exclude_unset=True)
-            send_token(user_dict, token_type="new_account", update_token=False)
+            await send_token(user_dict, token_type="new_account", update_token=False)
 
         return Response({"success": True, "_id": ids[0]}, 201, ())
 
@@ -252,7 +252,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         request.abort(403)
 
-    send_token(user.model_dump(byalias=True), token_type="new_account")
+    await send_token(user.model_dump(byalias=True), token_type="new_account")
 
     return success_response({"success": True})
 
@@ -290,7 +290,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
     if request.method == "POST":
         form = UserForm(user=user)
 
-        if form.validate_on_submit():
+        if await form.validate_on_submit():
             if form.email.data != user.email and not _is_email_address_valid(form.email.data):
                 return Response({"email": [gettext("Email address is already in use")]}, 400, ())
 
@@ -361,8 +361,8 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
     if not user:
         return NotFound(gettext("User not found"))
 
-    form = UserForm(user=user)
-    if form.validate_on_submit():
+    form = await UserForm.create_form(user=user)
+    if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
         await UsersService().update(args.user_id, updates)
         return success_response({"success": True})
@@ -414,7 +414,7 @@ async def _resend_token(user_id, token_type):
     if not user:
         return NotFound(gettext("User not found"))
 
-    if send_token(user, token_type):
+    if await send_token(user, token_type):
         return success_response({"success": True})
 
     return Response({"message": "Token could not be sent"}, 400, ())

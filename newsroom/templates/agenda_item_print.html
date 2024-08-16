@@ -15,7 +15,7 @@
     {% endif %}
 
     {% if location and location != '' %}
-        <h3 class="mt-4"><strong>{{ _('Where') }}:</strong> {{ location }}</h3>
+        <h3 class="mt-4"><strong>{{ gettext('Where') }}:</strong> {{ location }}</h3>
     {% endif %}
 
     {% if map and map != '' %}
@@ -27,7 +27,7 @@
 
     {% if contacts | length is gt 1 %}
     <h3 class="mt-3">
-    <strong>{{ _('Contact') }}:</strong>
+    <strong>{{ gettext('Contact') }}:</strong>
     {% for contact in contacts %}
         <div>
             {{ contact.name or contact.organisation }}
@@ -41,7 +41,7 @@
 
     {% if links | length is gt 1 %}
     <h3>
-    <strong>{{ _('Web') }}:</strong>
+    <strong>{{ gettext('Web') }}:</strong>
     {% for link in links %}
         <div><a href={{ link | safe }}>{{ link }}</a></div>
     {% endfor %}
@@ -56,12 +56,12 @@
             </div>
 
             {% if planning_item.get('ednote') %}
-                <h5 class="row"><p>{{ _('Editorial Note') }}: {{ planning_item.get('ednote') }}</p></h5>
+                <h5 class="row"><p>{{ gettext('Editorial Note') }}: {{ planning_item.get('ednote') }}</p></h5>
             {% endif %}
 
             {% if planning_item.get('coverages', []) %}
                 <div class="row">
-                    <h5>{{ _('Coverages:') }}</h5>
+                    <h5>{{ gettext('Coverages:') }}</h5>
                 </div>
                 {% for cov in planning_item.get('coverages', []) or [] %}
                     <p>{{ get_coverage_email_text(cov) }}{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<br><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}{% if is_admin and cov.get('planning', {}).get('internal_note') %}{{ "\r\n" }}<br><i>Internal Note: {{ cov['planning']['internal_note'] }}</i>{% endif %}</p>

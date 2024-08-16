@@ -1,4 +1,3 @@
-from flask import json
 from unittest.mock import patch
 
 
@@ -6,20 +5,20 @@ def ids(items):
     return {item["_id"] for item in items}
 
 
-def test_evolved_from_order(client, app):
+async def test_evolved_from_order(client, app):
     app.data.remove("items")
 
-    def push_item(data):
-        resp = client.post("/push", data=json.dumps(data), content_type="application/json")
+    async def push_item(data):
+        resp = await client.post("/push", json=data)
         assert resp.status_code == 200
 
-    def search():
-        resp = client.get("/wire/search")
+    async def search():
+        resp = await client.get("/wire/search")
         assert 200 == resp.status_code
-        return resp.json["_items"]
+        return (await resp.get_json())["_items"]
 
     with patch.dict(app.config, {"PUSH_FIX_UPDATES": True}):
-        push_item(
+        await push_item(
             {
                 "type": "text",
                 "guid": "item3",
@@ -27,7 +26,7 @@ def test_evolved_from_order(client, app):
             }
         )
 
-        push_item(
+        await push_item(
             {
                 "type": "text",
                 "guid": "item5",
@@ -35,25 +34,25 @@ def test_evolved_from_order(client, app):
             }
         )
 
-        items = search()
+        items = await search()
         assert 2 == len(items)
         assert "item3" in ids(items)
         assert "item5" in ids(items)
 
-        push_item({"type": "text", "guid": "item2", "evolvedfrom": "item1"})
-        items = search()
+        await push_item({"type": "text", "guid": "item2", "evolvedfrom": "item1"})
+        items = await search()
         assert 2 == len(items)
         assert "item3" in ids(items)
         assert "item5" in ids(items)
 
-        push_item({"type": "text", "guid": "item1"})
-        items = search()
+        await push_item({"type": "text", "guid": "item1"})
+        items = await search()
         assert 2 == len(items)
         assert "item3" in ids(items)
         assert "item5" in ids(items)
 
-        push_item({"type": "text", "guid": "item4", "evolvedfrom": "item3"})
-        items = search()
+        await push_item({"type": "text", "guid": "item4", "evolvedfrom": "item3"})
+        items = await search()
         assert 1 == len(items)
         assert "item5" in ids(items)
         assert ["item1", "item2", "item3", "item4"] == items[0]["ancestors"]

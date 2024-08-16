@@ -32,14 +32,14 @@ expiration_delay = 0
 
 
 @blueprint.route(TOKEN_ENDPOINT, methods=["POST"])
-def issue_token():
+async def issue_token():
     current_time = utcnow()
     try:
         token_response = authorization.create_token_response()
         if request.authorization:
             client_id = request.authorization.get("username")
         else:
-            client_id = request.form.get("client_id")
+            client_id = (await request.form).get("client_id")
     except Exception:
         raise
     else:

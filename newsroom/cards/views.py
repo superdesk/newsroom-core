@@ -1,7 +1,7 @@
 import re
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 
 from newsroom.flask import get_file_from_request
 from superdesk.core import json, get_current_app
@@ -31,14 +31,14 @@ def get_settings_data():
 
 @blueprint.route("/cards", methods=["GET"])
 @login_required
-def index():
+async def index():
     cards = list(query_resource("cards", lookup=None))
     return jsonify(cards), 200
 
 
 @blueprint.route("/cards/search", methods=["GET"])
 @admin_only
-def search():
+async def search():
     lookup = None
     if request.args.get("q"):
         regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
@@ -50,7 +50,7 @@ def search():
 @blueprint.route("/cards/new", methods=["POST"])
 @admin_only
 async def create():
-    data = json.loads(request.form["card"])
+    data = json.loads((await request.form)["card"])
     card_data = await _get_card_data(data)
     set_original_creator(card_data)
     ids = get_resource_service("cards").post([card_data])
@@ -59,6 +59,9 @@ async def create():
 
 
 async def _get_card_data(data):
+    if not data:
+        abort(400)
+
     if not data.get("label"):
         raise ValueError(gettext("Label not found"))
 
@@ -78,7 +81,7 @@ async def _get_card_data(data):
 
     if data.get("type") == "2x2-events":
         for index, event in enumerate(card_data["config"]["events"]):
-            file = get_file_from_request(f"file{index}")
+            file = await get_file_from_request(f"file{index}")
 
             if file:
                 file_url = await save_file_and_get_url(file)
@@ -101,7 +104,7 @@ async def _get_card_data(data):
 async def edit(id):
     get_entity_or_404(id, "cards")
 
-    data = json.loads(request.form["card"])
+    data = json.loads((await request.form)["card"])
     if not data:
         abort(400)
 
@@ -114,7 +117,7 @@ async def edit(id):
 
 @blueprint.route("/cards/<id>", methods=["DELETE"])
 @admin_only
-def delete(id):
+async def delete(id):
     """Deletes the cards by given id"""
     get_entity_or_404(id, "cards")
     get_resource_service("cards").delete({"_id": ObjectId(id)})

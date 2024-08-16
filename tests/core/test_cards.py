@@ -1,10 +1,10 @@
 from bson import ObjectId
-from flask import json
+from quart import json
 from pytest import fixture
 
 
 @fixture(autouse=True)
-def init(app):
+async def init(app):
     app.data.insert(
         "cards",
         [
@@ -22,18 +22,18 @@ def init(app):
     )
 
 
-def test_card_list_fails_for_anonymous_user(client):
-    with client.session_transaction() as session:
+async def test_card_list_fails_for_anonymous_user(client):
+    async with client.session_transaction() as session:
         session["user"] = None
-    response = client.get("/cards")
+    response = await client.get("/cards")
     assert response.status_code == 302
 
 
-def test_save_and_return_cards(client):
+async def test_save_and_return_cards(client):
     # Save a new card
-    client.post(
+    await client.post(
         "/cards/new",
-        data={
+        form={
             "card": json.dumps(
                 {
                     "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
@@ -48,23 +48,23 @@ def test_save_and_return_cards(client):
         },
     )
 
-    response = client.get("/cards")
-    assert "Local" in response.get_data(as_text=True)
+    response = await client.get("/cards")
+    assert "Local" in await response.get_data(as_text=True)
 
 
-def test_update_card(client):
-    client.post(
+async def test_update_card(client):
+    await client.post(
         "/cards/59b4c5c61d41c8d736852fbf/",
-        data={"card": json.dumps({"label": "Sport", "dashboard": "newsroom", "type": "4-picture-text"})},
+        form={"card": json.dumps({"label": "Sport", "dashboard": "newsroom", "type": "4-picture-text"})},
     )
 
-    response = client.get("/cards")
-    assert "4-picture-text" in response.get_data(as_text=True)
+    response = await client.get("/cards")
+    assert "4-picture-text" in await response.get_data(as_text=True)
 
 
-def test_delete_card_succeeds(client):
-    client.delete("/cards/59b4c5c61d41c8d736852fbf")
+async def test_delete_card_succeeds(client):
+    await client.delete("/cards/59b4c5c61d41c8d736852fbf")
 
-    response = client.get("/cards")
-    data = json.loads(response.get_data())
+    response = await client.get("/cards")
+    data = json.loads(await response.get_data())
     assert 0 == len(data)

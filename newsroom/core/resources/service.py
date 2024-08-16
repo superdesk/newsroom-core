@@ -1,6 +1,6 @@
 from typing import Generic, Any, ClassVar, TypeVar
 
-from flask import current_app as app
+from quart import current_app as app
 
 from superdesk.core.resources.service import AsyncResourceService
 from .model import NewshubResourceModel

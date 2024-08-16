@@ -1,11 +1,11 @@
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 
 def init_app(app):
     if not app.config.get("NEWS_API_ENABLED"):
         return
 
-    if getattr(app, "section"):
+    if hasattr(app, "section"):
         app.section("news_api", "News API", "api")
 
     app.general_setting(

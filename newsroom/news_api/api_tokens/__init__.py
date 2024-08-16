@@ -1,7 +1,7 @@
 import ipaddress
 from datetime import timedelta
 
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.auth import TokenAuth
 
 from superdesk.core import get_current_app, get_app_config
@@ -48,7 +48,8 @@ class CompanyTokenAuth(TokenAuth):
             # Request.access_route: If a forwarded header exists this is a
             # list of all ip addresses from the client ip to the last proxy server.
             # Ref. https://tedboy.github.io/flask/generated/generated/werkzeug.Request.access_route.html
-            request_ip_address = ipaddress.ip_address(request.access_route[0])
+            access_route = request.access_route[0] if request.access_route[0] != "<local>" else "127.0.0.1"
+            request_ip_address = ipaddress.ip_address(access_route)
             for i in company["allowed_ip_list"]:
                 if request_ip_address in ipaddress.ip_network(i, strict=False):
                     valid_network = True

@@ -8,7 +8,7 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.default_settings import (  # noqa
     VERSION,
@@ -222,8 +222,7 @@ PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "ht
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
 # Flask Limiter Settings
-RATELIMIT_ENABLED = True
-RATELIMIT_STRATEGY = "fixed-window"
+QUART_RATE_LIMITER_ENABLED = True
 
 # Cache Settings
 # https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching

@@ -1,10 +1,10 @@
-from flask_wtf import FlaskForm, RecaptchaField
-from flask_babel import lazy_gettext
+from quart_wtf import QuartForm
+from quart_babel import lazy_gettext
 from wtforms import StringField, PasswordField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
-class SignupForm(FlaskForm):
+class SignupForm(QuartForm):
     company_sizes = [("0-10", "0-10"), ("11-100", "11-100"), (">100", ">100")]
     occupations = [
         ("Editor", lazy_gettext("Editor")),
@@ -32,21 +32,23 @@ class SignupForm(FlaskForm):
     referred_by = TextAreaField(lazy_gettext("How did you hear about us? (Referral, social media, web search)"))
 
     consent = BooleanField(lazy_gettext("I agree to"), validators=[])
-    recaptcha = RecaptchaField()
+    # TODO-ASYNC: RecaptchaField is not possible in quart-wtf, as it requires getting request details which is async
+    #             Might need to add a `async_validators_<recaptcha>` here, and make recaptcha a simple stirng field
+    # recaptcha = RecaptchaField()
 
 
-class LoginForm(FlaskForm):
+class LoginForm(QuartForm):
     email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
     password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
     remember_me = BooleanField(lazy_gettext("Remember Me"), validators=[])
     firebase_status = StringField("firebase_status", validators=[])  # for firebase status code
 
 
-class TokenForm(FlaskForm):
+class TokenForm(QuartForm):
     email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
 
 
-class ResetPasswordForm(FlaskForm):
+class ResetPasswordForm(QuartForm):
     match_password2 = [
         DataRequired(),
         Length(min=8),

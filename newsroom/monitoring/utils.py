@@ -5,10 +5,10 @@ from superdesk.text_utils import get_text
 from newsroom.utils import get_items_by_id
 
 
-def get_monitoring_file(monitoring_profile, items):
+async def get_monitoring_file(monitoring_profile, items):
     _format = monitoring_profile.get("format_type", "monitoring_pdf")
     formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
-    _file = formatter.get_monitoring_file(get_date_items_dict(items), monitoring_profile)
+    _file = await formatter.get_monitoring_file(get_date_items_dict(items), monitoring_profile)
     _file.seek(0)
     return _file
 

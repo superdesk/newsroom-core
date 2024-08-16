@@ -1,5 +1,5 @@
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 
 import superdesk
 from superdesk.core import get_current_app
@@ -16,7 +16,7 @@ def init_app(app):
 
 
 @blueprint.route("/news/item/<path:item_id>", methods=["GET"])
-def get_item(item_id):
+async def get_item(item_id):
     app = get_current_app()
     auth = app.auth
     if not auth.authorized([], None, request.method):
@@ -25,7 +25,7 @@ def get_item(item_id):
     _format = request.args.get("format", "NINJSFormatter")
     _version = request.args.get("version")
     service = get_resource_service("formatters")
-    formatted = service.get_version(item_id, _version, _format)
+    formatted = await service.get_version(item_id, _version, _format)
     mimetype = formatted.get("mimetype")
     response = app.response_class(response=formatted.get("formatted_item"), status=200, mimetype=mimetype)
 

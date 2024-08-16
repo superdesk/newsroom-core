@@ -1,4 +1,5 @@
 from behave import then, when
+from behave.api.async_step import async_run_until_complete
 from wooper.expect import expect_status_in
 
 from superdesk.core import json
@@ -17,9 +18,10 @@ def assert_ok(response):
 
 
 @then("we get the following order")
-def step_impl_ordered_list(context):
+@async_run_until_complete
+async def step_impl_ordered_list(context):
     assert_200(context.response)
-    response_data = (get_json_data(context.response) or {}).get("_items")
+    response_data = ((await get_json_data(context.response)) or {}).get("_items")
     ids = [item["_id"] for item in response_data]
     expected_order = json.loads(context.text)
 
@@ -27,48 +29,57 @@ def step_impl_ordered_list(context):
 
 
 @when('we get json from "{url}"')
-def step_impl_get_json_array_from_url(context, url):
+@async_run_until_complete
+async def step_impl_get_json_array_from_url(context, url):
     url = apply_placeholders(context, url)
-    context.response = context.client.get(
-        get_prefixed_url(context.app, url),
-        headers=[header for header in context.headers if header[0] != "Content-Type"],
-    )
+    async with context.app.test_request_context(url):
+        context.response = await context.client.get(
+            get_prefixed_url(context.app, url),
+            headers=[header for header in context.headers if header[0] != "Content-Type"],
+        )
 
     assert_ok(context.response)
 
 
 @when('we post form to "{url}"')
-def step_impl_when_post_form_to_url(context, url):
+@async_run_until_complete
+async def step_impl_when_post_form_to_url(context, url):
     url = apply_placeholders(context, url)
     data = json.loads(apply_placeholders(context, context.text))
-    context.response = context.client.post(
-        get_prefixed_url(context.app, url),
-        data={key: json.dumps(val) for key, val in data.items()},
-        headers=[header for header in context.headers if header[0] != "Content-Type"],
-    )
+    async with context.app.test_request_context(url):
+        context.response = await context.client.post(
+            get_prefixed_url(context.app, url),
+            form={key: json.dumps(val) for key, val in data.items()},
+            headers=[header for header in context.headers if header[0] != "Content-Type"],
+        )
 
     assert_ok(context.response)
 
 
 @when('we post json to "{url}"')
-def step_impl_when_post_json_to_url(context, url):
+@async_run_until_complete
+async def step_impl_when_post_json_to_url(context, url):
     url = apply_placeholders(context, url)
     data = apply_placeholders(context, context.text)
-    context.response = context.client.post(url, data=data, headers=context.headers)
+
+    async with context.app.test_request_context(url):
+        context.response = await context.client.post(url, data=data, headers=context.headers)
 
     assert_ok(context.response)
 
 
 @then('we store "{tag}" with item id')
-def step_impl_store_response_item_id(context, tag):
-    data = get_json_data(context.response)
+@async_run_until_complete
+async def step_impl_store_response_item_id(context, tag):
+    data = await get_json_data(context.response)
     set_placeholder(context, tag, data.get("_id"))
 
 
 @then("we get aggregations")
-def step_impl_get_aggregations(context):
+@async_run_until_complete
+async def step_impl_get_aggregations(context):
     assert_200(context.response)
-    response_aggs = (get_json_data(context.response) or {}).get("_aggregations")
+    response_aggs = ((await get_json_data(context.response)) or {}).get("_aggregations")
     expected_aggs = json.loads(context.text)
 
     for key, val in expected_aggs.items():
@@ -77,16 +88,15 @@ def step_impl_get_aggregations(context):
 
 
 @when('we login with email "{email}" and password "{password}"')
-def when_we_login_as_user(context, email, password):
-    with context.app.test_request_context():
-        context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
-        response = context.client.post(
+@async_run_until_complete
+async def when_we_login_as_user(context, email, password):
+    async with context.app.test_request_context("/login"):
+        await context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
+        response = await context.client.post(
             get_prefixed_url(context.app, "/login"),
-            data=json.dumps(
-                dict(
-                    email=email,
-                    password=password,
-                )
+            form=dict(
+                email=email,
+                password=password,
             ),
             headers=context.headers,
         )
@@ -94,9 +104,10 @@ def when_we_login_as_user(context, email, password):
 
 
 @then("we get products assigned to items")
-def then_we_get_users_with_products(context):
+@async_run_until_complete
+async def then_we_get_users_with_products(context):
     data = json.loads(apply_placeholders(context, context.text))
-    list_items = get_json_data(context.response)
+    list_items = await get_json_data(context.response)
     if not isinstance(list_items, list):
         list_items = [list_items]
     for user in list_items:

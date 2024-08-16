@@ -1,6 +1,6 @@
 from unittest import mock
 
-from flask import url_for
+from quart import url_for
 
 from newsroom.types import CompanyType, Country
 from newsroom.auth import get_auth_user_by_email
@@ -21,9 +21,9 @@ async def test_new_user_signup_sends_email(app, client):
     )
     with app.mail.record_messages() as outbox:
         # Sign up
-        response = client.post(
+        response = await client.post(
             url_for("auth.signup"),
-            data={
+            form={
                 "email": "newuser@abc.org",
                 "first_name": "John",
                 "last_name": "Doe",
@@ -93,11 +93,11 @@ async def test_new_user_signup_sends_email(app, client):
     }
 
 
-def test_new_user_signup_fails_if_fields_not_provided(client):
+async def test_new_user_signup_fails_if_fields_not_provided(client):
     # Register a new account
-    response = client.post(
+    response = await client.post(
         url_for("auth.signup"),
-        data={
+        form={
             "email": "newuser@abc.org",
             "email2": "newuser@abc.org",
             "phone": "1234567",
@@ -105,7 +105,7 @@ def test_new_user_signup_fails_if_fields_not_provided(client):
             "password2": "abc",
         },
     )
-    txt = response.get_data(as_text=True)
+    txt = await response.get_data(as_text=True)
     assert "company: This field is required" in txt
     assert "company_size: This field is required" in txt
     assert "name: This field is required" in txt
@@ -114,16 +114,16 @@ def test_new_user_signup_fails_if_fields_not_provided(client):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_approve_company_and_users(app, client):
+async def test_approve_company_and_users(app, client):
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
 
     # Sign up a new Company & User
     with app.mail.record_messages():
-        response = client.post(
+        response = await client.post(
             url_for("auth.signup"),
-            data={
+            form={
                 "email": "john@doe.org",
                 "first_name": "John",
                 "last_name": "Doe",
@@ -148,7 +148,7 @@ def test_approve_company_and_users(app, client):
 
     # Approve the new Company and it's associated User
     with app.mail.record_messages() as outbox:
-        response = client.post(url_for("companies.approve_company", company_id=str(new_company["_id"])), data={})
+        response = await client.post(url_for("companies.approve_company", company_id=str(new_company["_id"])))
         assert response.status_code == 200
 
         # Test the Company & User are now enabled and approved, but not yet validated
@@ -168,9 +168,9 @@ def test_approve_company_and_users(app, client):
         assert auth_user["token"] in outbox[0].body
 
     # Sign up another user for the same company
-    response = client.post(
+    response = await client.post(
         url_for("auth.signup"),
-        data={
+        form={
             "email": "jane@doe.org",
             "first_name": "Jane",
             "last_name": "Doe",
@@ -195,7 +195,7 @@ def test_approve_company_and_users(app, client):
 
     # Approve the new User
     with app.mail.record_messages() as outbox:
-        response = client.post(url_for("users.approve_user", user_id=str(new_user["_id"])), data={})
+        response = await client.post(url_for("users.approve_user", user_id=str(new_user["_id"])))
         assert response.status_code == 200
 
         # Test the new User is now enabled and approved, but not yet validated

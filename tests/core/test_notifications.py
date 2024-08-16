@@ -1,4 +1,4 @@
-from flask import json
+from quart import json
 from bson import ObjectId
 import datetime
 from superdesk.utc import utcnow
@@ -13,7 +13,7 @@ notification = {"item": "Foo", "user": user}
 notifications_url = "users/%s/notifications" % user
 
 
-def test_notification_has_unique_id(client, app):
+async def test_notification_has_unique_id(client, app):
     app.config["NOTIFICATIONS_TTL"] = 1
     get_resource_service("notifications").post([notification])
     notifications = get_user_notifications(ObjectId(user))
@@ -21,7 +21,7 @@ def test_notification_has_unique_id(client, app):
     assert notifications[0]["_id"] == "{}_Foo".format(user)
 
 
-def test_notification_updates_with_unique_id(client, app):
+async def test_notification_updates_with_unique_id(client, app):
     get_resource_service("notifications").post([notification])
     old_notifications = get_user_notifications(ObjectId(user))
     app.data.update(
@@ -42,54 +42,54 @@ def test_notification_updates_with_unique_id(client, app):
     assert old_created != new_created
 
 
-def test_delete_notification_fails_for_different_user(client):
-    with client.session_transaction() as session:
+async def test_delete_notification_fails_for_different_user(client):
+    async with client.session_transaction() as session:
         session["user"] = user
 
     get_resource_service("notifications").post([notification])
     id = "{}_Foo".format(user)
 
-    with client.session_transaction() as session:
+    async with client.session_transaction() as session:
         session["user"] = str(TEST_USER_ID)
         session["name"] = "tester"
 
-    resp = client.delete("/users/{}/notifications/{}".format(user, id))
+    resp = await client.delete("/users/{}/notifications/{}".format(user, id))
     assert 403 == resp.status_code
 
 
-def test_delete_notification(client):
+async def test_delete_notification(client):
     get_resource_service("notifications").post([notification])
 
-    with client.session_transaction() as session:
+    async with client.session_transaction() as session:
         session["user"] = user
         session["name"] = "tester"
 
-    resp = client.get(notifications_url)
-    data = json.loads(resp.get_data())
+    resp = await client.get(notifications_url)
+    data = json.loads(await resp.get_data())
     notify_id = data["notifications"][0]["_id"]
 
-    resp = client.delete("/users/{}/notifications/{}".format(user, notify_id))
+    resp = await client.delete("/users/{}/notifications/{}".format(user, notify_id))
     assert 200 == resp.status_code
 
-    resp = client.get(notifications_url)
-    data = json.loads(resp.get_data())
+    resp = await client.get(notifications_url)
+    data = json.loads(await resp.get_data())
     assert 0 == len(data["notifications"])
 
 
-def test_delete_all_notifications(client):
+async def test_delete_all_notifications(client):
     get_resource_service("notifications").post([notification, {"item": "Bar", "user": user}])
 
-    with client.session_transaction() as session:
+    async with client.session_transaction() as session:
         session["user"] = user
         session["name"] = "tester"
 
-    resp = client.get(notifications_url)
-    data = json.loads(resp.get_data())
+    resp = await client.get(notifications_url)
+    data = json.loads(await resp.get_data())
     assert 2 == len(data["notifications"])
 
-    resp = client.delete("/users/{}/notifications".format(user))
+    resp = await client.delete("/users/{}/notifications".format(user))
     assert 200 == resp.status_code
 
-    resp = client.get(notifications_url)
-    data = json.loads(resp.get_data())
+    resp = await client.get(notifications_url)
+    data = json.loads(await resp.get_data())
     assert 0 == len(data["notifications"])

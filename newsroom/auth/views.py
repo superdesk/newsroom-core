@@ -3,10 +3,11 @@ import bcrypt
 import logging
 import google.oauth2.id_token
 import re
+from datetime import timedelta
 
 from bson import ObjectId
 from google.auth.transport import requests
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import abort, Blueprint, render_template, request, url_for, redirect, session
@@ -43,7 +44,7 @@ from newsroom.utils import (
     is_admin,
 )
 from newsroom.email import send_new_signup_email
-from newsroom.limiter import limiter
+from newsroom.limiter import rate_limit
 
 from .token import generate_auth_token, verify_auth_token
 
@@ -53,23 +54,22 @@ logger = logging.getLogger(__name__)
 
 
 @blueprint.route("/login", methods=["GET", "POST"])
-@limiter.limit("60/minute")
-def login():
-    if is_valid_session():
+@rate_limit(60, timedelta(minutes=1))
+async def login():
+    if await is_valid_session():
         # If user has already logged in, then redirect them to the next page
         # which defaults to the home page
         return redirect_to_next_url()
 
-    form = LoginForm()
-
-    if form.validate_on_submit():
+    form = await LoginForm.create_form()
+    if await form.validate_on_submit():
         if email_has_exceeded_max_login_attempts(form.email.data):
-            return render_template("account_locked.html", form=form)
+            return await render_template("account_locked.html", form=form)
 
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user is not None else None
 
-        if is_valid_user(user, company):
+        if await is_valid_user(user, company):
             auth_provider = get_company_auth_provider(company)
             firebase_status = form.firebase_status.data
             if (
@@ -82,22 +82,22 @@ def login():
                     "auth/wrong-password",
                 )
             ):
-                flash(gettext("Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
             elif auth_provider.type == AuthProviderType.FIREBASE and firebase_status:
-                log_firebase_unexpected_error(firebase_status)
+                await log_firebase_unexpected_error(firebase_status)
             elif auth_provider.type != AuthProviderType.PASSWORD and not is_admin(user):
                 # Password login is not enabled for this user's company, and the user is not an admin
-                flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
+                await flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
                 user_auth = get_auth_user_by_email(user["email"])
                 if not _is_password_valid(form.password.data.encode("UTF-8"), user_auth):
-                    flash(gettext("Invalid username or password."), "danger")
+                    await flash(gettext("Invalid username or password."), "danger")
                 else:
                     start_user_session(user, permanent=form.remember_me.data)
                     update_user_last_active(user)
                     return redirect_to_next_url()
 
-    return render_template("login.html", form=form, firebase=get_app_config("FIREBASE_ENABLED"))
+    return await render_template("login.html", form=form, firebase=get_app_config("FIREBASE_ENABLED"))
 
 
 def email_has_exceeded_max_login_attempts(email):
@@ -160,9 +160,9 @@ def _is_password_valid(password, user):
 
 # this could be rate limited to a specific ip address
 @blueprint.route("/login/token/", methods=["POST"])
-def get_login_token():
-    email = request.form.get("email")
-    password = request.form.get("password")
+async def get_login_token():
+    email = (await request.form).get("email")
+    password = (await request.form).get("password")
 
     if not email or not password:
         abort(400)
@@ -182,14 +182,14 @@ def get_login_token():
         if is_company_expired(user, company):
             abort(401, gettext("Company account has expired."))
 
-        if is_account_enabled(user):
+        if await is_account_enabled(user):
             return generate_auth_token(user)
     else:
         abort(401, gettext("Invalid username or password."))
 
 
 @blueprint.route("/login/token/<token>", methods=["GET"])
-def login_with_token(token):
+async def login_with_token(token):
     if not token:
         abort(401, gettext("Invalid token"))
 
@@ -205,7 +205,7 @@ def login_with_token(token):
     }
 
     start_user_session(user_data)
-    flash("login", "analytics")
+    await flash("login", "analytics")
     return redirect(url_for("wire.index"))
 
 
@@ -216,9 +216,9 @@ def logout():
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
-def signup():
+async def signup():
     app = get_current_app().as_any()
-    form = (app.signup_form_class or SignupForm)()
+    form = await (app.signup_form_class or SignupForm).create_form()
     if len(app.countries):
         form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
 
@@ -226,10 +226,10 @@ def signup():
     if len(company_types):
         form.company_type.choices += [(item.get("id"), item.get("name")) for item in company_types]
 
-    if form.validate_on_submit():
+    if await form.validate_on_submit():
         user = get_auth_user_by_email(form.email.data)
         if user is not None:
-            flash(gettext("Account already exists."), "danger")
+            await flash(gettext("Account already exists."), "danger")
             return redirect(url_for("auth.login"))
 
         company_service = get_resource_service("companies")
@@ -276,9 +276,9 @@ def signup():
             "sections": {section["_id"]: True for section in app.sections},
         }
         user_service.post([new_user])
-        send_new_signup_email(company, new_user, is_new_company)
-        return render_template("signup_success.html"), 200
-    return render_template(
+        await send_new_signup_email(company, new_user, is_new_company)
+        return await render_template("signup_success.html"), 200
+    return await render_template(
         "signup.html",
         form=form,
         sitekey=get_app_config("RECAPTCHA_PUBLIC_KEY"),
@@ -287,7 +287,7 @@ def signup():
 
 
 @blueprint.route("/validate/<token>")
-def validate_account(token):
+async def validate_account(token):
     user = get_resource_service("users").find_one(req=None, token=token)
     if not user:
         abort(404)
@@ -298,21 +298,21 @@ def validate_account(token):
     if user.get("token_expiry_date") > utcnow():
         updates = {"is_validated": True, "token": None, "token_expiry_date": None}
         get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
-        flash(gettext("Your account has been validated."), "success")
+        await flash(gettext("Your account has been validated."), "success")
         return redirect(url_for("auth.login"))
 
-    flash(gettext("Token has expired. Please create a new token"), "danger")
+    await flash(gettext("Token has expired. Please create a new token"), "danger")
     redirect(url_for("auth.token", token_type="validate"))
 
 
 @blueprint.route("/reset_password/<token>", methods=["GET", "POST"])
-def reset_password(token):
+async def reset_password(token):
     user = get_resource_service("users").find_one(req=None, token=token)
     if not user:
-        return render_template("password_reset_link_expiry.html")
+        return await render_template("password_reset_link_expiry.html")
 
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
+    form = await ResetPasswordForm.create_form()
+    if await form.validate_on_submit():
         updates = {
             "is_validated": True,
             "password": form.new_password.data,
@@ -320,7 +320,7 @@ def reset_password(token):
             "token_expiry_date": None,
         }
         get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
-        flash(gettext("Your password has been changed. Please login again."), "success")
+        await flash(gettext("Your password has been changed. Please login again."), "success")
 
         if get_user() is not None:  # user is authenticated already
             return redirect_to_next_url()
@@ -328,14 +328,14 @@ def reset_password(token):
         return redirect(url_for("auth.login"))
 
     get_current_app().as_any().cache.delete(user.get("email"))
-    return render_template("reset_password.html", form=form, token=token)
+    return await render_template("reset_password.html", form=form, token=token)
 
 
 @blueprint.route("/token/<token_type>", methods=["GET", "POST"])
-def token(token_type: Literal["reset_password", "validate"]):
+async def token(token_type: Literal["reset_password", "validate"]):
     """Get token to reset password or validate email."""
-    form = TokenForm()
-    if form.validate_on_submit():
+    form = await TokenForm.create_form()
+    if await form.validate_on_submit():
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
@@ -343,28 +343,28 @@ def token(token_type: Literal["reset_password", "validate"]):
         assert user
 
         if auth_provider.features["verify_email"]:
-            send_token(user, token_type)
+            await send_token(user, token_type)
 
-        flash(
+        await flash(
             gettext("A reset password token has been sent to your email address."),
             "success",
         )
 
         return redirect(url_for("auth.login"))
 
-    return render_template(
+    return await render_template(
         "request_token.html", form=form, token_type=token_type, firebase=get_app_config("FIREBASE_ENABLED")
     )
 
 
 @blueprint.route("/reset_password_done")
-def reset_password_confirmation():
-    return render_template("request_token_confirm.html")
+async def reset_password_confirmation():
+    return await render_template("request_token_confirm.html")
 
 
 @blueprint.route("/login_locale", methods=["POST"])
-def set_locale():
-    locale = request.form.get("locale")
+async def set_locale():
+    locale = (await request.form).get("locale")
     if locale and locale in get_app_config("LANGUAGES"):
         session["locale"] = locale
     return redirect(url_for("auth.login"))
@@ -372,10 +372,10 @@ def set_locale():
 
 @blueprint.route("/auth/impersonate", methods=["POST"])
 @admin_only
-def impersonate_user():
+async def impersonate_user():
     if not session.get("auth_user"):
         session["auth_user"] = session["user"]
-    user_id = request.form.get("user")
+    user_id = (await request.form).get("user")
     assert user_id
     user = get_resource_service("users").find_one(req=None, _id=user_id)
     assert user
@@ -385,7 +385,7 @@ def impersonate_user():
 
 @blueprint.route("/auth/impersonate_stop", methods=["POST"])
 @login_required
-def impersonate_stop():
+async def impersonate_stop():
     assert session.get("auth_user")
     user = get_resource_service("users").find_one(req=None, _id=session.get("auth_user"))
     start_user_session(user)
@@ -395,41 +395,43 @@ def impersonate_stop():
 
 @blueprint.route("/change_password", methods=["GET", "POST"])
 @login_required
-def change_password():
-    form = ResetPasswordForm()
+async def change_password():
+    form = await ResetPasswordForm.create_form()
     user = get_user_required()
     company = get_company(user)
     auth_provider = get_company_auth_provider(company)
     form.email.process_data(user["email"])
 
-    if form.validate_on_submit():
+    if await form.validate_on_submit():
         if auth_provider.type == AuthProviderType.FIREBASE:
             if form.data.get("firebase_status"):
                 firebase_status = form.data["firebase_status"]
                 if firebase_status == "OK":
-                    flash(gettext("Your password has been changed."), "success")
+                    await flash(gettext("Your password has been changed."), "success")
                 elif firebase_status == "auth/wrong-password":
-                    flash(gettext("Current password invalid."), "danger")
+                    await flash(gettext("Current password invalid."), "danger")
                 else:
-                    log_firebase_unexpected_error(firebase_status)
+                    await log_firebase_unexpected_error(firebase_status)
                 return redirect(url_for("auth.change_password"))
         elif auth_provider.type == AuthProviderType.PASSWORD:
             user_auth = get_auth_user_by_email(user["email"])
             if not _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
-                flash(gettext("Current password invalid."), "danger")
+                await flash(gettext("Current password invalid."), "danger")
             else:
                 updates = {"password": form.new_password.data}
                 get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
-                flash(gettext("Your password has been changed."), "success")
+                await flash(gettext("Your password has been changed."), "success")
                 return redirect(url_for("auth.change_password"))
         else:
-            flash(gettext("Change password is not available."), "warning")
+            await flash(gettext("Change password is not available."), "warning")
 
-    return render_template("change_password.html", form=form, user=user, firebase=get_app_config("FIREBASE_ENABLED"))
+    return await render_template(
+        "change_password.html", form=form, user=user, firebase=get_app_config("FIREBASE_ENABLED")
+    )
 
 
 @blueprint.route("/firebase_auth_token")
-def firebase_auth_token():
+async def firebase_auth_token():
     token = request.args.get("token")
     firebase_request_adapter = requests.Request()
     if token:
@@ -441,15 +443,15 @@ def firebase_auth_token():
             )
         except ValueError as err:
             logger.error(err)
-            flash(gettext("User token is not valid"), "danger")
+            await flash(gettext("User token is not valid"), "danger")
             return redirect(url_for("auth.login", token_error=1))
 
         email = claims["email"]
-        return sign_user_by_email(email, auth_type=AuthProviderType.FIREBASE, validate_login_attempt=True)
+        return await sign_user_by_email(email, auth_type=AuthProviderType.FIREBASE, validate_login_attempt=True)
 
     return redirect(url_for("auth.login"))
 
 
-def log_firebase_unexpected_error(firebase_status: str):
+async def log_firebase_unexpected_error(firebase_status: str):
     logger.warning("Unhandled firebase error %s", firebase_status)
-    flash(gettext("Could not change your password. Please contact us for assistance."), "warning")
+    await flash(gettext("Could not change your password. Please contact us for assistance."), "warning")

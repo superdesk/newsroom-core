@@ -1,4 +1,4 @@
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 from typing_extensions import assert_never
 
 import superdesk

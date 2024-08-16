@@ -22,16 +22,16 @@ items_ids = [item["_id"] for item in items[:2]]
 item = items[:2][0]
 
 
-def download_zip_file(client, _format, section):
+async def download_zip_file(client, _format, section):
     now = utcnow()
     payload = {"items": items_ids, "type": section, "format": _format}
-    resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
+    resp = await client.post("/download", json=payload)
     assert resp.status_code == 200
     assert resp.mimetype == "application/zip"
     assert resp.headers.get("Content-Disposition") == "attachment; filename={}-newsroom.zip".format(
         now.strftime("%Y%m%d%H%M")
     )
-    _file = io.BytesIO(resp.get_data())
+    _file = io.BytesIO(await resp.get_data())
     return _file
 
 
@@ -123,9 +123,9 @@ agenda_formats = [
 ]
 
 
-def setup_image(client, app):
+async def setup_image(client, app):
     media_id = str(bson.ObjectId())
-    upload_binary("picture.jpg", client, media_id=media_id)
+    await upload_binary("picture.jpg", client, media_id=media_id)
     associations = {
         "featuremedia": {
             "mimetype": "image/jpeg",
@@ -140,12 +140,12 @@ def setup_image(client, app):
     app.data.update("items", item["_id"], {"associations": associations}, item)
 
 
-def test_download_single(client, app):
-    setup_image(client, app)
+async def test_download_single(client, app):
+    await setup_image(client, app)
     for _format in wire_formats:
         payload = {"items": [item["_id"]], "format": _format["format"]}
-        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
-        assert resp.status_code == 200
+        resp = await client.post("/download", json=payload)
+        assert resp.status_code == 200, await resp.get_data(as_text=True)
         assert resp.mimetype == _format["mimetype"]
         assert resp.headers.get("Content-Disposition") in [
             "attachment; filename=%s" % _format["filename"],
@@ -153,10 +153,10 @@ def test_download_single(client, app):
         ]
 
 
-def test_wire_download(client, app):
-    setup_image(client, app)
+async def test_wire_download(client, app):
+    await setup_image(client, app)
     for _format in wire_formats:
-        _file = download_zip_file(client, _format["format"], "wire")
+        _file = await download_zip_file(client, _format["format"], "wire")
         with zipfile.ZipFile(_file) as zf:
             assert _format["filename"] in zf.namelist()
             content = zf.open(_format["filename"]).read()
@@ -173,15 +173,15 @@ def test_wire_download(client, app):
     assert history[0].get("section") == "wire"
 
 
-def test_agenda_download(client, app):
-    setup_image(client, app)
+async def test_agenda_download(client, app):
+    await setup_image(client, app)
     for _format in agenda_formats:
         payload = {"items": [agenda_items[0]["_id"]], "type": "agenda", "format": _format["format"]}
-        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
-        assert resp.status_code == 200, resp.get_data()
+        resp = await client.post("/download", json=payload)
+        assert resp.status_code == 200, await resp.get_data()
         assert resp.mimetype == _format["mimetype"]
         if _format.get("test_content"):
-            _format["test_content"](resp.get_data())
+            _format["test_content"](await resp.get_data())
         assert resp.headers.get("content-disposition") == "attachment; filename=%s" % filename(
             _format["filename"], agenda_items[0]
         )

@@ -7,7 +7,7 @@ from unittest import mock
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_company_expiry_alerts(client, app):
+async def test_company_expiry_alerts(client, app):
     now = utcnow()
     app.data.insert(
         "companies",
@@ -33,7 +33,7 @@ def test_company_expiry_alerts(client, app):
         ],
     )
 
-    post_json(
+    await post_json(
         client,
         "/settings/general_settings",
         {"company_expiry_alert_recipients": "admin@localhost.com, notanadmin@localhost.com"},
@@ -43,15 +43,16 @@ def test_company_expiry_alerts(client, app):
     expiry_time = (now + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
     assert companies.count() >= 2
 
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        CompanyExpiryAlerts().send_alerts()
-        assert len(outbox) == 1
-        assert outbox[0].recipients == [
-            "admin@localhost.com",
-            " notanadmin@localhost.com",
-        ]
-        assert outbox[0].subject == "Companies expired or due to expire within the next 7 days ({})".format(
-            expiry_time.strftime("%d-%m-%Y")
-        )
-        assert "Press Co. That Will Expire" in outbox[0].body
-        assert "Press Co. Will Not Expire" not in outbox[0].body
+    with app.mail.record_messages() as outbox:
+        async with app.app_context():
+            await CompanyExpiryAlerts().send_alerts()
+            assert len(outbox) == 1
+            assert outbox[0].recipients == [
+                "admin@localhost.com",
+                " notanadmin@localhost.com",
+            ]
+            assert outbox[0].subject == "Companies expired or due to expire within the next 7 days ({})".format(
+                expiry_time.strftime("%d-%m-%Y")
+            )
+            assert "Press Co. That Will Expire" in outbox[0].body
+            assert "Press Co. Will Not Expire" not in outbox[0].body

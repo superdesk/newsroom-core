@@ -2,7 +2,7 @@ import logging
 from typing import List, Literal, Optional, Union, Dict, Any, TypedDict
 from copy import deepcopy
 
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 

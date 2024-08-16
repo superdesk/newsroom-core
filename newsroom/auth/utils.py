@@ -3,7 +3,7 @@ import werkzeug
 
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, TypedDict, Union
-from flask_babel import _
+from quart_babel import gettext
 
 import superdesk
 from superdesk.core import get_current_app, get_app_config
@@ -35,7 +35,7 @@ from newsroom.email import (
 SESSION_AUTH_TTL = timedelta(minutes=15)
 
 
-def sign_user_by_email(
+async def sign_user_by_email(
     email: str,
     auth_type: AuthProviderType,
     redirect_on_success: str = "wire.index",
@@ -54,29 +54,29 @@ def sign_user_by_email(
         users.create([user])
         assert "_id" in user
 
-    def redirect_with_error(error_str):
+    async def redirect_with_error(error_str):
         session.pop("_flashes", None)
-        flash(error_str, "danger")
+        await flash(error_str, "danger")
         return redirect(url_for(redirect_on_error, user_error=1))
 
     if user is None:
-        return redirect_with_error(_("User not found"))
+        return await redirect_with_error(gettext("User not found"))
 
     if validate_login_attempt:
         company = get_company(user)
         company_auth_provider = get_company_auth_provider(company)
 
         if company is None:
-            return redirect_with_error(_("No Company assigned"))
+            return await redirect_with_error(gettext("No Company assigned"))
         elif not is_company_enabled(user, company):
-            return redirect_with_error(_("Company is disabled"))
+            return await redirect_with_error(gettext("Company is disabled"))
         elif is_company_expired(user, company):
-            return redirect_with_error(_("Company has expired"))
-        elif not is_account_enabled(user):
-            return redirect_with_error(_("Account is disabled"))
+            return await redirect_with_error(gettext("Company has expired"))
+        elif not await is_account_enabled(user):
+            return await redirect_with_error(gettext("Account is disabled"))
         elif company_auth_provider.type != auth_type:
-            return redirect_with_error(
-                _("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
+            return await redirect_with_error(
+                gettext("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
             )
 
     users.system_update(
@@ -132,7 +132,7 @@ def is_current_user(user_id):
     return session["user"] == str(user_id)
 
 
-def send_token(user: User, token_type="validate", update_token=True):
+async def send_token(user: User, token_type="validate", update_token=True):
     if user is not None and user.get("is_enabled", False):
         if token_type == "validate" and user.get("is_validated", False):
             return False
@@ -146,11 +146,11 @@ def send_token(user: User, token_type="validate", update_token=True):
         assert isinstance(token, str)
 
         if token_type == "validate":
-            send_validate_account_email(user, token)
+            await send_validate_account_email(user, token)
         if token_type == "new_account":
-            send_new_account_email(user, token)
+            await send_new_account_email(user, token)
         elif token_type == "reset_password":
-            send_reset_password_email(user, token)
+            await send_reset_password_email(user, token)
         return True
     return False
 
@@ -174,7 +174,7 @@ def add_token_data(user):
     user.update(updates)
 
 
-def is_valid_session():
+async def is_valid_session():
     """Uses timezone-aware objects to avoid TypeError comparison"""
     # Get the current UTC time as a timezone-aware datetime
     now = datetime.now(timezone.utc)
@@ -186,17 +186,19 @@ def is_valid_session():
 
     # Check session validity
     return (
-        session.get("user") and session.get("user_type") and (auth_ttl and auth_ttl > now or revalidate_session_user())
+        session.get("user")
+        and session.get("user_type")
+        and (auth_ttl and auth_ttl > now or await revalidate_session_user())
     )
 
 
-def revalidate_session_user():
+async def revalidate_session_user():
     user = superdesk.get_resource_service("users").find_one(req=None, _id=session.get("user"))
     if not user:
         clear_user_session()
         return False
     company = get_company(user)
-    is_valid = is_valid_user(user, company)
+    is_valid = await is_valid_user(user, company)
     if is_valid:
         session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
     return is_valid
@@ -260,7 +262,7 @@ def check_user_has_products(user: User, company_products) -> None:
         and not (is_current_user_admin() or is_current_user_account_mgr())
     ):
         raise AuthorizationError(
-            403, _("There is no product associated with your user. Please reach out to your Company Admin.")
+            403, gettext("There is no product associated with your user. Please reach out to your Company Admin.")
         )
 
 

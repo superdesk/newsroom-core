@@ -40,6 +40,7 @@ from newsroom.template_filters import (
 )
 from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications.notifications import get_initial_notifications
+
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
 from newsroom.settings import SettingsApp
@@ -194,10 +195,10 @@ class NewsroomWebApp(BaseNewsroomApp):
             "assets": assets,
         }
 
-    def send_theme_file(self, filename):
+    async def send_theme_file(self, filename):
         if os.path.exists(os.path.join(self.theme_folder, filename)):
-            return send_from_directory(self.theme_folder, filename)
-        return self.send_static_file(filename)
+            return await send_from_directory(self.theme_folder, filename)
+        return await self.send_static_file(filename)
 
     def section(self, _id, name, group, search_type=None):
         """Define new app section.
@@ -217,9 +218,9 @@ class NewsroomWebApp(BaseNewsroomApp):
 
             @blueprint.route('/foo')
             @section('foo')
-            def example():
+            async def example():
                 # user company has section foo enabled
-                return flask.render_template('example_index.html)
+                return await flask.render_template('example_index.html)
 
         You can also specify ``section`` param in sidenav and it will filter out
         menu items with sections which are not enabled for company.
@@ -300,7 +301,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.dashboards.append({"_id": _id, "name": name, "cards": cards})
 
 
-def get_app(config=None, **kwargs):
+def get_app(config=None, **kwargs) -> NewsroomWebApp:
     app = NewsroomWebApp(__name__, config=config, **kwargs)
 
     # register newsroom commands group

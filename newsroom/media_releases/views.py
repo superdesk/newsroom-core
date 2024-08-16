@@ -46,15 +46,15 @@ async def get_view_data():
 async def index():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
-    return render_template("media_releases_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("media_releases_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_releases/search")
 @login_required
 @section("media_releases")
-def search():
-    response = get_internal("media_releases_search")
-    return send_response("media_releases_search", response)
+async def search():
+    response = await get_internal("media_releases_search")
+    return await send_response("media_releases_search", response)
 
 
 @blueprint.route("/bookmarks_media_releases")
@@ -63,18 +63,18 @@ async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
     user_profile_data = await get_user_profile_data()
-    return render_template("media_releases_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("media_releases_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_releases_bookmark", methods=["POST", "DELETE"])
 @login_required
-def bookmark():
+async def bookmark():
     """Bookmark an item.
 
     Stores user id into item.bookmarks array.
     Uses mongodb to update the array and then pushes updated array to elastic.
     """
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
@@ -84,7 +84,7 @@ def bookmark():
 
 @blueprint.route("/media_releases/<_id>/copy", methods=["POST"])
 @login_required
-def copy(_id):
+async def copy(_id):
     item_type = get_type()
     get_entity_or_404(_id, item_type)
     update_action_list([_id], "copies", item_type=item_type)
@@ -93,7 +93,7 @@ def copy(_id):
 
 @blueprint.route("/media_releases/<_id>/versions")
 @login_required
-def versions(_id):
+async def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
     return jsonify({"_items": items})
@@ -111,14 +111,14 @@ async def item(_id):
     if is_json_request(request):
         return jsonify(item)
     if not item.get("_access"):
-        return render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
+        return await render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     if "print" in request.args:
         template = "wire_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
     else:
         template = "wire_item.html"
-    return render_template(
+    return await render_template(
         template,
         item=item,
         previous_versions=previous_versions,

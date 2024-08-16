@@ -1,8 +1,11 @@
+from quart.cli import with_appcontext
+
 from superdesk.core import get_current_app
 from .cli import newsroom_cli
 
 
 @newsroom_cli.cli.command("elastic_init")
+@with_appcontext
 def elastic_init():
     """Init elastic index.
 

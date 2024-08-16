@@ -21,7 +21,7 @@ from newsroom.notifications import (
 
 @blueprint.route("/users/<_id>/topics", methods=["GET"])
 @login_required
-def get_topics(_id):
+async def get_topics(_id):
     """Returns list of followed topics of given user"""
     if session["user"] != str(_id):
         abort(403)
@@ -30,13 +30,13 @@ def get_topics(_id):
 
 @blueprint.route("/users/<_id>/topics", methods=["POST"])
 @login_required
-def post_topic(_id):
+async def post_topic(_id):
     """Creates a user topic"""
     user = get_user()
     if str(user["_id"]) != str(_id):
         abort(403)
 
-    topic = get_json_or_400()
+    topic = await get_json_or_400()
     topic["user"] = user["_id"]
     topic["company"] = user.get("company")
 
@@ -56,15 +56,15 @@ def post_topic(_id):
 
 @blueprint.route("/topics/my_topics", methods=["GET"])
 @login_required
-def get_list_my_topics():
+async def get_list_my_topics():
     return jsonify(_get_user_topics(get_user_id())), 200
 
 
 @blueprint.route("/topics/<topic_id>", methods=["POST"])
 @login_required
-def update_topic(topic_id):
+async def update_topic(topic_id):
     """Updates a followed topic"""
-    data = get_json_or_400()
+    data = await get_json_or_400()
     current_user = get_user(required=True)
     original = get_resource_service("topics").find_one(req=None, _id=ObjectId(topic_id))
 
@@ -108,7 +108,7 @@ def update_topic(topic_id):
 
 @blueprint.route("/topics/<topic_id>", methods=["DELETE"])
 @login_required
-def delete(topic_id):
+async def delete(topic_id):
     """Deletes a followed topic by given id"""
     current_user = get_user(required=True)
     original = get_resource_service("topics").find_one(req=None, _id=ObjectId(topic_id))
@@ -178,9 +178,9 @@ def get_topic_url(topic):
 
 @blueprint.route("/topic_share", methods=["POST"])
 @login_required
-def share():
+async def share():
     current_user = get_user(required=True)
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")
     topic = get_entity_or_404(data.get("items")["_id"], "topics")
@@ -216,7 +216,7 @@ def share():
             "message": data.get("message"),
             "app_name": get_app_config("SITE_NAME"),
         }
-        send_user_email(
+        await send_user_email(
             user,
             template="share_topic",
             template_kwargs=template_kwargs,

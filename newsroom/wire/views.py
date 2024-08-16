@@ -1,5 +1,6 @@
 import io
 import zipfile
+from inspect import iscoroutinefunction
 import superdesk
 
 from typing import Dict
@@ -8,7 +9,7 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import ImmutableMultiDict
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, jsonify, render_template, abort, send_file
@@ -225,7 +226,7 @@ def get_previous_versions(item):
 
 @blueprint.route("/")
 async def index():
-    if not is_valid_session():
+    if not await is_valid_session():
         data = (
             await render_public_dashboard()
             if get_app_config("PUBLIC_DASHBOARD")
@@ -234,12 +235,12 @@ async def index():
         return data
     data = await get_home_data()
     user_profile_data = await get_user_profile_data()
-    return render_template("home.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("home.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_card_external/<card_id>")
 @login_required
-def get_media_card_external(card_id):
+async def get_media_card_external(card_id):
     cache_id = "{}_{}".format(HOME_EXTERNAL_ITEMS_CACHE_KEY, card_id)
     app = get_current_app().as_any()
 
@@ -255,7 +256,7 @@ def get_media_card_external(card_id):
 
 @blueprint.route("/card_items")
 @login_required
-def get_card_items():
+async def get_card_items():
     user = get_user()
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
@@ -269,7 +270,7 @@ def get_card_items():
 async def wire():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
-    return render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_wire")
@@ -278,28 +279,28 @@ async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
     user_profile_data = await get_user_profile_data()
-    return render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/wire/search")
 @login_required
 @section("wire")
-def search():
+async def search():
     if "prepend_embargoed" in request.args or get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH"):
         args = request.args.to_dict()
         args["prepend_embargoed"] = strtobool(
             str(request.args.get("prepend_embargoed", get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH")))
         )
         request.args = ImmutableMultiDict(args)
-    response = get_internal("wire_search")
-    return send_response("wire_search", response)
+    response = await get_internal("wire_search")
+    return await send_response("wire_search", response)
 
 
 @blueprint.route("/download", methods=["POST"])
 @login_required
 async def download():
     user = get_user(required=True)
-    data = request.json
+    data = await request.get_json()
     _format = data.get("format", "text")
     item_type = get_type(data.get("type"))
     items = get_items_for_user_action(data["items"], item_type)
@@ -311,8 +312,9 @@ async def download():
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                media_url = await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
-                return media_url
+                return (
+                    await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
+                ) or abort(404)
             except ValueError:
                 return abort(404)
         else:
@@ -329,7 +331,11 @@ async def download():
         item = items[0]
         args_item = item if _format != "monitoring" else items
         parse_dates(item)  # fix for old items
-        _file.write(formatter.format_item(args_item, item_type=item_type))
+
+        if iscoroutinefunction(formatter.format_item):
+            _file.write(await formatter.format_item(args_item, item_type=item_type))
+        else:
+            _file.write(formatter.format_item(args_item, item_type=item_type))
         _file.seek(0)
         mimetype = formatter.get_mimetype(item)
         attachment_filename = secure_filename(formatter.format_filename(item))
@@ -341,29 +347,34 @@ async def download():
     else:
         with zipfile.ZipFile(_file, mode="w") as zf:
             for item in items:
+                if iscoroutinefunction(formatter.format_item):
+                    formatted_data = await formatter.format_item(item, item_type=item_type)
+                else:
+                    formatted_data = formatter.format_item(item, item_type=item_type)
+
                 parse_dates(item)  # fix for old items
                 zf.writestr(
                     secure_filename(formatter.format_filename(item)),
-                    formatter.format_item(item, item_type=item_type),
+                    formatted_data,
                 )
         _file.seek(0)
 
     update_action_list(data["items"], "downloads", force_insert=True)
     get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
-    return send_file(
+    return await send_file(
         _file,
         mimetype=mimetype,
-        download_name=attachment_filename,
+        attachment_filename=attachment_filename,
         as_attachment=True,
     )
 
 
 @blueprint.route("/wire_share", methods=["POST"])
 @login_required
-def share():
+async def share():
     current_user = get_user(required=True)
     item_type = get_type()
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")
     items = get_items_for_user_action(data.get("items"), item_type)
@@ -408,7 +419,7 @@ def share():
             ]
         )
 
-        send_user_email(
+        await send_user_email(
             user,
             template=f"share_{item_type}",
             template_kwargs=template_kwargs,
@@ -422,8 +433,8 @@ def share():
 
 @blueprint.route("/wire", methods=["DELETE"])
 @admin_only
-def remove_wire_items():
-    data = get_json_or_400()
+async def remove_wire_items():
+    data = await get_json_or_400()
     assert data.get("items")
 
     items_service = get_resource_service("items")
@@ -455,13 +466,13 @@ def remove_wire_items():
 
 @blueprint.route("/wire_bookmark", methods=["POST", "DELETE"])
 @login_required
-def bookmark():
+async def bookmark():
     """Bookmark an item.
 
     Stores user id into item.bookmarks array.
     Uses mongodb to update the array and then pushes updated array to elastic.
     """
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
@@ -476,7 +487,7 @@ async def copy(_id):
     item = get_entity_or_404(_id, item_type)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
-    locale = (get_session_locale() or "en").lower()
+    locale = (await get_session_locale() or "en").lower()
     template_name = get_language_template_name(template_filename, locale, "txt")
 
     template_kwargs = {"item": item}
@@ -489,7 +500,7 @@ async def copy(_id):
                 "user_profile_data": await get_user_profile_data(),
             }
         )
-    copy_data = render_template(template_name, **template_kwargs).strip()
+    copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
     get_resource_service("history").create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
@@ -498,7 +509,7 @@ async def copy(_id):
 
 @blueprint.route("/wire/<_id>/versions")
 @login_required
-def versions(_id):
+async def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
     return jsonify({"_items": items})
@@ -524,7 +535,7 @@ async def item(_id):
     if is_json_request(request):
         return jsonify(item)
     if not item.get("_access"):
-        return render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
+        return await render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     template = "wire_item.html"
     data = {"item": item}
@@ -540,7 +551,7 @@ async def item(_id):
             [item], "print", get_user(), request.args.get("type", "wire")
         )
 
-    return render_template(
+    return await render_template(
         template,
         **data,
         previous_versions=previous_versions,
@@ -551,7 +562,7 @@ async def item(_id):
 
 @blueprint.route("/wire/items/<_ids>")
 @login_required
-def items(_ids):
+async def items(_ids):
     item_ids = _ids.split(",")
     items = superdesk.get_resource_service("wire_search").get_items(item_ids)
     for item in items:
