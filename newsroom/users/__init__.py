@@ -2,7 +2,6 @@ import superdesk
 
 from quart_babel import lazy_gettext
 from inspect import iscoroutine
-from flask_babel import lazy_gettext
 
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service
 from .module import module  # noqa

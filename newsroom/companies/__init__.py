@@ -1,7 +1,6 @@
 import superdesk
 from quart_babel import lazy_gettext
 
-from newsroom.companies.companies_async.types import CompanyResource
 from newsroom.users.model import UserResourceModel
 
 from superdesk.core import json, get_current_app
