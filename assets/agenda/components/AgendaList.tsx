@@ -357,7 +357,6 @@ class AgendaList extends React.Component<IProps, IState> {
                         ? this.props.readItems[itemId] != null // event
                         : version === this.props.readItems[itemId]; // planning item
 
-                    console.log(this.props.readItems[itemId], version)
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
                             {plans.map((plan) => (
