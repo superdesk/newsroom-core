@@ -8,7 +8,7 @@ aiofiles==24.1.0
     # via
     #   quart
     #   quart-uploads
-aiohappyeyeballs==2.3.5
+aiohappyeyeballs==2.3.6
     # via aiohttp
 aiohttp==3.10.3
     # via elasticsearch
@@ -388,7 +388,7 @@ python-twitter==3.5
     # via superdesk-core
 python3-saml==1.16.0
     # via -r requirements.txt
-pytz==2023.4
+pytz==2024.1
     # via
     #   croniter
     #   eve-elastic
