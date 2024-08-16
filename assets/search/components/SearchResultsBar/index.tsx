@@ -107,7 +107,7 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
 
         this.state = {
-            isTagSectionShown: !COLLAPSED_SEARCH_BY_DEFAULT ?? (this.props.initiallyOpen || this.topicNotNull),
+            isTagSectionShown: COLLAPSED_SEARCH_BY_DEFAULT === true ? false : (this.props.initiallyOpen || this.topicNotNull),
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
