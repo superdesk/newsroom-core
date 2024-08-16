@@ -126,7 +126,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         # Send new account / password reset email
         if auth_provider.features["verify_email"]:
             updated_user = user.model_copy(update=user_updates)
-            send_token(updated_user, token_type="new_account", update_token=False)
+            await send_token(updated_user, token_type="new_account", update_token=False)
 
     def _get_password_hash(self, password):
         return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))
