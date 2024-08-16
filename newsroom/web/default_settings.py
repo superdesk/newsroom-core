@@ -839,7 +839,13 @@ NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
 #: .. versionadded: 2.8
 #:
 AGENDA_TIME_FILTERS = [
-    {"name": lazy_gettext("Today"), "query": "now/d", "filter": "today"},
-    {"name": lazy_gettext("This Week"), "query": "now/w", "filter": "this_week"},
-    {"name": lazy_gettext("This Month"), "query": "now/M", "filter": "this_month"},
+    {"name": lazy_gettext("Today"), "query": "now/d"},
+    {
+        "name": lazy_gettext("This Week"),
+        "query": "now/w",
+    },
+    {
+        "name": lazy_gettext("This Month"),
+        "query": "now/M",
+    },
 ]

@@ -4,16 +4,11 @@ import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
 import {render} from 'render-utils';
+import {WIRE_TOPIC_FOLDERS_UPDATED} from './constants';
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));
 }
-
-/**
- * This constant needs to be defined here, and not in `assets/wire/index.ts` because of script loading.
- * If not it will break the tests because of the loading order.
- */
-export const WIRE_TOPIC_FOLDERS_UPDATED = 'reload-wire-folders';
 
 let previousState = store.getState();
 
