@@ -1,5 +1,5 @@
 import click
-from flask.cli import with_appcontext
+from quart.cli import with_appcontext
 
 from superdesk.core import get_current_app
 from superdesk.commands.index_from_mongo import IndexFromMongo

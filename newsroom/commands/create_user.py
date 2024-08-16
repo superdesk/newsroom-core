@@ -1,5 +1,5 @@
 import click
-from flask.cli import with_appcontext
+from quart.cli import with_appcontext
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
