@@ -6,23 +6,21 @@ import superdesk
 from datetime import datetime, date
 from copy import deepcopy
 
-from typing import Dict, Optional, List, TypedDict
+from typing import TypedDict
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest
 
 from superdesk.core import get_app_config, get_current_app
-from superdesk.flask import session, abort, request
+from superdesk.flask import abort, request
 from newsroom.products.types import PRODUCT_TYPES
-from newsroom.types import Company, ProductRef, User
-from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
+from newsroom.types import User
+from newsroom.auth import get_user_id, get_user, SessionAuth
 from newsroom.auth.utils import get_company, get_company_auth_provider, send_token
 from newsroom.settings import get_setting
-from newsroom.utils import set_version_creator
 from superdesk.utils import get_hash
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
 from newsroom.user_roles import UserRole
-from newsroom.signals import user_updated, user_deleted
-from newsroom.companies.utils import get_company_section_names, get_company_product_ids
+from newsroom.signals import user_deleted
 
 # from .utils import add_token_data
 
