@@ -36,7 +36,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         # removes attribute `id` that comes empty and breaks validation
         try:
             data.pop("id")
-        except:
+        except Exception:
             pass
 
         return super().get_model_instance_from_dict(data)
