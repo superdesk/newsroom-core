@@ -26,7 +26,7 @@ from superdesk.cache import cache_backend
 from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.factory.app import SuperdeskEve
 
-from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
 from newsroom.auth import SessionAuth
@@ -273,7 +273,7 @@ class BaseNewsroomApp(SuperdeskEve):
         if self.config.get("SENTRY_DSN"):
             sentry_sdk.init(
                 dsn=self.config["SENTRY_DSN"],
-                integrations=[FlaskIntegration()],
+                integrations=[QuartIntegration()],
             )
 
     def _get_apm_environment(self):
