@@ -110,7 +110,6 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
         this.state = {
             isTagSectionShown: initOpenTagSectionConfig ?? (this.props.initiallyOpen || this.topicNotNull),
-            sortValue: this.props.defaultSortValue ?? 'versioncreated:desc',
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
