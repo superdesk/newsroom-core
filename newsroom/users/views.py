@@ -77,9 +77,11 @@ def get_settings_data():
 async def get_view_data():
     user = await get_user_or_abort()
     user_as_dict = user.model_dump(by_alias=True, exclude_unset=True)
-
     company = await get_company_from_user_or_session(user)
-    company_as_dict = company.model_dump(by_alias=True, exclude_unset=True)
+
+    company_as_dict = None
+    if company:
+        company_as_dict = company.model_dump(by_alias=True, exclude_unset=True)
 
     auth_provider = get_company_auth_provider(company_as_dict)
     ui_config_service = UiConfigResourceService()
@@ -88,9 +90,9 @@ async def get_view_data():
 
     view_data = {
         "user": user_as_dict,
-        "company": company.id or "",
+        "company": getattr(company, "id", ""),
         "topics": get_user_topics(user.id) if user else [],
-        "companyName": user_company.name or "",
+        "companyName": getattr(user_company, "name", ""),
         "locators": get_vocabulary("locators"),
         "ui_configs": await ui_config_service.get_all_config(),
         "groups": get_app_config("WIRE_GROUPS", []),

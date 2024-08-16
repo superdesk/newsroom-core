@@ -175,17 +175,21 @@ async def get_login_token():
     user = get_auth_user_by_email(email)
 
     if user is not None and _is_password_valid(password.encode("UTF-8"), user):
+        user_dict = {}
         user = await UsersService().find_by_id(user["_id"])
-        company = get_company_from_user(user)
+        if user:
+            user_dict = user.model_dump(by_alias=True)
 
-        if not is_company_enabled(user, company):
+        company = get_company_from_user(user_dict)
+
+        if not is_company_enabled(user_dict, company):
             abort(401, gettext("Company account has been disabled."))
 
-        if is_company_expired(user, company):
+        if is_company_expired(user_dict, company):
             abort(401, gettext("Company account has expired."))
 
-        if await is_account_enabled(user):
-            return generate_auth_token(user)
+        if await is_account_enabled(user_dict):
+            return generate_auth_token(user_dict)
     else:
         abort(401, gettext("Invalid username or password."))
 
