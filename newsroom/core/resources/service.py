@@ -1,10 +1,10 @@
 from typing import Generic, Any, ClassVar, TypeVar
 
-from quart import current_app as app
-
 from superdesk.core.resources.service import AsyncResourceService
-from .model import NewshubResourceModel
 from newsroom.utils import get_user_id
+from newsroom.core import get_current_wsgi_app
+
+from .model import NewshubResourceModel
 
 
 NewshubResourceModelType = TypeVar("NewshubResourceModelType", bound=NewshubResourceModel)
@@ -25,9 +25,11 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
     async def on_updated(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         await super().on_updated(updates, original)
         if self.clear_item_cache_on_update:
+            app = get_current_wsgi_app()
             app.cache.delete(str(original.id))
 
     async def on_deleted(self, doc: NewshubResourceModelType):
         await super().on_deleted(doc)
         if self.clear_item_cache_on_update:
+            app = get_current_wsgi_app()
             app.cache.delete(str(doc.id))
