@@ -1,4 +1,4 @@
-import flask
+import quart
 
 from unittest import mock
 from datetime import datetime, timedelta
@@ -13,7 +13,7 @@ from ..utils import mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_realtime_notifications_wire(app, mocker, company_products):
+async def test_realtime_notifications_wire(app, mocker, company_products):
     user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
     navigations = [
         {
@@ -104,9 +104,9 @@ def test_realtime_notifications_wire(app, mocker, company_products):
 
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
-        assert not flask.request
-        notify_new_wire_item("topic1_item1")
-        notify_new_wire_item("item_other")
+        assert not quart.request
+        await notify_new_wire_item("topic1_item1")
+        await notify_new_wire_item("item_other")
 
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user["_id"]) in push_mock.call_args[1]["counts"].keys()
@@ -126,13 +126,13 @@ def test_realtime_notifications_wire(app, mocker, company_products):
     app.data.update("companies", company["_id"], {"products": []}, company)
 
     with app.mail.record_messages() as outbox:
-        notify_new_wire_item("topic1_item1")
+        await notify_new_wire_item("topic1_item1")
 
     assert len(outbox) == 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_realtime_notifications_agenda(app, mocker):
+async def test_realtime_notifications_agenda(app, mocker):
     app.data.insert(
         "topics",
         [
@@ -244,9 +244,9 @@ def test_realtime_notifications_agenda(app, mocker):
 
     # avoid using client to mimic celery worker
     with app.mail.record_messages() as outbox:
-        assert not flask.request
-        notify_new_agenda_item("event_id_1")
-        notify_new_agenda_item("event_id_2")
+        assert not quart.request
+        await notify_new_agenda_item("event_id_1")
+        await notify_new_agenda_item("event_id_2")
 
     notification = get_resource_service("notifications").find_one(req=None, user=ADMIN_USER_ID)
     assert notification is not None
@@ -259,7 +259,7 @@ def test_realtime_notifications_agenda(app, mocker):
     assert "http://localhost:5050/agenda?item=event_id_1" in outbox[0].body
 
 
-def test_realtime_notifications_agenda_reccuring_event(app):
+async def test_realtime_notifications_agenda_reccuring_event(app):
     app.data.insert(
         "agenda",
         [
@@ -289,18 +289,18 @@ def test_realtime_notifications_agenda_reccuring_event(app):
     )
 
     with mock.patch("newsroom.push.notify_new_item") as notify_new_item:
-        notify_new_agenda_item("event_id_1")
+        await notify_new_agenda_item("event_id_1")
         assert notify_new_item.call_count == 1
 
-        notify_new_agenda_item("event_id_2", is_new=True)
+        await notify_new_agenda_item("event_id_2", is_new=True)
         assert notify_new_item.call_count == 1
 
-        notify_new_agenda_item("event_id_2")
+        await notify_new_agenda_item("event_id_2")
         assert notify_new_item.call_count == 2
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_pause_notifications(app, mocker, company_products):
+async def test_pause_notifications(app, mocker, company_products):
     user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
     updates = {
         "notification_schedule": dict(
@@ -371,7 +371,7 @@ def test_pause_notifications(app, mocker, company_products):
 
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
-        notify_new_agenda_item("event_id_1")
-        notify_new_wire_item("item1")
+        await notify_new_agenda_item("event_id_1")
+        await notify_new_wire_item("item1")
         assert len(outbox) == 0
         push_mock.assert_not_called()

@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm
-from flask_babel import gettext
+from quart_wtf import QuartForm
+from quart_babel import gettext
 from wtforms import StringField, HiddenField, BooleanField, TextAreaField
 from wtforms import SelectField
 from wtforms.validators import DataRequired
@@ -11,7 +11,7 @@ alert_types = [
 format_types = [("monitoring_pdf", gettext("PDF")), ("monitoring_rtf", gettext("RTF"))]
 
 
-class MonitoringForm(FlaskForm):
+class MonitoringForm(QuartForm):
     class Meta:
         csrf = False
 

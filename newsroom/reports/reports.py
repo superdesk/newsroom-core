@@ -4,7 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.utils import secure_filename
 

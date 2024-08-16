@@ -3,7 +3,7 @@ from typing import Optional
 import ipaddress
 from pydantic import AfterValidator
 from pydantic_core import PydanticCustomError
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core.app import get_current_async_app
 

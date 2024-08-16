@@ -47,7 +47,7 @@ def gen_event(item: Dict[str, Any], event_end_date: int, plan_ids: Optional[List
     return item
 
 
-def test_has_plan_expired():
+async def test_has_plan_expired():
     expiry_datetime = now_minus_days(60)
 
     assert has_plan_expired(gen_plans({"_id": "p61"}, 61), expiry_datetime) is True
@@ -58,7 +58,7 @@ def test_has_plan_expired():
     assert has_plan_expired(gen_plans({"_id": "p61"}, 61, [61, 59]), expiry_datetime) is False
 
 
-def test_get_expired_chain_ids(app):
+async def test_get_expired_chain_ids(app):
     expiry_datetime = now_minus_days(60)
 
     plan1 = gen_plans({"_id": "plan1"}, 59)
@@ -96,7 +96,7 @@ def test_get_expired_chain_ids(app):
     assert _get_expired_chain_ids(event4, expiry_datetime) == []
 
 
-def test_remove_expired_agenda(runner, app):
+async def test_remove_expired_agenda(runner, app):
     app.data.insert(
         "agenda",
         [

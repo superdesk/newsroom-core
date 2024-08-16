@@ -11,7 +11,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
-from flask_babel import gettext, format_date as _format_date
+from quart_babel import gettext, format_date as _format_date
 
 import superdesk
 from superdesk.core.web import Request
@@ -132,8 +132,8 @@ def get_entities_elastic_or_mongo_or_404(_ids, resource):
     return items
 
 
-def get_json_or_400():
-    data = request.get_json()
+async def get_json_or_400():
+    data = await request.get_json()
     if not isinstance(data, dict):
         abort(400)
     return data
@@ -307,12 +307,12 @@ def is_company_expired(user=None, company=None):
     return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
 
 
-def is_account_enabled(user):
+async def is_account_enabled(user):
     """
     Checks if user account is active and approved
     """
     if not user.get("is_enabled"):
-        flash(gettext("Account is disabled"), "danger")
+        await flash(gettext("Account is disabled"), "danger")
         return False
 
     if user.get("is_approved") is False:
@@ -320,7 +320,7 @@ def is_account_enabled(user):
 
         approve_expiration = utcnow() + timedelta(days=-get_app_config("NEW_ACCOUNT_ACTIVE_DAYS", 14))
         if not account_created or account_created < approve_expiration:
-            flash(gettext("Account has not been approved"), "danger")
+            await flash(gettext("Account has not been approved"), "danger")
             return False
 
     return True
@@ -411,28 +411,28 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     return None
 
 
-def is_valid_user(user, company) -> bool:
+async def is_valid_user(user, company) -> bool:
     """Validate if user is valid and should be able to login to the system."""
     if not user:
-        flash(gettext("Invalid username or password."), "danger")
+        await flash(gettext("Invalid username or password."), "danger")
         return False
 
     session.pop("_flashes", None)  # remove old messages and just show one message
 
     if not is_admin(user) and not company:
-        flash(gettext("Insufficient Permissions. Access denied."), "danger")
+        await flash(gettext("Insufficient Permissions. Access denied."), "danger")
         return False
 
-    if not is_account_enabled(user):
-        flash(gettext("Account is disabled"), "danger")
+    if not await is_account_enabled(user):
+        await flash(gettext("Account is disabled"), "danger")
         return False
 
     if not is_company_enabled(user, company):
-        flash(gettext("Company account has been disabled."), "danger")
+        await flash(gettext("Company account has been disabled."), "danger")
         return False
 
     if is_company_expired(user, company):
-        flash(gettext("Company account has expired."), "danger")
+        await flash(gettext("Company account has expired."), "danger")
         return False
 
     return True

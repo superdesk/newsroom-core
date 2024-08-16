@@ -3,7 +3,7 @@
 import re
 import copy
 
-from flask_babel import gettext, lazy_gettext
+from quart_babel import gettext, lazy_gettext
 
 from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import Blueprint, abort, render_template, g, jsonify
@@ -36,14 +36,16 @@ async def app(app_id):
         if app._id == app_id:
             value = app.data()
             data = await value if iscoroutine(value) else value
-            return render_template("settings.html", setting_type=app_id, data=data, user_profile_data=user_profile_data)
+            return await render_template(
+                "settings.html", setting_type=app_id, data=data, user_profile_data=user_profile_data
+            )
     abort(404)
 
 
 @blueprint.route("/settings/general_settings", methods=["POST"])
 @admin_only
-def update_values():
-    values = get_json_or_400()
+async def update_values():
+    values = await get_json_or_400()
 
     error = validate_general_settings(values)
     if error:

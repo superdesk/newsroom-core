@@ -64,4 +64,4 @@ async def test_save_file_and_get_url_successful():
 
             assert result == "/assets/testfile.txt"
             mock_secure.assert_called_once_with("testfile.txt")
-            mock_url_for.assert_called_once_with("assets.get_upload", media_id="testfile.txt")
+            mock_url_for.assert_called_once_with("assets.download_file", media_id="testfile.txt")

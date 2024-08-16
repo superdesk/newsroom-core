@@ -3,7 +3,7 @@ import json
 from copy import deepcopy
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
 from superdesk.core import get_current_app, get_app_config
@@ -84,12 +84,12 @@ async def get_view_data():
 @login_required
 async def user_profile():
     data = await get_view_data()
-    return render_template("user_profile.html", data=data)
+    return await render_template("user_profile.html", data=data)
 
 
 @blueprint.route("/users/search", methods=["GET"])
 @account_manager_or_company_admin_only
-def search():
+async def search():
     lookup = {}
     sort = None
     if request.args.get("q"):
@@ -127,9 +127,9 @@ def search():
 
 @blueprint.route("/users/new", methods=["POST"])
 @account_manager_or_company_admin_only
-def create():
-    form = UserForm()
-    if form.validate():
+async def create():
+    form = await UserForm.create_form()
+    if await form.validate():
         if not _is_email_address_valid(form.email.data):
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
@@ -165,7 +165,7 @@ def create():
         ids = get_resource_service("users").post([new_user])
 
         if auth_provider.features["verify_email"]:
-            send_token(new_user, token_type="new_account", update_token=False)
+            await send_token(new_user, token_type="new_account", update_token=False)
 
         return jsonify({"success": True, "_id": ids[0]}), 201
     return jsonify(form.errors), 400
@@ -173,7 +173,7 @@ def create():
 
 @blueprint.route("/users/<_id>/resend_invite", methods=["POST"])
 @account_manager_or_company_admin_only
-def resent_invite(_id):
+async def resent_invite(_id):
     user = find_one("users", _id=ObjectId(_id))
     company = get_company()
     user_is_company_admin = is_current_user_company_admin()
@@ -190,7 +190,7 @@ def resent_invite(_id):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         abort(403)
 
-    send_token(user, token_type="new_account")
+    await send_token(user, token_type="new_account")
     return jsonify({"success": True}), 200
 
 
@@ -201,7 +201,7 @@ def _is_email_address_valid(email):
 
 @blueprint.route("/users/<_id>", methods=["GET", "POST"])
 @login_required
-def edit(_id):
+async def edit(_id):
     user_is_company_admin = is_current_user_company_admin()
     user_is_admin = is_current_user_admin()
     user_is_account_mgr = is_current_user_account_mgr()
@@ -224,8 +224,8 @@ def edit(_id):
         return abort(412)
 
     if request.method == "POST":
-        form = UserForm(user=user)
-        if form.validate_on_submit():
+        form = await UserForm.create_form(user=user)
+        if await form.validate_on_submit():
             if form.email.data != user["email"] and not _is_email_address_valid(form.email.data):
                 return (
                     jsonify({"email": [gettext("Email address is already in use")]}),
@@ -289,7 +289,7 @@ def get_updates_from_form(form: UserForm, on_create=False):
 
 @blueprint.route("/users/<_id>/profile", methods=["POST"])
 @login_required
-def edit_user_profile(_id):
+async def edit_user_profile(_id):
     if not is_current_user(_id):
         abort(403)
 
@@ -299,8 +299,8 @@ def edit_user_profile(_id):
     if not user:
         return NotFound(gettext("User not found"))
 
-    form = UserForm(user=user)
-    if form.validate_on_submit():
+    form = await UserForm.create_form(user=user)
+    if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
         get_resource_service("users").patch(user_id, updates=updates)
         return jsonify({"success": True}), 200
@@ -309,7 +309,7 @@ def edit_user_profile(_id):
 
 @blueprint.route("/users/<_id>/notification_schedules", methods=["POST"])
 @login_required
-def edit_user_notification_schedules(_id):
+async def edit_user_notification_schedules(_id):
     if not is_current_user(_id):
         abort(403)
 
@@ -319,7 +319,7 @@ def edit_user_notification_schedules(_id):
     if not user:
         return NotFound(gettext("User not found"))
 
-    data = get_json_or_400()
+    data = await get_json_or_400()
 
     updates = {"notification_schedule": deepcopy(user.get("notification_schedule") or {})}
     updates["notification_schedule"].update(data)
@@ -329,17 +329,17 @@ def edit_user_notification_schedules(_id):
 
 @blueprint.route("/users/<_id>/validate", methods=["POST"])
 @admin_only
-def validate(_id):
-    return _resend_token(_id, token_type="validate")
+async def validate(_id):
+    return await _resend_token(_id, token_type="validate")
 
 
 @blueprint.route("/users/<_id>/reset_password", methods=["POST"])
 @account_manager_or_company_admin_only
-def resend_token(_id):
-    return _resend_token(_id, token_type="reset_password")
+async def resend_token(_id):
+    return await _resend_token(_id, token_type="reset_password")
 
 
-def _resend_token(user_id, token_type):
+async def _resend_token(user_id, token_type):
     """
     Sends a new token for a given user_id
     :param user_id: Id of the user to send the token
@@ -354,7 +354,7 @@ def _resend_token(user_id, token_type):
     if not user:
         return NotFound(gettext("User not found"))
 
-    if send_token(user, token_type):
+    if await send_token(user, token_type):
         return jsonify({"success": True}), 200
 
     return jsonify({"message": "Token could not be sent"}), 400
@@ -362,7 +362,7 @@ def _resend_token(user_id, token_type):
 
 @blueprint.route("/users/<_id>", methods=["DELETE"])
 @account_manager_or_company_admin_only
-def delete(_id):
+async def delete(_id):
     """Deletes the user by given id"""
     get_resource_service("users").delete_action({"_id": ObjectId(_id)})
     return jsonify({"success": True}), 200
@@ -370,7 +370,7 @@ def delete(_id):
 
 @blueprint.route("/users/<user_id>/notifications", methods=["GET"])
 @login_required
-def get_notifications(user_id):
+async def get_notifications(user_id):
     if session["user"] != str(user_id):
         abort(403)
 
@@ -379,7 +379,7 @@ def get_notifications(user_id):
 
 @blueprint.route("/users/<user_id>/notifications", methods=["DELETE"])
 @login_required
-def delete_all(user_id):
+async def delete_all(user_id):
     """Deletes all notification by given user id"""
     if session["user"] != str(user_id):
         abort(403)
@@ -390,7 +390,7 @@ def delete_all(user_id):
 
 @blueprint.route("/users/<user_id>/notifications/<notification_id>", methods=["DELETE"])
 @login_required
-def delete_notification(user_id, notification_id):
+async def delete_notification(user_id, notification_id):
     """Deletes the notification by given id"""
     if session["user"] != str(user_id):
         abort(403)
@@ -401,7 +401,7 @@ def delete_notification(user_id, notification_id):
 
 @blueprint.route("/users/<user_id>/approve", methods=["POST"])
 @account_manager_or_company_admin_only
-def approve_user(user_id):
+async def approve_user(user_id):
     users_service = get_resource_service("users")
     user = users_service.find_one(req=None, _id=ObjectId(user_id))
     if not user:
@@ -410,5 +410,5 @@ def approve_user(user_id):
     if user.get("is_approved"):
         return jsonify({"error": gettext("User is already approved")}), 403
 
-    users_service.approve_user(user)
+    await users_service.approve_user(user)
     return jsonify({"success": True}), 200

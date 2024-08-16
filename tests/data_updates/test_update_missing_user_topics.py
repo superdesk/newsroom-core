@@ -4,7 +4,7 @@ import importlib
 update_module = importlib.import_module("data_updates.00014_20240312-085705_topics")
 
 
-def test_data_update(app):
+async def test_data_update(app):
     users = [
         {"name": "foo", "email": "foo"},
         {"name": "bar", "email": "bar"},

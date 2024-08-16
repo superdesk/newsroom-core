@@ -1,7 +1,7 @@
 import re
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.core import get_current_app
 from superdesk.flask import jsonify, request
@@ -32,7 +32,7 @@ def get_settings_data():
 
 @blueprint.route("/section_filters", methods=["GET"])
 @admin_only
-def index():
+async def index():
     lookup = None
     if request.args.get("q"):
         lookup = request.args.get("q")
@@ -42,7 +42,7 @@ def index():
 
 @blueprint.route("/section_filters/search", methods=["GET"])
 @admin_only
-def search():
+async def search():
     lookup = None
     if request.args.get("q"):
         regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
@@ -58,8 +58,8 @@ def validate_section_filter(section_filter):
 
 @blueprint.route("/section_filters/new", methods=["POST"])
 @admin_only
-def create():
-    section_filter = get_json_or_400()
+async def create():
+    section_filter = await get_json_or_400()
 
     validation = validate_section_filter(section_filter)
     if validation:
@@ -79,9 +79,9 @@ def create():
 
 @blueprint.route("/section_filters/<id>", methods=["POST"])
 @admin_only
-def edit(id):
+async def edit(id):
     get_entity_or_404(ObjectId(id), "section_filters")
-    data = get_json_or_400()
+    data = await get_json_or_400()
     updates = {
         "name": data.get("name"),
         "description": data.get("description"),
@@ -102,7 +102,7 @@ def edit(id):
 
 @blueprint.route("/section_filters/<id>", methods=["DELETE"])
 @admin_only
-def delete(id):
+async def delete(id):
     """Deletes the section_filters by given id"""
     get_entity_or_404(ObjectId(id), "section_filters")
     get_resource_service("section_filters").delete_action({"_id": ObjectId(id)})

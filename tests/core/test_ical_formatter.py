@@ -3,7 +3,7 @@ import copy
 from datetime import datetime
 
 import icalendar
-from flask import json
+from quart import json
 
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
@@ -22,8 +22,8 @@ event["dates"]["recurring_rule"] = {
 }
 
 
-def test_ical_formatter_item(client, app, mocker):
-    client.post("/push", data=json.dumps(event), content_type="application/json")
+async def test_ical_formatter_item(client, app, mocker):
+    await client.post("/push", json=event)
     parsed = get_entity_or_404(event["guid"], "agenda")
     formatter = iCalFormatter()
 
@@ -56,7 +56,7 @@ def test_ical_formatter_item(client, app, mocker):
     assert vevent["rrule"].to_ical() == b"FREQ=DAILY;COUNT=3;INTERVAL=1"
 
 
-def test_ical_formatter_failing(client, app):
+async def test_ical_formatter_failing(client, app):
     with open(
         os.path.join(os.path.dirname(__file__), "../fixtures", "agenda_fixture.json"),
         "r",

@@ -2,7 +2,7 @@ from typing import Optional
 import logging
 import newsroom
 
-from flask_babel import gettext
+from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
 from superdesk.core import get_app_config
@@ -105,7 +105,7 @@ class EmailTemplatesService(CacheableService):
             email["subject"].setdefault("default", DEFAULT_SUBJECTS[email_id])
             email["subject"].setdefault("translations", {})
 
-    def get_translated_subject(self, email_id: str, language_code: Optional[str] = None, **kwargs) -> str:
+    async def get_translated_subject(self, email_id: str, language_code: Optional[str] = None, **kwargs) -> str:
         language_code = language_code or get_app_config("DEFAULT_LANGUAGE")
         email = self.get_cached_by_id(email_id)
 
@@ -115,7 +115,7 @@ class EmailTemplatesService(CacheableService):
             subject = email["subject"]["default"]
 
         try:
-            return render_template_string(subject, **kwargs)
+            return await render_template_string(subject, **kwargs)
         except Exception as ex:
             if subject == email["subject"]["default"]:
                 logger.error("Failed to render email subject")
@@ -127,7 +127,7 @@ class EmailTemplatesService(CacheableService):
             # and fallback to using the default template
             logger.warning("Failed to render custom email subject, reverting to default instead")
             subject = email["subject"]["default"]
-            return render_template_string(subject, **kwargs)
+            return await render_template_string(subject, **kwargs)
         except Exception as ex:
             logger.error("Failed to render email subject using default template")
             logger.exception(ex)

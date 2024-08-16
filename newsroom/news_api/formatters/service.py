@@ -1,3 +1,4 @@
+from inspect import iscoroutinefunction
 from datetime import timedelta
 from eve.versioning import versioned_id_field
 
@@ -25,7 +26,7 @@ class APIFormattersService(Service):
         formatters = get_all_formatters()
         return next((f for f in formatters if type(f).__name__ == name), None)
 
-    def get_version(self, id, version, formatter_name):
+    async def get_version(self, id, version, formatter_name):
         formatter = self._get_formatter(formatter_name)
         if not formatter:
             abort(404)
@@ -45,7 +46,11 @@ class APIFormattersService(Service):
             "versioncreated", utcnow()
         ):
             abort(404)
-        ret = formatter.format_item(item)
+
+        if iscoroutinefunction(formatter.format_item):
+            ret = await formatter.format_item(item)
+        else:
+            ret = formatter.format_item(item)
         return {
             "formatted_item": ret,
             "mimetype": formatter.MIMETYPE,

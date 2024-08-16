@@ -26,7 +26,7 @@ class NotificationEmailTopicEntry(TypedDict):
 
 
 class SendScheduledNotificationEmails(Command):
-    def run(self, force: bool = False):
+    async def run(self, force: bool = False):
         self.log_msg = "Scheduled Notifications: {}".format(utcnow())
         logger.info(f"{self.log_msg} Starting to send scheduled notifications")
 
@@ -36,13 +36,13 @@ class SendScheduledNotificationEmails(Command):
             return
 
         try:
-            self.run_schedules(force)
+            await self.run_schedules(force)
         finally:
             unlock(lock_name)
 
         logger.info(f"{self.log_msg} Completed sending scheduled notifications")
 
-    def run_schedules(self, force: bool):
+    async def run_schedules(self, force: bool):
         try:
             now_utc = utcnow().replace(second=0, microsecond=0)
             companies = get_company_dict(False)
@@ -69,18 +69,20 @@ class SendScheduledNotificationEmails(Command):
                 if not user.get("notification_schedule"):
                     user["notification_schedule"] = {}
 
-                user["notification_schedule"].setdefault("timezone", get_session_timezone())
+                user["notification_schedule"].setdefault("timezone", await get_session_timezone())
                 user["notification_schedule"].setdefault(
                     "times", get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
                 )
 
                 company = companies.get(str(user.get("company", "")))
-                self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
+                await self.process_schedule(
+                    schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force
+                )
             except Exception as e:
                 logger.exception(e)
                 logger.error("Failed to run schedule for user %s", user_id)
 
-    def process_schedule(
+    async def process_schedule(
         self,
         schedule: NotificationQueue,
         user: User,
@@ -109,14 +111,14 @@ class SendScheduledNotificationEmails(Command):
 
         if not len(topic_entries["wire"]) and not len(topic_entries["agenda"]):
             # No item's matched this topic queue, send an email indicating no matches
-            send_user_email(
+            await send_user_email(
                 user,
                 template="scheduled_notification_no_matches_email",
                 template_kwargs=template_kwargs,
             )
         else:
             # Items matched this topic queue, send an email indicated matches
-            send_user_email(
+            await send_user_email(
                 user,
                 template="scheduled_notification_topic_matches_email",
                 template_kwargs=template_kwargs,

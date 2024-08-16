@@ -6,7 +6,7 @@ from superdesk.utc import utcnow
 from tests.fixtures import PUBLIC_USER_ID
 
 
-def test_adding_and_clearing_notification_queue():
+async def test_adding_and_clearing_notification_queue():
     service = get_resource_service("notification_queue")
 
     # Make sure the item doesn't already exist

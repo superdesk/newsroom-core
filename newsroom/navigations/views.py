@@ -2,7 +2,7 @@ import re
 from typing import List
 
 from bson import ObjectId
-from flask_babel import gettext
+from quart_babel import gettext
 
 from newsroom.flask import get_file_from_request
 from superdesk.core import get_current_app, json
@@ -50,9 +50,9 @@ def search():
 @blueprint.route("/navigations/new", methods=["POST"])
 @admin_only
 async def create():
-    data = json.loads(request.form["navigation"])
+    data = json.loads((await request.form)["navigation"])
     nav_data = await _get_navigation_data(data)
-    product_ids = nav_data.pop("products", None)
+    product_ids = nav_data.pop("products", [])
 
     set_original_creator(nav_data)
     ids = get_resource_service("navigations").post([nav_data])
@@ -77,7 +77,7 @@ async def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        file = get_file_from_request(f"file{index}")
+        file = await get_file_from_request(f"file{index}")
 
         if file:
             file_url = await save_file_and_get_url(f"file{index}")
@@ -92,9 +92,9 @@ async def _get_navigation_data(data):
 async def edit(_id):
     get_entity_or_404(_id, "navigations")
 
-    data = json.loads(request.form["navigation"])
+    data = json.loads((await request.form)["navigation"])
     nav_data = await _get_navigation_data(data)
-    product_ids = nav_data.pop("products", None)
+    product_ids = nav_data.pop("products", [])
 
     set_version_creator(nav_data)
     get_resource_service("navigations").patch(id=ObjectId(_id), updates=nav_data)
@@ -107,7 +107,7 @@ async def edit(_id):
 
 @blueprint.route("/navigations/<_id>", methods=["DELETE"])
 @admin_only
-def delete(_id):
+async def delete(_id):
     """Deletes the navigations by given id"""
     get_entity_or_404(_id, "navigations")
     get_resource_service("navigations").delete_action({"_id": ObjectId(_id)})

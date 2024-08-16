@@ -1,4 +1,4 @@
-from flask import json
+from quart import json
 from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
@@ -6,7 +6,7 @@ from newsroom.tests.fixtures import COMPANY_1_ID
 
 
 @fixture(autouse=True)
-def init(app):
+async def init(app):
     app.data.insert(
         "users",
         [
@@ -79,7 +79,7 @@ def init(app):
     )
 
 
-def test_company_saved_searches(client, app):
+async def test_company_saved_searches(client, app):
     app.data.insert(
         "topics",
         [
@@ -89,15 +89,15 @@ def test_company_saved_searches(client, app):
         ],
     )
 
-    resp = client.get("reports/company-saved-searches")
-    report = json.loads(resp.get_data())
+    resp = await client.get("reports/company-saved-searches")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Saved searches per company"
     assert len(report["results"]) == 1
     assert report["results"][0]["name"] == "Press Co."
     assert report["results"][0]["topic_count"] == 2
 
 
-def test_user_saved_searches(client, app):
+async def test_user_saved_searches(client, app):
     app.data.insert(
         "topics",
         [
@@ -107,17 +107,17 @@ def test_user_saved_searches(client, app):
         ],
     )
 
-    resp = client.get("reports/user-saved-searches")
-    report = json.loads(resp.get_data())
+    resp = await client.get("reports/user-saved-searches")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Saved searches per user"
     assert len(report["results"]) == 1
     assert report["results"][0]["name"] == "Foo Smith"
     assert report["results"][0]["topic_count"] == 2
 
 
-def test_company_products(client):
-    resp = client.get("reports/company-products")
-    report = json.loads(resp.get_data())
+async def test_company_products(client):
+    resp = await client.get("reports/company-products")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Products per company"
     assert len(report["results"]) == 4
     assert report["results"][0]["name"] == "Example 2 Company"
@@ -126,9 +126,9 @@ def test_company_products(client):
     assert len(report["results"][1]["products"]) == 1
 
 
-def test_product_companies(client):
-    resp = client.get("reports/product-companies")
-    report = json.loads(resp.get_data())
+async def test_product_companies(client):
+    resp = await client.get("reports/product-companies")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Companies permissioned per product"
     assert len(report["results"]) == 2
     assert report["results"][0]["product"] == "News"
@@ -137,7 +137,7 @@ def test_product_companies(client):
     assert len(report["results"][1]["enabled_companies"]) == 1
 
 
-def test_expired_companies(client, app):
+async def test_expired_companies(client, app):
     app.data.insert(
         "companies",
         [
@@ -155,15 +155,15 @@ def test_expired_companies(client, app):
             },
         ],
     )
-    resp = client.get("reports/expired-companies")
-    report = json.loads(resp.get_data())
+    resp = await client.get("reports/expired-companies")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Expired companies"
     assert len(report["results"]) == 2
 
 
-def test_companies(client):
-    resp = client.get("reports/company")
-    report = json.loads(resp.get_data())
+async def test_companies(client):
+    resp = await client.get("reports/company")
+    report = json.loads(await resp.get_data())
     assert report["name"] == "Company"
     assert len(report["results"]) == 4
     assert report["results"][0]["name"] == "Example 2 Company"

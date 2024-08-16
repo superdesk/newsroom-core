@@ -1,10 +1,13 @@
 import pytest
-import werkzeug.exceptions
+
+from pydantic import ValidationError
+from bson import ObjectId
 
 from newsroom.auth.saml import get_userdata
+from newsroom.companies import CompanyServiceAsync, CompanyResource
 
 
-def test_user_data_with_matching_company(app):
+async def test_user_data_with_matching_company(app):
     company = {
         "name": "test",
         "auth_domains": ["example.com"],
@@ -16,7 +19,7 @@ def test_user_data_with_matching_company(app):
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": ["Bar"],
     }
 
-    with app.test_request_context():
+    async with app.test_request_context("/login/saml"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
 
@@ -24,7 +27,7 @@ def test_user_data_with_matching_company(app):
         assert user_data.get("company") is None
 
 
-def test_user_data_with_matching_preconfigured_client(app, client):
+async def test_user_data_with_matching_preconfigured_client(app, client):
     company = {
         "name": "test",
         "auth_domains": ["samplecomp"],
@@ -37,32 +40,52 @@ def test_user_data_with_matching_preconfigured_client(app, client):
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": ["Bar"],
     }
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
-        assert 404 == resp.status_code
+    resp = await client.get("/login/samplecomp")
+    assert 404 == resp.status_code
 
+    async with app.test_request_context("/login/saml"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert "company" not in user_data
 
     app.config["SAML_CLIENTS"] = ["samplecomp"]
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
+    async with app.test_client() as c:
+        resp = await c.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
 
 
-def test_company_auth_domains(app):
-    app.data.insert("companies", [{"name": "test", "auth_domains": ["example.com"]}])
-    assert app.data.find_one("companies", req=None, auth_domains="example.com") is not None
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "test2", "auth_domains": ["example.com"]}])
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "TEST2", "auth_domains": ["EXAMPLE.COM"]}])
-    app.data.insert("companies", [{"name": "test3", "auth_domains": []}])
-    app.data.insert("companies", [{"name": "test4", "auth_domains": ["foo.com", "bar.com"]}])
-    assert app.data.find_one("companies", req=None, auth_domains="bar.com") is not None
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "test6", "auth_domains": ["unique.com", "example.com"]}])
+async def test_company_auth_domains(app, client):
+    service = CompanyServiceAsync()
+
+    await service.create([CompanyResource(id=ObjectId(), name="test", auth_domains=["example.com"])])
+
+    def assert_unique_domain_error(validation_error):
+        errors = validation_error.value.errors()
+        assert errors[0]["type"] == "unique"
+        assert errors[0]["loc"] == ("auth_domains",)
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="test2", auth_domains=["example.com"])])
+    assert_unique_domain_error(error)
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="TEST2", auth_domains=["EXAMPLE.COM"])])
+    assert_unique_domain_error(error)
+
+    ids = await service.create(
+        [
+            CompanyResource(id=ObjectId(), name="test3", auth_domains=[]),
+            CompanyResource(id=ObjectId(), name="test4", auth_domains=["foo.com", "bar.com"]),
+        ]
+    )
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="test6", auth_domains=["unique.com", "example.com"])])
+    assert_unique_domain_error(error)
+
+    with pytest.raises(ValidationError) as error:
+        await service.update(ids[0], dict(auth_domains=["unique.com", "example.com"]))
+    assert_unique_domain_error(error)

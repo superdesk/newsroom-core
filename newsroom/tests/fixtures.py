@@ -3,6 +3,8 @@ from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
+from quart import url_for
+
 from newsroom.types import Product
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
@@ -12,6 +14,7 @@ PUBLIC_USER_ID = ObjectId("59b4c5c61d41c8d736852fbf")
 PUBLIC_USER_FIRSTNAME = "Foo"
 PUBLIC_USER_LASTNAME = "Bar"
 PUBLIC_USER_NAME = "{} {}".format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
+PUBLIC_USER_EMAIL = "foo@bar.com"
 TEST_USER_ID = ObjectId("5cc94454bc43165c045ffec9")
 COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
 COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
@@ -19,6 +22,8 @@ PRODUCT_1_ID = ObjectId()
 PRODUCT_2_ID = ObjectId()
 PRODUCT_3_ID = ObjectId()
 PRODUCT_ALL_AGENDA_ID = ObjectId()
+
+ADMIN_USER_EMAIL = "admin@sourcefabric.org"
 
 items = [
     {
@@ -169,22 +174,23 @@ agenda_items = [
 
 
 @fixture(autouse=True)
-def init_items(app):
+async def init_items(app):
     app.data.insert("items", items)
 
 
 @fixture(autouse=True)
-def init_agenda_items(app):
-    app.data.insert("agenda", agenda_items)
+async def init_agenda_items(app):
+    async with app.app_context():
+        app.data.insert("agenda", agenda_items)
 
 
 @fixture()
-def user(app):
+async def user(app):
     _user = {
         "_id": ObjectId(ADMIN_USER_ID),
         "first_name": "admin",
         "last_name": "admin",
-        "email": "admin@sourcefabric.org",
+        "email": ADMIN_USER_EMAIL,
         "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
         "user_type": "administrator",
         "is_validated": True,
@@ -199,21 +205,21 @@ def user(app):
 
 
 @fixture()
-def admin(user):
+async def admin(user):
     return user
 
 
 @fixture()
-def auth_users(client, user):
-    test_login_succeeds_for_admin(client)
+async def auth_users(client, user):
+    await test_login_succeeds_for_admin(client)
 
 
 @fixture(autouse=True)
-def init_auth(app, auth_users):
+async def init_auth(app, auth_users):
     return
 
 
-def setup_user_company(app):
+async def setup_user_company(app):
     app.data.insert(
         "companies",
         [
@@ -244,7 +250,7 @@ def setup_user_company(app):
             {
                 "_id": PUBLIC_USER_ID,
                 "user_type": "public",
-                "email": "foo@bar.com",
+                "email": PUBLIC_USER_EMAIL,
                 "first_name": PUBLIC_USER_FIRSTNAME,
                 "last_name": PUBLIC_USER_LASTNAME,
                 "company": COMPANY_1_ID,
@@ -276,28 +282,27 @@ def setup_user_company(app):
 
 
 @fixture(autouse=True)
-def init_company(app):
-    setup_user_company(app)
+async def init_company(app):
+    await setup_user_company(app)
 
 
 @fixture
-def public_company(app, init_company):
+async def public_company(app, init_company):
     return app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
 
 
 @fixture
-def public_user(app, init_company):
+async def public_user(app, init_company):
     return app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
 
 
 @fixture
-def anonymous_user(client):
-    with client.session_transaction() as session:
-        session.clear()
+async def anonymous_user(client):
+    await client.get(url_for("auth.logout"))
 
 
 @fixture
-def company_products(app):
+async def company_products(app):
     _products: List[Product] = [
         {
             "_id": PRODUCT_1_ID,

@@ -5,7 +5,7 @@ from lxml import etree
 from typing import List, Optional, Dict, Any, Union
 from typing_extensions import TypedDict
 
-from flask_babel import gettext
+from quart_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
@@ -103,7 +103,7 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
-    app = get_current_app().as_any()._get_current_object()
+    app = get_current_app().as_any()
     return app.mail.send(msg)
 
 
@@ -130,7 +130,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
     _send_email.apply_async(kwargs=kwargs)
 
 
-def send_new_signup_email(company: Company, user: User, is_new_company: bool):
+async def send_new_signup_email(company: Company, user: User, is_new_company: bool):
     url_kwargs = (
         {
             "app_id": "companies",
@@ -158,7 +158,7 @@ def send_new_signup_email(company: Company, user: User, is_new_company: bool):
         if company_type is not None:
             company_type_name = company_type["name"]
 
-    send_template_email(
+    await send_template_email(
         to=get_app_config("SIGNUP_EMAIL_RECIPIENTS").split(","),
         template="signup_request_email",
         template_kwargs=dict(
@@ -226,7 +226,7 @@ EmailKwargs = Dict[str, Any]
 TemplateKwargs = Dict[str, Any]
 
 
-def send_user_email(
+async def send_user_email(
     user: User,
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
@@ -240,10 +240,10 @@ def send_user_email(
         return
     language = user.get("locale") or get_app_config("DEFAULT_LANGUAGE")
     timezone = get_user_timezone(user)
-    _send_localized_email([user["email"]], template, language, timezone, template_kwargs or {}, kwargs)
+    await _send_localized_email([user["email"]], template, language, timezone, template_kwargs or {}, kwargs)
 
 
-def send_template_email(
+async def send_template_email(
     to: List[str],
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
@@ -252,10 +252,10 @@ def send_template_email(
     """Send email to list of recipients using default locale."""
     language = get_app_config("DEFAULT_LANGUAGE")
     timezone = get_app_config("DEFAULT_TIMEZONE")
-    _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs)
+    await _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs)
 
 
-def _send_localized_email(
+async def _send_localized_email(
     to: List[str],
     template: str,
     language: str,
@@ -268,14 +268,18 @@ def _send_localized_email(
     html_template = get_language_template_name(template, language, "html")
     text_template = get_language_template_name(template, language, "txt")
     with template_locale(language, timezone):
-        subject = email_templates.get_translated_subject(template, language, **template_kwargs)
+        subject = await email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
+
+        text_body = await render_template(text_template, **template_kwargs)
+        html_body = await render_template(html_template, **template_kwargs)
+
         send_email(
             to=to,
             subject=subject,
-            text_body=render_template(text_template, **template_kwargs),
-            html_body=render_template(html_template, **template_kwargs),
+            text_body=text_body,
+            html_body=html_body,
             sender_name=get_sender_name(language),
             **email_kwargs,
         )
@@ -288,7 +292,7 @@ def get_sender_name(language: str) -> Optional[str]:
         return None
 
 
-def send_validate_account_email(user: User, token: str) -> None:
+async def send_validate_account_email(user: User, token: str) -> None:
     """
     Forms and sends validation email
     :param user_name: Name of the user
@@ -300,7 +304,7 @@ def send_validate_account_email(user: User, token: str) -> None:
     url = url_for("auth.validate_account", token=token, _external=True)
     hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE") * 24
 
-    send_user_email(
+    await send_user_email(
         user,
         template="validate_account_email",
         template_kwargs=dict(
@@ -313,7 +317,7 @@ def send_validate_account_email(user: User, token: str) -> None:
     )
 
 
-def send_new_account_email(user: User, token: str) -> None:
+async def send_new_account_email(user: User, token: str) -> None:
     """
     Forms and sends validation email
     :param user_name: Name of the user
@@ -325,7 +329,7 @@ def send_new_account_email(user: User, token: str) -> None:
     url = url_for("auth.reset_password", token=token, _external=True)
     hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE") * 24
 
-    send_user_email(
+    await send_user_email(
         user,
         template="account_created_email",
         template_kwargs=dict(
@@ -338,7 +342,7 @@ def send_new_account_email(user: User, token: str) -> None:
     )
 
 
-def send_reset_password_email(user: User, token: str) -> None:
+async def send_reset_password_email(user: User, token: str) -> None:
     """
     Forms and sends reset password email
     :param user_name: Name of the user
@@ -350,7 +354,7 @@ def send_reset_password_email(user: User, token: str) -> None:
     url = url_for("auth.reset_password", token=token, _external=True)
     hours = get_app_config("RESET_PASSWORD_TOKEN_TIME_TO_LIVE") * 24
 
-    send_user_email(
+    await send_user_email(
         user=user,
         template="reset_password_email",
         template_kwargs=dict(
@@ -364,14 +368,14 @@ def send_reset_password_email(user: User, token: str) -> None:
     )
 
 
-def send_new_item_notification_email(user, topic_name, item, section="wire"):
+async def send_new_item_notification_email(user, topic_name, item, section="wire"):
     if item.get("type") == "text":
-        _send_new_wire_notification_email(user, topic_name, item, section)
+        await _send_new_wire_notification_email(user, topic_name, item, section)
     else:
-        _send_new_agenda_notification_email(user, topic_name, item)
+        await _send_new_agenda_notification_email(user, topic_name, item)
 
 
-def _send_new_wire_notification_email(user, topic_name, item, section):
+async def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
         app_name=get_app_config("SITE_NAME"),
@@ -383,7 +387,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
         type="wire",
         section=section,
     )
-    send_user_email(
+    await send_user_email(
         user,
         template="new_wire_notification_email",
         template_kwargs=template_kwargs,
@@ -399,7 +403,7 @@ def _remove_restricted_coverage_info(user, item):
         remove_restricted_coverage_info([item])
 
 
-def _send_new_agenda_notification_email(user, topic_name, item):
+async def _send_new_agenda_notification_email(user, topic_name, item):
     _remove_restricted_coverage_info(user, item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
@@ -417,21 +421,21 @@ def _send_new_agenda_notification_email(user, topic_name, item):
         is_admin=is_admin_or_internal(user),
         section="agenda",
     )
-    send_user_email(
+    await send_user_email(
         user=user,
         template="new_agenda_notification_email",
         template_kwargs=template_kwargs,
     )
 
 
-def send_history_match_notification_email(user, item, section):
+async def send_history_match_notification_email(user, item, section):
     if item.get("type") == "text":
-        _send_history_match_wire_notification_email(user, item, section)
+        await _send_history_match_wire_notification_email(user, item, section)
     else:
-        _send_history_match_agenda_notification_email(user, item)
+        await _send_history_match_agenda_notification_email(user, item)
 
 
-def _send_history_match_wire_notification_email(user, item, section):
+async def _send_history_match_wire_notification_email(user, item, section):
     app_name = get_app_config("SITE_NAME")
     url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
@@ -443,14 +447,14 @@ def _send_history_match_wire_notification_email(user, item, section):
         type="wire",
         section=section,
     )
-    send_user_email(
+    await send_user_email(
         user,
         template="updated_wire_notification_email",
         template_kwargs=template_kwargs,
     )
 
 
-def _send_history_match_agenda_notification_email(user, item):
+async def _send_history_match_agenda_notification_email(user, item):
     _remove_restricted_coverage_info(user, item)
     app_name = get_app_config("SITE_NAME")
     url = url_for_agenda(item, _external=True)
@@ -468,34 +472,34 @@ def _send_history_match_agenda_notification_email(user, item):
         is_admin=is_admin_or_internal(user),
         section="agenda",
     )
-    send_user_email(
+    await send_user_email(
         user,
         template="updated_agenda_notification_email",
         template_kwargs=template_kwargs,
     )
 
 
-def send_item_killed_notification_email(user, item):
+async def send_item_killed_notification_email(user, item):
     if item.get("type") == "text":
-        _send_wire_killed_notification_email(user, item)
+        await _send_wire_killed_notification_email(user, item)
     else:
-        _send_agenda_killed_notification_email(user, item)
+        await _send_agenda_killed_notification_email(user, item)
 
 
-def _send_wire_killed_notification_email(user, item):
+async def _send_wire_killed_notification_email(user, item):
     formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
     recipients = [user["email"]]
     subject = gettext("Kill/Takedown notice")
-    text_body = to_text(formatter.format_item(item))
+    text_body = to_text(await formatter.format_item(item))
 
     send_email(to=recipients, subject=subject, text_body=text_body)
 
 
-def _send_agenda_killed_notification_email(user, item):
+async def _send_agenda_killed_notification_email(user, item):
     formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
     recipients = [user["email"]]
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
-    text_body = to_text(formatter.format_item(item, item_type="agenda"))
+    text_body = to_text(await formatter.format_item(item, item_type="agenda"))
 
     send_email(to=recipients, subject=subject, text_body=text_body)
 

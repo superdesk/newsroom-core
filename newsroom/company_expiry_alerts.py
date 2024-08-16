@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class CompanyExpiryAlerts:
-    def send_alerts(self):
+    async def send_alerts(self):
         self.log_msg = "Company Expiry Alerts: {}".format(utcnow())
         logger.info("{} Starting to send alerts.".format(self.log_msg))
 
@@ -36,7 +36,7 @@ class CompanyExpiryAlerts:
             return
 
         try:
-            self.worker()
+            await self.worker()
         except Exception as e:
             logger.exception(e)
         finally:
@@ -44,7 +44,7 @@ class CompanyExpiryAlerts:
 
         logger.info("{} Completed sending alerts.".format(self.log_msg))
 
-    def worker(self):
+    async def worker(self):
         from newsroom.email import send_template_email
 
         # Check if there are any recipients
@@ -73,7 +73,7 @@ class CompanyExpiryAlerts:
                         )
                     )
                     for user in users:
-                        send_user_email(
+                        await send_user_email(
                             user,
                             template="company_expiry_alert_user",
                             template_kwargs=template_kwargs,
@@ -88,7 +88,7 @@ class CompanyExpiryAlerts:
                 "expires_on": expiry_time.strftime("%d-%m-%Y"),
             }
             logger.info("{} Sending to following expiry administrators: {}".format(self.log_msg, recipients))
-            send_template_email(
+            await send_template_email(
                 to=recipients,
                 template="company_expiry_email",
                 template_kwargs=template_kwargs,

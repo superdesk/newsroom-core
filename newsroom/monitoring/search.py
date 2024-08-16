@@ -1,6 +1,6 @@
 import logging
 
-from flask_babel import gettext
+from quart_babel import gettext
 
 from superdesk.flask import abort
 from superdesk import get_resource_service

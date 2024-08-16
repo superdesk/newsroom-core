@@ -4,7 +4,7 @@ import werkzeug.exceptions
 from superdesk import get_resource_service
 from superdesk.resource import not_analyzed, not_enabled
 from superdesk.utc import utcnow
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.utils import ParsedRequest
 
 from superdesk.core import json
@@ -118,8 +118,8 @@ def get_history_users(item_ids, active_user_ids, active_company_ids, section, ac
 
 
 @blueprint.route("/history/new", methods=["POST"])
-def create():
-    params = get_json_or_400()
+async def create():
+    params = await get_json_or_400()
     if not params.get("item") or not params.get("action") or not params.get("section"):
         return "", gettext("Activity History: Inavlid request")
 

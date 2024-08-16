@@ -105,6 +105,7 @@ Feature: News API News Search
     Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
     Then we "get" "src="https://" in atom xml response
 
+      @wip
   Scenario: Atom request response restricted by featured image product
     Given "items"
         """

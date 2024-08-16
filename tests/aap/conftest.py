@@ -1,4 +1,4 @@
-from flask import Config
+from quart import Config
 from pytest import fixture
 
 from newsroom.web.factory import get_app

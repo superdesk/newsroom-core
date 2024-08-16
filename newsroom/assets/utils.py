@@ -87,7 +87,7 @@ async def save_file_and_get_url(file: Any) -> Optional[str]:
 
     await app.media_async.put(file, filename, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
 
-    endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
+    endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.download_file"
     return url_for(endpoint, media_id=filename)
 
 

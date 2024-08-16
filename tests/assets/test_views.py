@@ -23,24 +23,24 @@ def mock_valid_session():
         yield
 
 
-async def test_valid_media_request(client_async, app):
+async def test_valid_media_request(client, app):
     media_id = await save_black_dot_image(app)
-    response = await client_async.get(f"/assets/{media_id}")
+    response = await client.get(f"/assets/{media_id}")
 
     assert response.status_code == 200
     assert response.content_type == "image/png"
     assert "Content-Disposition" in response.headers
 
 
-def test_media_not_found(client):
+async def test_media_not_found(client):
     media_id = "nonexistent_media_id"
-    response = client.get(f"/assets/{media_id}")
+    response = await client.get(f"/assets/{media_id}")
     assert response.status_code == 404
 
 
-async def test_filename_in_response_header(client_async, app):
+async def test_filename_in_response_header(client, app):
     media_id = await app.media_async.put(b"Plain text content", content_type="text/plain", filename="testfile.txt")
 
-    response = await client_async.get(f"/assets/{media_id}?filename=testfile.txt")
+    response = await client.get(f"/assets/{media_id}?filename=testfile.txt")
     assert response.status_code == 200
     assert response.headers["Content-Disposition"] == 'attachment; filename="testfile.txt"'

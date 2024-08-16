@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 @blueprint.route("/news_api_tokens", methods=["POST"])
-def create():
+async def create():
     try:
-        data = loads(json.dumps(get_json_or_400()))
+        data = loads(json.dumps(await get_json_or_400()))
         new_token = get_resource_service(API_TOKENS).post([data])
         return jsonify({"token": new_token[0]}), 201
     except BadParameterValueError:
@@ -27,10 +27,10 @@ def create():
 
 
 @blueprint.route("/news_api_tokens", methods=["PATCH"])
-def update():
+async def update():
     token = request.args.get("token")
     try:
-        data = loads(json.dumps(get_json_or_400()))
+        data = loads(json.dumps(await get_json_or_400()))
         return jsonify(get_resource_service(API_TOKENS).patch(token, data)), 200
     except Exception as ex:
         return jsonify({"error": ex}), 500
