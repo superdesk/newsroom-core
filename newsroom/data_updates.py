@@ -63,9 +63,7 @@ DEFAULT_DATA_UPDATE_BW_IMPLEMENTATION = "raise NotImplementedError()"
 def get_dirs(only_relative_folder=False):
     dirs = []
     try:
-        app = get_current_app()
-        with app.app_context():
-            dirs.append(get_app_config("DATA_UPDATES_PATH", DEFAULT_DATA_UPDATE_DIR_NAME))
+        dirs.append(get_app_config("DATA_UPDATES_PATH", DEFAULT_DATA_UPDATE_DIR_NAME))
     except RuntimeError:
         # working outside of application context
         pass
