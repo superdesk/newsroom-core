@@ -169,7 +169,7 @@ async def test_fix_topic_nested_filters(app, runner):
     )
 
     async with app.app_context():
-        runner.invoke(fix_topic_nested_filters)
+        fix_topic_nested_filters()
 
     updated_topic = app.data.find_one("topics", None, topic_id)
 

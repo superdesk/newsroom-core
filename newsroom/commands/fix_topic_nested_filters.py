@@ -14,6 +14,10 @@ from .cli import newsroom_cli
 
 @newsroom_cli.cli.command("fix_topic_nested_filters")
 @with_appcontext
+def _fix_topic_nested_filters():
+    fix_topic_nested_filters()
+
+
 def fix_topic_nested_filters():
     """Fix My/Company Topics after adding ``Nested Agg`` to Wire/Agenda group configs
 

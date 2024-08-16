@@ -9,7 +9,9 @@ async def test_remove_expired_items(runner, app):
     ]
 
     app.data.insert("items", items)
-    runner.invoke(remove_expired, ["--expiry", "1"])
+
+    async with app.app_context():
+        remove_expired(1)
 
     expired = find_one("items", _id="expired")
     assert expired is None

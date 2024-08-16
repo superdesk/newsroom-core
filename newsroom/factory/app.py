@@ -10,7 +10,7 @@ import re
 import pathlib
 import importlib
 
-import sentry_sdk
+# import sentry_sdk
 from flask_mail import Mail
 from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
