@@ -26,7 +26,7 @@ from superdesk.cache import cache_backend
 from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.factory.app import SuperdeskEve
 
-from sentry_sdk.integrations.quart import QuartIntegration
+# from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
 from newsroom.auth import SessionAuth
@@ -270,11 +270,13 @@ class BaseNewsroomApp(SuperdeskEve):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
 
     def setup_sentry(self):
-        if self.config.get("SENTRY_DSN"):
-            sentry_sdk.init(
-                dsn=self.config["SENTRY_DSN"],
-                integrations=[QuartIntegration()],
-            )
+        # TODO-ASYNC: Fix sentry/quart integrations
+        pass
+        # if self.config.get("SENTRY_DSN"):
+        #     sentry_sdk.init(
+        #         dsn=self.config["SENTRY_DSN"],
+        #         integrations=[QuartIntegration()],
+        #     )
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
