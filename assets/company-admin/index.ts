@@ -5,6 +5,8 @@ import {companyAdminReducer} from './reducers';
 import {CompanyAdminApp} from './components/CompanyAdminApp';
 import {render} from 'render-utils';
 
+import 'user-profile';
+
 const store = createStore(companyAdminReducer, 'CompanyAdmin');
 
 if (window.viewData) {

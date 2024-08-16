@@ -81,9 +81,9 @@ export interface IOccurStatus {
     label: string;
 }
 
-export interface IDateFilters{
+export interface IDateFilter {
     name?: string,
     default?: boolean,
     filter?: string;
-    query?:string;
+    query?: string;
 }

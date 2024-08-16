@@ -17,7 +17,6 @@ import 'redux-logger';
 import 'reselect';
 import 'store';
 import 'url-search-params-polyfill';
-import 'whatwg-fetch';
 import 'react-datepicker';
 
 export const KEYS = {

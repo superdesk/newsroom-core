@@ -53,7 +53,7 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
             {'m-0': onlyDates})}
         >
             {format(item, onlyDates === true)}
-            {itemDays <= 1 ? null : (
+            {itemDays <= 1 || group === '' ? null : (
                 <MultiDayListLabel
                     current={diffDays}
                     days={itemDays}
