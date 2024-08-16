@@ -1,6 +1,7 @@
 from typing import List, Dict, Optional, Any
 from copy import deepcopy
 
+from quart.cli import with_appcontext
 from eve.utils import ParsedRequest
 
 from superdesk.core import json
@@ -12,6 +13,7 @@ from .cli import newsroom_cli
 
 
 @newsroom_cli.cli.command("fix_topic_nested_filters")
+@with_appcontext
 def fix_topic_nested_filters():
     """Fix My/Company Topics after adding ``Nested Agg`` to Wire/Agenda group configs
 

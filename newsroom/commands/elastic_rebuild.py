@@ -1,3 +1,4 @@
+from quart.cli import with_appcontext
 from elasticsearch import exceptions as es_exceptions
 from eve_elastic import get_es
 
@@ -7,6 +8,7 @@ from .cli import newsroom_cli
 
 
 @newsroom_cli.cli.command("elastic_rebuild")
+@with_appcontext
 def elastic_rebuild():
     """
     It removes elastic index, creates a new one(s) and index it from mongo.
