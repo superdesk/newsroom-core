@@ -230,40 +230,6 @@ COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES = {
 }
 
 
-def get_updated_sections(updates, original, company: Optional[Company]) -> Dict[str, bool]:
-    sections: Dict[str, bool] = {}
-    if "sections" in updates:
-        sections = updates["sections"] or {}
-    elif "sections" in original:
-        sections = original["sections"] or {}
-
-    if not company:
-        return sections
-
-    company_section_names = get_company_section_names(company)
-    return {section: enabled and section in company_section_names for section, enabled in sections.items()}
-
-
-def get_updated_products(updates, original, company: Optional[Company]) -> List[ProductRef]:
-    products: List[ProductRef] = []
-    if "products" in updates:
-        products = updates["products"] or []
-    elif "products" in original:
-        products = original["products"] or []
-
-    if not company:
-        return products
-
-    company_section_names = get_company_section_names(company)
-    company_product_ids = get_company_product_ids(company)
-
-    return [
-        product
-        for product in products
-        if product.get("section") in company_section_names and product.get("_id") in company_product_ids
-    ]
-
-
 class UsersService(newsroom.Service):
     """
     A service that knows how to perform CRUD operations on the `users`
@@ -271,32 +237,6 @@ class UsersService(newsroom.Service):
 
     Serves mainly as a proxy to the data layer.
     """
-
-    def on_update(self, updates, original):
-        self.check_permissions(original, updates)
-        set_version_creator(updates)
-        if "password" in updates:
-            updates["password"] = self._get_password_hash(updates["password"])
-
-        company = get_company_from_user({"company": updates.get("company", original.get("company"))})
-        company_changed = updates.get("company") and updates["company"] != original.get("company")
-
-        if company_changed or "sections" in updates or "products" in updates:
-            # Company, Sections or Products have changed, recalculate the list of sections & products
-            updates["sections"] = get_updated_sections(updates, original, company)
-            updates["products"] = get_updated_products(updates, original, company)
-
-        app = get_current_app().as_any()
-        app.cache.delete(str(original.get("_id")))
-        app.cache.delete(original.get("email"))
-
-    def on_updated(self, updates, original):
-        # set session locale if updating locale for current user
-        if updates.get("locale") and original["_id"] == get_user_id() and updates["locale"] != original.get("locale"):
-            session["locale"] = updates["locale"]
-        updated = original.copy()
-        updated.update(updates)
-        user_updated.send(self, user=updated, updates=updates)
 
     def update_notification_schedule_run_time(self, user: User, run_time: datetime):
         notification_schedule = deepcopy(user["notification_schedule"])

@@ -250,5 +250,5 @@ class SendScheduledNotificationEmails(Command):
 
 
 @celery.task(soft_time_limit=600)
-def send_scheduled_notifications():
-    SendScheduledNotificationEmails().run()
+async def send_scheduled_notifications():
+    await SendScheduledNotificationEmails().run()

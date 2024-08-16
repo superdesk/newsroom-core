@@ -1,6 +1,7 @@
 from bson import ObjectId
 from datetime import datetime, timedelta
-from typing import Optional, TypedDict
+from typing import Dict, Optional, TypedDict, Union
+from pydantic import BaseModel
 
 from superdesk.utc import utcnow
 from superdesk.core import get_app_config
@@ -54,14 +55,15 @@ async def get_user_or_abort() -> Optional[UserResourceModel]:
     return user
 
 
-async def get_company_from_user(user: UserResourceModel) -> Optional[CompanyResource]:
+async def get_company_from_user(
+    user: Union[UserResourceModel, Dict[str, Union[ObjectId, str]]]
+) -> Optional[CompanyResource]:
     """
     Retrieve the company associated with the given user, if it exists.
     """
-    if not user.company:
-        return None
+    company_id = user.company if isinstance(user, BaseModel) else user.get("company")
 
-    return await CompanyService().find_by_id(user.company)
+    return await CompanyService().find_by_id(company_id)
 
 
 async def get_company_from_user_or_session(

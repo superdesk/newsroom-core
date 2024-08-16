@@ -1,11 +1,13 @@
 from typing import Any, Dict
 
+from quart_babel import gettext
+from werkzeug.exceptions import BadRequest
+
 from superdesk.core import get_app_config
-from superdesk.flask import request, abort
+from superdesk.flask import request, abort, session
 from superdesk.utils import is_hashed, get_hash
 from superdesk.core.resources.service import ResourceModelType
 
-from newsroom.signals import user_created
 from newsroom.settings import get_setting
 from newsroom.auth.utils import (
     get_company_auth_provider,
@@ -14,7 +16,10 @@ from newsroom.auth.utils import (
     is_current_user_company_admin,
     send_token,
 )
+from newsroom.core import get_current_wsgi_app
+from newsroom.signals import user_created, user_updated, user_deleted
 from newsroom.core.resources.service import NewshubAsyncResourceService
+from newsroom.companies.utils import get_updated_products, get_updated_sections
 
 from .model import UserResourceModel
 from .users import COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES, COMPANY_ADMIN_ALLOWED_UPDATES, USER_PROFILE_UPDATES
@@ -54,6 +59,50 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         await super().on_created(docs)
         for doc in docs:
             user_created.send(self, user=doc)
+
+    async def on_update(self, updates, original):
+        from .utils import get_company_from_user
+
+        self.check_permissions(original, updates)
+        if "password" in updates:
+            updates["password"] = self._get_password_hash(updates["password"])
+
+        company_id = updates.get("company") or original.company
+        company = await get_company_from_user({"company": company_id})
+        company_changed = updates.get("company") and updates["company"] != original.company
+
+        if company_changed or "sections" in updates or "products" in updates:
+            # Company, Sections or Products have changed, recalculate the list of sections & products
+            updates["sections"] = get_updated_sections(updates, original, company)
+            updates["products"] = get_updated_products(updates, original, company)
+
+        app = get_current_wsgi_app()
+        app.cache.delete(str(original.id))
+        app.cache.delete(original.email)
+
+    async def on_updated(self, updates, original):
+        from .utils import get_user_id
+
+        # set session locale if updating locale for current user
+        if updates.get("locale") and original["_id"] == get_user_id() and updates["locale"] != original.get("locale"):
+            session["locale"] = updates["locale"]
+
+        updated = original.model_copy(update=updates)
+        user_updated.send(self, user=updated, updates=updates)
+
+    async def on_deleted(self, doc):
+        get_current_wsgi_app().cache.delete(str(doc.id))
+        user_deleted.send(self, user=doc.model_dump(by_alias=True))
+
+    async def on_delete(self, doc):
+        from .utils import get_user_id
+
+        if doc.id == get_user_id():
+            raise BadRequest(gettext("Can not delete current user"))
+
+        user = await self.find_by_id(doc.id)
+        self.check_permissions(user)
+        super().on_delete(doc)
 
     async def check_permissions(self, user: UserResourceModel, updates=None):
         """Check if current user has permissions to edit user."""

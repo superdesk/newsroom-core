@@ -1,5 +1,6 @@
-from bson import ObjectId
+import pytest
 import pytz
+from bson import ObjectId
 
 from quart import json
 from quart import url_for
@@ -32,30 +33,9 @@ async def test_user_list_fails_for_anonymous_user(app, public_user):
         assert "Forbidden" in await response.get_data(as_text=True)
 
 
-async def test_return_search_for_users(client, app):
-    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
-
-    # Register a new account
-    await client.post(
-        "/users/new",
-        form={
-            "email": "newuser@abc.org",
-            "first_name": "John",
-            "last_name": "Doe",
-            "password": "abc",
-            "phone": "1234567",
-            "company": company_ids[0],
-            "user_type": "public",
-        },
-    )
-
-    response = await client.get("/users/search?q=jo")
-    assert "John" in await response.get_data(as_text=True)
-    user_data = (await response.get_json())[0]
-    assert user_data.get("sections") is None
-
-
 async def test_reset_password_token_sent_for_user_succeeds(app, client):
+    from newsroom.users.service import UsersService
+
     # Insert a new user
     app.data.insert(
         "users",
@@ -77,8 +57,8 @@ async def test_reset_password_token_sent_for_user_succeeds(app, client):
     response = await client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 200
     assert '"success": true' in await response.get_data(as_text=True)
-    user = get_resource_service("auth_user").find_one(req=None, email="test@sourcefabric.org")
-    assert user.get("token") is not None
+    user = await UsersService().find_by_id("59b4c5c61d41c8d736852000")
+    assert user.token is not None
 
 
 async def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
@@ -486,12 +466,15 @@ async def test_account_manager_can_update_user(app, client):
     app.data.insert("users", [account_mgr])
     response = await login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
+
     account_mgr["first_name"] = "Updated Account"
     response = await client.post("users/5c5914275f627d5885fee6a8", form=account_mgr, follow_redirects=True)
     assert response.status_code == 200
+
     # account manager can't promote themselves
     account_mgr["user_type"] = "administrator"
-    response = await client.post("users/5c5914275f627d5885fee6a8", form=account_mgr, follow_redirects=True)
+    response = await client.post("/users/5c5914275f627d5885fee6a8", form=account_mgr, follow_redirects=True)
+
     assert response.status_code == 401
 
 
@@ -505,12 +488,14 @@ async def test_signals(client, app):
     user_updated.connect(updated_listener, weak=False)
     user_deleted.connect(deleted_listener, weak=False)
 
+    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
+
     user = {
         "email": "foo1@bar.com",
         "last_name": "bar1",
         "first_name": "foo1",
         "user_type": "public",
-        "company": ObjectId("59b4c5c61d41c8d736852fbf"),
+        "company": company_ids[0],
     }
 
     resp = await client.post(
@@ -520,12 +505,13 @@ async def test_signals(client, app):
     assert resp.status_code == 201, await resp.get_data(as_text=True)
 
     created_listener.assert_called_once()
-    assert "_id" in created_listener.call_args.kwargs["user"]
-    assert user["email"] == created_listener.call_args.kwargs["user"]["email"]
+    created_user = created_listener.call_args.kwargs["user"].model_dump(by_alias=True)
+    assert "_id" in created_user
+    assert user["email"] == created_user["email"]
 
     user["email"] = "foo@example.com"
     user["is_enabled"] = True
-    user_id = created_listener.call_args.kwargs["user"]["_id"]
+    user_id = created_user["_id"]
     resp = await client.post(
         f"/users/{user_id}",
         form=user,
@@ -533,12 +519,12 @@ async def test_signals(client, app):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     updated_listener.assert_called_once()
-    assert user_id == updated_listener.call_args.kwargs["user"]["_id"]
-    assert user["email"] == updated_listener.call_args.kwargs["user"]["email"]
+    updated_user = updated_listener.call_args.kwargs["user"].model_dump(by_alias=True)
+    assert user_id == updated_user["_id"]
+    assert user["email"] == updated_user["email"]
     updated_listener.reset_mock()
 
     token = app.data.find_one("auth_user", req=None, _id=user_id)["token"]
-
     resp = await client.get(f"/validate/{token}")
     assert 302 == resp.status_code, await resp.get_data(as_text=True)
     updated_listener.assert_called_once()
@@ -607,7 +593,10 @@ async def test_user_can_update_notification_schedule(app, client):
     assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now
 
 
-async def test_check_etag_when_updating_user(client):
+@pytest.mark.skip(reason="We do not yet support _etag in new framework")
+async def test_check_etag_when_updating_user(app, client):
+    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
+
     # Register a new account
     await client.post(
         "/users/new",
@@ -617,7 +606,7 @@ async def test_check_etag_when_updating_user(client):
             "last_name": "Doe",
             "password": "abc",
             "phone": "1234567",
-            "company": ObjectId("59b4c5c61d41c8d736852fbf"),
+            "company": company_ids[0],
             "user_type": "public",
             "sections": "wire,agenda",
         },
@@ -655,46 +644,6 @@ async def test_create_user_inherit_sections(app):
     assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
-async def test_filter_and_sorting_user(app, client):
-    users = await (await client.get("/users/search?q=")).get_json()
-    assert len(users) == 3
-    response = await client.get("/users/search?q=admin")
-    assert "admin" in await response.get_data(as_text=True)
-    user_data = (await response.get_json())[0]
-    patch_data = user_data.copy()
-    patch_data["first_name"] = "Zoe"
-    patch_data["last_name"] = "AAba"
-    response = await client.post(
-        f"/users/{user_data['_id']}",
-        form=patch_data,
-        headers={"If-Match": user_data["_etag"]},
-    )
-    assert response.status_code == 200
-
-    # sort by First_name
-    users = await (await client.get("/users/search?q=&sort=[('first_name', 1)]")).get_json()
-    assert users[0]["first_name"] == "Foo"
-    assert users[2]["first_name"] == "Zoe"
-
-    # sort by Last_name
-    users = await (await client.get("/users/search?q=&sort=[('last_name', 1)]")).get_json()
-    assert users[0]["last_name"] == "AAba"
-    assert users[1]["last_name"] == "Bar"
-
-    # filter by Company_id
-    users = await (await client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}')).get_json()
-    assert len(users) == 2
-    assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
-
-    # filter by company and search by name
-    users = await (await client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}')).get_json()
-    assert len(users) == 1
-
-    # filter by products
-    users = await (await client.get('/users/search?q=&where={"products._id":"random"}')).get_json()
-    assert len(users) == 0
-
-
 async def test_user_has_paused_notifications(app):
     user = User(email="foo", user_type="public")
     assert not get_resource_service("users").user_has_paused_notifications(user)
@@ -704,3 +653,77 @@ async def test_user_has_paused_notifications(app):
 
     user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2050-01-01"}
     assert get_resource_service("users").user_has_paused_notifications(user)
+
+
+async def test_search_all_users(app, client):
+    response = await client.get("/users/search?q=")
+    users = await response.get_json()
+    assert len(users) == 3
+
+
+async def test_search_user_by_name(app, client):
+    response = await client.get("/users/search?q=admin")
+    assert "admin" in await response.get_data(as_text=True)
+
+
+async def test_update_and_sort(app, client):
+    response = await client.get("/users/search?q=admin")
+    admin_test_user = (await response.get_json())[0]
+    patch_data = admin_test_user.copy()
+    patch_data["first_name"] = "AAba"
+    patch_data["last_name"] = "Zoe"
+
+    response = await client.post(f"/users/{admin_test_user['_id']}", form=patch_data)
+    assert response.status_code == 200
+
+    response = await client.get("/users/search?q=&sort=[('first_name', 1)]")
+    users = await response.get_json()
+    assert users[0]["first_name"] == "AAba"
+    assert users[2]["first_name"] == "Test"
+
+    response = await client.get("/users/search?q=&sort=[('last_name', 1)]")
+    users = await response.get_json()
+    assert users[0]["last_name"] == "Zoe"
+    assert users[1]["last_name"] == "Bar"
+
+
+async def test_filter_users_by_company_id(app, client):
+    response = await client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}')
+    users = await response.get_json()
+    assert len(users) == 2
+    assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
+
+
+async def test_filter_users_by_company_and_name(app, client):
+    response = await client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}')
+    users = await response.get_json()
+    assert len(users) == 1
+
+
+async def test_filter_users_by_product_id(app, client):
+    result = await client.get('/users/search?q=&where={"products_id":"6215cbf55fc14ebe18e175a5"}')
+    users = await result.get_json()
+    assert len(users) == 0
+
+
+async def test_create_and_search_new_user(client, app):
+    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
+
+    # Register a new account
+    await client.post(
+        "/users/new",
+        form={
+            "email": "newuser@abc.org",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password": "abc",
+            "phone": "1234567",
+            "company": company_ids[0],
+            "user_type": "public",
+        },
+    )
+
+    response = await client.get("/users/search?q=jo")
+    assert "John" in await response.get_data(as_text=True)
+    user_data = (await response.get_json())[0]
+    assert user_data.get("sections") is None

@@ -1,6 +1,6 @@
 import re
 import json
-import pymongo
+
 from copy import deepcopy
 from typing import Any, Dict, Optional
 from pydantic import BaseModel, field_validator
@@ -12,6 +12,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
+from superdesk.core.resources.service import MongoResourceCursorAsync
 
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email
@@ -168,15 +169,15 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
         if company:
             lookup["company"] = company.id
         else:
-            request.abort(401)
+            await request.abort(401)
 
-    mongo_cursor = await UsersService().search(lookup, use_mongo=True)
+    mongo_cursor: MongoResourceCursorAsync = await UsersService().search(lookup, use_mongo=True)
 
     # TODO-ASYNC: we need to implement the sorting somehow within the base service
     # When using mongo, the `AsyncIOMotorCollection.find` supports an additional
     # parameter `sort` for sorting.
     if sort:
-        mongo_cursor.cursor.sort(sort, pymongo.ASCENDING)
+        mongo_cursor.cursor.sort(sort)
 
     users = await mongo_cursor.to_list_raw()
 
@@ -186,8 +187,9 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
 @users_endpoints.endpoint("/users/new", methods=["POST"])
 @account_manager_or_company_admin_only
 async def create(request: Request):
-    form = UserForm()
-    if form.validate():
+    form = await UserForm.create_form()
+
+    if await form.validate():
         if not _is_email_address_valid(form.email.data):
             return Response({"email": [gettext("Email address is already in use")]}, 400, ())
 
@@ -197,7 +199,7 @@ async def create(request: Request):
         if is_current_user_company_admin():
             company_from_admin = await get_company_from_user_or_session()
             if not company_from_admin:
-                return request.abort(401)
+                return await request.abort(401)
 
             # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
             new_user.company = company_from_admin.id
@@ -214,8 +216,8 @@ async def create(request: Request):
         if company:
             auth_provider = get_company_auth_provider(company.model_dump(by_alias=True))
 
-        if auth_provider.features["verify_email"]:
-            add_token_data(new_user)
+            if auth_provider.features["verify_email"]:
+                add_token_data(new_user)
 
         ids = await UsersService().create([new_user])
 
@@ -237,7 +239,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
 
     user_company = await get_company_from_user_or_session(user)
     if not user_company:
-        return request.abort(403)
+        return await request.abort(403)
 
     auth_provider = get_company_auth_provider(user_company.model_dump(by_alias=True))
 
@@ -247,10 +249,10 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
         return Response({"is_validated": gettext("User is already validated")}, 400, ())
     elif user_is_company_admin and (company is None or user.company != company.id):
         # Company admins can only resent invites for members of their company only
-        request.abort(403)
+        await request.abort(403)
     elif not auth_provider.features["verify_email"]:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
-        request.abort(403)
+        await request.abort(403)
 
     await send_token(user.model_dump(byalias=True), token_type="new_account")
 
@@ -272,23 +274,23 @@ async def edit(args: RouteArguments, params: None, request: Request):
     user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
     if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(args.user_id):
-        request.abort(401)
+        await request.abort(401)
 
     user = await UsersService().find_by_id(args.user_id)
     company = await get_company_from_user_or_session()
 
     if user_is_company_admin and (company is None or user.company != company._id):
-        request.abort(403)
+        await request.abort(403)
 
     if not user:
         return NotFound(gettext("User not found"))
 
     etag = request.get_header("If-Match")
     if etag and user.etag != etag:
-        request.abort(412)
+        await request.abort(412)
 
     if request.method == "POST":
-        form = UserForm(user=user)
+        form = await UserForm.create_form()
 
         if await form.validate_on_submit():
             if form.email.data != user.email and not _is_email_address_valid(form.email.data):
@@ -298,9 +300,8 @@ async def edit(args: RouteArguments, params: None, request: Request):
                 return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
 
             updates = get_updates_from_form(form)
-
             if not user_is_admin and updates.get("user_type", "") != (user.user_type or ""):
-                request.abort(401)
+                await request.abort(401)
 
             allowed_fields = None
             if user_is_non_admin:
@@ -355,7 +356,7 @@ def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
 @login_required
 async def edit_user_profile(args: RouteArguments, params: None, request: Request):
     if not is_current_user(args.user_id):
-        request.abort(403)
+        await request.abort(403)
 
     user = await UsersService().find_by_id(args.user_id)
     if not user:
@@ -374,14 +375,19 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
 @login_required
 async def edit_user_notification_schedules(args: RouteArguments, params: None, request: Request):
     if not is_current_user(args.user_id):
-        request.abort(403)
+        await request.abort(403)
 
-    user = await UsersService().find_by_id(args.user_id)
+    user: Optional[UserResourceModel] = await UsersService().find_by_id(args.user_id)
     if not user:
         return NotFound(gettext("User not found"))
 
     data = await get_json_or_400_async(request)
-    updates = {"notification_schedule": deepcopy(user.notification_schedule or {})}
+
+    updates: Dict[str, Any] = {"notification_schedule": {}}
+    if user.notification_schedule:
+        user_dict = user.model_dump(by_alias=True)
+        updates["notification_schedule"] = deepcopy(user_dict.get("notification_schedule") or {})
+
     updates["notification_schedule"].update(data)
 
     await UsersService().update(args.user_id, updates)
@@ -394,7 +400,7 @@ async def validate(args: RouteArguments, params: None, request: None):
     return await _resend_token(args.user_id, token_type="validate")
 
 
-@users_endpoints.endpoint("/users/<_id>/reset_password", methods=["POST"])
+@users_endpoints.endpoint("/users/<string:user_id>/reset_password", methods=["POST"])
 @account_manager_or_company_admin_only
 async def resend_token(args: RouteArguments, params: None, request: None):
     return await _resend_token(args.user_id, token_type="reset_password")
@@ -414,7 +420,7 @@ async def _resend_token(user_id, token_type):
     if not user:
         return NotFound(gettext("User not found"))
 
-    if await send_token(user, token_type):
+    if await send_token(user.model_dump(by_alias=True), token_type):
         return success_response({"success": True})
 
     return Response({"message": "Token could not be sent"}, 400, ())
@@ -434,7 +440,7 @@ async def delete(args: RouteArguments, params: None, request: Request):
 @login_required
 async def get_notifications(args: RouteArguments, params: None, request: Request):
     if not is_current_user(args.user_id):
-        request.abort(403)
+        await request.abort(403)
 
     # TODO-ASYNC: migrate `get_notifications_with_items` to async
     return success_response(get_notifications_with_items())
@@ -445,7 +451,7 @@ async def get_notifications(args: RouteArguments, params: None, request: Request
 async def delete_all(args: RouteArguments, params: None, request: Request):
     """Deletes all notification by given user id"""
     if not is_current_user(args.user_id):
-        request.abort(403)
+        await request.abort(403)
 
     # TODO-ASYNC: adjust when notifications app is migrated to async
     get_resource_service("notifications").delete_action({"user": ObjectId(args.user_id)})
@@ -457,7 +463,7 @@ async def delete_all(args: RouteArguments, params: None, request: Request):
 async def delete_notification(args: NotificationRouteArguments, params: None, request: Request):
     """Deletes the notification by given id"""
     if not is_current_user(args.user_id):
-        request.abort(403)
+        await request.abort(403)
 
     # TODO-ASYNC: adjust when notifications app is migrated to async
     get_resource_service("notifications").delete_action({"_id": args.notification_id})

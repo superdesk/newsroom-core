@@ -23,7 +23,7 @@ async def get_company_sections_monitoring_data(company: CompanyResource, user: U
     """get the section configured for the company"""
     app = get_current_app().as_any()
 
-    if not company or user.user_type == UserRole.ADMINISTRATOR.value:
+    if not company or user.user_type == UserRole.ADMINISTRATOR:
         return {"userSections": app.sections}
 
     data = {"monitoring_administrator": company.monitoring_administrator, "userSections": app.sections}
