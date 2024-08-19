@@ -176,6 +176,8 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
 @company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])
 @admin_only
 async def delete_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    from newsroom.users.service import UsersService
+
     service = CompanyService()
     original = await service.find_by_id(args.company_id)
 
@@ -183,8 +185,7 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
         raise NotFound(gettext("Company not found"))
 
     try:
-        # TODO-ASYNC: Convert to users async service
-        get_resource_service("users").delete_action(lookup={"company": args.company_id})
+        await UsersService().delete_many(lookup={"company": args.company_id})
     except BadRequest as er:
         return Response({"error": str(er)}, 403, ())
 
