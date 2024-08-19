@@ -209,9 +209,9 @@ class AgendaListItem extends React.Component<IProps> {
                     if (segmentsRemainingToBeAdded > 0) {
                         paragraphsInnerText += paragraph.innerText;
                         paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
-    
+
                         segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
-    
+
                         descriptionHTMLArr.push(paragraph);
                     }
                 });
