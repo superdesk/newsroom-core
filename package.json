@@ -72,7 +72,7 @@
     "@types/karma": "^6.3.4",
     "@types/karma-chrome-launcher": "^3.1.4",
     "@types/karma-jasmine": "^4.0.2",
-    "@types/sinon": "^10.0.16",
+    "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
