@@ -84,7 +84,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         from .utils import get_user_id
 
         # set session locale if updating locale for current user
-        if updates.get("locale") and original["_id"] == get_user_id() and updates["locale"] != original.get("locale"):
+        if updates.get("locale") and original.id == get_user_id() and updates["locale"] != original.locale:
             session["locale"] = updates["locale"]
 
         updated = original.model_copy(update=updates)
@@ -157,8 +157,12 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         """Approves & enables the supplied user, and sends an account validation email"""
         from .utils import get_company_from_user_or_session, get_token_data
 
+        company_as_dict = None
         company = await get_company_from_user_or_session(user)
-        auth_provider = get_company_auth_provider(company)
+        if company:
+            company_as_dict = company.model_dump(by_alias=True)
+
+        auth_provider = get_company_auth_provider(company_as_dict)
 
         user_updates: Dict[str, Any] = {
             "is_enabled": True,
@@ -174,7 +178,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
         # Send new account / password reset email
         if auth_provider.features["verify_email"]:
-            updated_user = user.model_copy(update=user_updates)
+            updated_user = user.model_copy(update=user_updates).model_dump(by_alias=True)
             await send_token(updated_user, token_type="new_account", update_token=False)
 
     def _get_password_hash(self, password):

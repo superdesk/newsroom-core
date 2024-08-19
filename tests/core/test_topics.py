@@ -3,6 +3,8 @@ from unittest import mock
 from copy import deepcopy
 
 from newsroom.topics.views import get_topic_url
+from newsroom.users.model import UserResourceModel
+from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
     PUBLIC_USER_EMAIL,
@@ -303,7 +305,8 @@ async def test_topic_folders_unique_validation(client):
 
 async def test_topic_subscriber_auto_enable_user_emails(app, client):
     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user: UserResourceModel = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     topic = deepcopy(base_topic)
 
     async def disable_user_emails():

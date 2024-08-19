@@ -127,12 +127,15 @@ class TopicsService(newsroom.Service):
 
         # remove user topic subscriptions from existing topics
         topics = self.get(req=None, lookup={"subscribers.user_id": user["_id"]})
+
+        user_object_id = ObjectId(user["_id"])
+
         for topic in topics:
             updates = dict(
-                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user["_id"]],
+                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user_object_id],
             )
 
-            if topic.get("user") == user["_id"]:
+            if topic.get("user") == user_object_id:
                 topic["user"] = None
 
             self.system_update(topic["_id"], updates, topic)

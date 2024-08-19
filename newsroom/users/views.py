@@ -483,5 +483,5 @@ async def approve_user(args: RouteArguments, params: None, request: Request):
     if user.is_approved:
         return Response({"error": gettext("User is already approved")}, 403, ())
 
-    # users_service.approve_user(user)
+    await users_service.approve_user(user)
     return success_response({"success": True})

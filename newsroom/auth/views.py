@@ -10,6 +10,7 @@ from bson import ObjectId
 from google.auth.transport import requests
 from quart_babel import gettext
 
+from newsroom.users.model import UserResourceModel
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import abort, Blueprint, render_template, request, url_for, redirect, session
 from superdesk import get_resource_service
@@ -268,7 +269,7 @@ async def signup():
             company["_id"] = ids[0]
 
         user_service = UsersService()
-        new_user = {
+        new_user_dict = {
             "first_name": form.first_name.data,
             "last_name": form.last_name.data,
             "email": form.email.data,
@@ -280,9 +281,12 @@ async def signup():
             "is_enabled": False,
             "is_approved": False,
             "sections": {section["_id"]: True for section in app.sections},
+            "_id": ObjectId(),
         }
+        new_user = UserResourceModel.model_validate(new_user_dict)
         await user_service.create([new_user])
-        await send_new_signup_email(company, new_user, is_new_company)
+        await send_new_signup_email(company, new_user_dict, is_new_company)
+
         return await render_template("signup_success.html"), 200
     return await render_template(
         "signup.html",
