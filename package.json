@@ -79,7 +79,6 @@
     "enzyme": "^3.0.0",
     "eslint": "^8.46.0",
     "eslint-plugin-react": "^7.34.3",
-    "expect": "^21.1.0",
     "fetch-mock": "^9.11.0",
     "html-webpack-plugin": "~4.5.1",
     "karma": "^6.4.2",
