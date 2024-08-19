@@ -352,6 +352,10 @@ class AgendaList extends React.Component<IProps, IState> {
                     const plans = this.props.itemTypeFilter !== 'planning' ?
                         [] :
                         getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
+                    const version = getIntVersion(this.props.itemsById[itemId]);
+                    const isRead = version == null
+                        ? this.props.readItems[itemId] != null // event
+                        : version === this.props.readItems[itemId]; // planning item
 
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
@@ -362,7 +366,7 @@ class AgendaList extends React.Component<IProps, IState> {
                                     item={cloneDeep(this.props.itemsById[itemId])}
                                     isActive={this.isActiveItem(itemId, group.date, plan)}
                                     isSelected={this.props.selectedItems.includes(itemId)}
-                                    isRead={this.props.readItems[itemId] === getIntVersion(this.props.itemsById[itemId])}
+                                    isRead={isRead}
                                     onClick={this.onItemClick}
                                     onDoubleClick={this.onItemDoubleClick}
                                     onActionList={this.onActionList}
@@ -390,7 +394,7 @@ class AgendaList extends React.Component<IProps, IState> {
                             item={this.props.itemsById[itemId]}
                             isActive={this.isActiveItem(itemId, group.date, undefined)}
                             isSelected={this.props.selectedItems.includes(itemId)}
-                            isRead={this.props.readItems[itemId] === getIntVersion(this.props.itemsById[itemId])}
+                            isRead={isRead}
                             onClick={this.onItemClick}
                             onDoubleClick={this.onItemDoubleClick}
                             onActionList={this.onActionList}
