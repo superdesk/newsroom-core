@@ -30,7 +30,7 @@
     "@types/redux-logger": "^3.0.9",
     "@types/store": "^2.0.2",
     "@types/webpack-env": "^1.18.5",
-    "alertifyjs": "1.11.2",
+    "alertifyjs": "1.14.0",
     "bootstrap": "5.1.3",
     "classnames": "^2.5.1",
     "css-loader": "^0.28.5",
