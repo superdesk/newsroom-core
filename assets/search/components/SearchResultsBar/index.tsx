@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
 
-import {gettext} from 'utils';
+import {COLLAPSED_SEARCH_BY_DEFAULT, gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
 import {getAdvancedSearchFields} from '../../utils';
 import {
@@ -106,8 +106,9 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
+
         this.state = {
-            isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
+            isTagSectionShown: COLLAPSED_SEARCH_BY_DEFAULT === true ? false : (this.props.initiallyOpen || this.topicNotNull),
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
