@@ -6,7 +6,6 @@ from werkzeug.exceptions import BadRequest
 from superdesk.core import get_app_config
 from superdesk.flask import request, abort, session
 from superdesk.utils import is_hashed, get_hash
-from superdesk.core.resources.service import ResourceModelType
 
 from newsroom.settings import get_setting
 from newsroom.auth.utils import (

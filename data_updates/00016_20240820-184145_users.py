@@ -24,7 +24,7 @@ class DataUpdate(_DataUpdate):
 
         mongodb_collection.update_many({"id": {"$exists": True}}, {"$unset": {"id": ""}})
 
-        print(f"Removing `signup_details` field from all user registries.")
+        print("Removing `signup_details` field from all user registries.")
         mongodb_collection.update_many({}, {"$unset": {"signup_details": ""}})
 
         print("done.")
