@@ -28,24 +28,6 @@ from .users import COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES, COMPANY_ADMIN_ALLOWED_
 class UsersService(NewshubAsyncResourceService[UserResourceModel]):
     resource_name = "users"
 
-    def get_model_instance_from_dict(self, data: Dict[str, Any]) -> ResourceModelType:
-        """
-        Override method to avoid validation issues with `signup_details` coming as string
-        from already existing items in database. Also removing weird empty string "id" attribute
-        """
-
-        # remove legacy fields no longer user
-        if "signup_details" in data:
-            data.pop("signup_details")
-
-        # removes attribute `id` that comes empty and breaks validation
-        try:
-            data.pop("id")
-        except Exception:
-            pass
-
-        return super().get_model_instance_from_dict(data)
-
     async def on_create(self, docs):
         await super().on_create(docs)
 
