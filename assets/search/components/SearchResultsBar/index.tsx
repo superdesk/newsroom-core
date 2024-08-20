@@ -24,6 +24,7 @@ import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
 import {IDateFilter} from 'interfaces/common';
+import {ToolTip} from 'ui/components/ToolTip';
 
 interface ISortOption {
     label: string;
@@ -236,19 +237,26 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                 >
                                     {gettext('Clear All')}
                                 </button>
-                                <button
-                                    data-test-id="toggle-search-bar"
-                                    onClick={this.toggleTagSection}
-                                    className="icon-button icon-button--tertiary icon-button--bordered"
-                                >
-                                    <i className={classNames(
-                                        'icon--arrow-right',
-                                        {
-                                            'icon--collapsible-open': isTagSectionShown,
-                                            'icon--collapsible-closed': !isTagSectionShown,
+                                <ToolTip key={`${isTagSectionShown}--state`} placement="left">
+                                    <button
+                                        title={
+                                            isTagSectionShown
+                                                ? gettext('Hide search terms')
+                                                : gettext('Show search terms')
                                         }
-                                    )} />
-                                </button>
+                                        data-test-id="toggle-search-bar"
+                                        onClick={this.toggleTagSection}
+                                        className="icon-button icon-button--tertiary icon-button--bordered"
+                                    >
+                                        <i className={classNames(
+                                            'icon--arrow-right',
+                                            {
+                                                'icon--collapsible-open': isTagSectionShown,
+                                                'icon--collapsible-closed': !isTagSectionShown,
+                                            }
+                                        )} />
+                                    </button>
+                                </ToolTip>
                             </div>
                         </div>
                     )}
