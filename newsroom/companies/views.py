@@ -22,6 +22,7 @@ from newsroom.utils import (
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs
+from .utils import get_users_by_company
 from .companies_async import CompanyService, CompanyResource
 
 
@@ -184,7 +185,7 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
         raise NotFound(gettext("Company not found"))
 
     try:
-        await UsersService().delete_many(lookup={"company": str(args.company_id)})
+        await UsersService().delete_many(lookup={"company": args.company_id})
     except BadRequest as er:
         return Response({"error": str(er)}, 403, ())
 
@@ -199,10 +200,8 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
 @company_endpoints.endpoint("/companies/<string:company_id>/users", methods=["GET"])
 @login_required
 async def company_users(args: CompanyItemArgs, params: None, request: Request) -> Response:
-    from newsroom.users.service import UsersService
-
     users_list = []
-    company_users = await UsersService().search(lookup={"company": str(args.company_id)})
+    company_users = await get_users_by_company(args.company_id)
     async for user in company_users:
         public_data = get_public_user_data(user.model_dump(by_alias=True))
         users_list.append(public_data)
@@ -230,10 +229,9 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     await service.update(original.id, updates)
 
     # Activate the Users of this Company
-    users_service = UsersService()
-    company_users = await users_service.search(lookup={"company": str(original.id)})
+    company_users = await get_users_by_company(original.id)
 
     async for user in company_users:
-        await users_service.approve_user(user)
+        await UsersService().approve_user(user)
 
     return Response({"success": True}, 200, ())

@@ -83,7 +83,7 @@ async def test_new_user_signup_sends_email(app, client):
     assert new_user["phone"] == "1234567"
     assert new_user["role"] == "Other"
     assert new_user["country"] == "AUS"
-    assert new_user["company"] == str(new_company.id)
+    assert new_user["company"] == new_company.id
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False

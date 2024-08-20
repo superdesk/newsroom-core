@@ -1,17 +1,19 @@
-from bson import ObjectId
 from datetime import datetime, timedelta
-from typing import Dict, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, Optional, TypedDict, Union
+
+from bson import ObjectId
 from pydantic import BaseModel
-
-from superdesk.utc import utcnow
 from superdesk.core import get_app_config
-from newsroom.utils import get_random_string
-from superdesk.flask import request, session, abort, g
+from superdesk.flask import abort, g, request, session
+from superdesk.utc import utcnow
 
-from newsroom.companies.companies_async import CompanyResource, CompanyService
+from newsroom.utils import get_random_string
 
 from .model import UserResourceModel
 from .service import UsersService
+
+if TYPE_CHECKING:
+    from newsroom.companies.companies_async.types import CompanyResource
 
 
 def get_user_id():
@@ -57,10 +59,12 @@ async def get_user_or_abort() -> Optional[UserResourceModel]:
 
 async def get_company_from_user(
     user: Union[UserResourceModel, Dict[str, Union[ObjectId, str]]]
-) -> Optional[CompanyResource]:
+) -> Optional["CompanyResource"]:
     """
     Retrieve the company associated with the given user, if it exists.
     """
+    from newsroom.companies.companies_async import CompanyService
+
     company_id = user.company if isinstance(user, BaseModel) else user.get("company")
 
     return await CompanyService().find_by_id(company_id)
@@ -68,7 +72,7 @@ async def get_company_from_user(
 
 async def get_company_from_user_or_session(
     user: Optional[UserResourceModel] = None, is_user_required: bool = False
-) -> Optional[CompanyResource]:
+) -> Optional["CompanyResource"]:
     """
     Retrieve the company associated with the user or from the session if available.
 
@@ -79,6 +83,8 @@ async def get_company_from_user_or_session(
     Returns:
         Optional[CompanyResource]: The company resource associated with the user or session, or None if not found.
     """
+
+    from newsroom.companies.companies_async import CompanyService
 
     if user is None:
         user = await get_user_async(required=is_user_required)

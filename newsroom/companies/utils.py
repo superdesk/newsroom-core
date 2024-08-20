@@ -1,10 +1,16 @@
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
+
 from bson import ObjectId
-from typing import Dict, Optional, List
+from superdesk.core.resources.cursor import ResourceCursorAsync
 
 from newsroom.types import Company
 from newsroom.utils import query_resource
 
 from .companies_async.types import CompanyProduct, CompanyResource
+
+# avoid circular reference as it's used for type hints only
+if TYPE_CHECKING:
+    from newsroom.users.model import UserResourceModel
 
 
 def restrict_coverage_info(company: Optional[Company]) -> bool:
@@ -80,3 +86,19 @@ def get_companies_id_by_product(product_id: str) -> List[str]:
         for company in companies
         if any(prod["_id"] == ObjectId(product_id) for prod in company.get("products", []))
     ]
+
+
+async def get_users_by_company(company_id: Union[str, ObjectId]) -> ResourceCursorAsync["UserResourceModel"]:
+    """
+    Get all the users for the given company ID.
+
+    Parameters:
+        company_id (str | ObjectId): The ID of the company
+
+    Returns:
+        ResourceCursorAsync[UserResourceModel]: A result cursor of users that belong to the given company (if any)
+    """
+
+    from newsroom.users.service import UsersService
+
+    return await UsersService().search(lookup={"company": ObjectId(company_id)})
