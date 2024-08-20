@@ -99,9 +99,10 @@ const config = {
     ],
     devServer: {
         compress: true,
-        host: "0.0.0.0",
+        host: '0.0.0.0',
+        allowedHosts: 'all', // Allow any hosts in development
         headers: {
-            "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Origin': '*',
         },
     },
 };
