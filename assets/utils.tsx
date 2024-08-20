@@ -170,7 +170,7 @@ export function getProductQuery(product: any) {
  * @param {Boolean} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString: any, ignoreTimezone: any = false) {
+export function parseDate(dateString: any, ignoreTimezone?: boolean) {
     const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
 
     parsed.locale(getLocale());
@@ -283,8 +283,8 @@ export function formatTime(dateString: any) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDate(dateString: any) {
-    return parseDate(dateString).format(DATE_FORMAT);
+export function formatDate(dateString: any, ignoreTimezone?: boolean) {
+    return parseDate(dateString, ignoreTimezone).format(DATE_FORMAT);
 }
 
 /**

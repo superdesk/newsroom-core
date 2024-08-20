@@ -194,7 +194,7 @@ class UserProfile extends React.PureComponent<IProps> {
                                             <div className="nh-container nh-container__text--alert">
                                                 <div className='d-flex flex-column gap-3 p-3'>
                                                     <div>
-                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom), dateTo: formatDate(pausedTo)})}
+                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom, true), dateTo: formatDate(pausedTo, true)})}
                                                     </div>
                                                     <div>
                                                         <button
