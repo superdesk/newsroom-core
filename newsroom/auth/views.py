@@ -213,6 +213,9 @@ def logout():
 
 @blueprint.route("/signup", methods=["GET", "POST"])
 def signup():
+    if not app.config.get("SIGNUP_EMAIL_RECIPIENTS"):
+        flask.abort(404)
+
     form = (app.signup_form_class or SignupForm)()
     if len(app.countries):
         form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
