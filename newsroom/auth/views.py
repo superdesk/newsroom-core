@@ -389,7 +389,7 @@ async def impersonate_user():
     assert user_id
     user = await UsersService().find_by_id(user_id)
     assert user
-    start_user_session(user)
+    start_user_session(user.model_dump(by_alias=True))
     return redirect(url_for("wire.index"))
 
 
@@ -398,7 +398,7 @@ async def impersonate_user():
 async def impersonate_stop():
     assert session.get("auth_user")
     user = await UsersService().find_by_id(session.get("auth_user"))
-    start_user_session(user)
+    start_user_session(user.model_dump(by_alias=True))
     session.pop("auth_user")
     return redirect(url_for("settings.app", app_id="users"))
 

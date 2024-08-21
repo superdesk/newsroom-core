@@ -290,7 +290,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
     user = await UsersService().find_by_id(args.user_id)
     company = await get_company_from_user_or_session()
 
-    if user_is_company_admin and (company is None or user.company != company._id):
+    if user_is_company_admin and (company is None or user.company != company.id):
         await request.abort(403)
 
     if not user:
