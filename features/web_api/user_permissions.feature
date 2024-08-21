@@ -42,7 +42,7 @@ Feature: User Permissions
             ]
         }]
         """
-        And "users"
+        And newsroom "users"
         """
         [{
             "_id": "4e65964bf5db68883df561b0", "user_type": "company_admin",

@@ -1,7 +1,9 @@
-from behave import then, when
+from behave import then, when, given
 from behave.api.async_step import async_run_until_complete
 from wooper.expect import expect_status_in
+from eve.methods.common import parse
 
+from superdesk import get_resource_service
 from superdesk.core import json
 from superdesk.tests.steps import (
     assert_200,
@@ -9,6 +11,7 @@ from superdesk.tests.steps import (
     apply_placeholders,
     get_prefixed_url,
     set_placeholder,
+    is_user_resource,
 )
 from newsroom.utils import deep_get
 
@@ -138,8 +141,28 @@ async def then_we_get_users_with_products(context):
         if "sections" in user_data:
             expected_sections = user_data.get("sections") or []
             actual_sections = [name for name, value in (user.get("sections") or {}).items() if value]
+
             assert sorted(actual_sections) == sorted(expected_sections), (
                 "sections do not match\n"
                 f"expected_sections: {expected_sections}\n"
                 f"actual_sections: {user.get('sections')}"
             )
+
+
+@given('newsroom "{resource}"')
+@async_run_until_complete
+async def step_impl_given_newsroom_resource(context, resource):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        if not is_user_resource(resource):
+            get_resource_service(resource).delete_action()
+
+        items = [parse(item, resource) for item in json.loads(context.text)]
+        get_resource_service(resource).post(items)
+
+        context.data = items
+        context.resource = resource
+
+        try:
+            setattr(context, resource, items[-1])
+        except KeyError:
+            pass
