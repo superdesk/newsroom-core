@@ -17,7 +17,7 @@ class CommaSeparatedListField(Field):
 
     def process_formdata(self, valuelist):
         if (
-                valuelist == [""] or valuelist == [None] or valuelist == ["None"]
+            valuelist == [""] or valuelist == [None] or valuelist == ["None"]
         ):  # An empty string from the client is equal to an empty array
             self.data = []
         elif len(valuelist):
