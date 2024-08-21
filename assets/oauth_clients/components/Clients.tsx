@@ -58,6 +58,7 @@ class Clients extends React.Component<any, any> {
 
         if (confirm(gettext('Would you like to delete client: {{name}}', {name: this.props.clientToEdit.name}))) {
             this.props.deleteClient('clients');
+            this.props.cancelEdit();
         }
     }
 
