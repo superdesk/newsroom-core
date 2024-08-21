@@ -2,7 +2,7 @@ import pytz
 import regex
 import superdesk
 from functools import reduce
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from uuid import uuid4
 from datetime import datetime, timedelta
@@ -23,6 +23,7 @@ from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
+from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
 from newsroom.flask import flash
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
@@ -157,6 +158,16 @@ def success_response(data: Any, headers: Sequence = ()):
         data = data.model_dump(by_alias=True, exclude_unset=True)
 
     return Response(data, 200, headers)
+
+
+def response_from_validation(error: ValidationError, code=400):
+    """
+    Constructs a Response object with pydantic model validation error.
+    """
+    errors = {
+        field: list(err.values())[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
+    }
+    return Response(errors, code, ())
 
 
 def get_type(type: Optional[str] = None) -> str:

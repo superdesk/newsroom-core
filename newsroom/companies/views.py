@@ -10,7 +10,6 @@ from pydantic import BaseModel, ValidationError
 from superdesk.core import get_app_config, get_current_app
 from superdesk.core.web import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
-from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.types import AuthProviderConfig
@@ -18,6 +17,8 @@ from newsroom.utils import (
     get_public_user_data,
     query_resource,
     get_json_or_400_async,
+    response_from_validation,
+    success_response,
 )
 from newsroom.ui_config_async import UiConfigResourceService
 
@@ -85,14 +86,7 @@ async def create_company(request: Request) -> Response:
         new_company = CompanyResource.model_validate(company_data)
         ids = await CompanyService().create([new_company])
     except ValidationError as error:
-        return Response(
-            {
-                field: list(errors.values())[0]
-                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
-            },
-            400,
-            (),
-        )
+        return response_from_validation(error)
 
     return Response({"success": True, "_id": ids[0]}, 201, ())
 
@@ -161,16 +155,9 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     try:
         await service.update(args.company_id, updates)
     except ValidationError as error:
-        return Response(
-            {
-                field: list(errors.values())[0]
-                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
-            },
-            400,
-            (),
-        )
+        return response_from_validation(error)
 
-    return Response({"success": True}, 200, ())
+    return success_response({"success": True})
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])

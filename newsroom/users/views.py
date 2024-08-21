@@ -3,7 +3,7 @@ import json
 
 from copy import deepcopy
 from typing import Any, Dict, Optional
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ValidationError, field_validator
 
 from bson import ObjectId
 from quart_babel import gettext
@@ -42,6 +42,7 @@ from newsroom.utils import (
     get_json_or_400_async,
     query_resource,
     get_vocabulary,
+    response_from_validation,
     success_response,
 )
 from newsroom.monitoring.views import get_monitoring_for_company
@@ -196,7 +197,12 @@ async def create(request: Request):
             return Response({"email": [gettext("Email address is already in use")]}, 400, ())
 
         creation_data = get_updates_from_form(form, on_create=True)
-        new_user = UserResourceModel(**creation_data, id=ObjectId())
+        creation_data["id"] = ObjectId()
+
+        try:
+            new_user = UserResourceModel.model_validate(creation_data)
+        except ValidationError as error:
+            return response_from_validation(error)
 
         if is_current_user_company_admin():
             company_from_admin = await get_company_from_user_or_session()
@@ -221,7 +227,10 @@ async def create(request: Request):
             if auth_provider.features["verify_email"]:
                 add_token_data(new_user)
 
-        ids = await UsersService().create([new_user])
+        try:
+            ids = await UsersService().create([new_user])
+        except ValidationError as error:
+            return response_from_validation(error)
 
         if auth_provider.features["verify_email"]:
             user_dict = new_user.model_dump(by_alias=True, exclude_unset=True)
@@ -322,7 +331,10 @@ async def edit(args: RouteArguments, params: None, request: Request):
                     if field not in allowed_fields:
                         updates.pop(field, None)
 
-            await UsersService().update(args.user_id, updates=updates)
+            try:
+                await UsersService().update(args.user_id, updates)
+            except ValidationError as error:
+                return response_from_validation(error)
 
             return success_response({"success": True})
 
@@ -352,7 +364,7 @@ def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
         }
         updates["products"] = [
-            CompanyProduct(_id=product["_id"], section=product["product_type"]) for product in products.values()
+            CompanyProduct(_id=product["_id"], section=product["product_type"]) for product in products.values()  # type: ignore
         ]
 
     return updates
@@ -371,7 +383,11 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
     form = await UserForm.create_form(user=user)
     if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
-        await UsersService().update(args.user_id, updates)
+        try:
+            await UsersService().update(args.user_id, updates)
+        except ValidationError as error:
+            return response_from_validation(error)
+
         return success_response({"success": True})
 
     return Response(form.errors, 400, ())
@@ -396,7 +412,10 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
 
     updates["notification_schedule"].update(data)
 
-    await UsersService().update(args.user_id, updates)
+    try:
+        await UsersService().update(args.user_id, updates)
+    except ValidationError as error:
+        return response_from_validation(error)
     return success_response({"success": True})
 
 
