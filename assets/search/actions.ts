@@ -194,7 +194,7 @@ export function setView(view: any) {
  * @param {Object} searchParams
  */
 export function saveMyTopic(searchParams: any) {
-    return () => {
+    return (dispatch: any) => {
         const type = get(searchParams, 'topic_type') || 'wire';
 
         const menu = type === 'agenda' ?
@@ -214,11 +214,11 @@ export function saveMyTopic(searchParams: any) {
 export function followStory(item: any, type: any) {
     const slugline = get(item, 'slugline');
 
-    saveMyTopic({
+    return saveMyTopic({
         label: slugline,
         query: `slugline:"${slugline}"`,
         topic_type: type,
-    })();
+    });
 }
 
 /**
