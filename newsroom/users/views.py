@@ -302,6 +302,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
                 return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
 
             updates = get_updates_from_form(form)
+
             if not user_is_admin and updates.get("user_type", "") != (user.user_type or ""):
                 await request.abort(401)
 
@@ -331,6 +332,8 @@ async def edit(args: RouteArguments, params: None, request: Request):
 
 
 def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
+    from newsroom.companies.companies_async import CompanyProduct
+
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
@@ -349,8 +352,9 @@ def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
         }
         updates["products"] = [
-            {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+            CompanyProduct(_id=product["_id"], section=product["product_type"]) for product in products.values()
         ]
+
     return updates
 
 

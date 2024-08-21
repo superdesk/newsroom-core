@@ -45,21 +45,17 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
         if original_section_names != updated_section_names or original_product_ids != updated_product_ids:
             company_users = await get_users_by_company(original.id)
             async for user in company_users:
-                user_dict = user.model_dump(by_alias=True, exclude_unset=True)
                 user_updates = {
                     "sections": (
                         {}
-                        if not user_dict.get("sections")
-                        else {
-                            section: (user_dict.get("sections") or {}).get(section, False)
-                            for section in updated_section_names
-                        }
+                        if not user.sections
+                        else {section: user.sections.get(section, False) for section in updated_section_names}
                     ),
                     "products": [
                         product
-                        for product in user_dict.get("products") or []
-                        if product.get("section") in updated_section_names and product.get("_id") in updated_product_ids
+                        for product in user.products or []
+                        if product.section.value in updated_section_names and product._id in updated_product_ids
                     ],
                 }
 
-                UsersService().update(user.id, updates=user_updates)
+                await UsersService().update(user.id, updates=user_updates)

@@ -27,7 +27,7 @@ def get_company_section_names(company: Company) -> List[str]:
 def get_company_product_ids(company: Company) -> List[Optional[ObjectId]]:
     return sorted(
         [
-            product.get("_id")
+            ObjectId(product.get("_id"))
             for product in company.get("products") or []
             if product.get("section") and (company.get("sections") or {}).get(product["section"]) is True
         ],

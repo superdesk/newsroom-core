@@ -44,11 +44,11 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
     async def on_update(self, updates, original):
         from .utils import get_company_from_user
 
-        self.check_permissions(original, updates)
+        await self.check_permissions(original, updates)
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
 
-        company_id = updates.get("company") or original.company
+        company_id = updates.get("company", original.company)
         company = await get_company_from_user({"company": company_id})
         company_changed = updates.get("company") and updates["company"] != original.company
 
