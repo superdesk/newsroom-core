@@ -3,7 +3,7 @@ import bcrypt
 from typing import Optional
 
 from quart_babel import gettext
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from werkzeug.exceptions import NotFound
 
 from superdesk.utils import gen_password
@@ -13,6 +13,7 @@ from superdesk.core.resources.fields import ObjectId
 from newsroom.utils import get_json_or_400_async
 from newsroom.decorator import admin_only, account_manager_only
 from .clients_async import clients_endpoints, ClientService, ClientResource
+from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
 
 async def get_settings_data():
@@ -58,8 +59,19 @@ async def create(request: Request) -> Response:
         "name": client.get("name"),
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
-    new_client = ClientResource.model_validate(doc)
-    ids = await ClientService().create([new_client])
+    try:
+        new_client = ClientResource.model_validate(doc)
+        ids = await ClientService().create([new_client])
+    except ValidationError as error:
+        return Response(
+            {
+                field: list(errors.values())[0]
+                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
+            },
+            400,
+            (),
+        )
+
     return Response({"success": True, "_id": ids[0], "password": password}, 201, ())
 
 
