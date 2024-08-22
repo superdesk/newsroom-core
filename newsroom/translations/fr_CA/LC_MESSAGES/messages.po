@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-13 11:56+0200\n"
+"POT-Creation-Date: 2024-08-22 11:23+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2024\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
@@ -409,7 +409,7 @@ msgstr "J'accepte"
 #: assets/users/components/EditUser.tsx:236
 #: assets/users/components/UsersList.tsx:33 newsroom/auth/forms.py:39
 #: newsroom/auth/forms.py:46 newsroom/auth/forms.py:62
-#: newsroom/users/forms.py:46
+#: newsroom/users/forms.py:48
 msgid "Email"
 msgstr "Courriel"
 
@@ -492,45 +492,45 @@ msgstr ""
 msgid "Exceeded number of allowed login attempts"
 msgstr "Nombre de tentatives de connexion autorisées dépassé"
 
-#: newsroom/auth/views.py:227
+#: newsroom/auth/views.py:230
 msgid "Account already exists."
 msgstr "Ce compte existe déjà."
 
-#: newsroom/auth/views.py:296
+#: newsroom/auth/views.py:299
 msgid "Your account has been validated."
 msgstr "Votre compte a été validé."
 
-#: newsroom/auth/views.py:299
+#: newsroom/auth/views.py:302
 msgid "Token has expired. Please create a new token"
 msgstr "Le jeton a expiré. S'il vous plaît créez un nouveau jeton."
 
-#: newsroom/auth/views.py:318
+#: newsroom/auth/views.py:321
 msgid "Your password has been changed. Please login again."
 msgstr "Votre mot de passe a été changé. Veuillez vous reconnecter."
 
-#: newsroom/auth/views.py:344
+#: newsroom/auth/views.py:347
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 "Un jeton de réinitialisation du mot de passe a été envoyé à votre adresse de"
 " courriel."
 
-#: newsroom/auth/views.py:405 newsroom/auth/views.py:418
+#: newsroom/auth/views.py:408 newsroom/auth/views.py:421
 msgid "Your password has been changed."
 msgstr "Votre mot de passe a été modifié."
 
-#: newsroom/auth/views.py:407 newsroom/auth/views.py:414
+#: newsroom/auth/views.py:410 newsroom/auth/views.py:417
 msgid "Current password invalid."
 msgstr "Mot de passe incorrect"
 
-#: newsroom/auth/views.py:421
+#: newsroom/auth/views.py:424
 msgid "Change password is not available."
 msgstr "L'option de réinitialisation du mot de passe n'est pas disponible"
 
-#: newsroom/auth/views.py:441
+#: newsroom/auth/views.py:444
 msgid "User token is not valid"
 msgstr "Le jeton d'utilisateur n'est pas valable."
 
-#: newsroom/auth/views.py:452
+#: newsroom/auth/views.py:455
 msgid "Could not change your password. Please contact us for assistance."
 msgstr ""
 "La réinitialisation du mot de passe a échoué. Veuillez nous contacter pour "
@@ -695,7 +695,7 @@ msgstr "Type de format"
 #: assets/users/components/EditUser.tsx:273
 #: assets/users/components/EditUser.tsx:282
 #: assets/users/components/UsersList.tsx:38 newsroom/monitoring/forms.py:24
-#: newsroom/reports/reports.py:188 newsroom/users/forms.py:51
+#: newsroom/reports/reports.py:188 newsroom/users/forms.py:53
 msgid "Company"
 msgstr "Entreprise"
 
@@ -777,7 +777,7 @@ msgstr "Client non trouvé"
 #: assets/company-reports/components/Company.tsx:24
 #: assets/navigations/components/EditNavigation.tsx:26
 #: assets/users/components/EditUser.tsx:354 newsroom/products/__init__.py:15
-#: newsroom/users/forms.py:63
+#: newsroom/users/forms.py:65
 msgid "Products"
 msgstr "Produits"
 
@@ -880,7 +880,7 @@ msgid "API retrieval"
 msgstr "Récupération d'API"
 
 #: assets/company-reports/components/CompanyReportsApp.tsx:39
-#: newsroom/reports/content_activity.py:283
+#: newsroom/reports/content_activity.py:285
 msgid "Content activity"
 msgstr "Activité du contenu"
 
@@ -1050,7 +1050,7 @@ msgstr "Navigation latérale"
 #: newsroom/templates/base_layout.html:104
 #: newsroom/templates/base_layout.html:111
 #: newsroom/templates/company_admin_index.html:3
-#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:40
+#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:42
 msgid "Company Admin"
 msgstr "Administrateur client"
 
@@ -1312,105 +1312,105 @@ msgid "User Management"
 msgstr "Gestion des utilisateurs"
 
 #: assets/monitoring/utils.ts:4 assets/users/utils.ts:8
-#: newsroom/users/forms.py:36
+#: newsroom/users/forms.py:38
 msgid "Administrator"
 msgstr "Administrateur"
 
 #: assets/monitoring/utils.ts:6 assets/users/utils.ts:10
-#: newsroom/users/forms.py:37
+#: newsroom/users/forms.py:39
 msgid "Public"
 msgstr "Public"
 
 #: assets/companies/components/CompanyListItem.tsx:25
 #: assets/companies/components/EditCompanyDetails.tsx:187
 #: assets/monitoring/utils.ts:5 assets/users/utils.ts:9
-#: newsroom/users/forms.py:38
+#: newsroom/users/forms.py:40
 msgid "Internal"
 msgstr "Interne"
 
 #: assets/monitoring/utils.ts:7 assets/users/utils.ts:11
-#: newsroom/users/forms.py:39
+#: newsroom/users/forms.py:41
 msgid "Account Management"
 msgstr "Gestion de compte"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:86
 #: assets/users/components/EditUser.tsx:222
 #: assets/users/components/filters/UserListSortFilter.tsx:23
-#: newsroom/users/forms.py:44
+#: newsroom/users/forms.py:46
 msgid "First Name"
 msgstr "Prénom"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:95
 #: assets/users/components/EditUser.tsx:229
 #: assets/users/components/filters/UserListSortFilter.tsx:26
-#: newsroom/users/forms.py:45
+#: newsroom/users/forms.py:47
 msgid "Last Name"
 msgstr "Nom de famille"
 
 #: assets/companies/components/CompanyList.tsx:41
 #: assets/companies/components/EditCompanyDetails.tsx:126
-#: newsroom/users/forms.py:47
+#: newsroom/users/forms.py:49
 msgid "Telephone"
 msgstr "Téléphone"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:135
-#: assets/users/components/EditUser.tsx:250 newsroom/users/forms.py:48
+#: assets/users/components/EditUser.tsx:250 newsroom/users/forms.py:50
 msgid "Mobile"
 msgstr "Cellulaire"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:144
 #: assets/users/components/EditUser.tsx:257
-#: assets/users/components/UsersList.tsx:36 newsroom/users/forms.py:49
+#: assets/users/components/UsersList.tsx:36 newsroom/users/forms.py:51
 msgid "Role"
 msgstr "Poste"
 
 #: assets/users/components/EditUser.tsx:263
 #: assets/users/components/UsersList.tsx:37
 #: assets/users/components/filters/UserListSortFilter.tsx:35
-#: newsroom/users/forms.py:50
+#: newsroom/users/forms.py:52
 msgid "User Type"
 msgstr "Type d'utilisateur"
 
-#: newsroom/users/forms.py:52
+#: newsroom/users/forms.py:54
 msgid "Sign Up Details"
 msgstr "Détails d'inscription"
 
-#: newsroom/users/forms.py:53
+#: newsroom/users/forms.py:55
 msgid "Email Validated"
 msgstr "Courriel validé"
 
-#: newsroom/users/forms.py:54
+#: newsroom/users/forms.py:56
 msgid "Account Enabled"
 msgstr "Compte activé"
 
-#: newsroom/users/forms.py:55
+#: newsroom/users/forms.py:57
 msgid "Account Approved"
 msgstr "Compte approuvé"
 
-#: assets/users/components/EditUser.tsx:452 newsroom/users/forms.py:56
+#: assets/users/components/EditUser.tsx:452 newsroom/users/forms.py:58
 msgid "Company Expiry Alert"
 msgstr "Alerte d'expiration"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:162
-#: newsroom/users/forms.py:57
+#: newsroom/users/forms.py:59
 msgid "Receive Email Notifications"
 msgstr "Recevoir des notifications par courriel"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:153
-#: newsroom/users/forms.py:58
+#: newsroom/users/forms.py:60
 msgid "Receive App Notifications"
 msgstr "Recevoir des notifications dans l'application"
 
-#: newsroom/users/forms.py:59
+#: newsroom/users/forms.py:61
 msgid "Locale"
 msgstr "Endroit"
 
-#: assets/users/components/EditUser.tsx:462 newsroom/users/forms.py:60
+#: assets/users/components/EditUser.tsx:462 newsroom/users/forms.py:62
 msgid "Manage Company Topics"
 msgstr "Gérer les sujets partagés"
 
 #: assets/companies/components/CompanyPermissions.tsx:74
-#: assets/users/components/EditUser.tsx:320 newsroom/users/forms.py:62
+#: assets/users/components/EditUser.tsx:320 newsroom/users/forms.py:64
 msgid "Sections"
 msgstr "Sections"
 
@@ -1498,27 +1498,27 @@ msgstr "Non décidée / au mérite"
 msgid "Not Intended / Cancelled"
 msgstr "Non prévue / annulée"
 
-#: newsroom/web/default_settings.py:635
+#: newsroom/web/default_settings.py:636
 msgid "Home"
 msgstr "Accueil"
 
-#: newsroom/web/default_settings.py:640
+#: newsroom/web/default_settings.py:641
 msgid "Wire"
 msgstr "Fil de presse"
 
-#: newsroom/web/default_settings.py:645
+#: newsroom/web/default_settings.py:646
 msgid "Agenda"
 msgstr "Calendrier"
 
-#: newsroom/web/default_settings.py:650
+#: newsroom/web/default_settings.py:651
 msgid "Monitoring"
 msgstr "Suivi"
 
-#: newsroom/web/default_settings.py:655
+#: newsroom/web/default_settings.py:656
 msgid "Saved / Watched"
 msgstr "Ma liste"
 
-#: newsroom/web/default_settings.py:693
+#: newsroom/web/default_settings.py:694
 msgid "Newshub"
 msgstr "NouvellesPro"
 
@@ -1526,24 +1526,24 @@ msgstr "NouvellesPro"
 #: assets/agenda/components/AgendaList.tsx:329
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
-#: assets/components/ExpiryDateInput.tsx:93
-#: newsroom/web/default_settings.py:816 newsroom/web/default_settings.py:842
+#: assets/components/ExpiryDateInput.tsx:94
+#: newsroom/web/default_settings.py:817 newsroom/web/default_settings.py:843
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: newsroom/web/default_settings.py:818
+#: newsroom/web/default_settings.py:819
 msgid "Last Week"
 msgstr "La semaine dernière"
 
-#: newsroom/web/default_settings.py:824
+#: newsroom/web/default_settings.py:825
 msgid "Last 30 days"
 msgstr "Les 30 derniers jours"
 
-#: newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:845
 msgid "This Week"
 msgstr "Cette semaine"
 
-#: newsroom/web/default_settings.py:848
+#: newsroom/web/default_settings.py:849
 msgid "This Month"
 msgstr "Ce mois-ci"
 
@@ -1632,7 +1632,7 @@ msgstr "Expiration des produits du fil (en jours)"
 msgid "New navigation"
 msgstr "Nouvelle navigation"
 
-#: assets/utils.tsx:519
+#: assets/utils.tsx:520
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin"
@@ -1640,23 +1640,23 @@ msgstr ""
 "Aucun produit n'est associé à votre utilisateur. Veuillez contacter votre "
 "administrateur. "
 
-#: assets/utils.tsx:523
+#: assets/utils.tsx:524
 msgid "Resource was updated in the meantime, please refresh."
 msgstr "La ressource a été mise à jour entre-temps, veuillez la rafraîchir."
 
-#: assets/utils.tsx:525
+#: assets/utils.tsx:526
 msgid "Failed to process request!"
 msgstr "La requête n'a pas pu être exécutée!"
 
-#: assets/utils.tsx:713
+#: assets/utils.tsx:714
 msgid "Item copied successfully."
 msgstr "Élément copié avec succès."
 
-#: assets/utils.tsx:717
+#: assets/utils.tsx:718
 msgid "Sorry, Copy is not supported."
 msgstr "Désolé, la copie n'est pas prise en charge."
 
-#: assets/utils.tsx:748
+#: assets/utils.tsx:749
 msgid "Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}"
 msgstr ""
 "Tous les jours à {{ time1 }}, {{ time2 }} et {{ time3 }} {{ timezone }}"
@@ -1880,7 +1880,7 @@ msgid "Oldest updates"
 msgstr "Première modification"
 
 #: assets/agenda/components/AgendaApp.tsx:259
-#: assets/search/components/SearchResultsBar/index.tsx:63
+#: assets/search/components/SearchResultsBar/index.tsx:65
 msgid "Relevance"
 msgstr "Pertinence"
 
@@ -2073,7 +2073,7 @@ msgstr "Afficher"
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: assets/agenda/components/AgendaList.tsx:462
+#: assets/agenda/components/AgendaList.tsx:466
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
@@ -2936,31 +2936,31 @@ msgstr "Tout désélectionner"
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: assets/components/ExpiryDateInput.tsx:22
+#: assets/components/ExpiryDateInput.tsx:23
 msgid "on"
 msgstr "le"
 
-#: assets/components/ExpiryDateInput.tsx:23
+#: assets/components/ExpiryDateInput.tsx:24
 msgid "in 1 week"
 msgstr "dans 1 semaine"
 
-#: assets/components/ExpiryDateInput.tsx:24
+#: assets/components/ExpiryDateInput.tsx:25
 msgid "in 2 weeks"
 msgstr "dans 2 semaines"
 
-#: assets/components/ExpiryDateInput.tsx:25
+#: assets/components/ExpiryDateInput.tsx:26
 msgid "in 1 month"
 msgstr "dans 1 mois"
 
-#: assets/components/ExpiryDateInput.tsx:26
+#: assets/components/ExpiryDateInput.tsx:27
 msgid "in 6 months"
 msgstr "dans 6 mois"
 
-#: assets/components/ExpiryDateInput.tsx:27
+#: assets/components/ExpiryDateInput.tsx:28
 msgid "in 1 year"
 msgstr "dans 1 an"
 
-#: assets/components/ExpiryDateInput.tsx:28
+#: assets/components/ExpiryDateInput.tsx:29
 #: assets/news-api/components/EditAPIToken.tsx:195
 msgid "Never"
 msgstr "Jamais"
@@ -3005,7 +3005,7 @@ msgstr "Aucune nouvelle notification !"
 
 #: assets/components/NotificationPopup.tsx:72
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:235
+#: assets/search/components/SearchResultsBar/index.tsx:238
 msgid "Clear All"
 msgstr "Tout effacer"
 
@@ -3184,7 +3184,7 @@ msgid "All"
 msgstr "Tout"
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:194
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:195
 #: assets/user-profile/components/PauseNotificationModal.tsx:126
 #: assets/wire/components/filters/NavCreatedPicker.tsx:74
 msgid "To"
@@ -3685,11 +3685,11 @@ msgstr "Cela nécessite de vous connecter à votre compte !"
 msgid "Register"
 msgstr "Enregistrer"
 
-#: assets/search/actions.ts:296
+#: assets/search/actions.ts:298
 msgid "Items were shared successfully."
 msgstr "Les éléments ont été partagés avec succès."
 
-#: assets/search/actions.ts:298
+#: assets/search/actions.ts:300
 msgid "Item was shared successfully."
 msgstr "L'élément a été partagé avec succès."
 
@@ -3983,17 +3983,17 @@ msgid "inside"
 msgstr "dans"
 
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:176
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:177
 #: assets/user-profile/components/PauseNotificationModal.tsx:111
 #: assets/wire/components/filters/NavCreatedPicker.tsx:62
 msgid "From"
 msgstr "De"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:261
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:262
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:269
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:270
 msgid "Filters applied"
 msgstr "Filtres appliqués"
 
@@ -4017,28 +4017,28 @@ msgstr "Enregistrer en tant que nouveau sujet"
 msgid "Save new topic"
 msgstr "Enregistrer un nouveau sujet "
 
-#: assets/search/components/SearchResultsBar/index.tsx:55
+#: assets/search/components/SearchResultsBar/index.tsx:57
 msgid "Newest first"
 msgstr "Le plus récent en premier"
 
-#: assets/search/components/SearchResultsBar/index.tsx:59
+#: assets/search/components/SearchResultsBar/index.tsx:61
 msgid "Oldest first"
 msgstr "Le plus ancien en premier"
 
-#: assets/search/components/SearchResultsBar/index.tsx:198
+#: assets/search/components/SearchResultsBar/index.tsx:201
 msgid "1 result"
 msgstr "1 résultat"
 
-#: assets/search/components/SearchResultsBar/index.tsx:200
+#: assets/search/components/SearchResultsBar/index.tsx:203
 msgid "{{ count }} results"
 msgstr "{{ count }} résultats"
 
-#: assets/search/components/SearchResultsBar/index.tsx:208
+#: assets/search/components/SearchResultsBar/index.tsx:211
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr "Trier par : "
 
-#: assets/search/components/SearchResultsBar/index.tsx:211
+#: assets/search/components/SearchResultsBar/index.tsx:214
 msgid "Sort results by"
 msgstr "Trier par"
 
@@ -4356,19 +4356,19 @@ msgstr "Les éléments ont été retirés avec succès"
 msgid "Item was removed successfully"
 msgstr "L'élément a été retiré avec succès"
 
-#: assets/wire/utils.ts:396
+#: assets/wire/utils.ts:395
 msgid "segments"
 msgstr "segments"
 
-#: assets/wire/utils.ts:396
+#: assets/wire/utils.ts:395
 msgid "segment"
 msgstr "segment"
 
-#: assets/wire/utils.ts:399
+#: assets/wire/utils.ts:398
 msgid "versions"
 msgstr "versions"
 
-#: assets/wire/utils.ts:399
+#: assets/wire/utils.ts:398
 msgid "version"
 msgstr "version"
 
