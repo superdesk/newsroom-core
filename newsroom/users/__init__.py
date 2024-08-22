@@ -1,12 +1,10 @@
-from quart_babel import lazy_gettext
 import superdesk
-from superdesk.flask import Blueprint
 
-
-from .users import AuthUserService, UsersResource, AuthUserResource, users_service
+from quart_babel import lazy_gettext
 from inspect import iscoroutine
 
-blueprint = Blueprint("users", __name__)
+from .users import AuthUserService, UsersResource, AuthUserResource, users_service
+from .module import module  # noqa
 
 
 def init_app(app):

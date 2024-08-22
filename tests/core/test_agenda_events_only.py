@@ -29,7 +29,7 @@ async def set_events_only_company(app):
     assert company is not None
     updates = {
         "events_only": True,
-        "section": {"wire": True, "agenda": True},
+        "sections": {"wire": True, "agenda": True},
         "is_enabled": True,
     }
     app.data.update("companies", COMPANY_1_ID, updates, company)

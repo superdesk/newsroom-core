@@ -39,7 +39,7 @@ async def init(app):
                 "_id": companies["password_auth"],
                 "name": "Password based auth",
                 "is_enabled": True,
-                "auth_provider": "newsroom",
+                "auth_provider": "newshub",
             },
             {
                 "_id": companies["google_auth"],
@@ -59,8 +59,11 @@ async def init(app):
 
 
 async def test_password_auth_denies_other_auth_types(app, client):
+    from newsroom.users.service import UsersService
+
     await logout(client)
-    users_service = get_resource_service("users")
+    users_service = UsersService()
+
     user_id = ObjectId()
     app.data.insert(
         "users",
@@ -100,26 +103,26 @@ async def test_password_auth_denies_other_auth_types(app, client):
     await test_login_passes()
 
     # Test logging in with public user and company with no ``auth_provider`` assigned
-    users_service.patch(id=user_id, updates={"company": companies["empty_auth"], "user_type": "public"})
+    await users_service.update(user_id, updates={"company": companies["empty_auth"], "user_type": "public"})
     await test_login_passes()
 
     # Test logging in with public user and company with ``auth_provider`` set to a password based one
-    users_service.patch(id=user_id, updates={"company": companies["password_auth"]})
+    await users_service.update(user_id, updates={"company": companies["password_auth"]})
     await test_login_passes()
 
     # Test logging in fails with public user and company with ``auth_provider`` set to use OAuth
-    users_service.patch(id=user_id, updates={"company": companies["google_auth"]})
+    await users_service.update(user_id, updates={"company": companies["google_auth"]})
     response = await login_user()
     assert "Invalid login type" in await response.get_data(as_text=True)
 
     # Test logging in fails with public user and company with ``auth_provider`` set to use SAML
-    users_service.patch(id=user_id, updates={"company": companies["saml_auth"]})
+    await users_service.update(user_id, updates={"company": companies["saml_auth"]})
     response = await login_user()
     assert "Invalid login type" in await response.get_data(as_text=True)
 
     # Test logging in with password, as administrator and company with ``auth_provider`` set to SAML
     # This is used as a fallback option so admins can always login
-    users_service.patch(id=user_id, updates={"company": companies["saml_auth"], "user_type": "administrator"})
+    await users_service.update(user_id, updates={"company": companies["saml_auth"], "user_type": "administrator"})
     await test_login_passes()
 
 

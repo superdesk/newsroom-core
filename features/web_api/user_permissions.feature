@@ -42,7 +42,7 @@ Feature: User Permissions
             ]
         }]
         """
-        And "users"
+        And newsroom "users"
         """
         [{
             "_id": "4e65964bf5db68883df561b0", "user_type": "company_admin",
@@ -68,8 +68,11 @@ Feature: User Permissions
         When we post json to "/users/4e65964bf5db68883df561b0"
         """
         {
-            "company": null, "user_type": "administrator",
-            "email": "test1@test.org", "first_name": "admin", "last_name": "admin",
+            "company": null,
+            "user_type": "administrator",
+            "email": "test1@test.org",
+            "first_name": "admin",
+            "last_name": "admin",
             "sections": "wire,agenda",
             "products": "69b4c5c61d41c8d736852fbf,69b4c5c61d41c8d736852fba,69b4c5c61d41c8d736852fbb"
         }

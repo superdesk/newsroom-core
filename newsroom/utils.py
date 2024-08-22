@@ -1,10 +1,13 @@
-from functools import reduce
 import pytz
+import regex
+import superdesk
+from functools import reduce
+from pydantic import BaseModel, ValidationError
+
+from uuid import uuid4
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from uuid import uuid4
-import regex
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Sequence, Union
 from pymongo.cursor import Cursor as MongoCursor
 
 from bson import ObjectId
@@ -13,14 +16,14 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
-import superdesk
-from superdesk.core.web import Request
+from superdesk.core.web import Request, Response
 from superdesk.core import json, get_current_app, get_app_config
 from superdesk.flask import abort, request, g, session, url_for
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
+from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
 from newsroom.flask import flash
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
@@ -144,6 +147,27 @@ async def get_json_or_400_async(req: Request):
     if not isinstance(data, dict):
         await req.abort(400)
     return data
+
+
+def success_response(data: Any, headers: Sequence = ()):
+    """
+    Shortcut to return a `superdesk.core.web.Response` with a
+    status_code 200 and empty headers by default
+    """
+    if isinstance(data, BaseModel):
+        data = data.model_dump(by_alias=True, exclude_unset=True)
+
+    return Response(data, 200, headers)
+
+
+def response_from_validation(error: ValidationError, code=400):
+    """
+    Constructs a Response object with pydantic model validation error.
+    """
+    errors = {
+        field: list(err.values())[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
+    }
+    return Response(errors, code, ())
 
 
 def get_type(type: Optional[str] = None) -> str:

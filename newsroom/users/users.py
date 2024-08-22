@@ -1,28 +1,16 @@
 import pytz
-import bcrypt
+import newsroom
+import superdesk
+
 from datetime import datetime, date
 from copy import deepcopy
 
-from typing import Dict, Optional, List, TypedDict
-from quart_babel import gettext
-from werkzeug.exceptions import BadRequest
-
-import superdesk
 from superdesk.core import get_app_config, get_current_app
-from superdesk.flask import session, abort, request
-
-import newsroom
+from superdesk.flask import request
 from newsroom.products.types import PRODUCT_TYPES
-from newsroom.types import Company, ProductRef, User
-from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
-from newsroom.auth.utils import get_company, get_company_auth_provider, add_token_data, send_token
-from newsroom.settings import get_setting
-from newsroom.utils import set_original_creator, set_version_creator
-from superdesk.utils import is_hashed, get_hash
-from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
+from newsroom.types import User
+from newsroom.auth import get_user_id, get_user, SessionAuth
 from newsroom.user_roles import UserRole
-from newsroom.signals import user_created, user_updated, user_deleted
-from newsroom.companies.utils import get_company_section_names, get_company_product_ids
 
 
 class UserAuthentication(SessionAuth):
@@ -228,40 +216,6 @@ COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES = {
 }
 
 
-def get_updated_sections(updates, original, company: Optional[Company]) -> Dict[str, bool]:
-    sections: Dict[str, bool] = {}
-    if "sections" in updates:
-        sections = updates["sections"] or {}
-    elif "sections" in original:
-        sections = original["sections"] or {}
-
-    if not company:
-        return sections
-
-    company_section_names = get_company_section_names(company)
-    return {section: enabled and section in company_section_names for section, enabled in sections.items()}
-
-
-def get_updated_products(updates, original, company: Optional[Company]) -> List[ProductRef]:
-    products: List[ProductRef] = []
-    if "products" in updates:
-        products = updates["products"] or []
-    elif "products" in original:
-        products = original["products"] or []
-
-    if not company:
-        return products
-
-    company_section_names = get_company_section_names(company)
-    company_product_ids = get_company_product_ids(company)
-
-    return [
-        product
-        for product in products
-        if product.get("section") in company_section_names and product.get("_id") in company_product_ids
-    ]
-
-
 class UsersService(newsroom.Service):
     """
     A service that knows how to perform CRUD operations on the `users`
@@ -270,44 +224,8 @@ class UsersService(newsroom.Service):
     Serves mainly as a proxy to the data layer.
     """
 
-    def on_create(self, docs):
-        super().on_create(docs)
-        for doc in docs:
-            self.check_permissions(doc)
-            set_original_creator(doc)
-            if doc.get("password", None) and not is_hashed(doc.get("password")):
-                doc["password"] = self._get_password_hash(doc["password"])
-
-    def on_created(self, docs):
-        super().on_created(docs)
-        for doc in docs:
-            user_created.send(self, user=doc)
-
-    def on_update(self, updates, original):
-        self.check_permissions(original, updates)
-        set_version_creator(updates)
-        if "password" in updates:
-            updates["password"] = self._get_password_hash(updates["password"])
-
-        company = get_company_from_user({"company": updates.get("company", original.get("company"))})
-        company_changed = updates.get("company") and updates["company"] != original.get("company")
-
-        if company_changed or "sections" in updates or "products" in updates:
-            # Company, Sections or Products have changed, recalculate the list of sections & products
-            updates["sections"] = get_updated_sections(updates, original, company)
-            updates["products"] = get_updated_products(updates, original, company)
-
-        app = get_current_app().as_any()
-        app.cache.delete(str(original.get("_id")))
-        app.cache.delete(original.get("email"))
-
-    def on_updated(self, updates, original):
-        # set session locale if updating locale for current user
-        if updates.get("locale") and original["_id"] == get_user_id() and updates["locale"] != original.get("locale"):
-            session["locale"] = updates["locale"]
-        updated = original.copy()
-        updated.update(updates)
-        user_updated.send(self, user=updated, updates=updates)
+    # TODO-ASYNC: migrate these two pending methods below to `.service.UsersService`
+    # and update the references
 
     def update_notification_schedule_run_time(self, user: User, run_time: datetime):
         notification_schedule = deepcopy(user["notification_schedule"])
@@ -317,99 +235,6 @@ class UsersService(newsroom.Service):
         app = get_current_app().as_any()
         app.cache.delete(str(user["_id"]))
         app.cache.delete(user.get("email"))
-
-    def _get_password_hash(self, password):
-        return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))
-
-    def password_match(self, password, hashed_password):
-        """Return true if the given password matches the hashed password
-        :param password: plain password
-        :param hashed_password: hashed password
-        """
-        try:
-            return hashed_password == bcrypt.hashpw(password, hashed_password)
-        except Exception:
-            return False
-
-    def on_deleted(self, doc):
-        get_current_app().as_any().cache.delete(str(doc.get("_id")))
-        user_deleted.send(self, user=doc)
-
-    def on_delete(self, doc):
-        if doc.get("_id") == get_user_id():
-            raise BadRequest(gettext("Can not delete current user"))
-        user = self.find_one(req=None, _id=doc["_id"])
-        self.check_permissions(user)
-        super().on_delete(doc)
-
-    def check_permissions(self, doc, updates=None):
-        """Check if current user has permissions to edit user."""
-        if not request or request.method == "GET":  # in behave there is test request context
-            return
-
-        if is_current_user_admin() or is_current_user_account_mgr():
-            return
-
-        # Only check against metadata that has changed from the original
-        updated_fields = (
-            []
-            if updates is None
-            else [field for field in updates.keys() if updates[field] != doc.get(field) and field != "id"]
-        )
-
-        if request.url_rule and request.url_rule.rule:
-            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
-                return
-
-        if is_current_user_company_admin():
-            manager = get_user()
-            if doc.get("company") and doc["company"] == manager.get("company"):
-                allowed_updates = (
-                    COMPANY_ADMIN_ALLOWED_UPDATES
-                    if not get_setting("allow_companies_to_manage_products")
-                    else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
-                )
-
-                if not updated_fields:
-                    return
-                elif all([key in allowed_updates for key in updated_fields]):
-                    return
-                elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
-                    return
-
-        if request.method != "DELETE" and (
-            not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields])
-        ):
-            return
-
-        abort(403)
-
-    async def approve_user(self, user: User):
-        """Approves & enables the supplied user, and sends an account validation email"""
-
-        company = get_company(user)
-        auth_provider = get_company_auth_provider(company)
-
-        # Need to define ``user_updates`` type, otherwise ``updated_user.update(user_updates)`` fails type checks
-        class UserApprovalUpdates(TypedDict, total=False):
-            is_enabled: bool
-            is_approved: bool
-            token: str
-            token_expiry_date: str
-
-        user_updates: UserApprovalUpdates = {
-            "is_enabled": True,
-            "is_approved": True,
-        }
-        if auth_provider.features["verify_email"]:
-            add_token_data(user_updates)
-        self.patch(user["_id"], updates=user_updates)
-
-        # Send new account / password reset email
-        if auth_provider.features["verify_email"]:
-            updated_user: User = deepcopy(user)
-            updated_user.update(user_updates)
-            await send_token(updated_user, token_type="new_account", update_token=False)
 
     def user_has_paused_notifications(self, user: User) -> bool:
         schedule = user.get("notification_schedule") or {}

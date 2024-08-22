@@ -42,7 +42,7 @@ Feature: Company Products
             ]
         }]
         """
-        Given "users"
+        Given newsroom "users"
         """
         [{
             "_id": "4e65964bf5db68883df561b0", "user_type": "public",
@@ -253,8 +253,11 @@ Feature: Company Products
         When we post json to "/users/4e65964bf5db68883df561b0"
         """
         {
-            "company": "1e65964bf5db68883df561b1", "user_type": "public",
-            "email": "test1@test.org", "first_name": "admin", "last_name": "admin",
+            "company": "1e65964bf5db68883df561b1",
+            "user_type": "public",
+            "email": "test1@test.org",
+            "first_name": "admin",
+            "last_name": "admin",
             "sections": "wire,agenda",
             "products": "69b4c5c61d41c8d736852fbf,69b4c5c61d41c8d736852fba,69b4c5c61d41c8d736852fbb"
         }

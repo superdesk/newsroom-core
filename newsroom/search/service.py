@@ -33,7 +33,8 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
-from newsroom.users import users_service
+
+# from newsroom.users import users_service
 
 logger = logging.getLogger(__name__)
 
@@ -880,8 +881,8 @@ class BaseSearchService(Service):
             if not user_has_section_allowed(user, self.section):
                 continue
 
-            if users_service.user_has_paused_notifications(user):
-                continue
+            # if users_service.user_has_paused_notifications(user):
+            #     continue
 
             aggs = {"topics": {"filters": {"filters": {}}}}
             company = companies.get(str(user.get("company", "")))

@@ -317,10 +317,10 @@ class MonitoringEmailAlerts(Command):
 
 
 @celery.task(soft_time_limit=600)
-def monitoring_schedule_alerts():
-    MonitoringEmailAlerts().run()
+async def monitoring_schedule_alerts():
+    await MonitoringEmailAlerts().run()
 
 
 @celery.task(soft_time_limit=600)
-def monitoring_immediate_alerts():
-    MonitoringEmailAlerts().run(True)
+async def monitoring_immediate_alerts():
+    await MonitoringEmailAlerts().run(True)

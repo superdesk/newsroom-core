@@ -1,10 +1,11 @@
 from quart import json, url_for
 from bson import ObjectId
+from newsroom.companies import CompanyServiceAsync as CompanyService, CompanyResource
 from newsroom.tests.users import test_login_succeeds_for_admin
 from newsroom.tests.fixtures import COMPANY_1_ID
-from superdesk import get_resource_service
 
 from newsroom.user_roles import UserRole
+from newsroom.users.service import UsersService
 from tests.utils import logout
 
 
@@ -23,7 +24,7 @@ async def test_delete_company_deletes_company_and_users(client):
     )
 
     assert response.status_code == 201
-    company = get_resource_service("companies").find_one(req=None, name="Press 2 Co.")
+    company: CompanyResource = await CompanyService().find_one(name="Press 2 Co.")
 
     # Register a user for the company
     response = await client.post(
@@ -34,19 +35,20 @@ async def test_delete_company_deletes_company_and_users(client):
             "last_name": "Doe",
             "password": "abc",
             "phone": "1234567",
-            "company": ObjectId(company["_id"]),
+            "company": company.id,
             "user_type": "public",
         },
     )
     assert response.status_code == 201
 
-    response = await client.delete("/companies/{}".format(str(company["_id"])))
+    response = await client.delete("/companies/{}".format(company.id))
     assert response.status_code == 200
 
-    company = get_resource_service("companies").find_one(req=None, _id=str(company["_id"]))
-    assert company is None
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await UsersService().find_one(email="newuser@abc.org")
+    company = await CompanyService().find_by_id(company.id)
+
     assert user is None
+    assert company is None
 
 
 async def test_company_name_is_unique(client):
@@ -93,7 +95,7 @@ async def test_get_company_users(client):
         },
     )
     assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
-    resp = await client.get("companies/%s/users" % company_id)
+    resp = await client.get("/companies/%s/users" % company_id)
     assert resp.status_code == 200, (await resp.get_data()).decode("utf-8")
     users = json.loads(await resp.get_data())
     assert 1 == len(users)

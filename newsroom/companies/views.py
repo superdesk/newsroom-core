@@ -10,8 +10,6 @@ from pydantic import BaseModel, ValidationError
 from superdesk.core import get_app_config, get_current_app
 from superdesk.core.web import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
-from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
-from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.types import AuthProviderConfig
@@ -19,10 +17,13 @@ from newsroom.utils import (
     get_public_user_data,
     query_resource,
     get_json_or_400_async,
+    response_from_validation,
+    success_response,
 )
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs
+from .utils import get_users_by_company
 from .companies_async import CompanyService, CompanyResource
 
 
@@ -85,14 +86,7 @@ async def create_company(request: Request) -> Response:
         new_company = CompanyResource.model_validate(company_data)
         ids = await CompanyService().create([new_company])
     except ValidationError as error:
-        return Response(
-            {
-                field: list(errors.values())[0]
-                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
-            },
-            400,
-            (),
-        )
+        return response_from_validation(error)
 
     return Response({"success": True, "_id": ids[0]}, 201, ())
 
@@ -161,21 +155,16 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     try:
         await service.update(args.company_id, updates)
     except ValidationError as error:
-        return Response(
-            {
-                field: list(errors.values())[0]
-                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
-            },
-            400,
-            (),
-        )
+        return response_from_validation(error)
 
-    return Response({"success": True}, 200, ())
+    return success_response({"success": True})
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])
 @admin_only
 async def delete_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    from newsroom.users.service import UsersService
+
     service = CompanyService()
     original = await service.find_by_id(args.company_id)
 
@@ -183,8 +172,7 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
         raise NotFound(gettext("Company not found"))
 
     try:
-        # TODO-ASYNC: Convert to users async service
-        get_resource_service("users").delete_action(lookup={"company": args.company_id})
+        await UsersService().delete_many(lookup={"company": args.company_id})
     except BadRequest as er:
         return Response({"error": str(er)}, 403, ())
 
@@ -199,14 +187,20 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
 @company_endpoints.endpoint("/companies/<string:company_id>/users", methods=["GET"])
 @login_required
 async def company_users(args: CompanyItemArgs, params: None, request: Request) -> Response:
-    # TODO-ASYNC: Convert to users async service
-    users = [get_public_user_data(user) for user in query_resource("users", lookup={"company": args.company_id})]
-    return Response(users, 200, ())
+    users_list = []
+    company_users = await get_users_by_company(args.company_id)
+    async for user in company_users:
+        public_data = get_public_user_data(user.model_dump(by_alias=True))
+        users_list.append(public_data)
+
+    return Response(users_list, 200, ())
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>/approve", methods=["POST"])
 @account_manager_only
 async def approve_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    from newsroom.users.service import UsersService
+
     service = CompanyService()
     original = await service.find_by_id(args.company_id)
     if not original:
@@ -222,9 +216,9 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     await service.update(original.id, updates)
 
     # Activate the Users of this Company
-    # TODO-ASYNC: Convert to users async service
-    users_service = get_resource_service("users")
-    for user in users_service.get(req=None, lookup={"company": original.id, "is_approved": {"$ne": True}}):
-        await users_service.approve_user(user)
+    company_users = await get_users_by_company(original.id)
+
+    async for user in company_users:
+        await UsersService().approve_user(user)
 
     return Response({"success": True}, 200, ())

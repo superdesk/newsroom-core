@@ -4,6 +4,7 @@ from unittest import mock
 from datetime import datetime, timedelta
 
 from bson import ObjectId
+from newsroom.tests import markers
 from superdesk import get_resource_service
 from newsroom.push import notify_new_agenda_item, notify_new_wire_item
 from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
@@ -299,6 +300,7 @@ async def test_realtime_notifications_agenda_reccuring_event(app):
         assert notify_new_item.call_count == 2
 
 
+@markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_pause_notifications(app, mocker, company_products):
     user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)

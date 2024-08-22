@@ -129,7 +129,7 @@ async def test_user_sections(app, client, manager, product):
     # has section but no products
     with pytest.raises(AssertionError) as err:
         await utils.get_json(client, "/agenda/search")
-    assert "403" in str(err)
+        assert "403" in str(err)
 
     await utils.patch_json(
         client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}

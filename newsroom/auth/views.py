@@ -1,14 +1,16 @@
-from typing import Literal
+import re
 import bcrypt
 import logging
 import google.oauth2.id_token
-import re
+
+from typing import Literal
 from datetime import timedelta
 
 from bson import ObjectId
 from google.auth.transport import requests
 from quart_babel import gettext
 
+from newsroom.users.model import UserResourceModel
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import abort, Blueprint, render_template, request, url_for, redirect, session
 from superdesk import get_resource_service
@@ -45,6 +47,7 @@ from newsroom.utils import (
 )
 from newsroom.email import send_new_signup_email
 from newsroom.limiter import rate_limit
+from newsroom.users.service import UsersService
 
 from .token import generate_auth_token, verify_auth_token
 
@@ -173,17 +176,21 @@ async def get_login_token():
     user = get_auth_user_by_email(email)
 
     if user is not None and _is_password_valid(password.encode("UTF-8"), user):
-        user = get_resource_service("users").find_one(req=None, _id=user["_id"])
-        company = get_company_from_user(user)
+        user_dict = {}
+        user = await UsersService().find_by_id(user["_id"])
+        if user:
+            user_dict = user.model_dump(by_alias=True)
 
-        if not is_company_enabled(user, company):
+        company = get_company_from_user(user_dict)
+
+        if not is_company_enabled(user_dict, company):
             abort(401, gettext("Company account has been disabled."))
 
-        if is_company_expired(user, company):
+        if is_company_expired(user_dict, company):
             abort(401, gettext("Company account has expired."))
 
-        if await is_account_enabled(user):
-            return generate_auth_token(user)
+        if await is_account_enabled(user_dict):
+            return generate_auth_token(user_dict)
     else:
         abort(401, gettext("Invalid username or password."))
 
@@ -261,8 +268,8 @@ async def signup():
             ids = company_service.post([company])
             company["_id"] = ids[0]
 
-        user_service = get_resource_service("users")
-        new_user = {
+        user_service = UsersService()
+        new_user_dict = {
             "first_name": form.first_name.data,
             "last_name": form.last_name.data,
             "email": form.email.data,
@@ -274,9 +281,12 @@ async def signup():
             "is_enabled": False,
             "is_approved": False,
             "sections": {section["_id"]: True for section in app.sections},
+            "_id": ObjectId(),
         }
-        user_service.post([new_user])
-        await send_new_signup_email(company, new_user, is_new_company)
+        new_user = UserResourceModel.model_validate(new_user_dict)
+        await user_service.create([new_user])
+        await send_new_signup_email(company, new_user_dict, is_new_company)
+
         return await render_template("signup_success.html"), 200
     return await render_template(
         "signup.html",
@@ -297,7 +307,7 @@ async def validate_account(token):
 
     if user.get("token_expiry_date") > utcnow():
         updates = {"is_validated": True, "token": None, "token_expiry_date": None}
-        get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+        await UsersService().update(user["_id"], updates)
         await flash(gettext("Your account has been validated."), "success")
         return redirect(url_for("auth.login"))
 
@@ -319,7 +329,7 @@ async def reset_password(token):
             "token": None,
             "token_expiry_date": None,
         }
-        get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+        await UsersService().update(user["_id"], updates=updates)
         await flash(gettext("Your password has been changed. Please login again."), "success")
 
         if get_user() is not None:  # user is authenticated already
@@ -377,9 +387,9 @@ async def impersonate_user():
         session["auth_user"] = session["user"]
     user_id = (await request.form).get("user")
     assert user_id
-    user = get_resource_service("users").find_one(req=None, _id=user_id)
+    user = await UsersService().find_by_id(user_id)
     assert user
-    start_user_session(user)
+    start_user_session(user.model_dump(by_alias=True))
     return redirect(url_for("wire.index"))
 
 
@@ -387,8 +397,8 @@ async def impersonate_user():
 @login_required
 async def impersonate_stop():
     assert session.get("auth_user")
-    user = get_resource_service("users").find_one(req=None, _id=session.get("auth_user"))
-    start_user_session(user)
+    user = await UsersService().find_by_id(session.get("auth_user"))
+    start_user_session(user.model_dump(by_alias=True))
     session.pop("auth_user")
     return redirect(url_for("settings.app", app_id="users"))
 
@@ -419,7 +429,7 @@ async def change_password():
                 await flash(gettext("Current password invalid."), "danger")
             else:
                 updates = {"password": form.new_password.data}
-                get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+                await UsersService().update(user["_id"], updates=updates)
                 await flash(gettext("Your password has been changed."), "success")
                 return redirect(url_for("auth.change_password"))
         else:

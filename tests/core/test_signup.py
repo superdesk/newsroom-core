@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from unittest import mock
 
 from quart import url_for
@@ -6,6 +7,7 @@ from newsroom.types import CompanyType, Country
 from newsroom.auth import get_auth_user_by_email
 from newsroom.companies.companies_async import CompanyService, CompanyProduct
 from newsroom.products.types import ProductType
+from newsroom.users.service import UsersService
 
 from tests.utils import mock_send_email
 
@@ -113,6 +115,11 @@ async def test_new_user_signup_fails_if_fields_not_provided(client):
     assert "occupation: This field is required" in txt
 
 
+async def get_user_by_email(email: str) -> Dict[str, Any]:
+    new_user = await UsersService().find_one(email=email)
+    return new_user.model_dump(by_alias=True)
+
+
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_approve_company_and_users(app, client):
     app.countries = [Country(value="AUS", text="Australia")]
@@ -141,7 +148,8 @@ async def test_approve_company_and_users(app, client):
     new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
     assert new_company["is_enabled"] is False
     assert new_company["is_approved"] is False
-    new_user = app.data.find_one("users", req=None, email="john@doe.org")
+
+    new_user = await get_user_by_email("john@doe.org")
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False
@@ -155,7 +163,8 @@ async def test_approve_company_and_users(app, client):
         new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
         assert new_company["is_enabled"] is True
         assert new_company["is_approved"] is True
-        new_user = app.data.find_one("users", req=None, email="john@doe.org")
+
+        new_user = await get_user_by_email("john@doe.org")
         assert new_user["is_enabled"] is True
         assert new_user["is_approved"] is True
         assert new_user["is_validated"] is False
@@ -199,7 +208,7 @@ async def test_approve_company_and_users(app, client):
         assert response.status_code == 200
 
         # Test the new User is now enabled and approved, but not yet validated
-        new_user = app.data.find_one("users", req=None, email="jane@doe.org")
+        new_user = await get_user_by_email("jane@doe.org")
         assert new_user["is_enabled"] is True
         assert new_user["is_approved"] is True
         assert new_user["is_validated"] is False
