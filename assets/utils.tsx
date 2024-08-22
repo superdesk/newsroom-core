@@ -513,8 +513,6 @@ export function errorHandler(error: {errorData: any} | Response, dispatch?: any,
     if ('errorData' in error) {
         if (setError) {
             dispatch(setError(error.errorData));
-            const errorMessage = Object.values(error.errorData).join(', ');
-            notify.error(errorMessage);
         }
     } else {
         if (error.status === 403) {
