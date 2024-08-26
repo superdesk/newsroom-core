@@ -8,7 +8,7 @@ interface IProps {
 }
 
 export default class StaticMap extends React.Component<IProps, any> {
-   constructor(props: IProps) {
+    constructor(props: IProps) {
         super(props);
         this.state = {
             mapLoaded: false
