@@ -1,19 +1,31 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-class BannerDrop extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface IProps {
+    isOpenDefault: boolean;
+    id?: string;
+    children?: React.ReactNode;
+    labelCollapsed: string;
+    labelOpened: string;
+}
+
+interface IState {
+    open: boolean;
+}
+
+export default class BannerDrop extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
-        this.state = {open: this.props.isOpen};
+        this.state = {
+            open: this.props.isOpenDefault
+        };
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
-    componentWillReceiveProps(nextProps: any) {
+    componentWillReceiveProps(nextProps: IProps) {
         if (this.props.id !== nextProps.id &&
-                this.state.open !== nextProps.isOpen) {
-            this.setState({open: nextProps.isOpen});
+                this.state.open !== nextProps.isOpenDefault) {
+            this.setState({open: nextProps.isOpenDefault});
         }
     }
 
@@ -40,13 +52,3 @@ class BannerDrop extends React.Component<any, any> {
         </div>);
     }
 }
-
-BannerDrop.propTypes = {
-    id: PropTypes.string,
-    children: PropTypes.node,
-    isOpen: PropTypes.bool,
-    labelCollapsed: PropTypes.string,
-    labelOpened: PropTypes.string,
-};
-
-export default BannerDrop;
