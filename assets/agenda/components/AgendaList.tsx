@@ -362,7 +362,7 @@ class AgendaList extends React.Component<IProps, IState> {
                             {plans.map((plan) => (
                                 <AgendaListItem
                                     key={`${itemId}--${plan._id}`}
-                                    group={group.date}
+                                    group={group}
                                     item={cloneDeep(this.props.itemsById[itemId])}
                                     isActive={this.isActiveItem(itemId, group.date, plan)}
                                     isSelected={this.props.selectedItems.includes(itemId)}
@@ -390,7 +390,7 @@ class AgendaList extends React.Component<IProps, IState> {
                     ) : (
                         <AgendaListItem
                             key={itemId}
-                            group={group.date}
+                            group={group}
                             item={this.props.itemsById[itemId]}
                             isActive={this.isActiveItem(itemId, group.date, undefined)}
                             isSelected={this.props.selectedItems.includes(itemId)}
