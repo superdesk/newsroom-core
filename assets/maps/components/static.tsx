@@ -7,7 +7,11 @@ interface IProps {
     locations?: Array<any>;
 }
 
-export default class StaticMap extends React.Component<IProps, any> {
+interface IState {
+    mapLoaded: boolean;
+}
+
+export default class StaticMap extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {

@@ -4,13 +4,18 @@ import {shouldRenderLocation, getLocations} from 'maps/utils';
 import StaticMap from 'maps/components/static';
 import BannerDrop from 'components/BannerDrop';
 import {gettext} from '../../utils';
+import {IAgendaItem} from 'interfaces';
 
+interface IProps {
+    onClick: (item: IAgendaItem) => void;
+    item: IAgendaItem;
+}
 /**
  * Display map image for item location
  * @param {Object} item
  * @param {function} onClick
  */
-export default function AgendaPreviewImage({item, onClick}: any) {
+export default function AgendaPreviewImage({item, onClick}: IProps) {
     if (!shouldRenderLocation(item)) {
         return null;
     }
