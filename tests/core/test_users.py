@@ -681,7 +681,7 @@ async def test_update_and_sort(app, client):
     assert users[0]["first_name"] == "AAba"
     assert users[2]["first_name"] == "Test"
 
-    response = await client.get("/users/search?q=&sort=[('last_name', 1)]")
+    response = await client.get("/users/search?q=&sort=[('last_name', -1)]")
     users = await response.get_json()
     assert users[0]["last_name"] == "Zoe"
     assert users[1]["last_name"] == "Bar"

@@ -12,7 +12,8 @@ from werkzeug.exceptions import BadRequest, NotFound
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
-from superdesk.core.resources.service import MongoResourceCursorAsync
+from superdesk.core.resources.cursor import SearchRequest
+from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email
@@ -110,14 +111,8 @@ async def get_view_data():
 
 
 class WhereParam(BaseModel):
-    company: Optional[str] = None
-    products_id: Optional[str] = None
-
-    @field_validator("company", "products_id", mode="after")
-    def convert_to_objectid(cls, value):
-        if value is not None:
-            return ObjectId(value)
-        return value
+    company: Optional[ObjectIdField] = None
+    products_id: Optional[ObjectIdField] = None
 
 
 class ObjectIdListModel(BaseModel):
@@ -156,7 +151,7 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
         lookup = {"_id": {"$in": params.ids}}
 
     if params.sort:
-        sort = params.sort
+        sort = str(params.sort)
 
     where_param = params.where
 
@@ -174,14 +169,7 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
         else:
             await request.abort(401)
 
-    mongo_cursor: MongoResourceCursorAsync = await UsersService().search(lookup, use_mongo=True)
-
-    # TODO-ASYNC: we need to implement the sorting somehow within the base service
-    # When using mongo, the `AsyncIOMotorCollection.find` supports an additional
-    # parameter `sort` for sorting.
-    if sort:
-        mongo_cursor.cursor.sort(sort)
-
+    mongo_cursor = await UsersService().find(SearchRequest(where=lookup, sort=sort, max_results=250))
     users = await mongo_cursor.to_list_raw()
 
     return Response(users, 200, ())
