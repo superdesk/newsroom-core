@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
 
-import {gettext} from 'utils';
+import {COLLAPSED_SEARCH_BY_DEFAULT, gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
 import {getAdvancedSearchFields} from '../../utils';
 import {
@@ -24,6 +24,7 @@ import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
 import {IDateFilter} from 'interfaces/common';
+import {ToolTip} from 'ui/components/ToolTip';
 
 interface ISortOption {
     label: string;
@@ -105,8 +106,9 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
+
         this.state = {
-            isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
+            isTagSectionShown: COLLAPSED_SEARCH_BY_DEFAULT === true ? false : (this.props.initiallyOpen || this.topicNotNull),
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -235,19 +237,26 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                 >
                                     {gettext('Clear All')}
                                 </button>
-                                <button
-                                    data-test-id="toggle-search-bar"
-                                    onClick={this.toggleTagSection}
-                                    className="icon-button icon-button--tertiary icon-button--bordered"
-                                >
-                                    <i className={classNames(
-                                        'icon--arrow-right',
-                                        {
-                                            'icon--collapsible-open': isTagSectionShown,
-                                            'icon--collapsible-closed': !isTagSectionShown,
+                                <ToolTip key={`${isTagSectionShown}--state`} placement="left">
+                                    <button
+                                        title={
+                                            isTagSectionShown
+                                                ? gettext('Hide search terms')
+                                                : gettext('Show search terms')
                                         }
-                                    )} />
-                                </button>
+                                        data-test-id="toggle-search-bar"
+                                        onClick={this.toggleTagSection}
+                                        className="icon-button icon-button--tertiary icon-button--bordered"
+                                    >
+                                        <i className={classNames(
+                                            'icon--arrow-right',
+                                            {
+                                                'icon--collapsible-open': isTagSectionShown,
+                                                'icon--collapsible-closed': !isTagSectionShown,
+                                            }
+                                        )} />
+                                    </button>
+                                </ToolTip>
                             </div>
                         </div>
                     )}

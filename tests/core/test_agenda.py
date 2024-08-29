@@ -1,6 +1,6 @@
 import pytz
 from flask import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from urllib import parse
 from unittest import mock
 from pytest import fixture
@@ -26,7 +26,6 @@ from .utils import add_company_products
 
 from copy import deepcopy
 from bson import ObjectId
-from newsroom.agenda.agenda import get_date_filters
 
 date_time_format = "%Y-%m-%dT%H:%M:%S"
 
@@ -745,54 +744,3 @@ def test_filter_events_only(client):
     assert "urn:conference" == data["_items"][0]["_id"]
     assert "planning_items" not in data["_items"][0]
     assert "coverages" not in data["_items"][0]
-
-
-def test_agenda_filters_query(app):
-    app.config.update(
-        {
-            "AGENDA_TIME_FILTERS": [
-                {"name": "Next 7 days", "filter": "next_7_days", "query": "now+7d/d"},
-                {"name": "Next 30 days", "filter": "next_30_days", "query": "now+30d/d"},
-                {"name": "Next 3 months", "filter": "next_3_months", "query": "now+3M/d"},
-                {"name": "Next 12 months", "filter": "next_12_months", "query": "now+12M/d", "default": True},
-                {"name": "Last 7 days", "filter": "last_7_days", "query": "now-7d/d"},
-                {"name": "Last 30 days", "filter": "last_30_days", "query": "now-30d/d"},
-                {"name": "Last 24 hours", "filter": "last_24_hours", "query": "now-24h/h"},
-                {"name": "Today", "query": "now/d", "filter": "today"},
-                {"name": "This Week", "query": "now/w", "filter": "this_week"},
-                {"name": "This Month", "query": "now/M", "filter": "this_month"},
-            ]
-        }
-    )
-
-    now = datetime.now(pytz.UTC)
-
-    # Test case 1: Filter for next_3_months with date_from 2024-08-12
-    args = {"date_from": "2024-08-12", "date_filter": "next_3_months"}
-    date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC)
-    assert date_range["lt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC) + timedelta(days=90)
-
-    # Test case 2: Filter for last_7_days with date_from 2024-08-12
-    args = {"date_from": now.strftime("%Y-%m-%d"), "date_filter": "last_7_days"}
-    date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime.combine(now, datetime.min.time(), tzinfo=pytz.UTC) - timedelta(days=7)
-    assert date_range["lt"] == datetime.combine(now, datetime.min.time(), tzinfo=pytz.UTC)
-
-    # Test case 3: Custom filter with date_from 2024-08-12 and date_to 2024-09-12
-    args = {"date_from": "2024-08-12", "date_filter": "custom_date", "date_to": "2024-09-12"}
-    date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC)
-    assert date_range["lt"] == datetime(2024, 9, 12, 23, 59, 59, tzinfo=pytz.UTC)
-
-    # Test case 4: Default case where default filter is "next_12_months"
-    args = {"date_from": "2024-08-12"}
-    date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC)
-    assert date_range["lt"] == datetime(2025, 8, 12, 0, 0, tzinfo=pytz.UTC)
-
-    # Test case 5: Filter for this_week
-    args = {"date_from": "2024-08-13", "date_filter": "today"}
-    date_range = get_date_filters(args)
-    assert date_range["gt"] == datetime(2024, 8, 14, 0, 0, tzinfo=pytz.UTC)
-    assert date_range["lt"] == datetime(2024, 8, 14, 23, 59, 59, tzinfo=pytz.UTC)

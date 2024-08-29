@@ -31,7 +31,7 @@ export const NotificationPopup = (props: IProps) => {
 
                 <div className='d-flex flex-column gap-2 p-3'>
                     <div className='nh-container nh-container__text--alert p-2'>
-                        {gettext('All notifications are paused until {{date}}', {date: formatDate(pausedTo)})}
+                        {gettext('All notifications are paused until {{date}}', {date: formatDate(pausedTo, true)})}
                     </div>
 
                     <button
@@ -76,7 +76,7 @@ export const NotificationPopup = (props: IProps) => {
                     {(notificationsWillBePaused(pausedFrom, pausedTo)) && (
                         <div className='p-3'>
                             <div className='nh-container nh-container__text--info p-2'>
-                                {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom), dateTo: formatDate(pausedTo)})}
+                                {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom, true), dateTo: formatDate(pausedTo, true)})}
                             </div>
                         </div>
                     )}
