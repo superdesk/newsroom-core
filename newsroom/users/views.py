@@ -232,6 +232,7 @@ async def create(request: Request):
 @users_endpoints.endpoint("/users/<string:user_id>/resend_invite", methods=["POST"])
 @account_manager_or_company_admin_only
 async def resent_invite(args: RouteArguments, params: None, request: Request):
+    # TODO: cover with tests all the cases in this view
     user = await UsersService().find_by_id(args.user_id)
     company = await get_company_from_user_or_session()
     user_is_company_admin = is_current_user_company_admin()
