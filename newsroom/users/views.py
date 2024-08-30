@@ -253,7 +253,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         await request.abort(403)
 
-    await send_token(user.model_dump(byalias=True), token_type="new_account")
+    await send_token(user.model_dump(by_alias=True), token_type="new_account")
 
     return success_response({"success": True})
 
