@@ -162,7 +162,7 @@ async def send_new_signup_email(company: Company, user: User, is_new_company: bo
         to=get_app_config("SIGNUP_EMAIL_RECIPIENTS").split(","),
         template="signup_request_email",
         template_kwargs=dict(
-            url=url_for("settings.app", **url_kwargs),
+            url=url_for("settings.settings_app", **url_kwargs),
             user=user,
             company=company,
             is_new_company=is_new_company,
