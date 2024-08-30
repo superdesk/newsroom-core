@@ -82,7 +82,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             raise BadRequest(gettext("Can not delete current user"))
 
         user = await self.find_by_id(doc.id)
-        self.check_permissions(user)
+        await self.check_permissions(user)
         super().on_delete(doc)
 
     async def check_permissions(self, user: UserResourceModel, updates=None):
