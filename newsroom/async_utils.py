@@ -1,7 +1,7 @@
 import asyncio
 import threading
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from typing import Any, Coroutine, TypeVar
+from typing import Any, Coroutine, Optional, TypeVar
 
 __all__ = [
     "run_async_to_sync",
@@ -10,7 +10,7 @@ __all__ = [
 T = TypeVar("T")
 
 
-def run_async_to_sync(coroutine: Coroutine[Any, Any, T], timeout: float = None) -> T:
+def run_async_to_sync(coroutine: Coroutine[Any, Any, T], timeout: Optional[float] = None) -> T:
     """
     Runs a coroutine synchronously and returns its result.
 
@@ -71,7 +71,7 @@ def get_or_create_event_loop() -> asyncio.AbstractEventLoop:
         return create_event_loop()
 
 
-def run_coroutine_in_thread(coroutine: Coroutine[Any, Any, T], timeout: float = None) -> T:
+def run_coroutine_in_thread(coroutine: Coroutine[Any, Any, T], timeout: Optional[float] = None) -> T:
     """
     Run a coroutine in a new thread if the current thread's event loop is already running.
 
