@@ -151,7 +151,7 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
         lookup = {"_id": {"$in": params.ids}}
 
     if params.sort:
-        sort = str(params.sort)
+        sort = params.sort
 
     where_param = params.where
 
