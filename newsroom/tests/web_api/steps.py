@@ -1,6 +1,5 @@
 from behave import then, when, given
 from behave.api.async_step import async_run_until_complete
-from wooper.expect import expect_status_in
 from eve.methods.common import parse
 
 from superdesk import get_resource_service
@@ -16,8 +15,16 @@ from superdesk.tests.steps import (
 from newsroom.utils import deep_get
 
 
-def assert_ok(response):
-    expect_status_in(response, [200, 201])
+async def expect_status_in(response, codes):
+    assert response.status_code in [int(code) for code in codes], "exptected on of {expected}, got {code}, reason={reason}".format(
+        code=response.status_code,
+        expected=codes,
+        reason=(await response.get_data()).decode("utf-8"),
+    )
+
+
+async def assert_ok(response):
+    await expect_status_in(response, [200, 201])
 
 
 @then("we get the following order")
@@ -41,7 +48,7 @@ async def step_impl_get_json_array_from_url(context, url):
             headers=[header for header in context.headers if header[0] != "Content-Type"],
         )
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @when('we post form to "{url}"')
@@ -56,7 +63,7 @@ async def step_impl_when_post_form_to_url(context, url):
             headers=[header for header in context.headers if header[0] != "Content-Type"],
         )
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @when('we post json to "{url}"')
@@ -68,7 +75,7 @@ async def step_impl_when_post_json_to_url(context, url):
     async with context.app.test_request_context(url):
         context.response = await context.client.post(url, data=data, headers=context.headers)
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @then('we store "{tag}" with item id')
