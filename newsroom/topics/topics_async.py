@@ -166,7 +166,7 @@ async def get_user_id_to_topic_for_subscribers(
     notification_type: Optional[str] = None,
 ) -> Dict[ObjectId, Dict[ObjectId, Topic]]:
     user_topic_map: Dict[ObjectId, Dict[ObjectId, Topic]] = {}
-    for topic in get_topics_with_subscribers():
+    for topic in await get_topics_with_subscribers():
         for subscriber in topic.get("subscribers") or []:
             if notification_type is not None and subscriber.get("notification_type") != notification_type:
                 continue
@@ -198,7 +198,7 @@ async def get_agenda_notification_topics_for_query_by_id(item, users):
     return [t for t in topics if users.get(str(t["user"]))]
 
 
-async def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
+async def auto_enable_user_emails(updates, original, user):
     if not updates.get("subscribers"):
         return
 
@@ -210,7 +210,7 @@ async def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
 
     user_newly_subscribed = False
     for subscriber in updates.get("subscribers") or []:
-        if subscriber["user_id"] == user["_id"]:
+        if subscriber.user_id == user["_id"]:
             user_newly_subscribed = True
             break
 

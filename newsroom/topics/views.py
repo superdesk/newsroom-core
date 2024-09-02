@@ -1,4 +1,5 @@
 from bson import ObjectId
+from typing import Optional
 from pydantic import BaseModel, ValidationError
 
 from superdesk.core import json, get_app_config
@@ -22,8 +23,8 @@ from newsroom.users.service import UsersService
 
 
 class RouteArguments(BaseModel):
-    user_id: str = None
-    topic_id: str = None
+    user_id: Optional[str] = None
+    topic_id: Optional[str] = None
 
 
 @topic_endpoints.endpoint("/users/<string:user_id>/topics", methods=["GET"])
@@ -42,14 +43,19 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     """Creates a user topic"""
     user = get_user()
 
-    if str(user["_id"]) != str(args.user_id):
+    if not user or str(user["_id"]) != str(args.user_id):
         abort(403)
 
     topic = await get_json_or_400()
 
-    topic.update(
-        {"user": user["_id"], "company": user.get("company"), "_id": ObjectId(), "created_filter": topic.pop("created")}
-    )
+    if user:
+        data = {
+            "user": user.get("_id"),
+            "company": user.get("company"),
+            "_id": ObjectId(),
+            "created_filter": topic.pop("created", {}),
+        }
+        topic.update(data)
 
     for subscriber in topic.get("subscribers") or []:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
@@ -63,8 +69,8 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
 
     await auto_enable_user_emails(topic, {}, user)
 
-    if topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user["_id"]))
+    if user and topic.get("is_global"):
+        push_company_notification("topic_created", user_id=str(user.get("_id")))
     else:
         push_user_notification("topic_created")
 
@@ -86,8 +92,8 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
     current_user = get_user(required=True)
     original = await TopicService().find_by_id(args.topic_id)
 
-    if not can_edit_topic(original, current_user):
-        abort(403)
+    if not current_user or not can_edit_topic(original, current_user):
+        return abort(403)
 
     updates: Topic = {
         "label": data.get("label"),
@@ -95,7 +101,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
         "created": data.get("created"),
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
-        "company": current_user.get("company"),
+        "company": current_user.get("company", None),
         "subscribers": data.get("subscribers") or [],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
@@ -203,35 +209,36 @@ async def share(args: RouteArguments, params: None, request: Request):
             continue
 
         topic_url = await get_topic_url(topic)
-        save_user_notifications(
-            [
-                UserNotification(
-                    user=user["_id"],
-                    action="share",
-                    resource="topic",
-                    item=topic["_id"],
-                    data=dict(
-                        shared_by=dict(
-                            _id=current_user["_id"],
-                            first_name=current_user["first_name"],
-                            last_name=current_user["last_name"],
+        if current_user:
+            save_user_notifications(
+                [
+                    UserNotification(
+                        user=user["_id"],
+                        action="share",
+                        resource="topic",
+                        item=topic["_id"],
+                        data=dict(
+                            shared_by=dict(
+                                _id=current_user["_id"],
+                                first_name=current_user["first_name"],
+                                last_name=current_user["last_name"],
+                            ),
+                            url=topic_url,
                         ),
-                        url=topic_url,
-                    ),
-                )
-            ]
-        )
-        template_kwargs = {
-            "recipient": user,
-            "sender": current_user,
-            "topic": topic,
-            "url": topic_url,
-            "message": data.get("message"),
-            "app_name": get_app_config("SITE_NAME"),
-        }
-        await send_user_email(
-            user,
-            template="share_topic",
-            template_kwargs=template_kwargs,
-        )
+                    )
+                ]
+            )
+            template_kwargs = {
+                "recipient": user,
+                "sender": current_user,
+                "topic": topic,
+                "url": topic_url,
+                "message": data.get("message"),
+                "app_name": get_app_config("SITE_NAME"),
+            }
+            await send_user_email(
+                user,
+                template="share_topic",
+                template_kwargs=template_kwargs,
+            )
     return Response({"success": True}, 201, ())
