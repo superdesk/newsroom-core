@@ -72,8 +72,8 @@ class UserFoldersResourceService(NewshubAsyncResourceService[UserFoldersResource
 
 user_topic_folders_resource_config = ResourceConfig(
     name="user_topic_folders",
-    data_class=FolderResourceModel,
-    service=FolderResourceService,
+    data_class=UserFoldersResourceModel,
+    service=UserFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
 )
 
@@ -93,7 +93,7 @@ class CompanyFoldersResourceService(NewshubAsyncResourceService[UserFoldersResou
 
 company_topic_folder_resource_config = ResourceConfig(
     name="company_topic_folders",
-    data_class=FolderResourceModel,
-    service=FolderResourceService,
+    data_class=CompanyFoldersResourceModel,
+    service=CompanyFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
 )
