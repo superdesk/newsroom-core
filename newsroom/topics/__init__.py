@@ -1,12 +1,13 @@
 import superdesk
 from superdesk.core.module import Module
 
-from . import folders
+from . import folders, topics
 from .topics_async import topic_resource_config, topic_endpoints, init, get_user_topics  # noqa
 from .folders_async import UserFoldersResourceService, CompanyFoldersResourceService
 
 
 def init_app(app):
+    topics.TopicsResource("topics", app, topics.topics_service)
     folders.FoldersResource("topic_folders", app, folders.folders_service)
 
     superdesk.register_resource("user_topic_folders", folders.UserFoldersResource, folders.UserFoldersService, _app=app)

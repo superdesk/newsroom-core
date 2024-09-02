@@ -53,7 +53,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
             "user": user.get("_id"),
             "company": user.get("company"),
             "_id": ObjectId(),
-            "created_filter": topic.pop("created", []),
+            "created_filter": topic.pop("created", {}),
         }
         topic.update(data)
 
@@ -92,7 +92,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
     current_user = get_user(required=True)
     original = await TopicService().find_by_id(args.topic_id)
 
-    if not current_user or not can_edit_topic(original, current_user):
+    if not current_user or not await can_edit_topic(original, current_user):
         return abort(403)
 
     updates: Topic = {
@@ -168,7 +168,7 @@ async def can_edit_topic(topic, user):
     """
     Checks if the topic can be edited by the user
     """
-    if topic and (str(topic.user) == str(user["_id"]) or str(user["_id"])):
+    if topic and (str(topic.user) == str(user["_id"])):
         return True
     return await can_user_manage_topic(topic, user)
 

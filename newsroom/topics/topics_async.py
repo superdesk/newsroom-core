@@ -13,6 +13,7 @@ from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.utils import set_version_creator, get_user_id
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
+import superdesk
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import dataclass
 from superdesk.core.module import SuperdeskAsyncApp
@@ -99,12 +100,13 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
     async def on_delete(self, doc: TopicResourceModel):
         await super().on_delete(doc)
         # remove topic from users personal dashboards
-        users = await UsersService().search(lookup={"dashboards.topic_ids": doc.id})
-        async for user in users:
-            updates = {"dashboards": user.dashboards.copy()}
+        # TODO-ASYNC: use async users resource here
+        users = superdesk.get_resource_service("users").get(req=None, lookup={"dashboards.topic_ids": doc.id})
+        for user in users:
+            updates = {"dashboards": user["dashboards"].copy()}
             for dashboard in updates["dashboards"]:
                 dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc.id]
-            await UsersService().update(user.id, updates)
+            superdesk.get_resource_service("users").system_update(user["_id"], updates, user)
 
     async def on_user_deleted(self, sender, user, **kwargs):
         # delete user private topics
@@ -205,7 +207,8 @@ async def auto_enable_user_emails(updates, original, user):
 
     # If current user is already subscribed to this topic,
     # then no need to enable their email notifications
-    for subscriber in original.subscribers or []:
+    data = original.dict(by_alias=True, exclude_unset=True) if isinstance(original, TopicResourceModel) else original
+    for subscriber in data.get("subscribers", []):
         if subscriber.user_id == user["_id"]:
             return
 

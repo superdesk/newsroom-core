@@ -6,7 +6,15 @@ from datetime import datetime
 
 
 async def test_user_dashboards(app, client, public_user, public_company, company_products):
-    topics = [{"label": "test", "user": public_user["_id"], "query": "bar"}]
+    topics = [
+        {
+            "label": "test",
+            "user": public_user["_id"],
+            "query": "bar",
+            "company": public_user["company"],
+            "topic_type": "wire",
+        }
+    ]
     app.data.insert("topics", topics)
 
     app.data.remove("products")

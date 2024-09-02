@@ -1,6 +1,7 @@
 from quart import json
 from unittest import mock
 from copy import deepcopy
+from bson import ObjectId
 
 from newsroom.topics.views import get_topic_url
 from newsroom.users.model import UserResourceModel
@@ -19,9 +20,8 @@ from tests import utils
 base_topic = {
     "label": "Foo",
     "query": "foo",
-    "notifications": False,
     "topic_type": "wire",
-    "navigation": ["xyz"],
+    "navigation": [ObjectId("5cc94454bc43165c045ffec9")],
 }
 
 agenda_topic = {
@@ -170,22 +170,24 @@ async def test_share_agenda_topics(client, app):
 
 async def test_get_topic_share_url(app):
     topic = {"topic_type": "wire", "query": "art exhibition"}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
     topic = {"topic_type": "wire", "filter": {"location": [["Sydney"]]}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
+    assert (
+        await get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
+    )
 
     topic = {"topic_type": "wire", "navigation": ["123"]}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
 
     topic = {"topic_type": "wire", "navigation": ["123", "456"]}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
 
     topic = {"topic_type": "wire", "created": {"from": "2018-06-01"}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
 
     topic = {"topic_type": "wire", "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]}}
-    assert get_topic_url(topic) == (
+    assert await get_topic_url(topic) == (
         "http://localhost:5050/wire?advanced="
         "%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
@@ -199,7 +201,7 @@ async def test_get_topic_share_url(app):
         "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]},
     }
     assert (
-        get_topic_url(topic) == "http://localhost:5050/wire?"
+        await get_topic_url(topic) == "http://localhost:5050/wire?"
         "q=art+exhibition"
         "&filter=%7B%22urgency%22:+%5B3%5D%7D"
         "&navigation=%5B%22123%22%5D"
