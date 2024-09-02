@@ -4,7 +4,7 @@ from superdesk.tests.environment import setup_before_all
 import logging
 
 from newsroom.news_api.app import get_app
-from newsroom.news_api.default_settings import CORE_APPS
+from newsroom.news_api.default_settings import CORE_APPS, MODULES
 
 
 logger = logging.getLogger(__name__)
@@ -14,6 +14,7 @@ def before_all(context):
     config = {
         "BEHAVE": True,
         "CORE_APPS": CORE_APPS,
+        "MODULES": MODULES,
         "INSTALLED_APPS": [],
         "ELASTICSEARCH_FORCE_REFRESH": True,
         "NEWS_API_ENABLED": True,
@@ -39,6 +40,7 @@ async def before_scenario_async(context, scenario):
     config = {
         "BEHAVE": True,
         "CORE_APPS": CORE_APPS,
+        "MODULES": MODULES,
         "INSTALLED_APPS": [],
         "ELASTICSEARCH_FORCE_REFRESH": True,
         "NEWS_API_ENABLED": True,
