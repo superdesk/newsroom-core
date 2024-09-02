@@ -96,10 +96,10 @@ def set_item_permission(item, permitted=True):
 async def get_view_data() -> Dict:
     user = get_user_required()
     company = get_company(user)
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     company_id = str(user["company"]) if user and user.get("company") else None
-    user_folders = get_user_folders(user, "wire") if user else []
-    company_folders = get_company_folders(company, "wire") if company else []
+    user_folders = await get_user_folders(user, "wire") if user else []
+    company_folders = await get_company_folders(company, "wire") if company else []
     products = get_products_by_company(company, product_type="wire") if company else []
     ui_config_service = UiConfigResourceService()
 
@@ -189,7 +189,7 @@ async def get_home_data():
     company = get_company(user)
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     ui_config_service = UiConfigResourceService()
 
     return {

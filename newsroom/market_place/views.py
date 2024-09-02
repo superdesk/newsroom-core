@@ -33,7 +33,7 @@ search_endpoint_name = "{}_search".format(SECTION_ID)
 async def get_view_data():
     """Get the view data"""
     user = get_user()
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     navigations = get_navigations_by_company(
         str(user["company"]) if user and user.get("company") else None,
         product_type=SECTION_ID,

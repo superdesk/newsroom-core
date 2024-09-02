@@ -53,7 +53,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
             "user": user.get("_id"),
             "company": user.get("company"),
             "_id": ObjectId(),
-            "created_filter": topic.pop("created", {}),
+            "created_filter": topic.pop("created", []),
         }
         topic.update(data)
 

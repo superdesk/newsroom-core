@@ -1,17 +1,18 @@
 import superdesk
-
-from .topics import get_user_topics  # noqa
-from . import folders, topics
-from .topics_async import topic_resource_config, topic_endpoints, init
 from superdesk.core.module import Module
+from superdesk.core.module import SuperdeskAsyncApp
 
-
-module = Module(
-    init=init,
-    name="newsroom.topics",
-    resources=[topic_resource_config],
-    endpoints=[topic_endpoints],
+from . import folders, topics
+from .topics_async import topic_resource_config, topic_endpoints, TopicService, get_user_topics  # noqa
+from .folders_async import (
+    folder_resource_config,
+    user_topic_folders_resource_config,
+    company_topic_folder_resource_config,
+    UserFoldersResourceService,
+    CompanyFoldersResourceService,
+    FolderResourceService,
 )
+from newsroom.signals import user_deleted
 
 
 def init_app(app):
@@ -24,28 +25,42 @@ def init_app(app):
     )
 
 
-def get_user_folders(user, section):
-    return list(
-        superdesk.get_resource_service("user_topic_folders").get(
-            req=None,
-            lookup={
-                "user": user["_id"],
-                "section": section,
-            },
-        )
-    )
+async def init(app: SuperdeskAsyncApp):
+    user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
+    user_deleted.connect(await FolderResourceService().on_user_deleted)  # type: ignore
 
 
-def get_company_folders(company, section):
-    return list(
-        superdesk.get_resource_service("company_topic_folders").get(
-            req=None,
-            lookup={
-                "company": company["_id"],
-                "section": section,
-            },
-        )
+module = Module(
+    init=init,
+    name="newsroom.topics",
+    resources=[
+        topic_resource_config,
+        folder_resource_config,
+        user_topic_folders_resource_config,
+        company_topic_folder_resource_config,
+    ],
+    endpoints=[topic_endpoints],
+)
+
+
+async def get_user_folders(user, section):
+    mongo_cursor = await UserFoldersResourceService().search(
+        lookup={
+            "user": user["_id"],
+            "section": section,
+        },
     )
+    return await mongo_cursor.to_list_raw()
+
+
+async def get_company_folders(company, section):
+    mongo_cursor = await CompanyFoldersResourceService().search(
+        lookup={
+            "company": company["_id"],
+            "section": section,
+        },
+    )
+    return await mongo_cursor.to_list_raw()
 
 
 from . import views  # noqa
