@@ -1,11 +1,17 @@
 import superdesk
-from superdesk.flask import Blueprint
 
 from .topics import get_user_topics  # noqa
 from . import folders, topics
+from .topics_async import topic_resource_config, topic_endpoints, init
+from superdesk.core.module import Module
 
 
-blueprint = Blueprint("topics", __name__)
+module = Module(
+    init=init,
+    name="newsroom.topics",
+    resources=[topic_resource_config],
+    endpoints=[topic_endpoints],
+)
 
 
 def init_app(app):
