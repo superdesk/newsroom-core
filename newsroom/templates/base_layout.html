@@ -132,7 +132,7 @@
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}
                 <li class="sidenav-icons__item  {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a
-                      href="{{ url_for('settings.app', app_id=app._id) }}"
+                      href="{{ url_for('settings.settings_app', app_id=app._id) }}"
                       title="{{ gettext('Settings') }}"
                       aria-label="{{ gettext('Settings') }}"
                       role="button"

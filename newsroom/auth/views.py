@@ -400,7 +400,7 @@ async def impersonate_stop():
     user = await UsersService().find_by_id(session.get("auth_user"))
     start_user_session(user.model_dump(by_alias=True))
     session.pop("auth_user")
-    return redirect(url_for("settings.app", app_id="users"))
+    return redirect(url_for("settings.settings_app", app_id="users"))
 
 
 @blueprint.route("/change_password", methods=["GET", "POST"])
