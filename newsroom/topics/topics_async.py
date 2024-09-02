@@ -64,7 +64,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             doc.original_creator = get_user_id()
             doc.version_creator = get_user_id()
             if doc.folder:
-                doc.folder = ObjectId(doc["folder"])
+                doc.folder = ObjectId(doc.folder)
 
     async def on_update(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_update(updates, original)
@@ -223,7 +223,7 @@ async def auto_enable_user_emails(updates, original, user):
 
 
 async def init(app: SuperdeskAsyncApp):
-    user_deleted.connect(await TopicService().on_user_deleted) # type: ignore
+    user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
 
 
 topic_resource_config = ResourceConfig(
