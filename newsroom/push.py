@@ -27,7 +27,7 @@ from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
 )
-from newsroom.topics.topics import (
+from newsroom.topics.topics_async import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
 )
@@ -924,7 +924,7 @@ async def send_user_notification_emails(item, user_matches, users, section):
 
 
 async def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
-    topics = get_topics_with_subscribers("wire")
+    topics = await get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
     )
@@ -937,7 +937,7 @@ async def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[Obj
 
 
 async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
-    topics = get_topics_with_subscribers("agenda")
+    topics = await get_topics_with_subscribers("agenda")
     topic_matches = superdesk.get_resource_service("agenda").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
     )
@@ -946,7 +946,7 @@ async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[O
     topic_matches.extend(
         [
             topic
-            for topic in get_agenda_notification_topics_for_query_by_id(item, users_dict)
+            for topic in await get_agenda_notification_topics_for_query_by_id(item, users_dict)
             if topic.get("_id") not in topic_matches
         ]
     )
