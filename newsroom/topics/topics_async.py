@@ -6,6 +6,7 @@ from typing import Optional, List, Dict, Any, Annotated
 from newsroom import MONGO_PREFIX
 from newsroom.auth import get_user
 from newsroom.types import Topic
+from newsroom.signals import user_deleted
 
 from newsroom.users.service import UsersService
 from newsroom.core.resources.model import NewshubResourceModel
@@ -14,6 +15,7 @@ from newsroom.core.resources.service import NewshubAsyncResourceService
 
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import dataclass
+from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 from superdesk.core.resources.validators import validate_data_relation_async
@@ -219,6 +221,10 @@ async def auto_enable_user_emails(updates, original, user):
     # The current user subscribed to this topic in this update
     # Enable their email notifications now
     await UsersService().update(user["_id"], updates={"receive_email": True})
+
+
+async def init(app: SuperdeskAsyncApp):
+    user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
 
 
 topic_resource_config = ResourceConfig(

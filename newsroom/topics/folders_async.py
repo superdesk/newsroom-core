@@ -77,6 +77,8 @@ user_topic_folders_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
 )
 
+user_topic_folders_endpoints = EndpointGroup("user_topic_folders", __name__)
+
 
 class CompanyFoldersResourceModel(FolderResourceModel):
     """
@@ -97,3 +99,5 @@ company_topic_folder_resource_config = ResourceConfig(
     service=CompanyFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
 )
+
+company_topic_folders_endpoints = EndpointGroup("company_topic_folders", __name__)

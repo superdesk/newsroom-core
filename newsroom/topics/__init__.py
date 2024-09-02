@@ -1,22 +1,12 @@
 import superdesk
 from superdesk.core.module import Module
-from superdesk.core.module import SuperdeskAsyncApp
 
-from . import folders, topics
-from .topics_async import topic_resource_config, topic_endpoints, TopicService, get_user_topics  # noqa
-from .folders_async import (
-    folder_resource_config,
-    user_topic_folders_resource_config,
-    company_topic_folder_resource_config,
-    UserFoldersResourceService,
-    CompanyFoldersResourceService,
-    FolderResourceService,
-)
-from newsroom.signals import user_deleted
+from . import folders
+from .topics_async import topic_resource_config, topic_endpoints, init, get_user_topics  # noqa
+from .folders_async import UserFoldersResourceService, CompanyFoldersResourceService
 
 
 def init_app(app):
-    topics.TopicsResource("topics", app, topics.topics_service)
     folders.FoldersResource("topic_folders", app, folders.folders_service)
 
     superdesk.register_resource("user_topic_folders", folders.UserFoldersResource, folders.UserFoldersService, _app=app)
@@ -25,20 +15,10 @@ def init_app(app):
     )
 
 
-async def init(app: SuperdeskAsyncApp):
-    user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
-    user_deleted.connect(await FolderResourceService().on_user_deleted)  # type: ignore
-
-
 module = Module(
     init=init,
     name="newsroom.topics",
-    resources=[
-        topic_resource_config,
-        folder_resource_config,
-        user_topic_folders_resource_config,
-        company_topic_folder_resource_config,
-    ],
+    resources=[topic_resource_config],
     endpoints=[topic_endpoints],
 )
 

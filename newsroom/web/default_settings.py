@@ -145,7 +145,6 @@ CORE_APPS = [
     "newsroom.auth.oauth",
     "newsroom.companies",
     "newsroom.wire",
-    "newsroom.topics",
     "newsroom.history",
     "newsroom.notifications",
     "newsroom.products",
