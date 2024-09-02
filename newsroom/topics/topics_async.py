@@ -223,7 +223,7 @@ async def auto_enable_user_emails(updates, original, user):
 
 
 async def init(app: SuperdeskAsyncApp):
-    user_deleted.connect(await TopicService().on_user_deleted)
+    user_deleted.connect(await TopicService().on_user_deleted) # type: ignore
 
 
 topic_resource_config = ResourceConfig(
