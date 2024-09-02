@@ -111,11 +111,11 @@ $container-max-widths: (
     xxl: 1360px
 ) !default;
 
-
 // NEW COLORS
 //--------------------------
 
 :root {
+
     // NEUTRAL COLORS
     // Light
     --color-neutral-000: hsl(0, 2%, 100%);
@@ -127,7 +127,6 @@ $container-max-widths: (
     --color-neutral-300: hsl(0, 2%, 74%);
     --color-neutral-400: hsl(0, 2%, 54%);
     --color-neutral-500: hsl(0, 2%, 40%);
-
     --color-neutral-600: hsl(0, 2%, 34%);
     // Dark
     --color-neutral-700: hsl(0, 2%, 20%);
@@ -159,7 +158,7 @@ $container-max-widths: (
     
     --color-home-section-heading: var(--color-primary);
     --color-text--slugline: hsl(201, 62%, 30%);
-    --color-text-link: var(--color-primary);
+    //--color-text-link: var(--color-primary);
     --color-text-link--navbar: var(--color-primary);
     --color-icon-font: var(--color-text--muted);
 
@@ -226,11 +225,13 @@ $container-max-widths: (
     --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-family-core--serif: "Merriweather", serif;
     --font-size-base: 1rem; // 16px
+    --text-size--x-small: calc(var(--font-size-base) * 0.625);  // 10px
     --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
     --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
     --text-size--large: var(--font-size-base); // 16px
     --text-size--x-large: calc(var(--font-size-base) * 1.25); // 20px
     --text-size--xx-large: calc(var(--font-size-base) * 1.5); // 24px
+    --text-size--xxx-large: calc(var(--font-size-base) * 2); // 32px
 
     --font-family-core--primary: var(--font-family-core--sans);
     --font-family-core--secondary: var(--font-family-core--serif);
