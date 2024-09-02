@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any, Annotated
 
 from newsroom import MONGO_PREFIX
 from newsroom.auth import get_user
-from newsroom.types import Topic, User
+from newsroom.types import Topic
 from newsroom.signals import user_deleted
 from newsroom.users.service import UsersService
 from newsroom.core.resources.model import NewshubResourceModel
