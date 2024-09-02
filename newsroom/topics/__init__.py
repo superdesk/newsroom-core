@@ -3,7 +3,12 @@ from superdesk.core.module import Module
 
 from . import folders, topics
 from .topics_async import topic_resource_config, topic_endpoints, init, get_user_topics  # noqa
-from .folders_async import UserFoldersResourceService, CompanyFoldersResourceService
+from .folders_async import (
+    UserFoldersResourceService,
+    CompanyFoldersResourceService,
+    company_topic_folder_resource_config,
+    user_topic_folders_resource_config,
+)
 
 
 def init_app(app):
@@ -19,7 +24,7 @@ def init_app(app):
 module = Module(
     init=init,
     name="newsroom.topics",
-    resources=[topic_resource_config],
+    resources=[topic_resource_config, company_topic_folder_resource_config, user_topic_folders_resource_config],
     endpoints=[topic_endpoints],
 )
 
