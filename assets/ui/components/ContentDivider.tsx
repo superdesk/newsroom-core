@@ -14,7 +14,7 @@ interface IProps {
 export class ContentDivider extends React.Component<IProps> {
 
     render() {
-        let classes = classNames('sd-content-divider', {
+        const classes = classNames('sd-content-divider', {
             'sd-content-divider--horizontal': this.props.orientation === undefined,
             [`sd-content-divider--${this.props.type}`]: this.props.type || this.props.type !== undefined,
             [`sd-content-divider--text-${this.props.align}`]: this.props.align || this.props.align !== undefined,
@@ -29,7 +29,7 @@ export class ContentDivider extends React.Component<IProps> {
 
         if (this.props.children) {
             return (
-                <div className={"sd-content-divider--with-text " + classes} role="separator">
+                <div className={'sd-content-divider--with-text ' + classes} role="separator">
                     <span className="sd-content-divider__inner-text">{this.props.children}</span>
                 </div>
             );
