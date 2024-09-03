@@ -382,7 +382,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    followStory: (item: any) => followStory(item, 'wire'),
+    followStory: (item: any) => dispatch(followStory(item, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());

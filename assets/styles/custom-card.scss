@@ -266,3 +266,28 @@
         text-decoration: none;
     }
 }
+
+
+.login-box {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space--4);
+    box-shadow: 0 1px 6px hsla(0, 0%, 0%, 0.16), 0 3px 8px hsla(0, 0%, 0%, 0.24), 0 0 1px hsla(0, 0%, 0%, 0.1);
+    border-radius: var(--border-radius--l);
+    width: 100%;
+    max-width: 560px;
+    background-color: var(--color-neutral-000);
+    .login-box__title {
+        font-size: var(--text-size--x-large);
+        text-align: center;
+        margin-block-end: var(--space--2);
+    }
+    @include phone {
+        box-shadow: none;
+        border-radius: 0;
+        padding: var(--space--2);
+        .login-box__title {
+            margin-block-end: var(--space--1);
+        }
+    }
+}

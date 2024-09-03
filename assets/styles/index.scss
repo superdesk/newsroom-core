@@ -97,7 +97,7 @@ $nav-sidebar-border: #323847;
 
 label {
     color: var(--color-text--muted);
-    font-size: 14px;
+    font-size: var(--text-size--medium);
 }
 label:not(.label--no-spacing) {
     margin-block-end: 0.3rem;
@@ -4124,7 +4124,20 @@ article.list {
 }
 
 .nh-login-page__content { // login page background color
+    flex-grow: 1;
     background-color: var(--login-page-color-bg);
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    overflow: auto;
+
+    .card--login {
+        width: 100%;
+        max-width: 640px;
+    }
+
 }
 .login-logo {
     padding-inline: var(--login-logo-padding--inline);
