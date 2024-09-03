@@ -54,6 +54,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
             "company": user.get("company"),
             "_id": ObjectId(),
             "created_filter": topic.pop("created", {}),
+            "is_global": topic.get("is_global", False),
         }
         topic.update(data)
 

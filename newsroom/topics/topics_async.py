@@ -20,6 +20,7 @@ from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 from superdesk.core.resources.validators import validate_data_relation_async
+from superdesk.core.resources.cursor import SearchRequest
 
 
 @unique
@@ -137,13 +138,15 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
 async def get_user_topics(user_id):
     user = dict(await UsersService().find_by_id(user_id))
-    data = await TopicService().search(
-        lookup={
-            "$or": [
-                {"user": user["id"]},
-                {"$and": [{"company": user.get("company")}, {"is_global": True}]},
-            ]
-        },
+    data = await TopicService().find(
+        SearchRequest(
+            where={
+                "$or": [
+                    {"user": user["id"]},
+                    {"$and": [{"company": user.get("company")}, {"is_global": True}]},
+                ]
+            }
+        ),
     )
     return await data.to_list_raw()
 
