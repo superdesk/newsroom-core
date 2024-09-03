@@ -2,65 +2,108 @@
 
 {% block contentMain %}
 
-<div id="login-container" class="container-fluid py-5 overflow-auto nh-login-page__content {% block custom_container_style %}{% endblock %}">
+<div id="login-container" class="nh-login-page__content {% block custom_container_style %}{% endblock %}">
 
-    {% include "login_messages.html" %}
+    <div class="login-box">
+        
+        {% include "login_messages.html" %}
 
-    <div class="row">
-        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
-            <div class="card border-0 bg-white box-shadow--z1 rounded--m">
-                <div class="card-header pt-4 border-0 bg-white rounded--m">
-                    {% block login_header %}
-                    <div class="login-logo">
-                        {% include 'login_logo.html' %}
+        <div class="login-box__header">
+            {% block login_header %}
+            <div class="login-logo">
+                {% include 'login_logo.html' %}
+            </div>
+            {% block login_title %}
+            <h3 className="login-box__title">{{ gettext("Login to Newshub") }}</h3>
+            {% endblock %}
+            {% endblock %}
+        </div>
+        <div class="">
+            {% block login_body %}
+            <form class="form" role="form" id="formLogin" method="post">
+                {{ form.csrf_token }}
+
+                <div style="display:none">
+                    {{ form.firebase_status(type="hidden", id="firebase-status") }}
+                </div>
+
+                {% include "form_alerts.html" %}
+
+                <div class="form-group">
+                    <label for="email">{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-control", id="email", required="true", autocomplete="username") }}
+                </div>
+                <div class="form-group mb-2">
+                    <label for="password">{{ form.password.label.text }}</label>
+                    {{ form.password(class="form-control", id="password", required="true", autocomplete="current-password") }}
+                </div>
+
+                <div class="d-flex align-items-center mb-3 justify-content-between flex-wrap gap-1">
+                    <div class="form-check">
+                        {{ form.remember_me(class="form-check-input", id="remember_me") }}
+                        <label class="form-check-label" for="remember_me">{{ form.remember_me.label.text }}</label>
                     </div>
-                    {% block login_title %}
-                    <h5 class="mb-0">
-                        {{ gettext("Login") }}
-                    </h5>
-                    {% endblock %}
-                    {% endblock %}
-                </div>
-                <div class="card-body pt-1">
-                    {% block login_body %}
-                    {% include "login_form.html" %}
-                    {% endblock %}
+                    <span class="d-flex gap-1 text-md">
+                        {% block reset_password %}
+                        <span>{{ gettext('Forgot your password?') }}</span>
+                        <a class="link" href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
+                        {% endblock %}
+                    </span>
                 </div>
 
-                {% if config.SAML_PATH and request.endpoint == "auth.login" %}
-                <div class="card-body pt-1 pb-2">
-                    <form action="{{ url_for('auth.saml') }}">
-                        <button type="submit" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--primary w-100">{{ config.SAML_LABEL }}</button>
-                    </form>
-                </div>
+                <button type="submit" class="nh-button nh-button--primary w-100">{{ gettext("Login") }}</button>
+
+                {% if config.GOOGLE_LOGIN %}
+                <a href="{{ url_for('oauth.google_login') }}"
+                class="nh-button nh-button--secondary w-100"
+                role="button"
+                >
+                    {{ gettext('Log In with Google') }}
+                </a>
                 {% endif %}
+            </form>
+            {% endblock %}
+        </div>
 
-                <div class="card-footer bg-white border-0 text-muted small">
-                    {% block login_footer %}
-                    <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
-                        {% if config.SHOW_USER_REGISTER %}{{ gettext("Or you can") }} <a href="{{ url_for('auth.signup') }}">{{ gettext('click here to register.') }}</a>{% endif %}
-                    </p>
-                    {% endblock %}
-                </div>
+        {% if config.SAML_PATH and request.endpoint == "auth.login" %}
+        <div class="">
+            <div class="sd-content-divider--with-text sd-content-divider sd-content-divider--horizontal sd-content-divider--margin-medium sd-content-divider--text-small" role="separator">
+                <span class="sd-content-divider__inner-text">{{ gettext('Or') }}</span>
+            </div>
+            <form action="{{ url_for('auth.saml') }}">
+                <button type="submit" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--primary w-100">{{ gettext('Login with Company Credentials (SSO)') }}</button>
+            </form>
+            <p class="text-muted text-md mt-2">{{ gettext("Note! If your company credentials don't work for login, your company might not have an integration done to this system. Please contact your company IT.") }}</p>
+        </div>
+        {% endif %}
 
-                {% if get_client_locales()|length is gt 1 and request.endpoint == "auth.login" %}
-                <div class="card-body pt-1">
-                    <form class="form" role="form" method="post" action="{{ url_for('auth.set_locale') }}">
-                        <div class="form-group">
-                            <label for="language">{{ gettext('Language') }}</label>
-                            <div class="field">
-                                <select name="locale" class="form-control" onchange="this.form.submit()">
-                                    {% for locale in get_client_locales() %}
-                                    <option value="{{ locale.locale }}" {% if locale.locale == get_locale() %}selected{% endif %}>{{ locale.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <div class="mt-2 mb-3">
+            <div class="d-flex align-items-center">
+            {% block login_footer %}
+                {% if config.SHOW_USER_REGISTER %}
+                <span>{{ gettext("Don't have an account?") }}</span>
+                <a class="link" href="{{ url_fr('auth.signup') }}">{{ gettext('Sign up') }}</a>
                 {% endif %}
+            {% endblock %}
             </div>
         </div>
+
+        {% if get_client_locales()|length is gt 1 and request.endpoint == "auth.login" %}
+        <div class="">
+            <form class="form" role="form" method="post" action="{{ url_for('auth.set_locale') }}">
+                <div class="form-group mb-0">
+                    <label for="language">{{ gettext('Language') }}</label>
+                    <div class="field">
+                        <select name="locale" class="form-control" onchange="this.form.submit()">
+                            {% for locale in get_client_locales() %}
+                            <option value="{{ locale.locale }}" {% if locale.locale == get_locale() %}selected{% endif %}>{{ locale.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
     </div>
 
     {% block login_page_footer %}
