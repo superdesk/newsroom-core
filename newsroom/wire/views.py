@@ -247,7 +247,7 @@ async def get_media_card_external(card_id):
     if app.cache.get(cache_id):
         card_items = app.cache.get(cache_id)
     else:
-        card = CardsResourceService().find_by_id_raw(card_id)
+        card = await CardsResourceService().find_by_id_raw(card_id)
         if not card:
             abort(404)
         card_items = app.get_media_cards_external(card)
