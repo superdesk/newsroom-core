@@ -46,7 +46,6 @@ def get_settings_data():
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
         "countries": app.countries,
-        "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
         "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
     }
 
@@ -120,7 +119,15 @@ def get_company_updates(data, original=None):
         "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
     }
 
-    for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
+    for field in [
+        "sections",
+        "archive_access",
+        "events_only",
+        "restrict_coverage_info",
+        "products",
+        "seats",
+        "internal",
+    ]:
         if field in data:
             updates[field] = data[field]
 

@@ -4,6 +4,9 @@ const webpack = require('webpack');
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
+    // set timezone for tests
+    process.env.TZ = 'Europe/Prague';
+
     config.set({
         files: [
             'assets/tests.ts',
@@ -16,8 +19,8 @@ module.exports = function(config) {
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
-            plugins: webpackConfig.plugins.filter((plugin) => plugin instanceof webpack.ProvidePlugin),
             devtool: 'inline-source-map',
+            mode: 'development',
         },
 
         webpackMiddleware: {

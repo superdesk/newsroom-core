@@ -37,11 +37,13 @@ function MainNavbar() {
                 <img className="navbar__additional-logo-img navbar__additional-logo-img--fr" src="static/temp_logos/cp_logo-newspro-fr.svg" alt="NouvellesPro" aria-hidden="true" />
             </div> */}
             <div className="navbar-brand">
-                <nav>
+                <div className='navbar__title'>Home</div>
+                {/* <nav>
                     <span className="breadcrumb-item active">Home</span>
-                </nav>
-                 <DesignNav />
+                </nav> */}
+                 
             </div>
+            <DesignNav />
 
             {/* <div className="navbar__right navbar__right--login">
                 <div className="navbar__date">Tuesday, 05.07.2023</div>

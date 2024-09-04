@@ -59,17 +59,11 @@ export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, to
             {coverageTypes.length === 0 ? (
                 <div className="list-group-header__title">
                     {gettext('More hidden')}
-                    <span className="list-group-header__title-info">
-                        ({gettext('{{ numberOfItems }} Event', {numberOfItems: itemIds.length})})
-                    </span>
                 </div>
             ) : (
                 <React.Fragment>
                     <div className="list-group-header__title">
                         {gettext('More hidden')}
-                        <span className="list-group-header__title-info">
-                            ({gettext('{{ numberOfItems }} Event & Planning', {numberOfItems: itemCount})})
-                        </span>
                     </div>
                     <div className="list-group-header__coverage-group">
                         {coverageTypes.map((coverageType) => (

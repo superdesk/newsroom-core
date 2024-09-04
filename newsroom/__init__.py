@@ -12,7 +12,7 @@ from typing import Dict, List, Tuple
 
 from newsroom.user_roles import UserRole
 
-__version__ = "2.6.0-rc2"
+__version__ = "2.8.0.dev"
 
 # reuse content api dbs
 MONGO_PREFIX = "CONTENTAPI_MONGO"

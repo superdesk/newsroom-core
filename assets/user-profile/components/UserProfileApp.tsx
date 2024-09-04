@@ -25,6 +25,7 @@ import ShareItemModal from 'components/ShareItemModal';
 import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
 import {EditNotificationScheduleModal} from './EditNotificationScheduleModal';
+import {PauseNotificationModal} from './PauseNotificationModal';
 
 import '../style';
 import {IconButton} from 'components/IconButton';
@@ -32,6 +33,7 @@ import {IconButton} from 'components/IconButton';
 const modals: any = {
     shareItem: ShareItemModal,
     editNotificationSchedule: EditNotificationScheduleModal,
+    pauseNotificationModal: PauseNotificationModal
 };
 
 class UserProfileApp extends React.Component<any, any> {

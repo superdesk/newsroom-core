@@ -19,7 +19,6 @@ interface IProps {
     onChange(event: React.ChangeEvent): void;
     save(event: React.MouseEvent): void;
     deleteCompany(event: React.MouseEvent): void;
-    ssoEnabled: boolean;
     authProviders: Array<IAuthProvider>;
     countries: Array<ICountry>;
 }
@@ -32,7 +31,6 @@ export function EditCompanyDetails({
     onChange,
     save,
     deleteCompany,
-    ssoEnabled,
     authProviders,
     countries,
 }: IProps) {
@@ -48,27 +46,28 @@ export function EditCompanyDetails({
                 />
 
                 {authProviders.length <= 1 ? null : (
-                    <SelectInput
-                        name="auth_provider"
-                        label={gettext('Authentication Provider')}
-                        value={company.auth_provider || 'newshub'}
-                        options={authProviders.map((provider) => ({
-                            value: provider._id,
-                            text: provider.name,
-                        }))}
-                        onChange={onChange}
-                        error={errors?.auth_provider}
-                    />
-                )}
-
-                {ssoEnabled && (
-                    <TextListInput
-                        name='auth_domains'
-                        label={gettext('SSO domains')}
-                        value={company.auth_domains || []}
-                        onChange={onChange}
-                        error={errors ? errors.auth_domains : null}
-                    />
+                    <>
+                        <SelectInput
+                            name="auth_provider"
+                            label={gettext('Authentication Provider')}
+                            value={company.auth_provider || 'newshub'}
+                            options={authProviders.map((provider) => ({
+                                value: provider._id,
+                                text: provider.name,
+                            }))}
+                            onChange={onChange}
+                            error={errors?.auth_provider}
+                        />
+                        {company.auth_provider == null || company.auth_provider === 'newshub' ? null : (
+                            <TextListInput
+                                name='auth_domains'
+                                label={gettext('SSO domains')}
+                                value={company.auth_domains || []}
+                                onChange={onChange}
+                                error={errors ? errors.auth_domains : null}
+                            />
+                        )}
+                    </>
                 )}
 
                 <SelectInput
@@ -180,6 +179,14 @@ export function EditCompanyDetails({
                     name='is_enabled'
                     label={gettext('Enabled')}
                     value={company.is_enabled}
+                    onChange={onChange}
+                />
+
+                <CheckboxInput
+                    labelClass={company.internal ? 'text-warning' : ''}
+                    name='internal'
+                    label={gettext('Internal')}
+                    value={company.internal}
                     onChange={onChange}
                 />
 

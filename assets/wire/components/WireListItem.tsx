@@ -28,6 +28,7 @@ import WireListItemDeleted from './WireListItemDeleted';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
 import {FieldComponents} from './fields';
+import WireLabel from './WireLabel';
 
 export const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 export const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
@@ -225,8 +226,9 @@ class WireListItem extends React.Component<IProps, IState> {
                                         divider={false}
                                     />
                                 )}
-                                <Embargo item={item} />
+                                <Embargo item={item} isCard/>
                                 <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
+                                <WireLabel item={item}/>
                                 {item.es_highlight && item.es_highlight.headline ? <div
                                     dangerouslySetInnerHTML={({__html: item.es_highlight.headline && item.es_highlight.headline[0]})}
                                 /> : item.headline}

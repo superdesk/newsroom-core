@@ -29,11 +29,17 @@ export class ToolTip extends React.PureComponent<any, any> {
             } else if (!child.getAttribute('title')) {
                 console.error('Child of <ToolTip> must have a "title" attribute!');
             } else {
-                this.tooltip = new Tooltip(child, {
+                const options: Partial<Tooltip.Options> = {
                     trigger: 'hover',
                     placement: this.props.placement || 'top',
                     title: this.props.title,
-                });
+                };
+
+                if (this.props.title) {
+                    options.title = this.props.title;
+                }
+
+                this.tooltip = new Tooltip(child, options);
             }
         }
     }

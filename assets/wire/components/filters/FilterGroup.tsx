@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {get, cloneDeep, uniqBy} from 'lodash';
-import {gettext} from 'utils';
+import {getConfig, gettext} from 'utils';
 import {Skeleton} from 'primereact/skeleton';
 
 import NavGroup from './NavGroup';
@@ -12,7 +12,7 @@ import {searchIcon} from 'search/components/search-icon';
  * If the filter count is less than 50 we
  * shouldn't render the search.
  */
-const SEARCHBAR_THRESHOLD = 50;
+const SEARCHBAR_THRESHOLD = getConfig('searchbar_threshold_value') || 50;
 const LIMIT = 5;
 type IBucket = {key: string, doc_count: string};
 
@@ -80,8 +80,11 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         'key',
     );
     const bucketsBySearchTerm = allBuckets
-        .sort(compareFunction)
-        .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true);
+        .filter(({key}: any) => searchTerm.length > 0
+            ? key.toString().toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+            : true,
+        )
+        .sort(compareFunction);
 
     return (
         <NavGroup key={group.field} label={group.label}>

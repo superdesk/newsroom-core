@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
-import {IAgendaItem, ICoverage, IUser} from 'interfaces';
+import {IAgendaItem, IPlanningItem, ICoverage, IUser} from 'interfaces';
 import {gettext} from '../../utils';
 import {
     getCoverageIcon,
@@ -16,7 +16,7 @@ import {
 
 interface IProps {
     group: string;
-    planningItem?: IAgendaItem;
+    planningItem?: IPlanningItem;
     user: IUser['_id'];
     coverage: ICoverage;
     showBorder?: boolean;

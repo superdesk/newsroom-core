@@ -36,6 +36,7 @@ const SelectInput: React.FC<ISelectInputProps> = ({
             <div className="field">
                 <select
                     id={name}
+                    data-test-id={`field-${name}-select`}
                     name={name}
                     value={value || ''}
                     onChange={onChange}

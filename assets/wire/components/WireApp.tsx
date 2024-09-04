@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
-import {getSingleFilterValue} from 'search/utils';
+import {ISearchSortValue} from 'interfaces';
+import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
+import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 
 import {
     fetchItems,
@@ -108,46 +109,30 @@ class WireApp extends SearchBase<any> {
             !this.props.bookmarks;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel: any;
         const filterValue = getSingleFilterValue(this.props.activeFilter, ['genre', 'subject']);
 
         if (get(this.props, 'context') === 'wire') {
             if (get(this.props, 'activeTopic.label')) {
-                totalItemsLabel = this.props.activeTopic.label;
                 showTotalItems = showTotalLabel = true;
             } else if (numNavigations === 1) {
-                totalItemsLabel = get(getItemFromArray(
-                    this.props.searchParams.navigation[0],
-                    this.props.navigations
-                ), 'name') || '';
                 showTotalItems = showTotalLabel = true;
             } else if (get(this.props, 'activeProduct.name')) {
-                totalItemsLabel = this.props.activeProduct.name;
                 showTotalItems = showTotalLabel = true;
             } else if (filterValue !== null) {
-                totalItemsLabel = filterValue;
                 showTotalItems = showTotalLabel = true;
             } else if (numNavigations > 1) {
-                totalItemsLabel = gettext('Custom View');
                 showTotalItems = showTotalLabel = true;
             } else if (this.props.showSaveTopic) {
                 showTotalItems = showTotalLabel = true;
-                if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
-                    totalItemsLabel = this.props.searchParams.query;
-                }
             }
         } else {
-            if (get(this.props, 'searchParams.query.length', 0) > 0) {
-                totalItemsLabel = this.props.searchParams.query;
-            }
-
             showTotalItems = showTotalLabel = !isEqual(
                 this.props.searchParams,
                 {navigation: [get(this.props, 'searchParams.navigation[0]')]}
             );
         }
 
-        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+        const showFilters = searchParamsUpdated(this.props.searchParams) ||
             this.props.activeTopic != null ||
             this.props.activeProduct != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
@@ -232,10 +217,10 @@ class WireApp extends SearchBase<any> {
                                             showTotalLabel={showTotalLabel}
                                             showSaveTopic={showSaveTopic}
                                             totalItems={this.props.totalItems}
-                                            totalItemsLabel={totalItemsLabel}
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType={this.props.context === 'wire' ? this.props.context : null}
+                                            showSortDropdown={true}
                                             refresh={this.props.fetchItems}
                                             setSortQuery={this.props.setSortQuery}
                                             setQuery={this.props.setQuery}
@@ -274,6 +259,7 @@ class WireApp extends SearchBase<any> {
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
                                 <WirePreview
+                                    key={this.props.itemToPreview._id}
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     topics={this.props.topics}
@@ -353,6 +339,7 @@ WireApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
+    dateFilters: PropTypes.arrayOf(PropTypes.object),
 };
 
 const mapStateToProps = (state: any) => ({
@@ -390,11 +377,12 @@ const mapStateToProps = (state: any) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
-    errorMessage: state.errorMessage
+    errorMessage: state.errorMessage,
+    dateFilters: state.dateFilters
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    followStory: (item: any) => followStory(item, 'wire'),
+    followStory: (item: any) => dispatch(followStory(item, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
@@ -405,7 +393,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(fetchItems());
     },
     setQuery: (query: any) => dispatch(setQuery(query)),
-    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
+    setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),

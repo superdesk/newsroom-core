@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
 
-import {getItemFromArray, gettext} from 'utils';
-import {noNavigationSelected} from 'search/utils';
+import {ISearchSortValue} from 'interfaces';
+import {gettext} from 'utils';
+import {noNavigationSelected, searchParamsUpdated} from 'search/utils';
 
 import {
     fetchItems,
@@ -22,6 +23,7 @@ import {
     setView,
     setQuery,
     saveMyTopic,
+    setSortQuery,
 } from 'search/actions';
 
 import {
@@ -124,28 +126,18 @@ class AgendaApp extends SearchBase<any> {
             !this.props.featuredOnly;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel: any;
 
         if (get(this.props, 'activeTopic.label')) {
-            totalItemsLabel = this.props.activeTopic.label;
             showTotalItems = showTotalLabel = true;
         } else if (numNavigations === 1) {
-            totalItemsLabel = get(getItemFromArray(
-                this.props.searchParams.navigation[0],
-                this.props.navigations
-            ), 'name') || '';
             showTotalItems = showTotalLabel = true;
         } else if (numNavigations > 1) {
-            totalItemsLabel = gettext('Custom View');
             showTotalItems = showTotalLabel = true;
         } else if (this.props.showSaveTopic) {
             showTotalItems = showTotalLabel = true;
-            if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
-                totalItemsLabel = this.props.searchParams.query;
-            }
         }
 
-        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+        const showFilters = searchParamsUpdated(this.props.searchParams) ||
             this.props.activeTopic != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
             this.props.activeQuery != null ||
@@ -161,7 +153,6 @@ class AgendaApp extends SearchBase<any> {
                 group={this.props.previewGroup}
                 planningId={this.props.previewPlan}
                 eventsOnly={eventsOnly}
-                wireItems={this.props.wireItems}
                 coverageActions={this.props.coverageActions}
                 detailsConfig={this.props.detailsConfig}
                 restrictCoverageInfo={this.props.restrictCoverageInfo}
@@ -235,13 +226,11 @@ class AgendaApp extends SearchBase<any> {
                             <div className='wire-column__main-header-container'>
                                 {!this.props.bookmarks && (
                                     <AgendaFilters
-                                        aggregations={this.props.aggregations}
                                         toggleFilter={this.props.toggleDropdownFilter}
                                         activeFilter={this.props.activeFilter}
                                         eventsOnlyAccess={this.props.eventsOnlyAccess}
                                         restrictCoverageInfo={this.props.restrictCoverageInfo}
                                         itemTypeFilter={this.props.itemTypeFilter}
-                                        locators={this.props.locators}
                                     />
                                 )}
                                 {
@@ -256,12 +245,19 @@ class AgendaApp extends SearchBase<any> {
                                                 this.props.toggleDropdownFilter('itemType', null);
                                             }}
                                             totalItems={this.props.totalItems}
-                                            totalItemsLabel={totalItemsLabel}
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType="agenda"
                                             refresh={this.props.fetchItems}
                                             setQuery={this.props.setQuery}
+                                            setSortQuery={this.props.setSortQuery}
+                                            showSortDropdown={true}
+                                            sortOptions={[
+                                                {label: gettext('Date'), value: ''},
+                                                {label: gettext('Newest updates'), value: 'versioncreated:desc'},
+                                                {label: gettext('Oldest updates'), value: 'versioncreated:asc'},
+                                                {label: gettext('Relevance'), value: '_score'},
+                                            ]}
                                         />
                                     )
                                 }
@@ -303,7 +299,6 @@ class AgendaApp extends SearchBase<any> {
                             previewGroup={this.props.previewGroup}
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
-                            wireItems={this.props.wireItems}
                             previewConfig={this.props.previewConfig}
                             restrictCoverageInfo={this.props.restrictCoverageInfo}
                         />
@@ -352,7 +347,6 @@ AgendaApp.propTypes = {
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
-    aggregations: PropTypes.object,
     toggleDropdownFilter: PropTypes.func,
     selectDate: PropTypes.func,
     activeDate: PropTypes.number,
@@ -367,13 +361,12 @@ AgendaApp.propTypes = {
     eventsOnlyAccess: PropTypes.bool,
     restrictCoverageInfo: PropTypes.bool,
     itemTypeFilter: PropTypes.string,
-    locators: PropTypes.array,
-    wireItems: PropTypes.array,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
     groups: PropTypes.array,
+    dateFilters: PropTypes.array,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -398,7 +391,6 @@ const mapStateToProps = (state: any) => ({
     activeTopic: activeTopicSelector(state),
     activeNavigation: searchNavigationSelector(state),
     bookmarks: state.bookmarks,
-    aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
@@ -409,8 +401,6 @@ const mapStateToProps = (state: any) => ({
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
-    locators: get(state, 'locators.items', []),
-    wireItems: get(state, 'agenda.agendaWireItems'),
     setQuery: PropTypes.func.isRequired,
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
@@ -418,7 +408,8 @@ const mapStateToProps = (state: any) => ({
     detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
-    errorMessage:state.errorMessage
+    errorMessage: state.errorMessage,
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -441,6 +432,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     requestCoverage: (item: any, message: any) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query: any) => dispatch(setQuery(query)),
+    setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
+    saveMyTopic: (params: any) => dispatch(saveMyTopic(params)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

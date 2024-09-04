@@ -1,7 +1,7 @@
-import {get, isEmpty, includes, keyBy, sortBy} from 'lodash';
+import {get, isEmpty, keyBy, sortBy} from 'lodash';
 import moment from 'moment/moment';
 
-import {IAgendaItem, IAgendaListGroup, IAgendaListGroupItem, ICoverage, IUser} from 'interfaces';
+import {IAgendaItem, IPlanningItem, IAgendaListGroup, IAgendaListGroupItem, ICoverage, IUser} from 'interfaces';
 import {
     formatDate,
     formatMonth,
@@ -16,6 +16,7 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
+import {ISubject} from 'interfaces/common';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -476,50 +477,7 @@ export function getInternalNote(item: any, plan: any) {
     return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
-/**
- * Get internal notes per coverage
- *
- * @param {Object} item
- * @return {Object}
- */
-export function getDataFromCoverages(item: any) {
-    const planningItems = get(item, 'planning_items', []);
-    const data: any = {
-        'internal_note': {},
-        'ednote': {},
-        'workflow_status_reason': {},
-        'scheduled_update_status': {},
-    };
-
-    planningItems.forEach((p: any) => {
-        (get(p, 'coverages') || []).forEach((c: any) => {
-            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field: any) => {
-
-                // Don't populate if the value is same as the field in upper level planning_item
-                // Don't populate workflow_status_reason is planning_item is cancelled to avoid UI duplication
-                if (!get(c, `planning.${field}`, '') || c.planning[field] === p[field] ||
-                        (field === 'workflow_status_reason' && p['state'] === STATUS_CANCELED)) {
-                    return;
-                }
-
-                data[field][c.coverage_id] = c.planning[field];
-            });
-
-            if (get(c, 'scheduled_updates.length', 0) > 0 && c['workflow_status'] === WORKFLOW_STATUS.COMPLETED) {
-                // Get latest appropriate scheduled_update
-                const schedUpdate = getNextPendingScheduledUpdate(c);
-                if (schedUpdate) {
-                    const dateString = `${moment(schedUpdate.planning.scheduled).format(COVERAGE_DATE_TIME_FORMAT)}`;
-                    data['scheduled_update_status'][c.coverage_id] = gettext(`Update expected @ ${dateString}`);
-                }
-            }
-
-        });
-    });
-    return data;
-}
-
-const getNextPendingScheduledUpdate = (coverage: any) => {
+export const getNextPendingScheduledUpdate = (coverage: any) => {
     if (coverage.scheduled == null) {
         // Not privileged to see coverage details
         return null;
@@ -606,7 +564,7 @@ export function getHighlightedName(item: any) {
  * @param {Object} plan
  * @return {String}
  */
-export function getDescription(item: IAgendaItem, plan?: IAgendaItem): string {
+export function getDescription(item: IAgendaItem, plan?: IPlanningItem): string {
     return plan?.description_text || item?.definition_short || '';
 }
 
@@ -617,7 +575,7 @@ export function getDescription(item: IAgendaItem, plan?: IAgendaItem): string {
  * @param {Object} plan
  * @return {String}
  */
-export function getHighlightedDescription(item: IAgendaItem, plan?: IAgendaItem): string {
+export function getHighlightedDescription(item: IAgendaItem, plan?: IPlanningItem): string {
     if (item.es_highlight?.description_text?.[0] != null) {
         return item.es_highlight.description_text[0];
     }
@@ -711,7 +669,7 @@ export function getStartDate(item: IAgendaItem): moment.Moment {
 
 // get end date in utc mode if there is no end time info
 export function getEndDate(item: IAgendaItem): moment.Moment {
-    return item.dates.no_end_time === true || item.dates.all_day === true ?
+    return item.dates.all_day === true ?
         moment.utc(item.dates.end || item.dates.start) :
         moment(item.dates.end || item.dates.start);
 }
@@ -724,17 +682,12 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
 
     if (allDay) {
         // we ignore times and only check dates
-        testDay = moment(day.format('YYYY-MM-DD'));
         startDate = moment(start.format('YYYY-MM-DD'));
         endDate = moment(end.format('YYYY-MM-DD'));
-    } else if (noEndTime) {
-        // we ignore time for end date
-        testDay = moment(day.format('YYYY-MM-DD'));
-        endDate = moment(end.format('YYYY-MM-DD'));
-        return day.isSameOrAfter(start) && testDay.isSameOrBefore(endDate);
+        testDay =  moment(day.format('YYYY-MM-DD'));
     }
 
-    return testDay.isBetween(startDate, endDate, 'day', '[]');
+    return testDay.isSameOrAfter(startDate, 'day') && testDay.isSameOrBefore(endDate, 'day');
 };
 
 /**
@@ -890,7 +843,7 @@ export function sortGroups(groups: Array<IAgendaListGroup>): Array<IAgendaListGr
 /**
  * Get Planning Item for the day
  */
-export function getPlanningItemsByGroup(item: IAgendaItem, group: string): Array<IAgendaItem> {
+export function getPlanningItemsByGroup(item: IAgendaItem, group: string): Array<IPlanningItem> {
     const planningItems = item.planning_items || [];
 
     if (planningItems.length === 0) {
@@ -898,16 +851,16 @@ export function getPlanningItemsByGroup(item: IAgendaItem, group: string): Array
     }
 
     // Planning item without coverages
-    const plansWithoutCoverages: Array<IAgendaItem> = planningItems.filter((planningItem) => (
+    const plansWithoutCoverages = planningItems.filter((planningItem) => (
         formatDate(planningItem.planning_date) === group &&
         (planningItem.coverages?.length ?? 0) === 0
     ));
 
-    const allPlans: {[itemId: string]: IAgendaItem} = keyBy(planningItems, '_id');
+    const allPlans: {[itemId: string]: IPlanningItem} = keyBy(planningItems, '_id');
     const processed: {[itemId: string]: boolean} = {};
 
     // get unique plans for that group based on the coverage.
-    const plansWithCoverages: Array<IAgendaItem> = (item.coverages || [])
+    const plansWithCoverages = (item.coverages || [])
         .filter((coverage) => {
             if (isCoverageForExtraDay(coverage, group) === false) {
                 return false;
@@ -934,8 +887,8 @@ export function isCoverageOnPreviousDay(coverage: any, group: any) {
 
 
 export function getCoveragesForDisplay(item: any, plan: any, group: any) {
-    const currentCoverage: any = [];
-    const previousCoverage: any = [];
+    const currentCoverage: Array<ICoverage> = [];
+    const previousCoverage: Array<ICoverage> = [];
     // get current and preview coverages
     (get(item, 'coverages') || [])
         .forEach((coverage: any) => {
@@ -1084,12 +1037,16 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
 };
 
 function getScheduleType(item: IAgendaItem): string {
-    const start = moment(item.dates.start);
-    const end = moment(item.dates.end);
+    const start = getStartDate(item);
+    const end = getEndDate(item);
     const duration = end.diff(start, 'minutes');
 
     if (item.dates.all_day) {
         return duration === 0 ? SCHEDULE_TYPE.ALL_DAY : SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (item.dates.no_end_time && !start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.MULTI_DAY;
     }
 
     if (item.dates.no_end_time) {
@@ -1135,7 +1092,7 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
     const isTBCItem = isItemTBC(item);
     const start = parseDate(item.dates.start, item.dates.all_day);
-    const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
+    const end = parseDate(item.dates.end, item.dates.all_day);
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);
@@ -1208,3 +1165,6 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
         });
     }
 }
+
+export const isTopStory = (subj: ISubject) => subj.scheme === window.newsroom.client_config.agenda_top_story_scheme;
+export const wireLabel = (subj: ISubject) => subj.scheme === window.newsroom.client_config.wire_labels_scheme;

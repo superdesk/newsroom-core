@@ -90,10 +90,10 @@ export default class EditCompanyAPI extends React.Component<any, any> {
 
     render() {
         return (
-            <Fragment>
+            <div>
                 <EditAPIToken companyId={this.props.company._id} />
                 {this.renderIPWhiteList()}
-            </Fragment>
+            </div>
         );
     }
 }

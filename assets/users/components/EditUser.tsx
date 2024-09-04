@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {connect} from 'react-redux';
-import {get} from 'lodash';
 
 import {ICompany, IProduct, ISection, ICountry} from 'interfaces';
 
@@ -35,6 +34,7 @@ import ActionButton from 'components/ActionButton';
 import {Button} from 'components/Buttons';
 import {IconButton} from 'components/IconButton';
 import CloseButton from 'components/CloseButton';
+import {IUserSettingsState} from 'users/reducers';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -43,6 +43,7 @@ interface IReduxStoreProps {
     companySections: any;
     seats: any;
     countries: Array<ICountry>;
+    authProviderFeatures: IUserSettingsState['authProviderFeatures'];
 }
 
 interface IDispatchProps {
@@ -54,6 +55,7 @@ interface IUserProfileStore {
     companySections?: any;
     seats?: any;
     countries: Array<ICountry>;
+    authProviderFeatures: IUserSettingsState['authProviderFeatures'];
 }
 
 interface IOwnProps {
@@ -101,6 +103,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
         resendUserInvite,
         approveUser,
         countries,
+        authProviderFeatures,
     } = props;
 
     const companyId = user.company;
@@ -124,6 +127,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const userSections = Object.keys(user.sections || {}).length > 0 ?
         user.sections :
         company?.sections || {};
+    const authProvider = company?.auth_provider ?? 'newshub';
+    const userAuthProviderFeatures = authProviderFeatures[authProvider];
 
     const resendInviteButton = {
         icon: 'refresh',
@@ -462,6 +467,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 variant='secondary'
                                 id='resetPassword'
                                 onClick={onResetPassword}
+                                data-test-id='reset-password-btn'
                             />
                         )}
                         {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && (
@@ -489,6 +495,7 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
     countries: state.countries,
+    authProviderFeatures: state.authProviderFeatures,
 });
 
 const mapDispatchToProps = ({approveUser});

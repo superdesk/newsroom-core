@@ -6,6 +6,7 @@ from flask import render_template, current_app as app, jsonify
 from flask_babel import gettext
 
 from superdesk.utc import utcnow, utc_to_local
+from newsroom.auth.utils import get_auth_providers
 from newsroom.decorator import login_required, company_admin_only
 from newsroom.types import Company, Product
 from newsroom.utils import query_resource, get_json_or_400
@@ -42,6 +43,7 @@ def get_view_data():
         "sections": app.sections,
         "products": products,
         "countries": app.countries,
+        "auth_provider_features": {key: provider.features for key, provider in get_auth_providers().items()},
     }
 
 

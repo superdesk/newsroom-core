@@ -7,31 +7,31 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-15 15:38+0100\n"
+"POT-Creation-Date: 2024-08-14 08:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.15.0\n"
 
-#: newsroom/email.py:420
+#: newsroom/email.py:487
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:429
+#: newsroom/email.py:496
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr ""
 
-#: newsroom/email_templates.py:78
+#: newsroom/email_templates.py:79
 msgid "Email template name not supplied"
 msgstr ""
 
-#: newsroom/email_templates.py:80
+#: newsroom/email_templates.py:81
 #, python-format
 msgid "Email template '%(name)s' not found"
 msgstr ""
@@ -40,113 +40,138 @@ msgstr ""
 msgid "Activity History: Inavlid request"
 msgstr ""
 
-#: newsroom/push.py:109
+#: newsroom/push.py:115
 msgid "Unknown type {}"
 msgstr ""
 
-#: newsroom/settings.py:95 newsroom/settings.py:123
+#: newsroom/settings.py:102 newsroom/settings.py:130
 msgid "Company expiry alert recipients"
 msgstr ""
 
-#: newsroom/settings.py:97 newsroom/settings.py:130
+#: newsroom/settings.py:104 newsroom/settings.py:137
 msgid "Coverage request recipients"
 msgstr ""
 
-#: newsroom/settings.py:102
+#: newsroom/settings.py:109
 msgid "{}: Email IDs not in proper format"
 msgstr ""
 
-#: newsroom/settings.py:108
+#: newsroom/settings.py:115
 msgid "General Settings"
 msgstr ""
 
-#: newsroom/settings.py:118
+#: newsroom/settings.py:125
 msgid "Google Analytics ID"
 msgstr ""
 
-#: newsroom/settings.py:124
+#: newsroom/settings.py:131
 msgid ""
 "Comma separated list of email addresses to which the expiration alerts of"
 " companies will be sent to."
 msgstr ""
 
-#: newsroom/settings.py:131
+#: newsroom/settings.py:138
 msgid ""
 "Comma separated list of email addresses who will receive the coverage "
 "request emails."
 msgstr ""
 
-#: newsroom/settings.py:137
+#: newsroom/settings.py:144
 msgid "System alerts recipients"
 msgstr ""
 
-#: newsroom/settings.py:138
+#: newsroom/settings.py:145
 msgid "Comma separated list of email addresses who will receive system alerts."
 msgstr ""
 
-#: newsroom/settings.py:142
+#: newsroom/settings.py:149
 msgid "Monitoring report logo image"
 msgstr ""
 
-#: newsroom/settings.py:143
+#: newsroom/settings.py:150
 msgid "Monitoring report logo image (jpg or png) for RTF reports."
 msgstr ""
 
-#: newsroom/settings.py:147
+#: newsroom/settings.py:154
 msgid "Product Seat request recipients"
 msgstr ""
 
-#: newsroom/settings.py:148
+#: newsroom/settings.py:155
 msgid ""
 "Comma separated list of email addresses who will receive product seat "
 "requests."
 msgstr ""
 
-#: newsroom/settings.py:152
+#: newsroom/settings.py:159
 msgid "Allow companies to manage their own user product permissions"
 msgstr ""
 
-#: newsroom/settings.py:153
+#: newsroom/settings.py:160
 msgid ""
 "Allow Company Admins to change section and product permissions for their "
 "users"
 msgstr ""
 
+#: newsroom/template_filters.py:139
+msgid "Date: {start} to {end} ({tz}) (Time to be confirmed)"
+msgstr ""
+
+#: newsroom/template_filters.py:144
+msgid "Date: {start} ({tz}) (Time to be confirmed)"
+msgstr ""
+
+#: newsroom/template_filters.py:147
+msgid "Date: {start} ({tz})"
+msgstr ""
+
+#: newsroom/template_filters.py:150
+msgid "Date: {start} to {end} ({tz})"
+msgstr ""
+
+#: newsroom/template_filters.py:152
+msgid "Time: {start_time} to {end_time} on Date: {date} ({tz})"
+msgstr ""
+
+#: newsroom/template_filters.py:160
+msgid "Date: {start_time} {start_date} to {end_time} {end_date} ({tz})"
+msgstr ""
+
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:206
+#: newsroom/utils.py:213
 msgid "ALL DAY"
 msgstr ""
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:296
-#: newsroom/utils.py:407
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:305
+#: newsroom/utils.py:416
 msgid "Account is disabled"
 msgstr ""
 
-#: newsroom/utils.py:304
+#: newsroom/utils.py:313
 msgid "Account has not been approved"
 msgstr ""
 
-#: newsroom/auth/views.py:55 newsroom/auth/views.py:145 newsroom/utils.py:397
+#: newsroom/auth/views.py:83 newsroom/auth/views.py:92
+#: newsroom/auth/views.py:184 newsroom/utils.py:406
 msgid "Invalid username or password."
 msgstr ""
 
-#: newsroom/utils.py:403
+#: newsroom/utils.py:412
 msgid "Insufficient Permissions. Access denied."
 msgstr ""
 
-#: newsroom/auth/views.py:137 newsroom/utils.py:411
+#: newsroom/auth/views.py:176 newsroom/utils.py:420
 msgid "Company account has been disabled."
 msgstr ""
 
-#: newsroom/auth/views.py:140 newsroom/utils.py:415
+#: newsroom/auth/views.py:179 newsroom/utils.py:424
 msgid "Company account has expired."
 msgstr ""
 
-#: newsroom/agenda/__init__.py:48
+#: newsroom/agenda/__init__.py:53
 msgid "Google Maps Styles"
 msgstr ""
 
-#: newsroom/agenda/__init__.py:50
+#: newsroom/agenda/__init__.py:55
 msgid ""
 "Provide styles delimited by &(ampersand). For example, "
 "feature:poi|element:labels|visibility:off&transit|visibility:off. Refer "
@@ -155,86 +180,117 @@ msgid ""
 msgstr ""
 
 #: assets/agenda/components/AgendaTags.tsx:44
-#: assets/company-reports/components/ContentActivity.tsx:111
-#: assets/wire/components/PreviewTags.tsx:40 newsroom/agenda/__init__.py:61
-#: newsroom/reports/content_activity.py:190
+#: assets/company-reports/components/ContentActivity.tsx:61
+#: assets/wire/components/PreviewTags.tsx:40 newsroom/agenda/__init__.py:66
+#: newsroom/reports/content_activity.py:191
 #: newsroom/templates/wire_item.html:76
-#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:132
+#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:133
 msgid "Category"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:112
+#: assets/company-reports/components/ContentActivity.tsx:62
 #: assets/monitoring/components/MonitoringList.tsx:24
 #: assets/wire/components/PreviewTagsSubjects.tsx:42
-#: newsroom/agenda/__init__.py:65 newsroom/monitoring/forms.py:20
-#: newsroom/reports/content_activity.py:191 newsroom/wire/__init__.py:136
+#: newsroom/agenda/__init__.py:70 newsroom/monitoring/forms.py:20
+#: newsroom/reports/content_activity.py:192 newsroom/wire/__init__.py:137
 msgid "Subject"
 msgstr ""
 
 #: assets/wire/components/fields/UrgencyLabel.tsx:40
-#: newsroom/agenda/__init__.py:69 newsroom/wire/__init__.py:144
+#: newsroom/agenda/__init__.py:74 newsroom/wire/__init__.py:145
 msgid "News Value"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:110
-#: newsroom/agenda/__init__.py:73 newsroom/reports/content_activity.py:189
-#: newsroom/wire/__init__.py:148
+#: assets/company-reports/components/ContentActivity.tsx:60
+#: newsroom/agenda/__init__.py:78 newsroom/reports/content_activity.py:190
+#: newsroom/wire/__init__.py:149
 msgid "Place"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:55
+#: newsroom/agenda/agenda.py:51
 msgid "An event you have been watching has been updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:56
+#: newsroom/agenda/agenda.py:52
 msgid "Event updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:59
+#: newsroom/agenda/agenda.py:55
 msgid "An event you have been watching has been cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:60
+#: newsroom/agenda/agenda.py:56
 msgid "Event cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:63
+#: newsroom/agenda/agenda.py:59
 msgid "An event you have been watching has a new planning"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:64
+#: newsroom/agenda/agenda.py:60
 msgid "Planning added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:67
+#: newsroom/agenda/agenda.py:63
 msgid "An event you have been watching has a planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:68
+#: newsroom/agenda/agenda.py:64
 msgid "Planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:71
+#: newsroom/agenda/agenda.py:67
 msgid "An event you have been watching has a new coverage added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:72
+#: newsroom/agenda/agenda.py:68
 msgid "Coverage added"
 msgstr ""
 
-#: newsroom/agenda/views.py:223
+#: newsroom/agenda/utils.py:171 newsroom/web/default_settings.py:396
+#: newsroom/web/default_settings.py:397
+msgid "Completed"
+msgstr ""
+
+#: newsroom/agenda/utils.py:173 newsroom/agenda/utils.py:181
+#: newsroom/agenda/utils.py:197
+msgid "Cancelled"
+msgstr ""
+
+#: newsroom/agenda/utils.py:175 newsroom/agenda/utils.py:193
+msgid "Planned"
+msgstr ""
+
+#: newsroom/agenda/utils.py:177
+msgid "Not decided"
+msgstr ""
+
+#: newsroom/agenda/utils.py:179
+msgid "On request"
+msgstr ""
+
+#: assets/agenda/components/ToBeConfirmedLabel.tsx:21
+#: newsroom/agenda/utils.py:191
+msgid "To be confirmed"
+msgstr ""
+
+#: newsroom/agenda/utils.py:195
+msgid "Postponed"
+msgstr ""
+
+#: newsroom/agenda/views.py:221
 msgid "Cannot edit coverage watch when watching parent item"
 msgstr ""
 
-#: newsroom/agenda/views.py:230
+#: newsroom/agenda/views.py:228
 msgid "Coverage not found"
 msgstr ""
 
-#: newsroom/agenda/views.py:242
+#: newsroom/agenda/views.py:240
 msgid "Error removing watch."
 msgstr ""
 
-#: newsroom/agenda/views.py:281
+#: newsroom/agenda/views.py:279
 #, python-format
 msgid "%(section)s item not found"
 msgstr ""
@@ -291,48 +347,62 @@ msgstr ""
 msgid "Your position"
 msgstr ""
 
-#: newsroom/auth/forms.py:26
+#: assets/companies/components/EditCompanyDetails.tsx:74
+#: newsroom/auth/forms.py:25
+msgid "Company Type"
+msgstr ""
+
+#: newsroom/auth/forms.py:27
 msgid "Size of your company"
 msgstr ""
 
-#: newsroom/auth/forms.py:30
+#: newsroom/auth/forms.py:31
+msgid "Company URL"
+msgstr ""
+
+#: newsroom/auth/forms.py:32
+msgid "How did you hear about us? (Referral, social media, web search)"
+msgstr ""
+
+#: newsroom/auth/forms.py:34
 msgid "I agree to"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUsers.tsx:25
-#: assets/user-profile/components/profile/UserProfile.tsx:95
-#: assets/users/components/EditUser.tsx:194
-#: assets/users/components/UsersList.tsx:27 newsroom/auth/forms.py:35
-#: newsroom/auth/forms.py:41 newsroom/users/forms.py:45
+#: assets/user-profile/components/profile/UserProfile.tsx:104
+#: assets/users/components/EditUser.tsx:236
+#: assets/users/components/UsersList.tsx:33 newsroom/auth/forms.py:39
+#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:62
+#: newsroom/users/forms.py:46
 msgid "Email"
 msgstr ""
 
-#: newsroom/auth/forms.py:36
+#: newsroom/auth/forms.py:40
 msgid "Password"
 msgstr ""
 
-#: newsroom/auth/forms.py:37
+#: newsroom/auth/forms.py:41
 msgid "Remember Me"
 msgstr ""
 
-#: newsroom/auth/forms.py:48
+#: newsroom/auth/forms.py:53
 msgid "Passwords must match."
 msgstr ""
 
-#: newsroom/auth/forms.py:50
-msgid "Old password"
+#: newsroom/auth/forms.py:56
+msgid "Current password"
 msgstr ""
 
-#: newsroom/auth/forms.py:51
+#: newsroom/auth/forms.py:59
 msgid "New password"
 msgstr ""
 
-#: newsroom/auth/forms.py:52
+#: newsroom/auth/forms.py:60
 msgid "Confirm new password"
 msgstr ""
 
-#: newsroom/auth/oauth.py:61 newsroom/auth/views.py:151
-#: newsroom/auth/views.py:155 newsroom/news_api/news/assets/assets.py:24
+#: newsroom/auth/oauth.py:61 newsroom/auth/views.py:190
+#: newsroom/auth/views.py:194 newsroom/news_api/news/assets/assets.py:24
 #: newsroom/news_api/news/item/item.py:23
 msgid "Invalid token"
 msgstr ""
@@ -341,10 +411,10 @@ msgstr ""
 msgid "Email not found"
 msgstr ""
 
-#: newsroom/auth/oauth.py:72 newsroom/auth/utils.py:58
-#: newsroom/users/views.py:171 newsroom/users/views.py:208
-#: newsroom/users/views.py:287 newsroom/users/views.py:307
-#: newsroom/users/views.py:342
+#: newsroom/auth/oauth.py:72 newsroom/auth/utils.py:60
+#: newsroom/users/views.py:176 newsroom/users/views.py:213
+#: newsroom/users/views.py:292 newsroom/users/views.py:312
+#: newsroom/users/views.py:347 newsroom/users/views.py:400
 msgid "User not found"
 msgstr ""
 
@@ -364,7 +434,7 @@ msgstr ""
 msgid "Invalid login type, Oauth not enabled for your user"
 msgstr ""
 
-#: newsroom/auth/saml.py:134
+#: newsroom/auth/saml.py:137
 msgid "There was an error when using SSO"
 msgstr ""
 
@@ -373,37 +443,57 @@ msgstr ""
 msgid "Invalid login type, %(type)s not enabled for your user"
 msgstr ""
 
-#: newsroom/auth/utils.py:228
+#: newsroom/auth/utils.py:255
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin."
 msgstr ""
 
-#: newsroom/auth/views.py:128
+#: newsroom/auth/views.py:167
 msgid "Exceeded number of allowed login attempts"
 msgstr ""
 
-#: newsroom/auth/views.py:185
+#: newsroom/auth/views.py:227
 msgid "Account already exists."
 msgstr ""
 
-#: newsroom/auth/views.py:210
+#: newsroom/auth/views.py:296
 msgid "Your account has been validated."
 msgstr ""
 
-#: newsroom/auth/views.py:213
+#: newsroom/auth/views.py:299
 msgid "Token has expired. Please create a new token"
 msgstr ""
 
-#: newsroom/auth/views.py:232
+#: newsroom/auth/views.py:318
 msgid "Your password has been changed. Please login again."
 msgstr ""
 
-#: newsroom/auth/views.py:249
+#: newsroom/auth/views.py:344
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 
-#: newsroom/cards/__init__.py:14
+#: newsroom/auth/views.py:405 newsroom/auth/views.py:418
+msgid "Your password has been changed."
+msgstr ""
+
+#: newsroom/auth/views.py:407 newsroom/auth/views.py:414
+msgid "Current password invalid."
+msgstr ""
+
+#: newsroom/auth/views.py:421
+msgid "Change password is not available."
+msgstr ""
+
+#: newsroom/auth/views.py:441
+msgid "User token is not valid"
+msgstr ""
+
+#: newsroom/auth/views.py:452
+msgid "Could not change your password. Please contact us for assistance."
+msgstr ""
+
+#: newsroom/cards/__init__.py:73
 msgid "Dashboards"
 msgstr ""
 
@@ -423,32 +513,41 @@ msgstr ""
 msgid "Company Management"
 msgstr ""
 
-#: newsroom/companies/views.py:69
-msgid "Company already exists"
-msgstr ""
-
-#: newsroom/companies/views.py:79 newsroom/navigations/views.py:65
+#: newsroom/companies/views.py:87 newsroom/navigations/views.py:65
 #: newsroom/products/views.py:64 newsroom/section_filters/views.py:55
 msgid "Name not found"
 msgstr ""
 
-#: newsroom/companies/views.py:87
+#: newsroom/companies/views.py:95
 msgid "{0}: {1}"
 msgstr ""
 
-#: newsroom/companies/views.py:136 newsroom/company_admin/views.py:45
+#: newsroom/companies/views.py:152 newsroom/companies/views.py:206
+#: newsroom/company_admin/views.py:58
 msgid "Company not found"
 msgstr ""
 
-#: newsroom/company_admin/views.py:51
+#: newsroom/companies/views.py:173
+msgid "Value is already used"
+msgstr ""
+
+#: newsroom/companies/views.py:175
+msgid "Company already exists"
+msgstr ""
+
+#: newsroom/companies/views.py:209
+msgid "Company is already approved"
+msgstr ""
+
+#: newsroom/company_admin/views.py:64
 msgid "No products selected"
 msgstr ""
 
-#: newsroom/company_admin/views.py:54
+#: newsroom/company_admin/views.py:67
 msgid "Invalid number of seats requested"
 msgstr ""
 
-#: newsroom/company_admin/views.py:67 newsroom/company_admin/views.py:75
+#: newsroom/company_admin/views.py:80 newsroom/company_admin/views.py:88
 msgid "Product Seat Request recipients not configured"
 msgstr ""
 
@@ -461,7 +560,7 @@ msgid "Time limit for aapX items (in days)"
 msgstr ""
 
 #: newsroom/market_place/__init__.py:49 newsroom/news_api/__init__.py:17
-#: newsroom/wire/__init__.py:110
+#: newsroom/wire/__init__.py:111
 msgid ""
 "You can create an additional filter on top of the product definition. The"
 " time limit can be enabled for each company in the Permissions."
@@ -492,7 +591,7 @@ msgid "Linked extract(s)"
 msgstr ""
 
 #: assets/companies/components/CompanyList.tsx:35
-#: assets/companies/components/EditCompanyDetails.tsx:42
+#: assets/companies/components/EditCompanyDetails.tsx:41
 #: assets/company-admin/components/CompanyUsers.tsx:24
 #: assets/monitoring/components/EditMonitoringProfile.tsx:114
 #: assets/monitoring/components/MonitoringList.tsx:23
@@ -504,10 +603,10 @@ msgstr ""
 #: assets/products/components/ProductList.tsx:22
 #: assets/search/components/AdvancedSearchPanel.tsx:118
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:146
-#: assets/search/components/TopicForm.tsx:105
+#: assets/search/components/TopicForm.tsx:99
 #: assets/section-filters/components/EditSectionFilter.tsx:37
 #: assets/section-filters/components/SectionFilterList.tsx:22
-#: assets/users/components/UsersList.tsx:26 newsroom/monitoring/forms.py:19
+#: assets/users/components/UsersList.tsx:32 newsroom/monitoring/forms.py:19
 msgid "Name"
 msgstr ""
 
@@ -536,26 +635,26 @@ msgstr ""
 msgid "Format Type"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:74
-#: assets/company-reports/components/ComapnyNewsApiUsage.tsx:79
+#: assets/companies/components/EditCompany.tsx:76
 #: assets/company-reports/components/Company.tsx:86
+#: assets/company-reports/components/CompanyNewsApiUsage.tsx:79
 #: assets/company-reports/components/CompanyProducts.tsx:32
-#: assets/company-reports/components/CompanyReportsApp.tsx:20
+#: assets/company-reports/components/CompanyReportsApp.tsx:37
 #: assets/company-reports/components/CompanySavedSearches.tsx:17
 #: assets/company-reports/components/ExpiredCompanies.tsx:17
 #: assets/company-reports/components/SubscriberActivity.tsx:145
 #: assets/company-reports/components/UserSavedSearches.tsx:21
 #: assets/monitoring/components/EditMonitoringProfile.tsx:141
 #: assets/monitoring/components/MonitoringList.tsx:27
-#: assets/users/components/EditUser.tsx:231
-#: assets/users/components/EditUser.tsx:240
-#: assets/users/components/UsersList.tsx:32 newsroom/monitoring/forms.py:24
-#: newsroom/reports/reports.py:172 newsroom/users/forms.py:50
+#: assets/users/components/EditUser.tsx:273
+#: assets/users/components/EditUser.tsx:282
+#: assets/users/components/UsersList.tsx:38 newsroom/monitoring/forms.py:24
+#: newsroom/reports/reports.py:188 newsroom/users/forms.py:51
 msgid "Company"
 msgstr ""
 
-#: assets/companies/components/CompanyListItem.tsx:20
-#: assets/companies/components/EditCompanyDetails.tsx:161
+#: assets/companies/components/CompanyListItem.tsx:31
+#: assets/companies/components/EditCompanyDetails.tsx:179
 #: assets/monitoring/components/EditMonitoringProfile.tsx:191
 #: assets/monitoring/components/MonitoringItem.tsx:18
 #: assets/navigations/components/EditNavigation.tsx:97
@@ -566,8 +665,8 @@ msgstr ""
 #: assets/search/components/MonitoringEditor.tsx:198
 #: assets/section-filters/components/EditSectionFilter.tsx:79
 #: assets/section-filters/components/SectionFilterListItem.tsx:12
-#: assets/users/components/EditUser.tsx:391
-#: assets/users/components/UserListItem.tsx:26 newsroom/monitoring/forms.py:25
+#: assets/users/components/EditUser.tsx:442
+#: assets/users/components/UserListItem.tsx:35 newsroom/monitoring/forms.py:25
 msgid "Enabled"
 msgstr ""
 
@@ -592,7 +691,7 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
-#: newsroom/monitoring/search.py:67 newsroom/search/service.py:638
+#: newsroom/monitoring/search.py:67 newsroom/search/service.py:657
 msgid "Invalid product parameter"
 msgstr ""
 
@@ -629,168 +728,180 @@ msgstr ""
 #: assets/company-admin/components/CompanyDetails.tsx:20
 #: assets/company-reports/components/Company.tsx:24
 #: assets/navigations/components/EditNavigation.tsx:26
-#: assets/users/components/EditUser.tsx:303 newsroom/products/__init__.py:15
-#: newsroom/users/forms.py:62
+#: assets/users/components/EditUser.tsx:354 newsroom/products/__init__.py:15
+#: newsroom/users/forms.py:63
 msgid "Products"
 msgstr ""
 
 #: newsroom/reports/content_activity.py:25
-#: newsroom/reports/content_activity.py:75
+#: newsroom/reports/content_activity.py:76
 msgid "Must provide a section for this report"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:107
-#: assets/wire/components/filters/NavCreatedPicker.tsx:27
-#: newsroom/reports/content_activity.py:186
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:134
+#: assets/company-reports/components/ContentActivity.tsx:57
+#: newsroom/reports/content_activity.py:187
 msgid "Published"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:108
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:126
+#: assets/company-reports/components/ContentActivity.tsx:58
 #: assets/components/cards/edit/ConfigEvent.tsx:26
 #: assets/search/components/AdvancedSearchPanel.tsx:126
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:147
-#: newsroom/reports/content_activity.py:187
+#: newsroom/reports/content_activity.py:188
 msgid "Headline"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:109
-#: newsroom/reports/content_activity.py:188
+#: assets/company-reports/components/ContentActivity.tsx:59
+#: newsroom/reports/content_activity.py:189
 msgid "Take Key"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:52
-#: assets/company-reports/components/ContentActivity.tsx:113
+#: assets/company-reports/components/ContentActivity.tsx:63
+#: newsroom/reports/content_activity.py:193
+msgid "Source"
+msgstr ""
+
+#: assets/company-reports/components/ContentActivity.tsx:64
+#: assets/company-reports/components/ContentActivityFilters.tsx:88
 #: assets/products/components/EditProduct.tsx:37
-#: newsroom/reports/content_activity.py:192
+#: newsroom/reports/content_activity.py:194
 msgid "Companies"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:61
-#: assets/company-reports/components/ContentActivity.tsx:114
-#: newsroom/reports/content_activity.py:193
+#: assets/company-reports/components/ContentActivity.tsx:65
+#: assets/company-reports/components/ContentActivityFilters.tsx:97
+#: newsroom/reports/content_activity.py:195
 msgid "Actions"
 msgstr ""
 
 #: assets/agenda/components/AgendaAttachments.tsx:43
-#: assets/company-reports/components/ContentActivity.tsx:63
-#: assets/company-reports/components/ContentActivity.tsx:118
-#: assets/item-actions.ts:49 assets/ui/components/ArticleMedia.tsx:29
+#: assets/company-reports/components/ContentActivity.tsx:69
+#: assets/company-reports/components/ContentActivityFilters.tsx:99
+#: assets/item-actions.ts:50 assets/ui/components/ArticleMedia.tsx:29
 #: assets/wire/components/DownloadItemsModal.tsx:54
-#: newsroom/reports/content_activity.py:209
+#: newsroom/reports/content_activity.py:211
 msgid "Download"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:64
-#: assets/company-reports/components/ContentActivity.tsx:119
-#: assets/components/TextInput.tsx:35 assets/item-actions.ts:42
-#: newsroom/reports/content_activity.py:212
+#: assets/company-reports/components/ContentActivity.tsx:70
+#: assets/company-reports/components/ContentActivityFilters.tsx:100
+#: assets/components/TextInput.tsx:55 assets/item-actions.ts:43
+#: newsroom/reports/content_activity.py:214
 msgid "Copy"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:65
-#: assets/company-reports/components/ContentActivity.tsx:120
-#: assets/components/ShareItemModal.tsx:102 assets/item-actions.ts:25
+#: assets/company-reports/components/ContentActivity.tsx:71
+#: assets/company-reports/components/ContentActivityFilters.tsx:101
+#: assets/components/ShareItemModal.tsx:102 assets/item-actions.ts:26
 #: assets/search/components/FollowedTopics.tsx:77
-#: newsroom/reports/content_activity.py:215
+#: newsroom/reports/content_activity.py:217
 msgid "Share"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:66
-#: assets/company-reports/components/ContentActivity.tsx:121
-#: assets/item-actions.ts:35 newsroom/reports/content_activity.py:218
+#: assets/company-reports/components/ContentActivity.tsx:72
+#: assets/company-reports/components/ContentActivityFilters.tsx:102
+#: assets/item-actions.ts:36 newsroom/reports/content_activity.py:220
 msgid "Print"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:67
-#: assets/company-reports/components/ContentActivity.tsx:122
-#: assets/item-actions.ts:18 assets/search/components/TopicFolder.tsx:104
-#: newsroom/reports/content_activity.py:221
+#: assets/company-reports/components/ContentActivity.tsx:73
+#: assets/company-reports/components/ContentActivityFilters.tsx:103
+#: assets/item-actions.ts:19 assets/search/components/TopicFolder.tsx:108
+#: newsroom/reports/content_activity.py:223
 msgid "Open"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:68
-#: assets/company-reports/components/ContentActivity.tsx:123
-#: newsroom/reports/content_activity.py:224
+#: assets/company-reports/components/ContentActivity.tsx:74
+#: assets/company-reports/components/ContentActivityFilters.tsx:104
+#: newsroom/reports/content_activity.py:226
 msgid "Preview"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:69
-#: assets/company-reports/components/ContentActivity.tsx:124
-#: newsroom/reports/content_activity.py:227
+#: assets/company-reports/components/ContentActivity.tsx:75
+#: assets/company-reports/components/ContentActivityFilters.tsx:105
+#: newsroom/reports/content_activity.py:229
 msgid "Clipboard"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:70
-#: assets/company-reports/components/ContentActivity.tsx:125
-#: newsroom/reports/content_activity.py:230
+#: assets/company-reports/components/ContentActivity.tsx:76
+#: assets/company-reports/components/ContentActivityFilters.tsx:106
+#: newsroom/reports/content_activity.py:232
 msgid "API retrieval"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:22
-#: newsroom/reports/content_activity.py:301
+#: assets/company-reports/components/CompanyReportsApp.tsx:39
+#: newsroom/reports/content_activity.py:283
 msgid "Content activity"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:16
-#: newsroom/reports/reports.py:53
+#: assets/company-reports/components/CompanyReportsApp.tsx:32
+#: newsroom/reports/reports.py:54
 msgid "Saved searches per company"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:17
-#: newsroom/reports/reports.py:84
+#: assets/company-reports/components/CompanyReportsApp.tsx:33
+#: newsroom/reports/reports.py:85
 msgid "Saved searches per user"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:18
-#: newsroom/reports/reports.py:114
+#: assets/company-reports/components/CompanyReportsApp.tsx:34
+#: assets/company-reports/components/CompanyReportsApp.tsx:46
+#: newsroom/reports/reports.py:120
+msgid "Saved My Topics and Company Topics"
+msgstr ""
+
+#: assets/company-reports/components/CompanyReportsApp.tsx:35
+#: newsroom/reports/reports.py:140
 msgid "Products per company"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:19
-#: newsroom/reports/reports.py:137
+#: assets/company-reports/components/CompanyReportsApp.tsx:36
+#: newsroom/reports/reports.py:163
 msgid "Stories per product"
 msgstr ""
 
-#: newsroom/reports/reports.py:265
+#: newsroom/reports/reports.py:281
 msgid "SubscriberActivity"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:45
-#: newsroom/reports/reports.py:338
+#: assets/company-reports/components/CompanyReportsApp.tsx:73
+#: newsroom/reports/reports.py:354
 msgid "Company News API Usage"
 msgstr ""
 
-#: newsroom/reports/reports.py:378
+#: newsroom/reports/reports.py:394
 msgid "Companies permissioned per product"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:24
-#: newsroom/reports/reports.py:389
+#: assets/company-reports/components/CompanyReportsApp.tsx:41
+#: newsroom/reports/reports.py:405
 msgid "Expired companies"
 msgstr ""
 
-#: newsroom/reports/views.py:19 newsroom/reports/views.py:43
-#: newsroom/reports/views.py:55
+#: newsroom/reports/views.py:21 newsroom/reports/views.py:47
+#: newsroom/reports/views.py:60
 msgid "Unknown report {}"
 msgstr ""
 
-#: newsroom/search/service.py:306
+#: newsroom/search/service.py:326
 msgid "Page limit exceeded"
 msgstr ""
 
-#: newsroom/search/service.py:555
+#: newsroom/search/service.py:577
 msgid "Incorrect type supplied for advanced search params"
 msgstr ""
 
-#: newsroom/search/service.py:629
+#: newsroom/search/service.py:648
 msgid "User does not belong to a company."
 msgstr ""
 
-#: newsroom/search/service.py:631
+#: newsroom/search/service.py:650
 msgid "Your company doesn't have any products defined."
 msgstr ""
 
-#: newsroom/search/service.py:633
+#: newsroom/search/service.py:652
 msgid "Your product is not assigned to you or your company."
 msgstr ""
 
@@ -846,8 +957,8 @@ msgstr ""
 msgid "Editorial Note"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:42
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:118
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:56
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:134
 #: newsroom/templates/agenda_item_print.html:64
 msgid "Coverages:"
 msgstr ""
@@ -858,45 +969,69 @@ msgstr ""
 msgid "AM"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:31
+#: newsroom/templates/base_layout.html:37
 msgid "Main Navigation Bar"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:55 newsroom/templates/login.html:13
-#: newsroom/templates/login_client.html:4 newsroom/templates/login_form.html:20
+#: assets/public/components/PublicApp.tsx:79
+#: newsroom/templates/base_layout.html:62
+#: newsroom/templates/login_client.html:4 newsroom/templates/login_form.html:24
+#: newsroom/templates/login_layout.html:19
 msgid "Login"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:59 newsroom/templates/footer.html:4
+#: newsroom/templates/base_layout.html:66 newsroom/templates/footer.html:4
 msgid "Contact Us"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:69
+#: newsroom/templates/base_layout.html:77
 msgid "Side Navigation"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUserListItem.tsx:48
-#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:95
-#: newsroom/templates/base_layout.html:96
-#: newsroom/templates/base_layout.html:103
+#: assets/users/utils.ts:12 newsroom/templates/base_layout.html:103
+#: newsroom/templates/base_layout.html:104
+#: newsroom/templates/base_layout.html:111
 #: newsroom/templates/company_admin_index.html:3
-#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:39
+#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:40
 msgid "Company Admin"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:112
-#: newsroom/templates/base_layout.html:113
 #: newsroom/templates/base_layout.html:120
+#: newsroom/templates/base_layout.html:121
+#: newsroom/templates/base_layout.html:128
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:128
-#: newsroom/templates/base_layout.html:129
-#: newsroom/templates/base_layout.html:136 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:136
+#: newsroom/templates/base_layout.html:137
+#: newsroom/templates/base_layout.html:144 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
+msgstr ""
+
+#: newsroom/templates/change_password.html:13
+#: newsroom/templates/change_password.html:44
+#: newsroom/templates/reset_password.html:37
+msgid "Change Password"
+msgstr ""
+
+#: newsroom/templates/change_password.html:36
+#: newsroom/templates/reset_password.html:30
+msgid "Please use 8 or more characters."
+msgstr ""
+
+#: newsroom/templates/change_password.html:47
+#: newsroom/templates/login_layout.html:40
+msgid "Forgot your password?"
+msgstr ""
+
+#: newsroom/templates/change_password.html:47
+#: newsroom/templates/login_layout.html:40
+#: newsroom/templates/password_reset_link_expiry.html:8
+msgid "Click here to reset."
 msgstr ""
 
 #: newsroom/templates/factcheck_index.html:3
@@ -924,39 +1059,32 @@ msgstr ""
 msgid "Stop impersonation"
 msgstr ""
 
-#: newsroom/templates/login.html:21 newsroom/templates/login_client.html:9
+#: newsroom/templates/login_client.html:9
+#: newsroom/templates/login_layout.html:33
 msgid "Login using Single Sign On"
-msgstr ""
-
-#: newsroom/templates/login.html:26
-msgid "Forgot your password?"
-msgstr ""
-
-#: newsroom/templates/login.html:26
-#: newsroom/templates/password_reset_link_expiry.html:8
-msgid "Click here to reset."
-msgstr ""
-
-#: newsroom/templates/login.html:27
-msgid "Or you can"
-msgstr ""
-
-#: newsroom/templates/login.html:27
-msgid "click here to register."
-msgstr ""
-
-#: assets/user-profile/components/profile/UserProfile.tsx:175
-#: assets/users/components/EditUser.tsx:255 newsroom/templates/login.html:35
-#: newsroom/templates/login_locale_dropdown.html:5
-msgid "Language"
 msgstr ""
 
 #: newsroom/templates/login_client.html:13
 msgid "If you have trouble logging in, please contact your own IT support."
 msgstr ""
 
-#: newsroom/templates/login_form.html:26
+#: newsroom/templates/login_form.html:30
 msgid "Log In with Google"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:41
+msgid "Or you can"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:41
+msgid "click here to register."
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.tsx:235
+#: assets/users/components/EditUser.tsx:308
+#: newsroom/templates/login_layout.html:50
+#: newsroom/templates/login_locale_dropdown.html:5
+msgid "Language"
 msgstr ""
 
 #: newsroom/templates/media_releases_index.html:3
@@ -990,37 +1118,29 @@ msgid ""
 "password again."
 msgstr ""
 
-#: newsroom/templates/request_token.html:12
+#: newsroom/templates/request_token.html:4
 msgid "Password Reset"
 msgstr ""
 
-#: newsroom/templates/request_token.html:27
+#: newsroom/templates/request_token.html:20
 msgid "Validate"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:425
-#: newsroom/templates/request_token.html:29
+#: assets/users/components/EditUser.tsx:476
+#: newsroom/templates/request_token.html:22
 #: newsroom/templates/reset_password.html:12
 msgid "Reset Password"
 msgstr ""
 
-#: newsroom/templates/reset_password.html:30
-msgid "Please use 8 or more characters."
-msgstr ""
-
-#: newsroom/templates/reset_password.html:37
-msgid "Change Password"
-msgstr ""
-
 #: assets/agenda/components/AgendaCoverageRequest.tsx:57
 #: assets/components/CardEditor.tsx:73 assets/components/CardEditor.tsx:75
-#: assets/components/EditPanel.tsx:133 assets/components/Modal.tsx:143
+#: assets/components/EditPanel.tsx:133 assets/components/Modal.tsx:145
 #: assets/search/components/MonitoringEditor.tsx:206
 #: assets/search/components/TopicEditor.tsx:553
 #: assets/search/components/TopicEditor.tsx:556
 #: assets/search/components/TopicFolderEditor.jsx:37
-#: assets/search/components/TopicFolderEditor.jsx:38
-#: assets/user-profile/components/profile/UserProfile.tsx:191
+#: assets/search/components/TopicFolderEditor.jsx:39
+#: assets/user-profile/components/profile/UserProfile.tsx:251
 #: assets/wire/components/SelectedItemsBar.tsx:48
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
@@ -1031,27 +1151,27 @@ msgstr ""
 msgid "Settings Menu"
 msgstr ""
 
-#: newsroom/templates/signup.html:13 newsroom/templates/signup.html:68
+#: newsroom/templates/signup.html:13 newsroom/templates/signup_form.html:61
 msgid "Sign up"
 msgstr ""
 
-#: newsroom/templates/signup.html:61
+#: newsroom/templates/signup_form.html:54
 msgid "the terms and conditions"
 msgstr ""
 
-#: newsroom/templates/signup_success.html:12
+#: newsroom/templates/signup_success.html:9
 msgid "Newsroom sign up"
 msgstr ""
 
-#: newsroom/templates/signup_success.html:15
+#: newsroom/templates/signup_success.html:12
 msgid "Thank you for your interest in Newsroom"
 msgstr ""
 
-#: newsroom/templates/signup_success.html:16
+#: newsroom/templates/signup_success.html:13
 msgid "Your sign up request has been sent successfully"
 msgstr ""
 
-#: newsroom/templates/signup_success.html:17
+#: newsroom/templates/signup_success.html:14
 msgid "One of our team members will be in touch with you shortly"
 msgstr ""
 
@@ -1060,7 +1180,7 @@ msgid "User Profile"
 msgstr ""
 
 #: assets/cards/components/EditCard.tsx:53
-#: assets/companies/components/EditCompany.tsx:165
+#: assets/companies/components/EditCompany.tsx:171
 #: assets/components/CloseButton.tsx:9 assets/components/SortItems.tsx:48
 #: assets/monitoring/components/EditMonitoringProfile.tsx:88
 #: assets/navigations/components/EditNavigation.tsx:54
@@ -1069,12 +1189,12 @@ msgstr ""
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
 #: assets/search/components/TopicEditor.tsx:459
-#: assets/search/components/TopicFolder.tsx:98
+#: assets/search/components/TopicFolder.tsx:100
 #: assets/section-filters/components/EditSectionFilter.tsx:27
 #: assets/ui/components/ContentBar.tsx:8 assets/ui/components/Preview.tsx:16
-#: assets/user-profile/components/UserProfileApp.tsx:117
-#: assets/user-profile/components/UserProfileApp.tsx:135
-#: assets/users/components/EditUser.tsx:127
+#: assets/user-profile/components/UserProfileApp.tsx:119
+#: assets/user-profile/components/UserProfileApp.tsx:137
+#: assets/users/components/EditUser.tsx:155
 #: newsroom/templates/wire_item.html:11
 msgid "Close"
 msgstr ""
@@ -1086,7 +1206,7 @@ msgstr ""
 
 #: assets/components/cards/render/CardMeta.tsx:23
 #: assets/wire/components/ItemVersion.tsx:24
-#: assets/wire/components/WireListItem.tsx:238
+#: assets/wire/components/WireListItem.tsx:279
 #: assets/wire/components/fields/WordCount.tsx:6
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
@@ -1112,11 +1232,10 @@ msgstr ""
 
 #: assets/wire/components/PreviewTags.tsx:53
 #: newsroom/templates/wire_item.html:86
-#: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:140
+#: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:141
 msgid "Content Type"
 msgstr ""
 
-#: assets/wire/components/ListItemPreviousVersions.tsx:66
 #: newsroom/templates/wire_item.html:98
 msgid "Previous versions"
 msgstr ""
@@ -1125,282 +1244,287 @@ msgstr ""
 msgid "On:"
 msgstr ""
 
-#: newsroom/users/__init__.py:20
+#: newsroom/users/__init__.py:21
 msgid "User Management"
 msgstr ""
 
-#: assets/monitoring/utils.ts:4 assets/users/utils.ts:7
-#: newsroom/users/forms.py:35
+#: assets/monitoring/utils.ts:4 assets/users/utils.ts:8
+#: newsroom/users/forms.py:36
 msgid "Administrator"
 msgstr ""
 
-#: assets/monitoring/utils.ts:6 assets/users/utils.ts:9
-#: newsroom/users/forms.py:36
+#: assets/monitoring/utils.ts:6 assets/users/utils.ts:10
+#: newsroom/users/forms.py:37
 msgid "Public"
 msgstr ""
 
-#: assets/monitoring/utils.ts:5 assets/users/utils.ts:8
-#: newsroom/users/forms.py:37
+#: assets/companies/components/CompanyListItem.tsx:25
+#: assets/companies/components/EditCompanyDetails.tsx:187
+#: assets/monitoring/utils.ts:5 assets/users/utils.ts:9
+#: newsroom/users/forms.py:38
 msgid "Internal"
 msgstr ""
 
-#: assets/monitoring/utils.ts:7 assets/users/utils.ts:10
-#: newsroom/users/forms.py:38
+#: assets/monitoring/utils.ts:7 assets/users/utils.ts:11
+#: newsroom/users/forms.py:39
 msgid "Account Management"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:77
-#: assets/users/components/EditUser.tsx:180
+#: assets/user-profile/components/profile/UserProfile.tsx:86
+#: assets/users/components/EditUser.tsx:222
 #: assets/users/components/filters/UserListSortFilter.tsx:23
-#: newsroom/users/forms.py:43
+#: newsroom/users/forms.py:44
 msgid "First Name"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:86
-#: assets/users/components/EditUser.tsx:187
+#: assets/user-profile/components/profile/UserProfile.tsx:95
+#: assets/users/components/EditUser.tsx:229
 #: assets/users/components/filters/UserListSortFilter.tsx:26
-#: newsroom/users/forms.py:44
+#: newsroom/users/forms.py:45
 msgid "Last Name"
 msgstr ""
 
 #: assets/companies/components/CompanyList.tsx:41
-#: assets/companies/components/EditCompanyDetails.tsx:108
-#: newsroom/users/forms.py:46
+#: assets/companies/components/EditCompanyDetails.tsx:126
+#: newsroom/users/forms.py:47
 msgid "Telephone"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:113
-#: assets/users/components/EditUser.tsx:208
-#: assets/users/components/UsersList.tsx:29 newsroom/users/forms.py:47
+#: assets/user-profile/components/profile/UserProfile.tsx:135
+#: assets/users/components/EditUser.tsx:250 newsroom/users/forms.py:48
 msgid "Mobile"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:122
-#: assets/users/components/EditUser.tsx:215
-#: assets/users/components/UsersList.tsx:30 newsroom/users/forms.py:48
+#: assets/user-profile/components/profile/UserProfile.tsx:144
+#: assets/users/components/EditUser.tsx:257
+#: assets/users/components/UsersList.tsx:36 newsroom/users/forms.py:49
 msgid "Role"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:221
-#: assets/users/components/UsersList.tsx:31
+#: assets/users/components/EditUser.tsx:263
+#: assets/users/components/UsersList.tsx:37
 #: assets/users/components/filters/UserListSortFilter.tsx:35
-#: newsroom/users/forms.py:49
+#: newsroom/users/forms.py:50
 msgid "User Type"
 msgstr ""
 
-#: newsroom/users/forms.py:51
+#: newsroom/users/forms.py:52
 msgid "Sign Up Details"
 msgstr ""
 
-#: newsroom/users/forms.py:52
+#: newsroom/users/forms.py:53
 msgid "Email Validated"
 msgstr ""
 
-#: newsroom/users/forms.py:53
+#: newsroom/users/forms.py:54
 msgid "Account Enabled"
 msgstr ""
 
-#: newsroom/users/forms.py:54
+#: newsroom/users/forms.py:55
 msgid "Account Approved"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:401 newsroom/users/forms.py:55
+#: assets/users/components/EditUser.tsx:452 newsroom/users/forms.py:56
 msgid "Company Expiry Alert"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:140
-#: newsroom/users/forms.py:56
+#: assets/user-profile/components/profile/UserProfile.tsx:162
+#: newsroom/users/forms.py:57
 msgid "Receive Email Notifications"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:131
-#: newsroom/users/forms.py:57
+#: assets/user-profile/components/profile/UserProfile.tsx:153
+#: newsroom/users/forms.py:58
 msgid "Receive App Notifications"
 msgstr ""
 
-#: newsroom/users/forms.py:58
+#: newsroom/users/forms.py:59
 msgid "Locale"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:411 newsroom/users/forms.py:59
+#: assets/users/components/EditUser.tsx:462 newsroom/users/forms.py:60
 msgid "Manage Company Topics"
 msgstr ""
 
 #: assets/companies/components/CompanyPermissions.tsx:74
-#: assets/users/components/EditUser.tsx:267 newsroom/users/forms.py:61
+#: assets/users/components/EditUser.tsx:320 newsroom/users/forms.py:62
 msgid "Sections"
 msgstr ""
 
-#: newsroom/users/users.py:333
+#: newsroom/users/users.py:335
 msgid "Can not delete current user"
 msgstr ""
 
-#: newsroom/users/views.py:122 newsroom/users/views.py:219
+#: newsroom/users/views.py:127 newsroom/users/views.py:224
 msgid "Email address is already in use"
 msgstr ""
 
-#: newsroom/users/views.py:138 newsroom/users/views.py:224
+#: newsroom/users/views.py:143 newsroom/users/views.py:229
 msgid "Company is required for non administrators"
 msgstr ""
 
-#: newsroom/users/views.py:173
+#: newsroom/users/views.py:178
 msgid "User is already validated"
 msgstr ""
 
-#: newsroom/users/views.py:337
+#: newsroom/users/views.py:342
 msgid "User id not provided"
 msgstr ""
 
-#: assets/am-news/utils.ts:37 newsroom/web/default_settings.py:286
+#: newsroom/users/views.py:403
+msgid "User is already approved"
+msgstr ""
+
+#: assets/am-news/utils.ts:37 newsroom/web/default_settings.py:291
 msgid "Text"
 msgstr ""
 
-#: newsroom/web/default_settings.py:287
+#: newsroom/web/default_settings.py:292
 msgid "Photo"
 msgstr ""
 
-#: newsroom/web/default_settings.py:288
+#: newsroom/web/default_settings.py:293
 msgid "Picture"
 msgstr ""
 
-#: newsroom/web/default_settings.py:289
+#: newsroom/web/default_settings.py:294
 msgid "Audio"
 msgstr ""
 
-#: newsroom/web/default_settings.py:290
+#: newsroom/web/default_settings.py:295
 msgid "Video"
 msgstr ""
 
-#: newsroom/web/default_settings.py:291
+#: newsroom/web/default_settings.py:296
 msgid "Explainer"
 msgstr ""
 
-#: newsroom/web/default_settings.py:292
+#: newsroom/web/default_settings.py:297
 msgid "Infographics"
 msgstr ""
 
-#: newsroom/web/default_settings.py:293
+#: newsroom/web/default_settings.py:298
 msgid "Graphic"
 msgstr ""
 
-#: newsroom/web/default_settings.py:294
+#: newsroom/web/default_settings.py:299
 msgid "Live Video"
 msgstr ""
 
-#: newsroom/web/default_settings.py:295
+#: newsroom/web/default_settings.py:300
 msgid "Live Blog"
 msgstr ""
 
-#: newsroom/web/default_settings.py:296
+#: newsroom/web/default_settings.py:301
 msgid "Video Explainer"
 msgstr ""
 
-#: newsroom/web/default_settings.py:366 newsroom/web/default_settings.py:367
+#: newsroom/web/default_settings.py:372 newsroom/web/default_settings.py:373
 msgid "No Coverage"
 msgstr ""
 
-#: newsroom/web/default_settings.py:372 newsroom/web/default_settings.py:373
+#: newsroom/web/default_settings.py:378 newsroom/web/default_settings.py:379
 msgid "Is Planned"
 msgstr ""
 
-#: newsroom/web/default_settings.py:378 newsroom/web/default_settings.py:379
+#: newsroom/web/default_settings.py:384 newsroom/web/default_settings.py:385
 msgid "Not Decided / On Request"
 msgstr ""
 
-#: newsroom/web/default_settings.py:384 newsroom/web/default_settings.py:385
+#: newsroom/web/default_settings.py:390 newsroom/web/default_settings.py:391
 msgid "Not Intended / Cancelled"
 msgstr ""
 
-#: newsroom/web/default_settings.py:390 newsroom/web/default_settings.py:391
-msgid "Completed"
-msgstr ""
-
-#: newsroom/web/default_settings.py:625
+#: newsroom/web/default_settings.py:635
 msgid "Home"
 msgstr ""
 
-#: newsroom/web/default_settings.py:630
+#: newsroom/web/default_settings.py:640
 msgid "Wire"
 msgstr ""
 
-#: newsroom/web/default_settings.py:635
+#: newsroom/web/default_settings.py:645
 msgid "Agenda"
 msgstr ""
 
-#: newsroom/web/default_settings.py:640
+#: newsroom/web/default_settings.py:650
 msgid "Monitoring"
 msgstr ""
 
-#: newsroom/web/default_settings.py:645
+#: newsroom/web/default_settings.py:655
 msgid "Saved / Watched"
 msgstr ""
 
-#: newsroom/web/default_settings.py:682
+#: newsroom/web/default_settings.py:693
 msgid "Newshub"
+msgstr ""
+
+#: assets/agenda/components/AgendaDateButtons.tsx:15
+#: assets/agenda/components/AgendaList.tsx:329
+#: assets/company-reports/components/ProductStories.tsx:26
+#: assets/components/CalendarButton.tsx:49
+#: assets/components/ExpiryDateInput.tsx:93
+#: newsroom/web/default_settings.py:816 newsroom/web/default_settings.py:842
+msgid "Today"
+msgstr ""
+
+#: newsroom/web/default_settings.py:818
+msgid "Last Week"
+msgstr ""
+
+#: newsroom/web/default_settings.py:824
+msgid "Last 30 days"
+msgstr ""
+
+#: newsroom/web/default_settings.py:843
+msgid "This Week"
+msgstr ""
+
+#: newsroom/web/default_settings.py:844
+msgid "This Month"
 msgstr ""
 
 #: newsroom/wire/__init__.py:37
 msgid "Newsroom"
 msgstr ""
 
-#: newsroom/wire/__init__.py:75
+#: newsroom/wire/__init__.py:76
 msgid "Plain Text"
 msgstr ""
 
-#: newsroom/wire/__init__.py:86
+#: newsroom/wire/__init__.py:87
 msgid "Story Image"
 msgstr ""
 
-#: assets/missing-translations.ts:11 newsroom/wire/__init__.py:97
+#: assets/missing-translations.ts:11 newsroom/wire/__init__.py:98
 msgid "News only filter"
 msgstr ""
 
-#: newsroom/wire/__init__.py:99
+#: newsroom/wire/__init__.py:100
 msgid ""
 "This query defines what is NOT considered 'news' content. It is used by "
 "the News only switch to filter the view. When switched on, stories "
 "matching this filter will not be displayed."
 msgstr ""
 
-#: newsroom/wire/__init__.py:106
+#: newsroom/wire/__init__.py:107
 #, python-format
 msgid "Time limit for %(section)s products (in days)"
 msgstr ""
 
-#: newsroom/wire/views.py:404
+#: newsroom/wire/views.py:422
 msgid "Not found"
 msgstr ""
 
-#: assets/cards/components/EditCard.tsx:95
-#: assets/companies/components/CompanyPermissions.tsx:167
-#: assets/companies/components/EditCompanyAPI.tsx:86
-#: assets/companies/components/EditCompanyDetails.tsx:178
-#: assets/components/CardEditor.tsx:65 assets/components/EditPanel.tsx:141
-#: assets/components/Modal.tsx:149
-#: assets/components/PersonalizeHomeModal.tsx:243
-#: assets/general-settings/components/GeneralSettingsApp.tsx:112
-#: assets/item-actions.ts:58
-#: assets/monitoring/components/EditMonitoringProfile.tsx:212
-#: assets/monitoring/components/MonitoringSchedule.tsx:199
-#: assets/navigations/components/EditNavigation.tsx:126
-#: assets/oauth_clients/components/EditClient.tsx:69
-#: assets/products/components/EditProduct.tsx:192
-#: assets/search/components/MonitoringEditor.tsx:213
-#: assets/search/components/TopicEditor.tsx:562
-#: assets/search/components/TopicEditor.tsx:565
-#: assets/search/components/TopicFolderEditor.jsx:47
-#: assets/search/components/TopicFolderEditor.jsx:48
-#: assets/section-filters/components/EditSectionFilter.tsx:93
-#: assets/user-profile/components/EditNotificationScheduleModal.tsx:115
-#: assets/users/components/EditUser.tsx:438
-msgid "Save"
+#: assets/item-actions.ts:59
+msgid "Bookmark"
 msgstr ""
 
-#: assets/item-actions.ts:67
-msgid "Unsave"
+#: assets/item-actions.ts:68
+msgid "Unbookmark"
 msgstr ""
 
-#: assets/item-actions.ts:76
+#: assets/item-actions.ts:77
 msgid "Remove"
 msgstr ""
 
@@ -1441,48 +1565,29 @@ msgstr ""
 msgid "New navigation"
 msgstr ""
 
-#: assets/utils.tsx:534
+#: assets/utils.tsx:519
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin"
 msgstr ""
 
-#: assets/utils.tsx:538
+#: assets/utils.tsx:523
 msgid "Resource was updated in the meantime, please refresh."
 msgstr ""
 
-#: assets/utils.tsx:540
+#: assets/utils.tsx:525
 msgid "Failed to process request!"
 msgstr ""
 
-#: assets/agenda/components/AgendaDateButtons.tsx:15
-#: assets/agenda/components/AgendaList.tsx:217
-#: assets/company-reports/components/ProductStories.tsx:26
-#: assets/components/CalendarButton.tsx:32
-#: assets/components/ExpiryDateInput.tsx:93 assets/utils.tsx:716
-#: assets/wire/components/filters/NavCreatedPicker.tsx:9
-msgid "Today"
-msgstr ""
-
-#: assets/company-reports/components/ProductStories.tsx:28 assets/utils.tsx:718
-#: assets/wire/components/filters/NavCreatedPicker.tsx:10
-msgid "This week"
-msgstr ""
-
-#: assets/company-reports/components/ProductStories.tsx:30 assets/utils.tsx:720
-#: assets/wire/components/filters/NavCreatedPicker.tsx:11
-msgid "This month"
-msgstr ""
-
-#: assets/utils.tsx:732
+#: assets/utils.tsx:713
 msgid "Item copied successfully."
 msgstr ""
 
-#: assets/utils.tsx:736
+#: assets/utils.tsx:717
 msgid "Sorry, Copy is not supported."
 msgstr ""
 
-#: assets/utils.tsx:767
+#: assets/utils.tsx:748
 msgid "Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}"
 msgstr ""
 
@@ -1494,188 +1599,211 @@ msgstr ""
 msgid "Disconnected from Notification Server!"
 msgstr ""
 
-#: assets/agenda/actions.ts:112
+#: assets/agenda/actions.ts:126
 msgid "Your inquiry has been sent successfully"
 msgstr ""
 
-#: assets/agenda/actions.ts:296
+#: assets/agenda/actions.ts:430
 msgid "Started watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:307
+#: assets/agenda/actions.ts:441
 msgid "Stopped watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:352 assets/wire/actions.ts:357
+#: assets/agenda/actions.ts:486 assets/wire/actions.ts:360
 msgid "Items were bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:354 assets/wire/actions.ts:359
+#: assets/agenda/actions.ts:488 assets/wire/actions.ts:362
 msgid "Item was bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:369 assets/wire/actions.ts:374
+#: assets/agenda/actions.ts:503 assets/wire/actions.ts:377
 msgid "Items were removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:371 assets/wire/actions.ts:376
+#: assets/agenda/actions.ts:505 assets/wire/actions.ts:379
 msgid "Item was removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:669
+#: assets/agenda/actions.ts:818
 msgid "Started watching coverage successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:682
+#: assets/agenda/actions.ts:831
 msgid "Stopped watching coverage successfully."
 msgstr ""
 
-#: assets/agenda/item-actions.ts:21 assets/agenda/item-actions.ts:41
+#: assets/agenda/item-actions.ts:25 assets/agenda/item-actions.ts:45
 msgid "Watch"
 msgstr ""
 
-#: assets/agenda/item-actions.ts:28 assets/agenda/item-actions.ts:48
+#: assets/agenda/item-actions.ts:32 assets/agenda/item-actions.ts:52
 msgid "Stop watching"
 msgstr ""
 
-#: assets/agenda/item-actions.ts:45
+#: assets/agenda/item-actions.ts:49
 msgid "Watch this coverage"
 msgstr ""
 
-#: assets/agenda/utils.ts:57
+#: assets/agenda/item-actions.ts:56
+msgid "Stop watching this coverage"
+msgstr ""
+
+#: assets/agenda/utils.ts:61
 msgid "coverage updated {{ at }}"
 msgstr ""
 
-#: assets/agenda/utils.ts:67
+#: assets/agenda/utils.ts:71
 msgid "Time to be confirmed"
 msgstr ""
 
-#: assets/agenda/utils.ts:77 assets/agenda/utils.ts:78
+#: assets/agenda/utils.ts:81 assets/agenda/utils.ts:82
 msgid "Coverage not planned"
 msgstr ""
 
-#: assets/agenda/utils.ts:79 assets/agenda/utils.ts:86
+#: assets/agenda/utils.ts:83 assets/agenda/utils.ts:90
 msgid "Coverage planned"
 msgstr ""
 
-#: assets/agenda/utils.ts:80 assets/agenda/utils.ts:81
+#: assets/agenda/utils.ts:84 assets/agenda/utils.ts:85
 msgid "Coverage on merit"
 msgstr ""
 
-#: assets/agenda/utils.ts:82
+#: assets/agenda/utils.ts:86
 msgid "Coverage on request"
 msgstr ""
 
-#: assets/agenda/utils.ts:87
+#: assets/agenda/utils.ts:91
 msgid "Coverage in progress"
 msgstr ""
 
-#: assets/agenda/utils.ts:88
+#: assets/agenda/utils.ts:92
 msgid "Coverage available"
 msgstr ""
 
-#: assets/agenda/utils.ts:89
+#: assets/agenda/utils.ts:93
 msgid "Coverage cancelled"
 msgstr ""
 
-#: assets/agenda/utils.ts:500
-msgid "Update expected @ ${dateString}"
+#: assets/agenda/utils.ts:987
+msgid "assignee: {{name}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:939
-msgid "{{ type }} coverage {{ slugline }} {{ status_text }}"
+#: assets/agenda/utils.ts:988
+msgid "desk: {{name}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:946
-msgid "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
+#: assets/agenda/utils.ts:997
+msgid "{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:953
+#: assets/agenda/utils.ts:1005
+msgid ""
+"Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
+" {{assignedDetails}}"
+msgstr ""
+
+#: assets/agenda/utils.ts:1013
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
-"{{time}}"
+"{{time}} {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:956
-msgid "{{ type }} coverage {{slugline}} cancelled"
+#: assets/agenda/utils.ts:1017
+msgid "{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:963
+#: assets/agenda/utils.ts:1025
 msgid "(update to come)"
 msgstr ""
 
-#: assets/agenda/utils.ts:963
+#: assets/agenda/utils.ts:1025
 msgid "(updated)"
 msgstr ""
 
-#: assets/agenda/utils.ts:966
-msgid "{{ type }} coverage {{ slugline }} available {{deliveryState}}"
+#: assets/agenda/utils.ts:1028
+msgid ""
+"{{ type }} coverage {{ slugline }} available {{deliveryState}} "
+"{{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:973
-msgid "{{ type }} coverage"
+#: assets/agenda/utils.ts:1036
+msgid "{{ type }} coverage {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1063
+#: assets/agenda/utils.ts:1106
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1069
+#: assets/agenda/utils.ts:1112
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1074
+#: assets/agenda/utils.ts:1117
 msgid "{{startDate}} to {{endDate}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1083
+#: assets/agenda/utils.ts:1126
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1091
+#: assets/agenda/utils.ts:1134
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1098
+#: assets/agenda/utils.ts:1141
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1106 assets/agenda/utils.ts:1116
+#: assets/agenda/utils.ts:1149 assets/agenda/utils.ts:1159
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:139
-#: assets/layout/components/BaseApp.tsx:110
-#: assets/wire/components/WireApp.tsx:131
-msgid "Custom View"
-msgstr ""
-
-#: assets/agenda/components/AgendaApp.tsx:170
+#: assets/agenda/components/AgendaApp.tsx:161
 msgid "{{agenda}} Content"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:179
-#: assets/agenda/components/AgendaApp.tsx:180
-#: assets/am-news/components/AmNewsApp.tsx:127
-#: assets/am-news/components/AmNewsApp.tsx:128
-#: assets/wire/components/WireApp.tsx:179
-#: assets/wire/components/WireApp.tsx:180
+#: assets/agenda/components/AgendaApp.tsx:170
+#: assets/agenda/components/AgendaApp.tsx:171
+#: assets/am-news/components/AmNewsApp.tsx:124
+#: assets/am-news/components/AmNewsApp.tsx:125
+#: assets/wire/components/WireApp.tsx:164
+#: assets/wire/components/WireApp.tsx:165
 msgid "Close filter panel"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:191
-#: assets/agenda/components/AgendaApp.tsx:192
-#: assets/am-news/components/AmNewsApp.tsx:135
-#: assets/am-news/components/AmNewsApp.tsx:136
-#: assets/wire/components/WireApp.tsx:196
-#: assets/wire/components/WireApp.tsx:197
+#: assets/agenda/components/AgendaApp.tsx:182
+#: assets/agenda/components/AgendaApp.tsx:183
+#: assets/am-news/components/AmNewsApp.tsx:132
+#: assets/am-news/components/AmNewsApp.tsx:133
+#: assets/wire/components/WireApp.tsx:181
+#: assets/wire/components/WireApp.tsx:182
 msgid "Open filter panel"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:224
-#: assets/am-news/components/AmNewsApp.tsx:154
-#: assets/wire/components/WireApp.tsx:216
+#: assets/agenda/components/AgendaApp.tsx:215
+#: assets/am-news/components/AmNewsApp.tsx:151
+#: assets/wire/components/WireApp.tsx:201
 msgid "Side filter panel"
+msgstr ""
+
+#: assets/agenda/components/AgendaApp.tsx:256
+msgid "Date"
+msgstr ""
+
+#: assets/agenda/components/AgendaApp.tsx:257
+msgid "Newest updates"
+msgstr ""
+
+#: assets/agenda/components/AgendaApp.tsx:258
+msgid "Oldest updates"
+msgstr ""
+
+#: assets/agenda/components/AgendaApp.tsx:259
+#: assets/search/components/SearchResultsBar/index.tsx:63
+msgid "Relevance"
 msgstr ""
 
 #: assets/agenda/components/AgendaAttachments.tsx:36
@@ -1696,9 +1824,9 @@ msgstr ""
 
 #: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:57
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:68
-#: assets/agenda/components/AgendaFilters.tsx:63
-#: assets/agenda/components/AgendaFilters.tsx:97
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:31
+#: assets/agenda/components/AgendaFilters.tsx:65
+#: assets/agenda/components/AgendaFilters.tsx:99
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:39
 #: assets/agenda/components/LocationFilter.tsx:498
 msgid "Clear selection"
 msgstr ""
@@ -1744,16 +1872,8 @@ msgstr ""
 msgid "Submit inquiry"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverages.tsx:56
+#: assets/agenda/components/AgendaCoverages.tsx:67
 msgid "Open {{agenda}} in a new tab"
-msgstr ""
-
-#: assets/agenda/components/AgendaCoverages.tsx:69
-msgid "expected"
-msgstr ""
-
-#: assets/agenda/components/AgendaCoverages.tsx:76
-msgid "Source"
 msgstr ""
 
 #: assets/agenda/components/AgendaDateButtons.tsx:21
@@ -1774,10 +1894,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaDateButtons.tsx:52
 msgid "M"
-msgstr ""
-
-#: assets/agenda/components/AgendaDetailCoverages.tsx:15
-msgid "Coverages"
 msgstr ""
 
 #: assets/agenda/components/AgendaEdNote.tsx:19
@@ -1811,22 +1927,22 @@ msgstr ""
 msgid "Top Stories"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:56
-#: assets/agenda/components/AgendaFilters.tsx:62
+#: assets/agenda/components/AgendaFilters.tsx:58
+#: assets/agenda/components/AgendaFilters.tsx:64
 #: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:77
+#: assets/agenda/components/AgendaFilters.tsx:79
 msgid "Region"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:90
-#: assets/agenda/components/AgendaFilters.tsx:96
+#: assets/agenda/components/AgendaFilters.tsx:92
+#: assets/agenda/components/AgendaFilters.tsx:98
 msgid "Coverage types"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:100
+#: assets/agenda/components/AgendaFilters.tsx:102
 msgid "Coverage type"
 msgstr ""
 
@@ -1834,60 +1950,79 @@ msgstr ""
 msgid "Internal Note"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemDetails.tsx:97
+#: assets/agenda/components/AgendaItemDetails.tsx:111
 #: assets/agenda/components/AgendaPreviewAttachments.tsx:16
 msgid "Attachments"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTimeUpdater.tsx:81
+#: assets/agenda/components/AgendaItemTimeUpdater.tsx:89
 msgid "Posted"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTimeUpdater.tsx:85
+#: assets/agenda/components/AgendaItemTimeUpdater.tsx:93
 msgid "Updated"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTimeUpdater.tsx:90
+#: assets/agenda/components/AgendaItemTimeUpdater.tsx:98
 msgid "{{ action }} just now"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTimeUpdater.tsx:92
+#: assets/agenda/components/AgendaItemTimeUpdater.tsx:100
 msgid "{{ action }} {{ minutes }} minute(s) ago"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:14
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:40
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:22
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:49
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:75
 msgid "Events Only"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:15
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:48
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:23
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:58
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:75
 msgid "Planning Only"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:20
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:28
 msgid "Events & Coverages"
 msgstr ""
 
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:30
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:38
 msgid "Show"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.tsx:221
+#: assets/agenda/components/AgendaList.tsx:333
 msgid "Tomorrow"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.tsx:330
+#: assets/agenda/components/AgendaList.tsx:462
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.tsx:42
+#: assets/agenda/components/AgendaListCoverageItem.tsx:53
 msgid "(Watching)"
 msgstr ""
 
-#: assets/agenda/components/AgendaListItemIcons.tsx:126
+#: assets/agenda/components/AgendaListGroupHeader.tsx:60
+#: assets/agenda/components/AgendaListGroupHeader.tsx:65
+msgid "More hidden"
+msgstr ""
+
+#: assets/agenda/components/AgendaListGroupHeader.tsx:88
+msgid "Hide"
+msgstr ""
+
+#: assets/agenda/components/AgendaListGroupHeader.tsx:88
+msgid "Show all"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItem.tsx:258
+msgid "{{n}} more"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemIcons.tsx:144
 msgid "{{ attachments }} file(s) attached"
 msgstr ""
 
@@ -1907,8 +2042,8 @@ msgstr ""
 msgid "event completed"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:54
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:130
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:69
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:147
 msgid "Previous Coverages:"
 msgstr ""
 
@@ -1924,11 +2059,15 @@ msgstr ""
 msgid "Hide Map"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewPlanning.tsx:47
+#: assets/agenda/components/AgendaPreviewPlanning.tsx:61
 msgid "Planning Item"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewPlanning.tsx:65
+#: assets/agenda/components/AgendaPreviewPlanning.tsx:80
+msgid "Planning Items"
+msgstr ""
+
+#: assets/agenda/components/AgendaPreviewPlanning.tsx:80
 msgid "Other Planning Items"
 msgstr ""
 
@@ -1940,38 +2079,49 @@ msgstr ""
 msgid "Invitation Details"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.tsx:81
-#: assets/companies/components/CompanyList.tsx:39
-#: assets/company-admin/components/CompanyUsers.tsx:27
-#: assets/monitoring/components/MonitoringList.tsx:28
-#: assets/navigations/components/NavigationList.tsx:24
-#: assets/products/components/ProductList.tsx:23
-#: assets/section-filters/components/SectionFilterList.tsx:23
-#: assets/users/components/UsersList.tsx:33
-msgid "Status"
-msgstr ""
-
-#: assets/agenda/components/CoverageItemStatus.tsx:95
-#: assets/agenda/components/CoverageItemStatus.tsx:112
+#: assets/agenda/components/CoverageItemStatus.tsx:105
+#: assets/agenda/components/CoverageItemStatus.tsx:125
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:27
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:83
 msgid "Open in new tab"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.tsx:96
-#: assets/agenda/components/CoverageItemStatus.tsx:113
-#: assets/agenda/components/CoverageItemStatus.tsx:119
+#: assets/agenda/components/CoverageItemStatus.tsx:110
+#: assets/agenda/components/CoverageItemStatus.tsx:130
+#: assets/agenda/components/CoverageItemStatus.tsx:141
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:90
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:150
 msgid "View Content"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.tsx:141
+#: assets/agenda/components/CoverageItemStatus.tsx:138
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:30
+msgid "You don’t have access to this content, please contact {{email}}"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.tsx:139
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:36
+msgid "You don’t have access to this content"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.tsx:164
+#: assets/agenda/components/preview/coverage/CoverageWorkflowReason.tsx:19
 msgid "All coverages cancelled: {{ reason }}"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.tsx:144
+#: assets/agenda/components/CoverageItemStatus.tsx:167
+#: assets/agenda/components/preview/coverage/CoverageWorkflowReason.tsx:22
 msgid "Planning cancelled: {{ reason }}"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.tsx:167
+#: assets/agenda/components/CoverageItemStatus.tsx:191
+#: assets/agenda/components/preview/coverage/CoverageUpdateComing.tsx:10
 msgid "Update coming"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.tsx:197
+#: assets/agenda/components/preview/coverage/CoverageStatus.tsx:11
+msgid "status"
 msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:332
@@ -1996,7 +2146,8 @@ msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:421
 #: assets/companies/components/CompanyList.tsx:42
-#: assets/companies/components/EditCompanyDetails.tsx:132
+#: assets/companies/components/EditCompanyDetails.tsx:150
+#: assets/users/components/EditUser.tsx:296
 msgid "Country"
 msgstr ""
 
@@ -2025,6 +2176,42 @@ msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:534
 msgid "No places found"
+msgstr ""
+
+#: assets/agenda/components/MultiDayListLabel.tsx:32
+msgid "Day:"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:111
+msgid "Hide all versions ({{count}})"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:112
+msgid "Show all versions ({{count}})"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageAssigneeNames.tsx:17
+msgid "Coverage inquiry from {{sitename}} user: {{item}}"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageAssigneeNames.tsx:24
+msgid "assignee"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageAssigneeNames.tsx:40
+msgid "desk"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageExpectedDate.tsx:17
+msgid "expected"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageProvider.tsx:9
+msgid "source"
+msgstr ""
+
+#: assets/agenda/components/preview/coverage/CoverageScheduledStatus.tsx:24
+msgid "Updated expected @ {{dateString}}"
 msgstr ""
 
 #: assets/am-news/utils.ts:41
@@ -2096,6 +2283,7 @@ msgstr ""
 #: assets/company-reports/components/ProductCompanies.tsx:57
 #: assets/company-reports/components/ProductStories.tsx:24
 #: assets/components/cards/edit/ConfigProduct.tsx:29
+#: assets/components/cards/edit/ConfigWireList.tsx:30
 #: assets/products/components/EditProduct.tsx:34
 msgid "Product"
 msgstr ""
@@ -2112,7 +2300,7 @@ msgstr ""
 #: assets/oauth_clients/components/ClientList.tsx:23
 #: assets/products/components/ProductList.tsx:27
 #: assets/section-filters/components/SectionFilterList.tsx:26
-#: assets/users/components/UsersList.tsx:34
+#: assets/users/components/UsersList.tsx:40
 msgid "Created On"
 msgstr ""
 
@@ -2133,7 +2321,7 @@ msgid "New Card"
 msgstr ""
 
 #: assets/cards/components/EditCard.tsx:45
-#: assets/companies/components/EditCompany.tsx:156
+#: assets/companies/components/EditCompany.tsx:162
 #: assets/monitoring/components/EditMonitoringProfile.tsx:80
 #: assets/navigations/components/EditNavigation.tsx:46
 #: assets/oauth_clients/components/EditClient.tsx:18
@@ -2141,8 +2329,8 @@ msgstr ""
 #: assets/search/components/MonitoringEditor.tsx:125
 #: assets/section-filters/components/EditSectionFilter.tsx:19
 #: assets/ui/components/Content.tsx:7 assets/ui/components/Preview.tsx:8
-#: assets/user-profile/components/UserProfileApp.tsx:112
-#: assets/users/components/EditUser.tsx:117
+#: assets/user-profile/components/UserProfileApp.tsx:114
+#: assets/users/components/EditUser.tsx:145
 msgid "dialog"
 msgstr ""
 
@@ -2151,7 +2339,7 @@ msgid "Edit Cards"
 msgstr ""
 
 #: assets/cards/components/EditCard.tsx:90
-#: assets/companies/components/EditCompanyDetails.tsx:171
+#: assets/companies/components/EditCompanyDetails.tsx:197
 #: assets/components/CardEditor.tsx:106
 #: assets/components/PersonalizeHomeModal.tsx:224
 #: assets/monitoring/components/EditMonitoringProfile.tsx:207
@@ -2161,19 +2349,47 @@ msgstr ""
 #: assets/search/components/FollowedTopics.tsx:82
 #: assets/search/components/TopicFolder.tsx:58
 #: assets/section-filters/components/EditSectionFilter.tsx:88
-#: assets/users/components/EditUser.tsx:432
+#: assets/users/components/EditUser.tsx:485
 msgid "Delete"
 msgstr ""
 
-#: assets/companies/actions.ts:130
+#: assets/cards/components/EditCard.tsx:95
+#: assets/companies/components/CompanyPermissions.tsx:167
+#: assets/companies/components/EditCompanyAPI.tsx:86
+#: assets/companies/components/EditCompanyDetails.tsx:204
+#: assets/components/CardEditor.tsx:65 assets/components/EditPanel.tsx:141
+#: assets/components/Modal.tsx:151
+#: assets/components/PersonalizeHomeModal.tsx:243
+#: assets/general-settings/components/GeneralSettingsApp.tsx:112
+#: assets/monitoring/components/EditMonitoringProfile.tsx:212
+#: assets/monitoring/components/MonitoringSchedule.tsx:199
+#: assets/navigations/components/EditNavigation.tsx:126
+#: assets/oauth_clients/components/EditClient.tsx:69
+#: assets/products/components/EditProduct.tsx:192
+#: assets/search/components/MonitoringEditor.tsx:213
+#: assets/search/components/TopicEditor.tsx:562
+#: assets/search/components/TopicEditor.tsx:565
+#: assets/search/components/TopicFolderEditor.jsx:48
+#: assets/search/components/TopicFolderEditor.jsx:49
+#: assets/section-filters/components/EditSectionFilter.tsx:93
+#: assets/user-profile/components/EditNotificationScheduleModal.tsx:115
+#: assets/users/components/EditUser.tsx:491
+msgid "Save"
+msgstr ""
+
+#: assets/companies/actions.ts:131
+msgid "Company has been approved"
+msgstr ""
+
+#: assets/companies/actions.ts:151
 msgid "Company updated successfully"
 msgstr ""
 
-#: assets/companies/actions.ts:132
+#: assets/companies/actions.ts:153
 msgid "Company created successfully"
 msgstr ""
 
-#: assets/companies/actions.ts:170
+#: assets/companies/actions.ts:191
 msgid "Company deleted successfully"
 msgstr ""
 
@@ -2182,21 +2398,31 @@ msgid "New Company"
 msgstr ""
 
 #: assets/companies/components/CompanyList.tsx:37
-#: assets/companies/components/EditCompanyDetails.tsx:92
+#: assets/companies/components/EditCompanyDetails.tsx:110
 msgid "Superdesk Subscriber Id"
 msgstr ""
 
 #: assets/companies/components/CompanyList.tsx:38
-#: assets/companies/components/EditCompanyDetails.tsx:100
+#: assets/companies/components/EditCompanyDetails.tsx:118
 #: assets/company-reports/components/Company.tsx:69
 msgid "Account Manager"
+msgstr ""
+
+#: assets/companies/components/CompanyList.tsx:39
+#: assets/company-admin/components/CompanyUsers.tsx:27
+#: assets/monitoring/components/MonitoringList.tsx:28
+#: assets/navigations/components/NavigationList.tsx:24
+#: assets/products/components/ProductList.tsx:23
+#: assets/section-filters/components/SectionFilterList.tsx:23
+#: assets/users/components/UsersList.tsx:39
+msgid "Status"
 msgstr ""
 
 #: assets/companies/components/CompanyList.tsx:44
 msgid "Expires On"
 msgstr ""
 
-#: assets/companies/components/CompanyListItem.tsx:20
+#: assets/companies/components/CompanyListItem.tsx:31
 #: assets/company-admin/components/CompanyUserListItem.tsx:21
 #: assets/company-reports/components/Company.tsx:57
 #: assets/company-reports/components/ExpiredCompanies.tsx:12
@@ -2204,12 +2430,12 @@ msgstr ""
 #: assets/navigations/components/NavigationListItem.tsx:13
 #: assets/products/components/ProductListItem.tsx:12
 #: assets/section-filters/components/SectionFilterListItem.tsx:12
-#: assets/users/components/UserListItem.tsx:26
+#: assets/users/components/UserListItem.tsx:35
 msgid "Disabled"
 msgstr ""
 
 #: assets/companies/components/CompanyPermissions.tsx:35
-#: assets/users/components/EditUser.tsx:175
+#: assets/users/components/EditUser.tsx:217
 msgid "General"
 msgstr ""
 
@@ -2233,36 +2459,50 @@ msgstr ""
 msgid "Seats:"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:75
-#: assets/company-admin/components/CompanyAdminApp.tsx:208
+#: assets/companies/components/EditCompany.tsx:77
+#: assets/company-admin/components/CompanyAdminApp.tsx:215
 #: assets/company-admin/components/CompanyDetails.tsx:22
 #: assets/monitoring/components/EditMonitoringProfile.tsx:29
 #: assets/search/components/MonitoringEditor.tsx:34
 msgid "Users"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:76
+#: assets/companies/components/EditCompany.tsx:78
 msgid "Permissions"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:80
+#: assets/companies/components/EditCompany.tsx:82
 msgid "API"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:96
+#: assets/companies/components/EditCompany.tsx:98
 msgid "There are no users in the company."
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:114
+#: assets/companies/components/EditCompany.tsx:116
 msgid "Please provide company name"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:138
+#: assets/companies/components/EditCompany.tsx:140
 msgid "Would you like to delete company: {{name}}"
 msgstr ""
 
-#: assets/companies/components/EditCompany.tsx:157
+#: assets/companies/components/EditCompany.tsx:149
+msgid "This will also send account activation emails, would you like to continue?"
+msgstr ""
+
+#: assets/companies/components/EditCompany.tsx:163
 msgid "Edit Company"
+msgstr ""
+
+#: assets/companies/components/EditCompany.tsx:181
+#: assets/company-admin/components/CompanyUserListItem.tsx:16
+msgid "Pending"
+msgstr ""
+
+#: assets/companies/components/EditCompany.tsx:188
+#: assets/companies/components/EditCompany.tsx:191
+msgid "Approve Company & Users"
 msgstr ""
 
 #: assets/companies/components/EditCompanyAPI.tsx:77
@@ -2273,33 +2513,38 @@ msgstr ""
 msgid "Authentication Provider"
 msgstr ""
 
-#: assets/companies/components/EditCompanyDetails.tsx:65
-msgid "SSO domain"
-msgstr ""
-
-#: assets/companies/components/EditCompanyDetails.tsx:74
-msgid "Company Type"
+#: assets/companies/components/EditCompanyDetails.tsx:63
+msgid "SSO domains"
 msgstr ""
 
 #: assets/companies/components/EditCompanyDetails.tsx:84
+msgid "Company Size"
+msgstr ""
+
+#: assets/companies/components/EditCompanyDetails.tsx:94
 msgid "Company Url"
 msgstr ""
 
-#: assets/companies/components/EditCompanyDetails.tsx:116
+#: assets/companies/components/EditCompanyDetails.tsx:102
+msgid "Referred By"
+msgstr ""
+
+#: assets/companies/components/EditCompanyDetails.tsx:134
 msgid "Contact Name"
 msgstr ""
 
-#: assets/companies/components/EditCompanyDetails.tsx:124
+#: assets/companies/components/EditCompanyDetails.tsx:142
 msgid "Contact Email"
 msgstr ""
 
-#: assets/companies/components/EditCompanyDetails.tsx:141
+#: assets/companies/components/EditCompanyDetails.tsx:159
 #: assets/company-reports/components/Company.tsx:86
 #: assets/company-reports/components/ExpiredCompanies.tsx:17
+#: assets/wire/components/fields/ExpiryDateLabel.tsx:19
 msgid "Expiry Date"
 msgstr ""
 
-#: assets/companies/components/EditCompanyDetails.tsx:149
+#: assets/companies/components/EditCompanyDetails.tsx:167
 msgid "{{monitoring}} Administrator"
 msgstr ""
 
@@ -2321,16 +2566,16 @@ msgstr ""
 msgid "New User"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.tsx:198
+#: assets/company-admin/components/CompanyAdminApp.tsx:201
 msgid "My Company"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.tsx:213
+#: assets/company-admin/components/CompanyAdminApp.tsx:220
 msgid "Users : {{total}}"
 msgstr ""
 
 #: assets/company-admin/components/CompanyAdminProductSeatRequestModal.tsx:98
-#: assets/company-admin/components/CompanyDetailsProductRow.tsx:38
+#: assets/company-admin/components/CompanyDetailsProductRow.tsx:35
 msgid "Request more seats"
 msgstr ""
 
@@ -2351,12 +2596,12 @@ msgstr ""
 msgid "Company User Management"
 msgstr ""
 
-#: assets/company-admin/components/CompanyDetailsProductFilter.tsx:18
+#: assets/company-admin/components/CompanyDetailsProductFilter.tsx:36
 #: assets/company-reports/components/ProductCompanies.tsx:23
 msgid "All Products"
 msgstr ""
 
-#: assets/company-admin/components/CompanyDetailsProductRow.tsx:25
+#: assets/company-admin/components/CompanyDetailsProductRow.tsx:22
 msgid "Unlimited"
 msgstr ""
 
@@ -2366,12 +2611,8 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUserListItem.tsx:16
-msgid "Pending"
-msgstr ""
-
 #: assets/company-admin/components/CompanyUserListItem.tsx:52
-#: assets/users/components/EditUser.tsx:142
+#: assets/users/components/EditUser.tsx:170
 msgid "Admin"
 msgstr ""
 
@@ -2380,33 +2621,17 @@ msgid "{{ section }} Products"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUsers.tsx:35
-#: assets/users/components/UsersList.tsx:35
+#: assets/users/components/UsersList.tsx:41
 #: assets/users/components/filters/UserListSortFilter.tsx:29
 msgid "Last Active"
 msgstr ""
 
-#: assets/company-reports/actions.ts:40
+#: assets/company-reports/actions.ts:44
 msgid "To date is after From date"
 msgstr ""
 
-#: assets/company-reports/actions.ts:151
+#: assets/company-reports/actions.ts:155
 msgid "No data to export."
-msgstr ""
-
-#: assets/company-reports/components/ComapnyNewsApiUsage.tsx:74
-#: assets/company-reports/components/ContentActivity.tsx:253
-#: assets/company-reports/components/SubscriberActivity.tsx:162
-msgid "No Data"
-msgstr ""
-
-#: assets/company-reports/components/ComapnyNewsApiUsage.tsx:84
-#: assets/company-reports/components/SubscriberActivity.tsx:183
-msgid "FROM:"
-msgstr ""
-
-#: assets/company-reports/components/ComapnyNewsApiUsage.tsx:90
-#: assets/company-reports/components/SubscriberActivity.tsx:189
-msgid "TO:"
 msgstr ""
 
 #: assets/company-reports/components/Company.tsx:38
@@ -2432,6 +2657,22 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: assets/company-reports/components/CompanyNewsApiUsage.tsx:74
+#: assets/company-reports/components/ContentActivity.tsx:146
+#: assets/company-reports/components/SubscriberActivity.tsx:162
+msgid "No Data"
+msgstr ""
+
+#: assets/company-reports/components/CompanyNewsApiUsage.tsx:84
+#: assets/company-reports/components/SubscriberActivity.tsx:183
+msgid "FROM:"
+msgstr ""
+
+#: assets/company-reports/components/CompanyNewsApiUsage.tsx:90
+#: assets/company-reports/components/SubscriberActivity.tsx:189
+msgid "TO:"
+msgstr ""
+
 #: assets/company-reports/components/CompanyProducts.tsx:10
 msgid "Product name"
 msgstr ""
@@ -2440,6 +2681,7 @@ msgstr ""
 #: assets/company-reports/components/CompanyProducts.tsx:32
 #: assets/company-reports/components/CompanySavedSearches.tsx:17
 #: assets/company-reports/components/ProductStories.tsx:25
+#: assets/company-reports/components/SavedMyTopicsAndCompanyTopics.tsx:32
 #: assets/company-reports/components/UserSavedSearches.tsx:20
 msgid "Is Enabled"
 msgstr ""
@@ -2452,19 +2694,24 @@ msgstr ""
 msgid "Number Of Products"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:21
+#: assets/company-reports/components/CompanyReportsApp.tsx:31
+#: assets/company-reports/components/CompanyReportsApp.tsx:45
+msgid "Select a report"
+msgstr ""
+
+#: assets/company-reports/components/CompanyReportsApp.tsx:38
 msgid "Subscriber activity"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:23
+#: assets/company-reports/components/CompanyReportsApp.tsx:40
 msgid "Companies per Product"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:67
+#: assets/company-reports/components/CompanyReportsApp.tsx:110
 msgid "Run report"
 msgstr ""
 
-#: assets/company-reports/components/CompanyReportsApp.tsx:73
+#: assets/company-reports/components/CompanyReportsApp.tsx:116
 msgid "Print report"
 msgstr ""
 
@@ -2473,17 +2720,17 @@ msgstr ""
 msgid "Number Of Saved Searches"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:28
+#: assets/company-reports/components/ContentActivity.tsx:165
+msgid "Export to CSV"
+msgstr ""
+
+#: assets/company-reports/components/ContentActivityFilters.tsx:62
 #: assets/company-reports/components/SubscriberActivity.tsx:145
 msgid "Section"
 msgstr ""
 
-#: assets/company-reports/components/ContentActivity.tsx:43
+#: assets/company-reports/components/ContentActivityFilters.tsx:79
 msgid "Genres"
-msgstr ""
-
-#: assets/company-reports/components/ContentActivity.tsx:290
-msgid "Export to CSV"
 msgstr ""
 
 #: assets/company-reports/components/ProductCompanies.tsx:57
@@ -2498,8 +2745,16 @@ msgstr ""
 msgid "Last 24 hours"
 msgstr ""
 
+#: assets/company-reports/components/ProductStories.tsx:28
+msgid "This week"
+msgstr ""
+
 #: assets/company-reports/components/ProductStories.tsx:29
 msgid "Last 7 days"
+msgstr ""
+
+#: assets/company-reports/components/ProductStories.tsx:30
+msgid "This month"
 msgstr ""
 
 #: assets/company-reports/components/ProductStories.tsx:31
@@ -2508,6 +2763,29 @@ msgstr ""
 
 #: assets/company-reports/components/ProductStories.tsx:32
 msgid "Last 6 months"
+msgstr ""
+
+#: assets/company-reports/components/SavedMyTopicsAndCompanyTopics.tsx:31
+#: assets/company-reports/components/SubscriberActivity.tsx:145
+#: assets/company-reports/components/UserSavedSearches.tsx:19
+msgid "User"
+msgstr ""
+
+#: assets/company-reports/components/SavedMyTopicsAndCompanyTopics.tsx:33
+#: assets/components/PersonalizeHomeModal.tsx:214
+#: assets/components/PersonalizeHomeModal.tsx:276
+#: assets/layout/components/SearchBase.tsx:76
+#: assets/search/components/FollowedTopics.tsx:201
+#: assets/search/components/TopicsTab.tsx:99
+msgid "My Topics"
+msgstr ""
+
+#: assets/company-reports/components/SavedMyTopicsAndCompanyTopics.tsx:34
+#: assets/components/PersonalizeHomeModal.tsx:214
+#: assets/components/PersonalizeHomeModal.tsx:280
+#: assets/search/components/FollowedTopics.tsx:210
+#: assets/search/components/TopicsTab.tsx:116
+msgid "Company Topics"
 msgstr ""
 
 #: assets/company-reports/components/SubscriberActivity.tsx:24
@@ -2534,11 +2812,6 @@ msgid "Action"
 msgstr ""
 
 #: assets/company-reports/components/SubscriberActivity.tsx:145
-#: assets/company-reports/components/UserSavedSearches.tsx:19
-msgid "User"
-msgstr ""
-
-#: assets/company-reports/components/SubscriberActivity.tsx:145
 #: assets/monitoring/components/MonitoringSchedule.tsx:174
 msgid "Time"
 msgstr ""
@@ -2561,7 +2834,7 @@ msgstr ""
 
 #: assets/components/CardEditor.tsx:103
 #: assets/search/components/FollowedTopics.tsx:68
-#: assets/ui/components/Collapse.tsx:44
+#: assets/search/components/TopicsTab.tsx:107
 msgid "Edit"
 msgstr ""
 
@@ -2574,7 +2847,7 @@ msgid "Deselect All"
 msgstr ""
 
 #: assets/components/EditPanel.tsx:93 assets/components/ShareItemModal.tsx:78
-#: assets/users/components/EditUser.tsx:334
+#: assets/users/components/EditUser.tsx:385
 #: assets/wire/components/SelectedItemsBar.tsx:44
 msgid "Select All"
 msgstr ""
@@ -2625,23 +2898,38 @@ msgstr ""
 msgid "All {{label}}"
 msgstr ""
 
-#: assets/components/NotificationList.tsx:88
-#: assets/components/NotificationList.tsx:96
-#: assets/components/NotificationList.tsx:105
+#: assets/components/NotificationList.tsx:80
+#: assets/components/NotificationList.tsx:93
+#: assets/components/NotificationList.tsx:95
+#: assets/components/NotificationPopup.tsx:29
+#: assets/components/NotificationPopup.tsx:54
+#: assets/components/NotificationPopup.tsx:66
 msgid "Notifications"
 msgstr ""
 
-#: assets/components/NotificationList.tsx:99
+#: assets/components/NotificationPopup.tsx:34
+msgid "All notifications are paused until {{date}}"
+msgstr ""
+
+#: assets/components/NotificationPopup.tsx:44
+msgid "Resume all notifications"
+msgstr ""
+
+#: assets/components/NotificationPopup.tsx:58
 msgid "No new notifications!"
 msgstr ""
 
-#: assets/components/NotificationList.tsx:109
+#: assets/components/NotificationPopup.tsx:72
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:178
+#: assets/search/components/SearchResultsBar/index.tsx:235
 msgid "Clear All"
 msgstr ""
 
-#: assets/components/NotificationList.tsx:114
+#: assets/components/NotificationPopup.tsx:79
+msgid "All notifications are set to be paused from {{dateFrom}} to {{dateTo}}"
+msgstr ""
+
+#: assets/components/NotificationPopup.tsx:86
 msgid "Loading..."
 msgstr ""
 
@@ -2667,30 +2955,15 @@ msgstr ""
 msgid "Select some topics from the sidebar to add them here."
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:214
-#: assets/components/PersonalizeHomeModal.tsx:280
-#: assets/search/components/FollowedTopics.tsx:209
-#: assets/search/components/TopicsTab.tsx:106
-msgid "Company Topics"
-msgstr ""
-
-#: assets/components/PersonalizeHomeModal.tsx:214
-#: assets/components/PersonalizeHomeModal.tsx:276
-#: assets/layout/components/BaseApp.tsx:55
-#: assets/search/components/FollowedTopics.tsx:200
-#: assets/search/components/TopicsTab.tsx:98
-msgid "My Topics"
-msgstr ""
-
 #: assets/components/PersonalizeHomeModal.tsx:242
-#: assets/home/components/HomeApp.tsx:262
-#: assets/home/components/HomeApp.tsx:264
+#: assets/home/components/HomeApp.tsx:150
+#: assets/home/components/HomeApp.tsx:152
 msgid "Personalize Home"
 msgstr ""
 
 #: assets/components/PersonalizeHomeModal.tsx:246
-#: assets/components/PersonalizeHomeModal.tsx:320
-#: assets/home/components/HomeApp.tsx:278
+#: assets/components/PersonalizeHomeModal.tsx:318
+#: assets/home/components/HomeApp.tsx:166
 msgid "My Home"
 msgstr ""
 
@@ -2710,6 +2983,7 @@ msgstr ""
 #: assets/components/PersonalizeHomeModal.tsx:306
 #: assets/home/components/search-bar.tsx:33
 #: assets/search/components/SearchBar.tsx:73
+#: assets/wire/components/filters/FilterGroup.tsx:107
 msgid "Clear search"
 msgstr ""
 
@@ -2722,47 +2996,51 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: assets/components/cards/utils.ts:96
+#: assets/components/cards/utils.ts:103
 msgid "6-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:103
+#: assets/components/cards/utils.ts:110
 msgid "4-picture-text"
 msgstr ""
 
-#: assets/components/cards/utils.ts:110
+#: assets/components/cards/utils.ts:117
 msgid "4-media-gallery"
 msgstr ""
 
-#: assets/components/cards/utils.ts:117
+#: assets/components/cards/utils.ts:124
 msgid "4-photo-gallery"
 msgstr ""
 
-#: assets/components/cards/utils.ts:124
+#: assets/components/cards/utils.ts:131
 msgid "1x1-top-news"
 msgstr ""
 
-#: assets/components/cards/utils.ts:131
+#: assets/components/cards/utils.ts:138
 msgid "2x2-top-news"
 msgstr ""
 
-#: assets/components/cards/utils.ts:138
+#: assets/components/cards/utils.ts:145
 msgid "3-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:145
+#: assets/components/cards/utils.ts:152
 msgid "3-picture-text"
 msgstr ""
 
-#: assets/components/cards/utils.ts:152
+#: assets/components/cards/utils.ts:159
 msgid "4-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:159
+#: assets/components/cards/utils.ts:166
 msgid "2x2-events"
 msgstr ""
 
-#: assets/components/cards/utils.ts:166
+#: assets/components/cards/utils.ts:173
+msgid "Wire list"
+msgstr ""
+
+#: assets/components/cards/utils.ts:180
 msgid "6 Navigation Tiles Per Row"
 msgstr ""
 
@@ -2810,19 +3088,24 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+#: assets/components/cards/edit/ConfigWireList.tsx:40
+msgid "Number of items"
+msgstr ""
+
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:26
 #: assets/wire/components/filters/NavigationTab.tsx:39
 msgid "All"
 msgstr ""
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:68
-#: assets/wire/components/filters/NavCreatedPicker.tsx:46
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:194
+#: assets/user-profile/components/PauseNotificationModal.tsx:126
+#: assets/wire/components/filters/NavCreatedPicker.tsx:70
 msgid "To"
 msgstr ""
 
-#: assets/components/cards/render/MoreNewsButton.tsx:19
-#: assets/components/cards/render/MoreNewsButton.tsx:24
+#: assets/components/cards/render/MoreNewsButton.tsx:28
+#: assets/components/cards/render/MoreNewsButton.tsx:38
 msgid "More news"
 msgstr ""
 
@@ -2834,25 +3117,25 @@ msgstr ""
 msgid "Settings were updated successfully."
 msgstr ""
 
-#: assets/home/components/HomeApp.tsx:169
+#: assets/home/components/DashboardPanels.tsx:70
 msgid "Loading Card Items"
 msgstr ""
 
-#: assets/home/components/HomeApp.tsx:274
-msgid "Default"
-msgstr ""
-
-#: assets/home/components/HomeApp.tsx:296
-msgid "Edit personal Home"
-msgstr ""
-
-#: assets/home/components/HomeApp.tsx:319
+#: assets/home/components/DashboardPanels.tsx:130
 #: assets/market-place/components/MarketPlaceApp.tsx:34
 msgid "Warning"
 msgstr ""
 
-#: assets/home/components/HomeApp.tsx:320
+#: assets/home/components/DashboardPanels.tsx:131
 msgid "There's no card defined for {{home}} page!"
+msgstr ""
+
+#: assets/home/components/HomeApp.tsx:162
+msgid "Default"
+msgstr ""
+
+#: assets/home/components/HomeApp.tsx:184
+msgid "Edit personal Home"
 msgstr ""
 
 #: assets/home/components/search-bar.tsx:20
@@ -2860,7 +3143,7 @@ msgstr ""
 #: assets/search/components/AdvancedSearchPanel.tsx:178
 #: assets/search/components/SearchBar.tsx:59
 #: assets/search/components/SearchBar.tsx:81
-#: assets/wire/components/filters/FiltersTab.tsx:151
+#: assets/wire/components/filters/FiltersTab.tsx:167
 msgid "Search"
 msgstr ""
 
@@ -2871,12 +3154,16 @@ msgstr ""
 msgid "Search for..."
 msgstr ""
 
-#: assets/layout/components/BaseApp.tsx:54
+#: assets/layout/components/SearchBase.tsx:75
 msgid "Topics"
 msgstr ""
 
-#: assets/layout/components/BaseApp.tsx:56
+#: assets/layout/components/SearchBase.tsx:77
 msgid "Filters"
+msgstr ""
+
+#: assets/layout/components/SearchBase.tsx:131
+msgid "Custom View"
 msgstr ""
 
 #: assets/maps/components/static.tsx:37
@@ -2946,7 +3233,7 @@ msgid "Keywords"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringApp.tsx:29
-#: assets/wire/components/WireApp.tsx:81
+#: assets/wire/components/WireApp.tsx:82
 msgid "{{monitoring}} Profiles"
 msgstr ""
 
@@ -3130,12 +3417,17 @@ msgstr ""
 msgid "Generate Token"
 msgstr ""
 
-#: assets/notifications/actions.ts:68
+#: assets/notifications/actions.ts:74
 msgid "Notification cleared successfully"
 msgstr ""
 
-#: assets/notifications/actions.ts:86
+#: assets/notifications/actions.ts:92
 msgid "Notifications cleared successfully"
+msgstr ""
+
+#: assets/notifications/components/NotificationsApp.tsx:46
+#: assets/user-profile/components/profile/UserProfile.tsx:204
+msgid "Notifications resumed"
 msgstr ""
 
 #: assets/notifications/components/notificationItems.tsx:35
@@ -3294,6 +3586,14 @@ msgstr ""
 msgid "New Product"
 msgstr ""
 
+#: assets/public/components/PublicApp.tsx:62
+msgid "This action requires you to log in!"
+msgstr ""
+
+#: assets/public/components/PublicApp.tsx:71
+msgid "Register"
+msgstr ""
+
 #: assets/search/actions.ts:296
 msgid "Items were shared successfully."
 msgstr ""
@@ -3363,20 +3663,20 @@ msgid "Body"
 msgstr ""
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:148
+#: assets/search/components/TopicForm.tsx:142
 msgid "Remove from folder"
 msgstr ""
 
-#: assets/search/components/FollowedTopics.tsx:118
+#: assets/search/components/FollowedTopics.tsx:119
 msgid "Would you like to delete topic {{name}}?"
 msgstr ""
 
-#: assets/search/components/FollowedTopics.tsx:218
-#: assets/search/components/TopicForm.tsx:173
+#: assets/search/components/FollowedTopics.tsx:219
+#: assets/search/components/TopicForm.tsx:167
 msgid "Create new folder"
 msgstr ""
 
-#: assets/search/components/FollowedTopics.tsx:222
+#: assets/search/components/FollowedTopics.tsx:223
 msgid "New folder"
 msgstr ""
 
@@ -3404,16 +3704,9 @@ msgstr ""
 msgid "Subscribe"
 msgstr ""
 
-#: assets/search/components/NewItemsIcon.tsx:46
-msgid "New events to load"
-msgstr ""
-
-#: assets/search/components/NewItemsIcon.tsx:47
-msgid "New stories available to load"
-msgstr ""
-
-#: assets/search/components/NewItemsIcon.tsx:56
-msgid "Refresh"
+#: assets/search/components/NewItemsIcon.tsx:57
+#: assets/search/components/NewItemsIcon.tsx:58
+msgid "refresh"
 msgstr ""
 
 #: assets/search/components/SearchResults.tsx:15
@@ -3457,12 +3750,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr ""
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:218
+#: assets/search/components/TopicForm.tsx:214
 msgid "Real-Time"
 msgstr ""
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:228
+#: assets/search/components/TopicForm.tsx:224
 msgid "Scheduled"
 msgstr ""
 
@@ -3506,7 +3799,7 @@ msgstr ""
 msgid "Rename"
 msgstr ""
 
-#: assets/search/components/TopicFolder.tsx:124
+#: assets/search/components/TopicFolder.tsx:128
 msgid "Folder Actions"
 msgstr ""
 
@@ -3515,54 +3808,54 @@ msgstr ""
 msgid "Folder Name"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:21
+#: assets/search/components/TopicForm.tsx:22
 msgid "Add to folder"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:116
+#: assets/search/components/TopicForm.tsx:110
 msgid "Share with my Company"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:123
+#: assets/search/components/TopicForm.tsx:117
 msgid "Created Externally"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:128
+#: assets/search/components/TopicForm.tsx:122
 msgid "Organize your Topic"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:197
+#: assets/search/components/TopicForm.tsx:193
 msgid "Email Notifications:"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:208
+#: assets/search/components/TopicForm.tsx:204
 msgid "None"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:235
+#: assets/search/components/TopicForm.tsx:231
 msgid ""
 "Your saved topic results will be emailed in a digest format at the "
 "time(s) per day set below."
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:246
-#: assets/user-profile/components/profile/UserProfile.tsx:164
+#: assets/search/components/TopicForm.tsx:242
+#: assets/user-profile/components/profile/UserProfile.tsx:185
 msgid "Edit schedule"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:255
+#: assets/search/components/TopicForm.tsx:251
 msgid "Topic details"
 msgstr ""
 
-#: assets/search/components/TopicsTab.tsx:36
+#: assets/search/components/TopicsTab.tsx:37
 msgid "{{ section }} Topics"
 msgstr ""
 
-#: assets/search/components/TopicsTab.tsx:51
+#: assets/search/components/TopicsTab.tsx:52
 msgid "No {{name}} created."
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultTagsList.tsx:113
+#: assets/search/components/SearchResultsBar/SearchResultTagsList.tsx:117
 msgid "Edit search terms"
 msgstr ""
 
@@ -3579,7 +3872,7 @@ msgid "not"
 msgstr ""
 
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:140
-#: assets/wire/components/filters/FiltersTab.tsx:144
+#: assets/wire/components/filters/FiltersTab.tsx:160
 msgid "Clear"
 msgstr ""
 
@@ -3592,17 +3885,18 @@ msgstr ""
 msgid "inside"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:31
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:50
-#: assets/wire/components/filters/NavCreatedPicker.tsx:38
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:176
+#: assets/user-profile/components/PauseNotificationModal.tsx:111
+#: assets/wire/components/filters/NavCreatedPicker.tsx:58
 msgid "From"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:134
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:261
 msgid "Clear filters"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:142
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:269
 msgid "Filters applied"
 msgstr ""
 
@@ -3626,36 +3920,28 @@ msgstr ""
 msgid "Save new topic"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:38
-msgid "Date ↑"
+#: assets/search/components/SearchResultsBar/index.tsx:55
+msgid "Newest first"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:42
-msgid "Date ↓"
+#: assets/search/components/SearchResultsBar/index.tsx:59
+msgid "Oldest first"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:46
-msgid "Relevance"
-msgstr ""
-
-#: assets/search/components/SearchResultsBar/index.tsx:140
+#: assets/search/components/SearchResultsBar/index.tsx:198
 msgid "1 result"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:142
+#: assets/search/components/SearchResultsBar/index.tsx:200
 msgid "{{ count }} results"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:149
+#: assets/search/components/SearchResultsBar/index.tsx:208
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:150
-msgid "{{sort}}"
-msgstr ""
-
-#: assets/search/components/SearchResultsBar/index.tsx:152
+#: assets/search/components/SearchResultsBar/index.tsx:211
 msgid "Sort results by"
 msgstr ""
 
@@ -3724,34 +4010,30 @@ msgid "Article Preview"
 msgstr ""
 
 #: assets/ui/components/Preview.tsx:13
-#: assets/wire/components/ItemDetails.tsx:91
+#: assets/wire/components/ItemDetails.tsx:105
 msgid "Published on {{ date }} at {{ time }}"
 msgstr ""
 
-#: assets/user-profile/actions.ts:109 assets/users/actions.ts:164
+#: assets/user-profile/actions.ts:111 assets/users/actions.ts:173
 msgid "User updated successfully"
 msgstr ""
 
-#: assets/user-profile/actions.ts:113
+#: assets/user-profile/actions.ts:115
 msgid "Please reload the page in order to change language."
 msgstr ""
 
-#: assets/user-profile/actions.ts:147
+#: assets/user-profile/actions.ts:149
 msgid "Topic deleted successfully"
 msgstr ""
 
-#: assets/user-profile/actions.ts:187
+#: assets/user-profile/actions.ts:197
 msgid "Topic was shared successfully."
 msgstr ""
 
-#: assets/user-profile/actions.ts:280
+#: assets/user-profile/actions.ts:294
 msgid ""
 "Are you sure you want to delete the folder {{name}} and all of its "
 "contents?"
-msgstr ""
-
-#: assets/user-profile/actions.ts:336
-msgid "Global schedule updated"
 msgstr ""
 
 #: assets/user-profile/components/EditNotificationScheduleModal.tsx:114
@@ -3780,38 +4062,58 @@ msgstr ""
 msgid "Timezone"
 msgstr ""
 
-#: assets/user-profile/components/UserProfileApp.tsx:44
+#: assets/user-profile/components/EditNotificationScheduleModal.tsx:194
+msgid "Global schedule updated"
+msgstr ""
+
+#: assets/user-profile/components/PauseNotificationModal.tsx:67
+msgid "Notifications paused"
+msgstr ""
+
+#: assets/user-profile/components/PauseNotificationModal.tsx:99
+msgid "Pause notifications..."
+msgstr ""
+
+#: assets/user-profile/components/PauseNotificationModal.tsx:100
+msgid "Pause notifications"
+msgstr ""
+
+#: assets/user-profile/components/UserProfileApp.tsx:46
 msgid "My Profile"
 msgstr ""
 
-#: assets/user-profile/components/UserProfileApp.tsx:52
-#: assets/user-profile/components/UserProfileApp.tsx:61
+#: assets/user-profile/components/UserProfileApp.tsx:54
+#: assets/user-profile/components/UserProfileApp.tsx:63
 msgid "My {{ section }} Topics"
 msgstr ""
 
-#: assets/user-profile/components/UserProfileApp.tsx:70
+#: assets/user-profile/components/UserProfileApp.tsx:72
 msgid "My {{ monitoring }}"
 msgstr ""
 
-#: assets/user-profile/components/UserProfileApp.tsx:178
+#: assets/user-profile/components/UserProfileApp.tsx:180
 msgid "Logout"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:42
+#: assets/user-profile/components/profile/UserProfile.tsx:49
 msgid "Please provide first name"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:47
+#: assets/user-profile/components/profile/UserProfile.tsx:54
 msgid "Please provide last name"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:104
-#: assets/users/components/EditUser.tsx:201
-#: assets/users/components/UsersList.tsx:28
+#: assets/user-profile/components/profile/UserProfile.tsx:117
+msgid "Change password"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.tsx:126
+#: assets/users/components/EditUser.tsx:243
+#: assets/users/components/UsersList.tsx:35
 msgid "Phone"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.tsx:150
+#: assets/user-profile/components/profile/UserProfile.tsx:171
 msgid ""
 "You will receive email notifications daily, sent in a digest format at "
 "regular intervals. This setting will apply to all subscribed scheduled "
@@ -3819,75 +4121,103 @@ msgid ""
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.tsx:197
+msgid "All notifications will be paused from {{dateFrom}} to {{dateTo}}"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.tsx:207
+msgid "Clear Pausing"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.tsx:220
+msgid "Pause All Notifications"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.tsx:257
 msgid "Save Changes"
 msgstr ""
 
-#: assets/users/actions.ts:132
+#: assets/users/actions.ts:139
 msgid "Personalized dashboard saved!"
 msgstr ""
 
-#: assets/users/actions.ts:166
+#: assets/users/actions.ts:175
 msgid "User created successfully"
 msgstr ""
 
-#: assets/users/actions.ts:183
+#: assets/users/actions.ts:192
 msgid "Reset password token is sent successfully"
 msgstr ""
 
-#: assets/users/actions.ts:202
+#: assets/users/actions.ts:211
 msgid "User deleted successfully"
 msgstr ""
 
-#: assets/users/actions.ts:216
+#: assets/users/actions.ts:225
 msgid "Invitation as been resent"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:103
-#: assets/users/components/EditUser.tsx:105
-#: assets/users/components/EditUser.tsx:149
+#: assets/users/actions.ts:258
+msgid "User has been approved"
+msgstr ""
+
+#: assets/users/components/EditUser.tsx:131
+#: assets/users/components/EditUser.tsx:133
+#: assets/users/components/EditUser.tsx:177
 msgid "Resend Invite"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:108
+#: assets/users/components/EditUser.tsx:136
 msgid "Would you like to resend the invitation for {{ email }}?"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:118
+#: assets/users/components/EditUser.tsx:146
 msgid "Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:121
+#: assets/users/components/EditUser.tsx:149
 msgid "Add/Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:161
-#: assets/users/components/EditUser.tsx:164
+#: assets/users/components/EditUser.tsx:188
+msgid "Approve User"
+msgstr ""
+
+#: assets/users/components/EditUser.tsx:194
+msgid "Approve"
+msgstr ""
+
+#: assets/users/components/EditUser.tsx:202
+#: assets/users/components/EditUser.tsx:205
 msgid "Impersonate User"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:309
+#: assets/users/components/EditUser.tsx:360
 msgid "No products available"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:366
+#: assets/users/components/EditUser.tsx:417
 msgid "If a company hasn't been selected, you can't select any products."
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:374
+#: assets/users/components/EditUser.tsx:425
 msgid "User Settings"
 msgstr ""
 
-#: assets/users/components/EditUser.tsx:381
-#: assets/users/components/UserListItem.tsx:25
+#: assets/users/components/EditUser.tsx:432
+#: assets/users/components/UserListItem.tsx:34
 msgid "Approved"
 msgstr ""
 
-#: assets/users/components/UserListItem.tsx:25
+#: assets/users/components/UserListItem.tsx:34
 msgid "Needs Approval"
 msgstr ""
 
 #: assets/users/components/Users.tsx:64
 msgid "Would you like to delete user: {{name}}?"
+msgstr ""
+
+#: assets/users/components/UsersList.tsx:34
+msgid "User Id"
 msgstr ""
 
 #: assets/users/components/filters/UserListSortFilter.tsx:19
@@ -3906,16 +4236,32 @@ msgstr ""
 msgid "Sort"
 msgstr ""
 
-#: assets/wire/actions.ts:135
+#: assets/wire/actions.ts:137
 msgid "Are you sure you want to permanently remove these item(s)?"
 msgstr ""
 
-#: assets/wire/actions.ts:139
+#: assets/wire/actions.ts:141
 msgid "Items were removed successfully"
 msgstr ""
 
-#: assets/wire/actions.ts:141
+#: assets/wire/actions.ts:143
 msgid "Item was removed successfully"
+msgstr ""
+
+#: assets/wire/utils.ts:396
+msgid "segments"
+msgstr ""
+
+#: assets/wire/utils.ts:396
+msgid "segment"
+msgstr ""
+
+#: assets/wire/utils.ts:399
+msgid "versions"
+msgstr ""
+
+#: assets/wire/utils.ts:399
+msgid "version"
 msgstr ""
 
 #: assets/wire/components/AgendaLinks.tsx:85
@@ -3951,12 +4297,16 @@ msgstr ""
 msgid "There are no statistics available for selected item."
 msgstr ""
 
-#: assets/wire/components/ListItemNextVersion.tsx:45
-msgid "Next version"
+#: assets/wire/components/ListItemNextVersion.tsx:70
+msgid "Next {{ versionsLabel }}"
 msgstr ""
 
-#: assets/wire/components/ListItemPreviousVersions.tsx:45
+#: assets/wire/components/ListItemPreviousVersions.tsx:69
 msgid "Loading"
+msgstr ""
+
+#: assets/wire/components/ListItemPreviousVersions.tsx:92
+msgid "Previous {{ versionsLabel }}"
 msgstr ""
 
 #: assets/wire/components/ListSearchOptions.tsx:40
@@ -3978,24 +4328,24 @@ msgstr ""
 msgid "{{ count }} item(s) selected"
 msgstr ""
 
-#: assets/wire/components/WireApp.tsx:170
+#: assets/wire/components/WireApp.tsx:155
 msgid "{{wire}} Content"
 msgstr ""
 
-#: assets/wire/components/WireListItem.tsx:43
-msgid "Hide previous versions ({{ count }}) - {{ matches }} matches"
+#: assets/wire/components/WireListItem.tsx:47
+msgid "Hide previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches"
 msgstr ""
 
-#: assets/wire/components/WireListItem.tsx:50
-msgid "Hide previous versions ({{ count }})"
+#: assets/wire/components/WireListItem.tsx:55
+msgid "Hide previous {{ versionsLabel }} ({{ count }})"
 msgstr ""
 
-#: assets/wire/components/WireListItem.tsx:56
-msgid "Show previous versions ({{ count }}) - {{ matches }} matches"
+#: assets/wire/components/WireListItem.tsx:64
+msgid "Show previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches"
 msgstr ""
 
-#: assets/wire/components/WireListItem.tsx:63
-msgid "Show previous versions ({{ count }})"
+#: assets/wire/components/WireListItem.tsx:72
+msgid "Show previous {{ versionsLabel }} ({{ count }})"
 msgstr ""
 
 #: assets/wire/components/WireListItemDeleted.tsx:30
@@ -4006,6 +4356,10 @@ msgstr ""
 msgid "Authors"
 msgstr ""
 
+#: assets/wire/components/fields/DurationLabel.tsx:40
+msgid "Duration"
+msgstr ""
+
 #: assets/wire/components/fields/Embargo.tsx:74
 msgid "embargo"
 msgstr ""
@@ -4014,23 +4368,36 @@ msgstr ""
 msgid "MATCH"
 msgstr ""
 
-#: assets/wire/components/fields/PreviousVersions.tsx:18
-msgid "{{ count }} previous versions"
+#: assets/wire/components/fields/PreviousVersions.tsx:28
+msgid "{{ count }} previous {{ versionsLabel }}"
 msgstr ""
 
 #: assets/wire/components/fields/VersionType.tsx:7
 msgid "Version type: {{version}}"
 msgstr ""
 
-#: assets/wire/components/filters/FilterGroup.tsx:21
+#: assets/wire/components/filters/FilterGroup.tsx:33
 msgid "Show more"
 msgstr ""
 
-#: assets/wire/components/filters/FilterGroup.tsx:29
+#: assets/wire/components/filters/FilterGroup.tsx:41
 msgid "Show less"
 msgstr ""
 
-#: assets/wire/components/filters/NavCreatedPicker.tsx:27
+#: assets/wire/components/filters/FilterGroup.tsx:103
+#: assets/wire/components/filters/FilterGroup.tsx:104
+msgid "Search Filters"
+msgstr ""
+
+#: assets/wire/components/filters/NavCreatedPicker.tsx:36
 msgid "Event Date"
+msgstr ""
+
+#: assets/wire/components/filters/NavCreatedPicker.tsx:36
+msgid "Published By"
+msgstr ""
+
+#: assets/wire/components/filters/NavCreatedPicker.tsx:52
+msgid "Custom date range"
 msgstr ""
 

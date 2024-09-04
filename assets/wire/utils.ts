@@ -8,7 +8,6 @@ export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
 const STATUS_KILLED = 'canceled';
 
-
 /**
  * Returns the item version as integer
  *
@@ -289,6 +288,9 @@ function getTextFromNode(node: Node | null): string {
     if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
         return textContent.trim();
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        return element.innerText.trim();
     }
     return '';
 }
@@ -318,7 +320,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
             extractedText.push(textBefore);
         }
 
-        extractedText.push(highlightSpan.outerHTML);
+        extractedText.push(`<span class="es-highlight">${getTextFromNode(highlightSpan)}</span>`);
 
         if (textAfter) {
             extractedText.push(textAfter);
@@ -326,7 +328,9 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
 
         lastNode = highlightSpan.nextSibling;
     }
-    return extractedText.join(' ')+(html.length > maxLength ? '...' : ' ');
+    return extractedText.join(' ')
+        .replace(/<img[^>]*src="([^"]*)"[^>]*>/g, ' ')
+            + (html.length > maxLength ? '...' : ' ');
 }
 
 /**

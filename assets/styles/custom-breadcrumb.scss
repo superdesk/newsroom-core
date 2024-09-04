@@ -13,6 +13,9 @@
     @include xxsm {
       display: none;
     }
+    @include phone {
+      font-size: var(--text-size--small);
+    }
   }
 
   a.breadcrumb-item {

@@ -1,7 +1,8 @@
+import pytz
 import bcrypt
 import newsroom
 import superdesk
-from datetime import datetime
+from datetime import datetime, date
 from copy import deepcopy
 
 from typing import Dict, Optional, List, TypedDict
@@ -144,6 +145,12 @@ class UsersResource(newsroom.Resource):
                 },
                 "last_run_time": {
                     "type": "datetime",
+                },
+                "pause_from": {
+                    "type": "string",
+                },
+                "pause_to": {
+                    "type": "string",
                 },
             },
         },
@@ -389,15 +396,28 @@ class UsersService(newsroom.Service):
             "is_enabled": True,
             "is_approved": True,
         }
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             add_token_data(user_updates)
         self.patch(user["_id"], updates=user_updates)
 
         # Send new account / password reset email
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             updated_user: User = deepcopy(user)
             updated_user.update(user_updates)
             send_token(updated_user, token_type="new_account", update_token=False)
+
+    def user_has_paused_notifications(self, user: User) -> bool:
+        schedule = user.get("notification_schedule") or {}
+        timezone = pytz.timezone(schedule.get("timezone") or app.config.get("DEFAULT_TIMEZONE") or "UTC")
+        pause_from = schedule.get("pause_from")
+        pause_to = schedule.get("pause_to")
+        if pause_from and pause_to:
+            now = datetime.now(timezone).date()
+            pause_from_date = date.fromisoformat(pause_from)
+            pause_to_date = date.fromisoformat(pause_to)
+            if pause_from_date <= now <= pause_to_date:
+                return True
+        return False
 
 
 class AuthUserService(newsroom.Service):

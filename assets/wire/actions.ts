@@ -226,6 +226,7 @@ export function search(state: any, next?: any, aggs?: any) {
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,
+        date_filter: createdFilter.date_filter,
         timezone_offset: getTimezoneOffset(),
         newsOnly,
         product: searchParams.product,

@@ -4,6 +4,7 @@ from flask_babel import Babel, get_translations, format_datetime
 
 from newsroom.auth import get_user
 from newsroom.template_loaders import get_template_locale
+from newsroom.types import User
 
 
 def get_client_translations(domain="client"):
@@ -44,6 +45,14 @@ def get_session_locale():
     if get_template_locale():
         return get_template_locale()
     return current_app.config["DEFAULT_LANGUAGE"]
+
+
+def get_user_timezone(user: User) -> str:
+    try:
+        return user["notification_schedule"]["timezone"]
+    except (TypeError, ValueError, KeyError):
+        pass
+    return current_app.config.get("BABEL_DEFAULT_TIMEZONE") or current_app.config["DEFAULT_TIMEZONE"]
 
 
 def get_session_timezone():

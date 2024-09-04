@@ -121,23 +121,22 @@
                 </li>
                 {% endif %}
 
-                {% if is_admin_or_account_manager() %}
+                {% if is_admin_manager_or_company_admin() %}
                 <li class="sidenav__item  {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                    <a
-                        href="{{ url_for('reports.company_reports') }}"
-                        title="{{ gettext('Reports') }}"
-                        aria-label="{{ gettext('Reports') }}"
-                        role="button"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="right"
-                        data-test-id="sidenav-link-reports"
-                    >
-                        <span class="sidenav__item-icon">
-                            <i class="icon--report"></i>
-                        </span>    
-                    
-                        <span class="sidenav__item-title">{{ gettext('Reports') }}</span>
-                    </a>
+                  <a
+                      href="{{ url_for('reports.company_reports') }}"
+                      title="{{ gettext('Reports') }}"
+                      aria-label="{{ gettext('Reports') }}"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-test-id="sidenav-link-reports"
+                  >
+                    <span class="sidenav__item-icon">
+                        <i class="icon--report"></i>
+                    </span>
+                    <span class="sidenav__item-title">{{ gettext('Reports') }}</span>
+                  </a>
                 </li>
                 {% endif %}
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}

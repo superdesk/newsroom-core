@@ -3,6 +3,7 @@ import {render} from 'render-utils';
 import productReducer from './reducers';
 import ProductsApp from './components/ProductsApp';
 import {initViewData} from './actions';
+import 'user-profile';
 
 
 const store = createStore(productReducer, 'Products');

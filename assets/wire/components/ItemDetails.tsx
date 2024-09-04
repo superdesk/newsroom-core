@@ -26,7 +26,7 @@ import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
-import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+import {ArticleBodyHtml} from 'ui/components/ArticleBodyHtml';
 import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';

@@ -1,7 +1,9 @@
+from typing import List
 from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
+from newsroom.types import Product
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
 
@@ -16,6 +18,7 @@ COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
 PRODUCT_1_ID = ObjectId()
 PRODUCT_2_ID = ObjectId()
 PRODUCT_3_ID = ObjectId()
+PRODUCT_ALL_AGENDA_ID = ObjectId()
 
 items = [
     {
@@ -139,6 +142,7 @@ agenda_items = [
                 },
                 "workflow_status": "active",
                 "coverage_id": "urn:coverage",
+                "planning_id": "urn:planning",
                 "news_coverage_status": {
                     "label": "Planned",
                     "name": "coverage intended",
@@ -155,6 +159,7 @@ agenda_items = [
             "pubstatus": "usable",
             "files": [{"media": "media", "name": "test.txt", "mimetype": "text/plain"}],
             "internal_note": "Internal message for event",
+            "state": "scheduled",
         },
         "firstcreated": "2018-06-27T11:12:04+0000",
         "_current_version": 1,
@@ -222,6 +227,7 @@ def setup_user_company(app):
                     {"_id": PRODUCT_1_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_2_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_3_ID, "section": "wire", "seats": 0},
+                    {"_id": PRODUCT_ALL_AGENDA_ID, "section": "agenda", "seats": 0},
                 ],
             },
             {
@@ -292,29 +298,37 @@ def anonymous_user(client):
 
 @fixture
 def company_products(app):
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": PRODUCT_1_ID,
-                "name": "product test",
-                "query": "headline:more",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-            {
-                "_id": PRODUCT_2_ID,
-                "name": "product test 2",
-                "query": "headline:Weather",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-            {
-                "_id": PRODUCT_3_ID,
-                "name": "all content",
-                "query": "*:*",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-        ],
-    )
+    _products: List[Product] = [
+        {
+            "_id": PRODUCT_1_ID,
+            "name": "product test",
+            "query": "headline:more",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_2_ID,
+            "name": "product test 2",
+            "query": "headline:Weather",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_3_ID,
+            "name": "all content",
+            "query": "*:*",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_ALL_AGENDA_ID,
+            "name": "all agenda",
+            "query": "*:*",
+            "is_enabled": True,
+            "product_type": "agenda",
+        },
+    ]
+
+    app.data.insert("products", _products)
+
+    return _products

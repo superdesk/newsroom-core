@@ -7,6 +7,7 @@ import moment from 'moment';
 
 import {
     IAgendaItem,
+    IPlanningItem,
     IAgendaListGroup,
     IAgendaListGroupItem,
     ICompany,
@@ -25,10 +26,10 @@ import {AgendaListGroupHeader} from './AgendaListGroupHeader';
 import {setActive, previewItem, toggleSelected, openItem, toggleHiddenGroupItems} from '../actions';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {getIntVersion} from 'wire/utils';
-import {getPlanningItemsByGroup, getListItems} from 'agenda/utils';
+import {getPlanningItemsByGroup, getListItems, isTopStory} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
-import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
+import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP} from '../../utils';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -39,6 +40,47 @@ const itemsByIdSelector = (state: IAgendaState) => state.itemsById || EMPTY_OBJE
 const groupedItemsSelector = (state: IAgendaState) => state.listItems.groups;
 
 const hiddenGroupsShownSelector = (state: IAgendaState) => state.listItems.hiddenGroupsShown;
+
+const getItemIdsSorted = (
+    itemIds: Array<string>,
+    itemsById: {[itemId: string]: IAgendaItem},
+    listConfig: IListConfig,
+    group: IAgendaListGroup,
+) => {
+    const topStoryIds: Array<string> = [];
+    const coveragesOnlyIds: Array<string> = [];
+    const restIds: Array<string> = [];
+
+    itemIds.forEach((id) => {
+        const item = itemsById[id];
+        const hasCoverage = (item.coverages?.length ?? 0) > 0;
+        const topStory = (item.subject ?? []).find(isTopStory);
+
+        if (topStory) {
+
+            // hiddenItems has items which are multiDay and are not on the first date of the group
+            if (group.hiddenItems.includes(item._id) === false) {
+                topStoryIds.push(item._id);
+            } else {
+                restIds.push(item._id);
+            }
+        } else if (hasCoverage && AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP == true) {
+
+            // items with coverages are displayed after top stories
+            coveragesOnlyIds.push(item._id);
+        } else {
+
+            // all other items should follow
+            restIds.push(item._id);
+        }
+    });
+
+    return [
+        ...topStoryIds,
+        ...coveragesOnlyIds,
+        ...restIds,
+    ];
+};
 
 /**
  * Single event or planning item could be display multiple times.
@@ -246,7 +288,7 @@ class AgendaList extends React.Component<IProps, IState> {
           (!action.when || action.when(this.props, item)));
     }
 
-    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IAgendaItem) {
+    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IPlanningItem) {
         const {activeItem} = this.props;
 
         if (activeItem == null || (!_id && !group && !plan)) {
@@ -305,22 +347,26 @@ class AgendaList extends React.Component<IProps, IState> {
                 className="wire-articles__group"
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
-                {itemIds.map((itemId) => {
+                {getItemIdsSorted(itemIds, this.props.itemsById, this.props.listConfig, group).map((itemId) => {
                     // Only show multiple entries for this item if we're in the `Planning Only` view
                     const plans = this.props.itemTypeFilter !== 'planning' ?
                         [] :
                         getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
+                    const version = getIntVersion(this.props.itemsById[itemId]);
+                    const isRead = version == null
+                        ? this.props.readItems[itemId] != null // event
+                        : version === this.props.readItems[itemId]; // planning item
 
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
                             {plans.map((plan) => (
                                 <AgendaListItem
                                     key={`${itemId}--${plan._id}`}
-                                    group={group.date}
+                                    group={group}
                                     item={cloneDeep(this.props.itemsById[itemId])}
                                     isActive={this.isActiveItem(itemId, group.date, plan)}
                                     isSelected={this.props.selectedItems.includes(itemId)}
-                                    isRead={this.props.readItems[itemId] === getIntVersion(this.props.itemsById[itemId])}
+                                    isRead={isRead}
                                     onClick={this.onItemClick}
                                     onDoubleClick={this.onItemDoubleClick}
                                     onActionList={this.onActionList}
@@ -344,11 +390,11 @@ class AgendaList extends React.Component<IProps, IState> {
                     ) : (
                         <AgendaListItem
                             key={itemId}
-                            group={group.date}
+                            group={group}
                             item={this.props.itemsById[itemId]}
                             isActive={this.isActiveItem(itemId, group.date, undefined)}
                             isSelected={this.props.selectedItems.includes(itemId)}
-                            isRead={this.props.readItems[itemId] === getIntVersion(this.props.itemsById[itemId])}
+                            isRead={isRead}
                             onClick={this.onItemClick}
                             onDoubleClick={this.onItemDoubleClick}
                             onActionList={this.onActionList}
@@ -372,6 +418,9 @@ class AgendaList extends React.Component<IProps, IState> {
     }
 
     render() {
+        const lastGroupWithItems = getLastGroupWithItems(this.props.groupedItems);
+        const groupedItems = this.props.groupedItems.slice(0, lastGroupWithItems + 1);
+
         return (
             <div
                 className={classNames('wire-articles wire-articles--list', {
@@ -386,30 +435,33 @@ class AgendaList extends React.Component<IProps, IState> {
                 }}
                 onScroll={this.props.onScroll}
             >
-                {this.props.groupedItems.map((group) => (
-                    <React.Fragment key={group.date}>
-                        <div className='wire-articles__header' key={`${group.date}header`}>
-                            {this.getListGroupDate(group)}
-                        </div>
+                {groupedItems.length === 1 ?
+                    this.renderGroupItems(groupedItems[0], false) :
+                    groupedItems.map((group) => (
+                        <React.Fragment key={group.date}>
+                            <div className='wire-articles__header' key={`${group.date}header`}>
+                                {this.getListGroupDate(group)}
+                            </div>
 
-                        {group.hiddenItems.length === 0 ? null : (
-                            <AgendaListGroupHeader
-                                group={group.date}
-                                itemIds={group.hiddenItems}
-                                itemsById={this.props.itemsById}
-                                itemsShown={this.props.hiddenGroupsShown[group.date] === true}
-                                toggleHideItems={this.props.toggleHiddenGroupItems}
-                            />
-                        )}
+                            {group.hiddenItems.length === 0 ? null : (
+                                <AgendaListGroupHeader
+                                    group={group.date}
+                                    itemIds={group.hiddenItems}
+                                    itemsById={this.props.itemsById}
+                                    itemsShown={this.props.hiddenGroupsShown[group.date] === true}
+                                    toggleHideItems={this.props.toggleHiddenGroupItems}
+                                />
+                            )}
 
-                        {this.props.hiddenGroupsShown[group.date] !== true ?
-                            null :
-                            this.renderGroupItems(group, true)
-                        }
-                        {this.renderGroupItems(group, false)}
-                    </React.Fragment>
-                ))}
-                {!this.props.groupedItems.length &&
+                            {this.props.hiddenGroupsShown[group.date] !== true ?
+                                null :
+                                this.renderGroupItems(group, true)
+                            }
+                            {this.renderGroupItems(group, false)}
+                        </React.Fragment>
+                    ))
+                }
+                {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>
@@ -461,3 +513,15 @@ const component = connect<
 >(mapStateToProps, mapDispatchToProps)(AgendaList);
 
 export default component;
+
+function getLastGroupWithItems(groupedItems: Array<IAgendaListGroup>): number {
+    const groupsWithItems = groupedItems.filter((group) => group.items.length > 0);
+
+    if (groupsWithItems.length > 0) {
+        const lastGroup = groupsWithItems[groupsWithItems.length - 1];
+        return groupedItems.indexOf(lastGroup);
+    }
+
+    // If no groups have items, return the last group
+    return groupedItems.length - 1;
+}

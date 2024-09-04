@@ -64,6 +64,7 @@ DEFAULT_SUBJECTS = {
     "additional_product_seat_request_email": "New Product Seat request",
     "scheduled_notification_topic_matches_email": "Your {{ app_name }} daily digest at {{ date | notification_time }}",
     "scheduled_notification_no_matches_email": "Your {{ app_name }} daily digest at {{ date | notification_time }}",
+    "test_template": "This templates is for testing",
 }
 
 

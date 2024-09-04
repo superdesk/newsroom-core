@@ -7,12 +7,14 @@ from flask_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
+from newsroom.types import Company, Section, SectionFilter, Topic, User
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
 from newsroom.auth.utils import user_has_section_allowed
+from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -30,6 +32,7 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
+from newsroom.users import users_service
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +51,7 @@ def query_string(
     fields: List[str] = ["*"],
     multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
     analyze_wildcard=False,
-):
+) -> QueryStringQuery:
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
@@ -106,39 +109,52 @@ class AdvancedSearchParams(TypedDict):
     fields: List[str]
 
 
+class SearchArgs(TypedDict, total=False):
+    q: str
+    id: str
+    ids: List[str]
+    size: int
+    bookmarks: str
+    ignore_latest: bool
+    filter: Union[Dict[str, str], str]
+
+
 class SearchQuery(object):
     """Class for storing the search parameters for validation and query generation"""
 
     def __init__(self):
-        self.user = None
+        self.user: Optional[User] = None
+        self.company: Optional[Company] = None
         self.is_admin = False
-        self.company = None
 
-        self.section = None
+        self.section: Optional[Section] = None
         self.navigation_ids = []
         self.products = []
         self.requested_products = []
         self.advanced: Optional[AdvancedSearchParams] = None
 
-        self.args = {}
+        self.args: SearchArgs = {}
         self.lookup = {}
         self.projections = {}
         self.req = None
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
+        self.query: BoolQuery = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []
 
 
 class BaseSearchService(Service):
-    section = "wire"
+    section: Section = "wire"
     limit_days_setting: Union[None, str] = "wire_time_limit_days"
     default_sort = [{"versioncreated": "desc"}]
-    default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
+
+    @property
+    def default_page_size(self) -> int:
+        return 25
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -199,7 +215,7 @@ class BaseSearchService(Service):
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
-        search.query["bool"] = {"filter": {"terms": {"_id": next_item_ids}}}
+        search.query["bool"] = {"filter": [{"ids": {"values": next_item_ids}}]}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         res = self.internal_get(internal_req, search.lookup)
@@ -275,7 +291,7 @@ class BaseSearchService(Service):
         self.prefill_search_advanced(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search, section_filters=None):
+    def apply_filters(self, search: SearchQuery, section_filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
@@ -330,10 +346,11 @@ class BaseSearchService(Service):
 
         return internal_req
 
-    def set_bool_query_from_filters(self, bool_query: Dict[str, Any], filters: Dict[str, Any]):
+    def set_bool_query_from_filters(self, bool_query: BoolQueryParams, filters: Dict[str, Any]) -> None:
         for key, val in filters.items():
             if not val:
                 continue
+            bool_query.setdefault("must", [])
             bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
@@ -576,7 +593,7 @@ class BaseSearchService(Service):
             highlight_search.advanced = deepcopy(search.advanced)
 
             # Set up the search query for filtering
-            self.apply_request_filter(highlight_search)
+            self.apply_request_filter(highlight_search, highlights=True)
 
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
@@ -661,7 +678,7 @@ class BaseSearchService(Service):
 
             return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
-    def apply_section_filter(self, search, filters=None):
+    def apply_section_filter(self, search: SearchQuery, filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate the section filter
 
         :param SearchQuery search: the search query instance
@@ -697,7 +714,7 @@ class BaseSearchService(Service):
         limit_days = get_setting(self.limit_days_setting) if self.limit_days_setting is not None else None
 
         if limit_days and search.company and not search.company.get("archive_access", False):
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("filter", []).append(
                 {
                     "range": {
                         "versioncreated": {
@@ -742,31 +759,34 @@ class BaseSearchService(Service):
         if product.get("query"):
             return self.query_string(product["query"])
 
-    def apply_request_filter(self, search):
+    def parse_filters(self, search: SearchQuery) -> Optional[Dict[str, Any]]:
+        if search.args.get("filter"):
+            if isinstance(search.args["filter"], dict):
+                return search.args["filter"]
+            else:
+                try:
+                    return json.loads(search.args["filter"])
+                except TypeError:
+                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        return None
+
+    def apply_request_filter(self, search: SearchQuery, highlights=False) -> None:
         if search.args.get("q"):
             search.query["bool"].setdefault("must", []).append(
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"ids": {"values": search.args["ids"]}})
 
-        filters = None
-        if search.args.get("filter"):
-            if isinstance(search.args["filter"], dict):
-                filters = search.args["filter"]
-            else:
-                try:
-                    filters = json.loads(search.args["filter"])
-                except TypeError:
-                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        filters = self.parse_filters(search)
 
         if not app.config.get("FILTER_BY_POST_FILTER", False):
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
-                else:
-                    search.query["bool"]["must"].append(filters)
+                elif isinstance(filters, dict):
+                    search.query["bool"]["must"].append(filters)  # type: ignore
 
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.query["bool"]["must"].append(self.versioncreated_range(search.args))
@@ -858,6 +878,9 @@ class BaseSearchService(Service):
             if not user_has_section_allowed(user, self.section):
                 continue
 
+            if users_service.user_has_paused_notifications(user):
+                continue
+
             aggs = {"topics": {"filters": {"filters": {}}}}
             company = companies.get(str(user.get("company", "")))
             # there will be one base search for a user with aggs for user topics
@@ -907,7 +930,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def apply_topic_args(self, topic, args=None):
+    def apply_topic_args(self, topic, args=None) -> SearchArgs:
         if args is None:
             args = {}
 
@@ -934,7 +957,15 @@ class BaseSearchService(Service):
 
         return args
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
+    def get_topic_query(
+        self,
+        topic: Topic,
+        user: User,
+        company: Company,
+        section_filters: Optional[List[SectionFilter]] = None,
+        query: Optional[BoolQuery] = None,
+        args: Optional[SearchArgs] = None,
+    ) -> Optional[SearchQuery]:
         search = SearchQuery()
         search.user = user
         search.company = company
@@ -957,16 +988,23 @@ class BaseSearchService(Service):
                 self.validate_request(search)
                 self.apply_filters(search, section_filters)
             else:
+                self.prefill_topic_products(topic, search)
                 self.apply_topic_filter(search)
+                self.apply_products_filter(search)
         except Forbidden as exc:
             if user and topic:
                 logger.info(
                     "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
                     exc_info=exc,
                 )
-            return
+            return None
 
         return search
+
+    def prefill_topic_products(self, topic: Topic, search: SearchQuery) -> None:
+        navigation_ids = topic.get("navigation") or []
+        if navigation_ids:
+            search.products = get_products_by_navigation(navigation_ids, product_type=topic.get("topic_type"))
 
     def get_items_by_query(self, search, size=10, aggs=None):
         search.args["size"] = size
@@ -975,7 +1013,7 @@ class BaseSearchService(Service):
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
 
-    def query_string(self, query, default_operator="AND"):
+    def query_string(self, query, default_operator="AND") -> QueryStringQuery:
         fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
         fields = app.config.get(fields_config_key, ["*"])
         return query_string(query, default_operator=default_operator, fields=fields)

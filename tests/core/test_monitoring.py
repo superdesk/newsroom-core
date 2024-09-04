@@ -1,4 +1,5 @@
 import os
+from typing import List
 from flask import json
 from pytest import fixture
 from bson import ObjectId
@@ -264,14 +265,26 @@ def test_send_immediate_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
         assert "monitoring-export.pdf" in outbox[0].attachments[0]
+
+
+def assert_recipients(outbox, recipients: List[str]):
+    assert len(outbox) == len(recipients)
+    outbox_recipients = []
+    for o in outbox:
+        outbox_recipients.extend(o.recipients)
+    for recipient in recipients:
+        assert recipient in outbox_recipients
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -308,10 +321,13 @@ def test_send_one_hour_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -352,10 +368,13 @@ def test_send_two_hour_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -396,10 +415,13 @@ def test_send_four_hour_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -458,10 +480,13 @@ def test_send_daily_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run()
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -521,10 +546,13 @@ def test_send_weekly_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run()
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -565,10 +593,13 @@ def test_send_alerts_respects_last_run_time(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -683,7 +714,7 @@ def test_always_send_schedule_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
+        assert len(outbox) > 0
         assert "No content has matched the monitoring profile for this schedule." in outbox[0].body
 
 
@@ -748,10 +779,13 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -796,10 +830,13 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -955,7 +992,7 @@ def test_will_send_one_hour_alerts_on_odd_hours(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(now)
-        assert len(outbox) == 1
+        assert len(outbox) > 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -1070,10 +1107,13 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
@@ -1104,10 +1144,13 @@ def test_send_immediate_headline_subject_alerts(client, app):
     )
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
-        assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 2
-        assert "foo_user2@bar.com" in outbox[0].recipients
-        assert "foo_user@bar.com" in outbox[0].recipients
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Article headline about product"
         assert "Newsroom Monitoring: W1" in outbox[0].body

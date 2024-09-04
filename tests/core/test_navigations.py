@@ -4,17 +4,20 @@ from pytest import fixture
 from newsroom.navigations.views import add_remove_products_for_navigation
 from newsroom.products.products import get_products_by_navigation
 
+from newsroom.products.views import get_product_ref
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations
+from newsroom.types import Product
 from tests.core.utils import add_company_products
 
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
+AGENDA_NAV_ID = ObjectId()
 
 
 @fixture(autouse=True)
-def init(app):
+def navigations(app):
     app.data.insert(
         "navigations",
         [
@@ -24,7 +27,13 @@ def init(app):
                 "product_type": "wire",
                 "description": "Top level sport navigation",
                 "is_enabled": True,
-            }
+            },
+            {
+                "_id": AGENDA_NAV_ID,
+                "name": "Calendar",
+                "product_type": "agenda",
+                "is_enabled": True,
+            },
         ],
     )
 
@@ -227,9 +236,9 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
 
     test_login_succeeds_for_admin(client)
     company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
-    navigations = get_navigations_by_company(company, "agenda")
+    navigations = get_navigations(None, company, "agenda")
     assert navigations[0].get("name") == "Uber"
-    navigations = get_navigations_by_company(company, "wire")
+    navigations = get_navigations(None, company, "wire")
     assert navigations[0].get("name") == "Sport"
 
 
@@ -270,3 +279,49 @@ def test_get_products_by_navigation_caching(app):
 
     with app.app_context():
         assert 0 == len(get_products_by_navigation([nav_id], "wire"))
+
+
+def test_get_navigations_for_admin(admin):
+    navigations = get_navigations(admin, None, "wire")
+    assert 1 == len(navigations)
+    assert "Sport" == navigations[0]["name"]
+
+    navigations = get_navigations(admin, None, "agenda")
+    assert 1 == len(navigations)
+    assert "Calendar" == navigations[0]["name"]
+
+
+def test_get_navigations_for_user(public_user, public_company, app):
+    navigations = get_navigations(public_user, public_company, "wire")
+    assert 0 == len(navigations)
+
+    navigations = get_navigations(public_user, public_company, "agenda")
+    assert 0 == len(navigations)
+
+    products = [
+        Product(
+            _id=ObjectId(),
+            name="Wire",
+            navigations=[NAV_ID],
+            is_enabled=True,
+            product_type="wire",
+        ),
+        Product(
+            _id=ObjectId(),
+            name="Agenda",
+            navigations=[AGENDA_NAV_ID],
+            is_enabled=True,
+            product_type="agenda",
+        ),
+    ]
+
+    app.data.insert("products", products)
+    public_user["products"] = [get_product_ref(products[0]), get_product_ref(products[1])]
+
+    navigations = get_navigations(public_user, public_company, "wire")
+    assert 1 == len(navigations)
+    assert "Sport" == navigations[0]["name"]
+
+    navigations = get_navigations(public_user, public_company, "agenda")
+    assert 1 == len(navigations)
+    assert "Calendar" == navigations[0]["name"]

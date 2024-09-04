@@ -10,6 +10,17 @@ def assert_never(value: NoReturn) -> NoReturn:
 
 
 NameString = Union[str, LazyString]
+NavigationIds = List[Union[str, ObjectId]]
+Section = Literal["wire", "agenda", "monitoring", "news_api", "media_releases", "factcheck", "am_news", "aapX"]
+SectionAllowedMap = Dict[Section, bool]
+Permissions = Literal["coverage_info"]
+
+
+class Group(TypedDict):
+    field: str
+    label: str
+    nested: dict
+    permissions: List[Permissions]
 
 
 class Country(TypedDict):
@@ -30,21 +41,23 @@ class Product(Entity, total=False):
     query: str
     planning_item_query: str
     is_enabled: bool
-    product_type: str
-    navigations: List[ObjectId]
+    product_type: Section
+    navigations: NavigationIds
     companies: List[ObjectId]
 
 
 class ProductRef(TypedDict):
     _id: ObjectId
     seats: int
-    section: str
+    section: Section
 
 
 class NotificationSchedule(TypedDict, total=False):
     timezone: str
     times: List[str]
     last_run_time: datetime
+    pause_from: str
+    pause_to: str
 
 
 class NotificationQueueTopic(TypedDict, total=False):
@@ -67,7 +80,7 @@ class UserDashboardEntry(TypedDict):
 
 class UserRequired(TypedDict):
     email: str
-    user_type: str
+    user_type: Literal["administrator", "internal", "public", "company_admin", "account_management"]
 
 
 class UserData(UserRequired, total=False):
@@ -95,7 +108,7 @@ class UserData(UserRequired, total=False):
     version_creator: ObjectId
 
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
@@ -111,7 +124,7 @@ class PublicUserData(TypedDict):
     last_name: str
     email: str
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     notification_schedule: Optional[NotificationSchedule]
 
 
@@ -168,7 +181,7 @@ class Company(CompanyRequired, total=False):
 
     # Authorization
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     restrict_coverage_info: bool
     sd_subscriber_id: str
     archive_access: bool
@@ -201,13 +214,25 @@ class Topic(TypedDict, total=False):
     company: ObjectId
     is_global: bool
     timezone_offset: int
-    topic_type: str
-    navigation: List[str]
+    topic_type: Section
+    navigation: NavigationIds
     original_creator: ObjectId
     version_creator: ObjectId
     folder: ObjectId
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
+
+
+class SectionFilter(TypedDict, total=False):
+    name: str
+    description: str
+    sd_product_id: str
+    query: str
+    is_enabled: bool
+    filter_type: Section
+    search_type: Section
+    original_creator: ObjectId
+    version_creator: ObjectId
 
 
 class DashboardCardConfig(TypedDict, total=False):
@@ -231,7 +256,7 @@ DashboardCardType = Literal[
 ]
 
 
-class DashboardCard(TypedDict, total=False):
+class DashboardCard(TypedDict):
     _id: ObjectId
     label: str
     type: DashboardCardType
@@ -243,3 +268,7 @@ class DashboardCard(TypedDict, total=False):
 
 
 Article = Dict[str, Any]
+
+
+class Navigation(Entity):
+    name: str

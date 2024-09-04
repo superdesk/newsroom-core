@@ -14,7 +14,7 @@ from newsroom.auth.utils import check_user_has_products
 from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
 from newsroom.utils import (
@@ -27,6 +27,7 @@ from newsroom.utils import (
     get_public_contacts,
     get_links,
     get_vocabulary,
+    get_groups,
 )
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
@@ -131,22 +132,17 @@ def get_view_data() -> Dict:
             for f in app.download_formatters.values()
             if "agenda" in f["types"]
         ],
-        "navigations": get_navigations_by_company(
-            company,
-            product_type="agenda",
-            events_only=company.get("events_only", False),
-        )
-        if company
-        else [],
+        "navigations": get_navigations(user, company, "agenda"),
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
         "events_only": company.get("events_only", False) if company else False,
         "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
         "locators": get_vocabulary("locators"),
         "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
-        "groups": app.config.get("AGENDA_GROUPS", []),
+        "groups": get_groups(app.config.get("AGENDA_GROUPS", []), company),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": get_user_folders(user, "agenda") if user else [],
         "company_folders": get_company_folders(company, "agenda") if company else [],
+        "date_filters": app.config.get("AGENDA_TIME_FILTERS", []),
     }
 
 

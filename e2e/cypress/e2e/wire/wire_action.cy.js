@@ -5,11 +5,9 @@ import {NewshubLayout} from '../../support/pages/layout';
 import {WIRE_ITEMS} from '../../fixtures/wire'
 
 const WireItems = {
-    item_1: {
-        ...WIRE_ITEMS.syd_weather_1,
-        versioncreated: new Date(),
-    },
+    item_1: WIRE_ITEMS.syd_weather_1,
     item_2: WIRE_ITEMS.bris_traffic_1,
+    item_3: WIRE_ITEMS.bris_traffic_2,
 };
 
 describe('wire - filters', () => {
@@ -22,12 +20,15 @@ describe('wire - filters', () => {
             items: [
                 WireItems.item_1,
                 WireItems.item_2,
+                WireItems.item_3,
             ],
         }]);
         NewshubLayout.login('admin@example.com', 'admin');
     });
 
     it('can search using navigation & filters', () => {
+        cy.get('[data-test-id="search-results-bar"]').should('not.exist');
+
         /**
             SEARCH
         */
@@ -64,13 +65,26 @@ describe('wire - filters', () => {
 
         FilterPanel.button('clear');
 
-        /**
-            check filtering by date input
-        */
-        FilterPanel.selectNowDate();
-        FilterPanel.button('search');
+        // check filtering by date input
+        cy.get('[data-test-id="date-filter-select"]').should('have.value', '');
 
         WirePage.item(WireItems.item_1._id).should('exist');
-        WirePage.item(WireItems.item_2._id).should('not.exist'); 
+        WirePage.item(WireItems.item_2._id).should('exist');
+
+        const fromDate = '2024-06-03';
+        const toDate = '2024-06-05';
+
+        cy.get('[data-test-id="date-filter-select"]').select('custom_date');
+        cy.get('[data-test-id="custom-date-from"]').type(fromDate);
+        cy.get('[data-test-id="custom-date-to"]').type(toDate);
+        FilterPanel.button('search');
+
+        // Add assertions to verify the items displayed based on the custom date range
+        WirePage.item(WireItems.item_3._id).should('exist');
+
+        cy.get('[data-test-id="date-filter-select"]').select('');
+        FilterPanel.button('search');
+
+        cy.get('[data-test-id="search-results-bar"]').should('not.exist');
     });
 });

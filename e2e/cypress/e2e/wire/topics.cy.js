@@ -61,10 +61,9 @@ describe('Wire - Topics', function () {
             'news value': ['3'],
             place: ['New South Wales', 'Queensland'],
         });
-        WirePage.filterPanel.getNavGroupInput('published', 'created-from')
-            .type('2023-06-01');
-        WirePage.filterPanel.getNavGroupInput('published', 'created-to')
-            .type('2023-06-30');
+        cy.get('[data-test-id="date-filter-select"]').select('custom_date');
+        cy.get('[data-test-id="custom-date-from"]').type('2023-06-01');
+        cy.get('[data-test-id="custom-date-to"]').type('2023-06-30');
         WirePage.filterPanel.runSearch();
 
         // Enter in 'Today' in the top search bar

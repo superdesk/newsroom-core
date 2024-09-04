@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from eve.utils import ParsedRequest
 from flask import current_app as app, json
+from newsroom.types import Section
 from superdesk import get_resource_service
 from werkzeug.exceptions import Forbidden
 
@@ -12,6 +13,8 @@ from newsroom.settings import get_setting
 from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
+from typing import TypedDict, List, Optional
+import pytz
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +25,21 @@ def get_bookmarks_count(user_id, product_type):
 
 def get_aggregations():
     return app.config.get("WIRE_AGGS", {})
+
+
+class DateRangeQuery(TypedDict):
+    gt: str
+    gte: str
+    lt: str
+    lte: str
+    time_zone: Optional[str]
+
+
+class TimeFilter(TypedDict):
+    name: str
+    default: bool
+    query: DateRangeQuery
+    filter: str
 
 
 class WireSearchResource(newsroom.Resource):
@@ -69,6 +87,13 @@ def versioncreated_range(created):
     return {"range": {"versioncreated": _range}}
 
 
+def get_start_and_end_of_last_week(date=None):
+    now = date or datetime.now(pytz.utc)
+    start_of_last_week = (now - timedelta(days=now.weekday() + 7)).replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_last_week = start_of_last_week + timedelta(days=7)
+    return start_of_last_week, end_of_last_week
+
+
 def set_bookmarks_query(query, user_id):
     query["bool"]["filter"].append(
         {
@@ -92,7 +117,7 @@ def items_query(ignore_latest=False):
 
 
 class WireSearchService(BaseSearchService):
-    section = "wire"
+    section: Section = "wire"
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()
@@ -158,12 +183,12 @@ class WireSearchService(BaseSearchService):
 
         if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
             embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("filter", []).append(
                 {
                     "bool": {
                         "should": [
                             {"range": {"embargoed": {"lt": f"now{embargo_query_rounding}"}}},
-                            {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
+                            {"bool": {"must_not": [{"exists": {"field": "embargoed"}}]}},
                         ]
                     }
                 }
@@ -270,13 +295,34 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return False
 
-    def apply_request_filter(self, search):
+    def get_time_filters(self) -> List[TimeFilter]:
+        """Retrieve the time filters from app config."""
+        return app.config.get("WIRE_TIME_FILTERS", [])
+
+    def get_date_filter_query(self, filter_name: str) -> Optional[DateRangeQuery]:
+        """Get the query for the given filter name."""
+        time_filters = self.get_time_filters()
+        for time_filter in time_filters:
+            if time_filter["filter"] == filter_name:
+                query = time_filter["query"]
+                query.setdefault("time_zone", app.config.get("DEFAULT_TIMEZONE"))
+                return query
+        return None
+
+    def get_date_range_query(self, date_filter: str) -> Optional[DateRangeQuery]:
+        if date_filter != "custom_date":
+            query = self.get_date_filter_query(date_filter)
+            if query:
+                return query
+        return None
+
+    def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
-        super().apply_request_filter(search)
+        super().apply_request_filter(search, highlights=highlights)
 
         if search.args.get("bookmarks"):
             set_bookmarks_query(search.query, search.args["bookmarks"])
@@ -288,6 +334,19 @@ class WireSearchService(BaseSearchService):
             elif app.config.get("NEWS_ONLY_FILTERS"):
                 for f in app.config.get("NEWS_ONLY_FILTERS", []):
                     search.query["bool"]["must_not"].append(f)
+
+        date_filter = search.args.get("date_filter")
+        date_range_query: Optional[DateRangeQuery] = None
+        if date_filter:
+            date_range_query = self.get_date_range_query(date_filter)
+        else:
+            default_time_filter: Optional[TimeFilter] = next((f for f in self.get_time_filters() if f["default"]), None)
+            if default_time_filter:
+                date_range_query = default_time_filter["query"]
+                date_range_query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
+
+        if date_range_query:
+            search.query["bool"]["must"].append({"range": {"versioncreated": date_range_query}})
 
     def get_product_item_report(self, product, section_filters=None):
         query = items_query()

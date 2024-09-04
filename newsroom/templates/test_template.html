@@ -1,0 +1,15 @@
+This Template is for testing
+
+Event status : {{get_event_state(item)}}
+
+{%  for planning_item in item.get('planning_items', []) or [] %}
+        {% if planning_item.get('coverages', []) %}
+                {% for cov in get_planning_coverages(item, planning_item._id) %}
+                    <div>
+                        <p><b>Coverage status: </b>{{get_coverage_status(cov)}}</p>
+                    </div>
+                {% endfor %}
+            </p>
+        {% endif %}
+    </div>
+{% endfor %}

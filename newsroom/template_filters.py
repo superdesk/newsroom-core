@@ -14,9 +14,11 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
+from newsroom.auth import get_company
 from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
 from enum import Enum
 
+from newsroom.types import User
 from newsroom.user_roles import UserRole
 
 
@@ -208,7 +210,10 @@ def notification_datetime(datetime):
         return format_datetime(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_DATETIME_FORMAT"))
 
 
-def plain_text(html):
+def plain_text(html) -> str:
+    if not html:
+        return ""
+
     # Remove newlines, and strip whitespace, before converting tag blocks to newlines
     text = "".join([line.strip() for line in html.split("\n")])
 
@@ -292,11 +297,18 @@ def sidenavs_by_group(group=0, blueprint=None):
     return [nav for nav in blueprint_navs if nav.get("group") == group]
 
 
-def is_admin_or_account_manager(user=None):
-    allowed_user_types = ["administrator", "account_management"]
+def is_user_type_allowed(allowed_user_types, user=None):
     if user:
         return user.get("user_type") in allowed_user_types
     return flask.session.get("user_type") in allowed_user_types
+
+
+def is_admin_or_account_manager(user=None):
+    return is_user_type_allowed(["administrator", "account_management"], user)
+
+
+def is_admin_manager_or_company_admin(user=None):
+    return is_user_type_allowed(["administrator", "account_management", "company_admin"], user)
 
 
 def is_company_admin(user=None):
@@ -381,3 +393,14 @@ def get_item_category_names(item: Dict[str, Any]) -> str:
         return ""
 
     return ", ".join([category["name"] for category in item["service"]])
+
+
+def get_ga_user_properties(user: User) -> Dict[str, str]:
+    if not user:
+        return {}
+    company = get_company(user)
+    return {
+        "company": (company.get("name") if company else "") or "none",
+        "user": f"{user['first_name']} {user['last_name'][:1]}".strip(),
+        "user_internal_id": str(user.get("_id") or ""),  # user_id is reserved name
+    }

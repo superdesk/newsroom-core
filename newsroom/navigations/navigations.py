@@ -1,9 +1,10 @@
+from typing import List, Optional
 import newsroom
 from newsroom.products.products import get_products_by_company, get_products_by_user
 import superdesk
 
 from newsroom.utils import is_admin
-from newsroom.types import Company, UserData
+from newsroom.types import Company, Navigation, UserData
 
 
 class NavigationsResource(newsroom.Resource):
@@ -38,19 +39,32 @@ class NavigationsService(newsroom.Service):
             superdesk.get_resource_service("products").patch(product["_id"], product)
 
 
-def get_navigations_by_company(company: Company, product_type="wire", events_only=False):
+def get_navigations(user: Optional[UserData], company: Optional[Company], product_type="wire") -> List[Navigation]:
     """
-    Returns list of navigations for given company id
-    Navigations will contain the list of product ids
+    Returns list of navigations for given user and company
     """
-    products = get_products_by_company(company, None, product_type, True)
+    if user and is_admin(user):
+        return list(superdesk.get_resource_service("navigations").get(req=None, lookup={"product_type": product_type}))
 
-    # Get the navigation ids used across products
+    products = []
+    if company:
+        products += get_products_by_company(company, None, product_type, True)
+    if user:
+        products += get_products_by_user(user, product_type, None)
+
     navigation_ids = []
     for p in products:
         if p.get("navigations"):
             navigation_ids.extend(p["navigations"])
     return get_navigations_by_ids(navigation_ids)
+
+
+def get_navigations_by_company(company: Company, product_type="wire"):
+    """
+    Returns list of navigations for given company id
+    Navigations will contain the list of product ids
+    """
+    return get_navigations(None, company, product_type)
 
 
 def get_navigations_by_ids(navigation_ids):
@@ -65,22 +79,3 @@ def get_navigations_by_ids(navigation_ids):
             req=None, lookup={"_id": {"$in": navigation_ids}, "is_enabled": True}
         )
     )
-
-
-def get_navigations_by_user(user: UserData, product_type="wire", events_only=False):
-    """
-    Returns list of navigations for given user id
-    Navigations will contain the list of product ids
-    """
-
-    if is_admin(user):
-        return list(superdesk.get_resource_service("navigations").get(req=None, lookup={}))
-
-    products = get_products_by_user(user, product_type, None)
-
-    # Get the navigation ids used across products
-    navigation_ids = []
-    for p in products:
-        if p.get("navigations"):
-            navigation_ids.extend(p["navigations"])
-    return get_navigations_by_ids(navigation_ids)

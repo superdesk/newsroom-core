@@ -1,4 +1,3 @@
-import {IPublicAppState} from 'interfaces';
 
 import {INIT_DATA} from 'actions';
 import {SET_CARD_ITEMS, getMultipleCardItems} from 'home/actions';
@@ -6,6 +5,7 @@ import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from 'actions';
 
 import {modalReducer} from 'reducers';
 import homeReducer from 'home/reducers';
+import {IPublicAppState} from 'home/reducers';
 
 const initialState: IPublicAppState = {
     cards: [],

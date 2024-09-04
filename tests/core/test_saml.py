@@ -19,9 +19,11 @@ def test_user_data_with_matching_company(app):
     with app.test_request_context():
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
+        assert user_data.get("user_type") == "public"
 
         user_data = get_userdata("foo@newcomp.com", saml_data)
         assert user_data.get("company") is None
+        assert user_data.get("user_type") == "internal"
 
 
 def test_user_data_with_matching_preconfigured_client(app, client):
@@ -52,6 +54,17 @@ def test_user_data_with_matching_preconfigured_client(app, client):
 
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
+        assert user_data.get("user_type") == "public"
+
+    app.data.update("companies", company["_id"], {"internal": True}, company)
+
+    with app.test_client() as c:
+        resp = c.get("/login/samplecomp")
+        assert 200 == resp.status_code
+
+        user_data = get_userdata("foo@example.com", saml_data)
+        assert user_data.get("company") == company["_id"]
+        assert user_data.get("user_type") == "internal"
 
 
 def test_company_auth_domains(app):

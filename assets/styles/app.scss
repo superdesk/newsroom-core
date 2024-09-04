@@ -1,4 +1,5 @@
 @import './breakpoints.scss';
+@import './primitives.scss';
 @import './color-functions.scss';
 @import './custom.scss'; // Bootstrap customized
 @import './index.scss';
@@ -25,4 +26,5 @@
 @import './vendor';
 @import './tips-content';
 @import './time-picker';
+@import './content-divider';
 @import '../components/pagination/sd-pagination';

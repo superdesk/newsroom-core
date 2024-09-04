@@ -3,6 +3,7 @@ import {render} from 'render-utils';
 import userReducer from './reducers';
 import UsersApp from './components/UsersApp';
 import {initViewData, onURLParamsChanged} from './actions';
+import 'user-profile';
 
 const store = createStore(userReducer, 'Users');
 

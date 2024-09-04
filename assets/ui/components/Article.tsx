@@ -8,8 +8,11 @@ import AgendaName from '../../agenda/components/AgendaName';
 import AgendaMap from '../../agenda/components/AgendaMap';
 import AgendaTime from '../../agenda/components/AgendaTime';
 import AgendaListItemLabels from '../../agenda/components/AgendaListItemLabels';
+import TopStoryLabel from 'agenda/components/TopStoryLabel';
+import ToBeConfirmedLabel from 'agenda/components/ToBeConfirmedLabel';
+import {LabelGroup} from './LabelGroup';
 
-export default function Article({image, item, children, disableTextSelection}: any) {
+export default function Article({image, item, children, disableTextSelection, detailsConfig}: any) {  
     return (
         <article
             id='preview-article'
@@ -19,7 +22,13 @@ export default function Article({image, item, children, disableTextSelection}: a
             )}
         >
             <div className={bem('wire-column__preview', 'content', {covering: hasCoverages(item)})}>
-                <AgendaName item={item} />
+                <hgroup className='mt-4'>
+                    <LabelGroup>
+                        <TopStoryLabel item={item} config={detailsConfig} size='big' />
+                        <ToBeConfirmedLabel item={item} size='big' />
+                    </LabelGroup>
+                    <AgendaName item={item} noMargin />
+                </hgroup>
                 <AgendaTime item={item}>
                     <AgendaListItemLabels
                         item={item}
@@ -40,6 +49,7 @@ Article.propTypes = {
     group: PropTypes.any,
     children: PropTypes.node,
     disableTextSelection: PropTypes.bool,
+    detailsConfig: PropTypes.any,
 };
 
 Article.defaultProps = {disableTextSelection: false};

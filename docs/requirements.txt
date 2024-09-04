@@ -1,4 +1,2 @@
--e ..
-
 sphinx
 sphinx-autobuild

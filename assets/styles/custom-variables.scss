@@ -111,11 +111,11 @@ $container-max-widths: (
     xxl: 1360px
 ) !default;
 
-
 // NEW COLORS
 //--------------------------
 
 :root {
+
     // NEUTRAL COLORS
     // Light
     --color-neutral-000: hsl(0, 2%, 100%);
@@ -127,7 +127,6 @@ $container-max-widths: (
     --color-neutral-300: hsl(0, 2%, 74%);
     --color-neutral-400: hsl(0, 2%, 54%);
     --color-neutral-500: hsl(0, 2%, 40%);
-
     --color-neutral-600: hsl(0, 2%, 34%);
     // Dark
     --color-neutral-700: hsl(0, 2%, 20%);
@@ -138,7 +137,7 @@ $container-max-widths: (
     @include defineColorHSL(--color-success, 95, 50%, 34%);
     @include defineColorHSL(--color-warning, 36, 100%, 40%);
     @include defineColorHSL(--color-alert, 356, 72%, 46%);
-    @include defineColorHSL(--color-info, 198, 45%, 50%);
+    @include defineColorHSL(--color-info, 198, 45%, 45%);
     @include defineColorHSL(--color-highlight, 356, 72%, 46%);
     @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
     @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
@@ -159,7 +158,7 @@ $container-max-widths: (
     
     --color-home-section-heading: var(--color-primary);
     --color-text--slugline: hsl(201, 62%, 30%);
-    --color-text-link: var(--color-primary);
+    //--color-text-link: var(--color-primary);
     --color-text-link--navbar: var(--color-primary);
     --color-icon-font: var(--color-text--muted);
 
@@ -226,11 +225,13 @@ $container-max-widths: (
     --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-family-core--serif: "Merriweather", serif;
     --font-size-base: 1rem; // 16px
+    --text-size--x-small: calc(var(--font-size-base) * 0.625);  // 10px
     --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
     --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
     --text-size--large: var(--font-size-base); // 16px
     --text-size--x-large: calc(var(--font-size-base) * 1.25); // 20px
     --text-size--xx-large: calc(var(--font-size-base) * 1.5); // 24px
+    --text-size--xxx-large: calc(var(--font-size-base) * 2); // 32px
 
     --font-family-core--primary: var(--font-family-core--sans);
     --font-family-core--secondary: var(--font-family-core--serif);
@@ -241,13 +242,14 @@ $container-max-widths: (
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-
+    --base-line-height: 1.5;
 
 
     // CORE: ICONS
     --icon-size--default: 24px;
     --icon-size--small: 20px;
     --icon-size--x-small: 16px;
+    --icon-size--xx-small: 12px;
     --icon-color--muted: var(--color-text--muted);
     --icon-color--muted-2: var(--color-text--muted-2);
 
@@ -316,7 +318,7 @@ $container-max-widths: (
     --top-bar-logo-main-max-width: 240px;
     --top-bar-logo-main-max-width--mobile: 160px;
     --top-bar-logo-main-padding-y: 12px;
-    --top-bar-logo-main-padding-x: 16px;
+    --top-bar-logo-main-padding-x: 16px 8px;
     --top-bar-logo-main-margin-top: 0;
     --top-bar-logo-main-margin-top--mobile: 0;
     // Logo additional
@@ -618,6 +620,7 @@ $container-max-widths: (
     --content-item-headline-line-height: 1.2;
 
     --content-item-text-font-size: var(--text-size--large);
+    --content-item-lead-font-size: calc(var(--text-size--large) * 1.0625); // 17px
     --content-item-text-line-height: 1.6;
     --content-item-text-font-weight: 300;
     --content-item-text-font-family: var(--font-family-core--secondary);
@@ -673,7 +676,7 @@ $container-max-widths: (
     --search-result-tags-list-shadow-inner: inset 0 1px 2px hsla(0, 0%, 0%, 0.08), inset 0 -1px 2px hsla(0, 0%, 0%, 0.06);
 
     // COMPONENT: MULTI-DAY LABEL
-    --multiday-label-color-bg: hsl(89, 66%, 30%);
+    --multiday-label-color-bg: var(--color-success);
     --multiday-label-color-fg: hsl(0, 0%, 100%);
     --multiday-label-font-size: var(--text-size--small);
 
@@ -683,6 +686,10 @@ $container-max-widths: (
 
     // COMPONENT: LABEL
     --color-top-story: var(--color-primary);
+    --label-color-bg-wire-latest: var(--color-warning);
+    --label-color-bg-wire-alert: var(--color-alert);
+    --label-color-bg-wire-advisory: var(--color-success);
+    --label-color-bg-wire-press-release: var(--color-info);
 }
 
 .line-shadow-end--light {

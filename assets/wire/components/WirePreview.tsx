@@ -20,7 +20,7 @@ import ArticleAuthor from  'ui/components/ArticleAuthor';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
-import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+import {ArticleBodyHtml} from 'ui/components/ArticleBodyHtml';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
@@ -101,7 +101,7 @@ class WirePreview extends React.PureComponent<any, any> {
                         filterGroupLabels={filterGroupLabels} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
-                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
+                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item} />}
 
                     {media == null ? null : media.map((mediaItem) => (
                         <ArticleMedia
