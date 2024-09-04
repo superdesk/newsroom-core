@@ -10,7 +10,7 @@ from newsroom.data_updates import (
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("data_generate_update")
+@newsroom_cli.command("data_generate_update")
 @click.option("-r", "--resource", required=True, help="Resource to generate update for")
 @with_appcontext
 def data_generate_update(resource):
@@ -18,7 +18,7 @@ def data_generate_update(resource):
     cmd.run(resource)
 
 
-@newsroom_cli.cli.command("data_upgrade")
+@newsroom_cli.command("data_upgrade")
 @click.option(
     "-i",
     "--id",
@@ -49,7 +49,7 @@ def data_upgrade(data_update_id=None, fake=False, dry=False):
     cmd.run(data_update_id, fake, dry)
 
 
-@newsroom_cli.cli.command("data_downgrade")
+@newsroom_cli.command("data_downgrade")
 @click.option(
     "-i",
     "--id",

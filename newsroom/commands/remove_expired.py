@@ -5,7 +5,7 @@ import content_api
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("remove_expired")
+@newsroom_cli.command("remove_expired")
 @click.option("-m", "--expiry", "expiry_days", required=False, help="Number of days to determine expiry")
 @with_appcontext
 def _remove_expired(expiry_days):

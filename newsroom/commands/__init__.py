@@ -21,6 +21,7 @@ from .scheduled_notifications import send_scheduled_notifications
 from newsroom.celery_app import celery
 
 from . import elastic_reindex
+from .cli import commands_blueprint, newsroom_cli
 
 
 @celery.task(soft_time_limit=600)

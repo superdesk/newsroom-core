@@ -8,9 +8,7 @@ from collections import OrderedDict
 from quart.cli import with_appcontext
 
 from superdesk.core import get_current_app
-from apps.prepopulate.app_initialize import (
-    AppInitializeWithDataCommand as _AppInitializeWithDataCommand,
-)
+from apps.prepopulate.app_initialize import import_file
 from .cli import newsroom_cli
 
 from .elastic_rebuild import elastic_rebuild
@@ -27,7 +25,7 @@ __entities__: OrderedDict = OrderedDict(
 )
 
 
-class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
+class AppInitializeWithDataCommand:
     def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info("Starting data initialization")
         app = get_current_app()
@@ -69,7 +67,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
                 (file_name, index_params, do_patch) = __entities__[name]
                 for path in data_paths:
                     if path.joinpath(file_name).exists():
-                        self.import_file(name, path, file_name, index_params, do_patch, force)
+                        import_file(name, path, file_name, index_params, do_patch, force)
                         break
             except KeyError:
                 continue
@@ -81,7 +79,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         return 0
 
 
-@newsroom_cli.cli.command("initialize_data")
+@newsroom_cli.command("initialize_data")
 @click.option(
     "-n",
     "--entity-name",

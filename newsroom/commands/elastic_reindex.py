@@ -5,7 +5,7 @@ from superdesk.core import get_current_app
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("elastic_reindex")
+@newsroom_cli.command("elastic_reindex")
 @click.option("-r", "--resource", required=True, help="Resource to reindex")
 @click.option("-s", "--requests-per-second", default=1000, type=int, help="Number of requests per second")
 @with_appcontext
