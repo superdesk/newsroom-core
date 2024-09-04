@@ -4,6 +4,7 @@ from eve.methods.get import get_internal
 from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 from superdesk import get_resource_service
+
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.auth import get_user, get_user_id, get_company_from_user
 from newsroom.decorator import login_required, section
@@ -20,11 +21,11 @@ from newsroom.utils import (
     get_entity_or_404,
     is_json_request,
     get_type,
-    query_resource,
 )
 from newsroom.notifications import push_user_notification
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
+from newsroom.cards import CardsResourceService
 
 
 search_endpoint_name = "{}_search".format(SECTION_ID)
@@ -64,7 +65,7 @@ def get_story_count(navigations, user):
     get_resource_service(search_endpoint_name).get_navigation_story_count(navigations, SECTION_ID, company, user)
 
 
-def get_home_page_data():
+async def get_home_page_data():
     """Get home page data for market place"""
     user = get_user()
     navigations = get_navigations_by_company(
@@ -76,7 +77,7 @@ def get_home_page_data():
         "user": str(user["_id"]) if user else None,
         "company": str(user["company"]) if user and user.get("company") else None,
         "navigations": navigations,
-        "cards": list(query_resource("cards", lookup={"dashboard": SECTION_ID})),
+        "cards": await (await CardsResourceService().find({"dashboard": SECTION_ID})).to_list_raw(),
         "saved_items": get_bookmarks_count(user["_id"], SECTION_ID),
         "context": SECTION_ID,
         "home_page": True,
