@@ -5,7 +5,7 @@ from newsroom.notifications.send_scheduled_notifications import SendScheduledNot
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("send_scheduled_notifications")
+@newsroom_cli.command("send_scheduled_notifications")
 @click.option(
     "-i",
     "--ignore-schedule",

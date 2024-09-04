@@ -7,7 +7,7 @@ from superdesk.commands.flush_elastic_index import FlushElasticIndex
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("elastic_rebuild")
+@newsroom_cli.command("elastic_rebuild")
 @with_appcontext
 def elastic_rebuild():
     """
