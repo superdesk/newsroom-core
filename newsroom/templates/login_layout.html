@@ -6,19 +6,21 @@
 
     <div class="login-box">
         
-        {% include "login_messages.html" %}
-
         <div class="login-box__header">
-            {% block login_header %}
+            {% block login_logo %}
             <div class="login-logo">
-                {% include 'login_logo.html' %}
+                <div class="d-flex align-items-center justify-content-center">
+                    {% include 'login_logo.html' %}
+                </div>
             </div>
-            {% block login_title %}
-            <h3 className="login-box__title">{{ gettext("Login to Newshub") }}</h3>
             {% endblock %}
+            {% block login_title %}
+            <h3 class="login-box__title">{{ gettext("Login to Newshub") }}</h3>
             {% endblock %}
         </div>
         <div class="">
+            {% include "login_messages.html" %}
+
             {% block login_body %}
             <form class="form" role="form" id="formLogin" method="post">
                 {{ form.csrf_token }}
