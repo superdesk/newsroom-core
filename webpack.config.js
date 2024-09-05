@@ -69,9 +69,14 @@ const config = {
             {
                 test: /\.scss$/,
                 use: [
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader',
+                    {loader: 'style-loader'},
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            url: (url, resourcePath) => url.startsWith('/') === false,
+                        },
+                    },
+                    {loader: 'sass-loader'},
                 ],
             },
             {
