@@ -8,8 +8,8 @@ from tests import utils
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
-        "section_filters",
+    collection = app.async_app.mongo.get_collection_async("section_filters")
+    collection.insert_many(
         [
             {
                 "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
@@ -91,7 +91,6 @@ async def test_delete_product(client):
         json={
             "name": "Breaking",
             "description": "Breaking news",
-            "parents": "59b4c5c61d41c8d736852fbf",
             "is_enabled": True,
             "query": "bar",
         },
@@ -102,6 +101,7 @@ async def test_delete_product(client):
 
     response = await client.get("/section_filters")
     data = json.loads(await response.get_data())
+
     assert 1 == len(data)
     assert data[0]["name"] == "Breaking"
 
@@ -109,9 +109,10 @@ async def test_delete_product(client):
 async def test_gets_all_products(client, app):
     await test_login_succeeds_for_admin(client)
 
+    collection = app.async_app.mongo.get_collection_async("section_filters")
+
     for i in range(250):
-        app.data.insert(
-            "section_filters",
+        collection.insert_many(
             [
                 {
                     "name": "Sport-%s" % i,

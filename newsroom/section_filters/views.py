@@ -3,6 +3,7 @@ import json
 from typing import Any, Dict, Optional
 
 from bson import ObjectId
+from quart import abort
 from quart_babel import gettext
 from pydantic import BaseModel, field_validator
 
