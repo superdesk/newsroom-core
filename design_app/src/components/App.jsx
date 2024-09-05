@@ -12,6 +12,8 @@ import Company from '../pages/Company';
 import MyTopics from '../pages/MyTopics';
 import SaveTopic from '../pages/SaveTopic';
 import MyDashboard from '../pages/MyDashboard';
+import Login from '../pages/Login';
+import Drafts from '../pages/Drafts';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="mytopics" element={<MyTopics />} />   
           <Route path="savetopic" element={<SaveTopic />} />   
           <Route path="mydashboard" element={<MyDashboard />} />
+          <Route path="login" element={<Login />} />
+          <Route path="drafts" element={<Drafts />} />
         </Route>          
       </Routes>      
     </BrowserRouter>

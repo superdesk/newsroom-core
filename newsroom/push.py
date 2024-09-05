@@ -45,6 +45,7 @@ from newsroom.agenda.utils import (
     TO_BE_CONFIRMED_FIELD,
     push_agenda_item_notification,
 )
+from newsroom.users import users_service
 
 
 logger = logging.getLogger(__name__)
@@ -274,8 +275,10 @@ def publish_event(event, orig):
             updates["coverages"] = None
             updates["planning_items"] = None
 
-        elif event.get("state") == WORKFLOW_STATE.SCHEDULED:
-            # event is reposted (possibly after a cancel)
+        elif parse_date_str(event.get("versioncreated")) > orig.get(
+            "versioncreated"
+        ):  # event is reposted (possibly after a cancel)
+            logger.info("Updating event %s", orig["_id"])
             updates = {
                 "event": event,
                 "version": event.get("version", event.get(app.config["VERSION"])),
@@ -286,6 +289,9 @@ def publish_event(event, orig):
             }
 
             set_agenda_metadata_from_event(updates, event, False)
+
+        else:
+            logger.info("Ignoring event %s", orig["_id"])
 
         if updates:
             updated = orig.copy()
@@ -437,6 +443,7 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     agenda["definition_short"] = event.get("definition_short")
     agenda["definition_long"] = event.get("definition_long")
     agenda["version"] = event.get("version")
+    agenda["versioncreated"] = event.get("versioncreated")
     agenda["calendars"] = event.get("calendars")
     agenda["location"] = event.get("location")
     agenda["ednote"] = event.get("ednote")
@@ -504,6 +511,9 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     if not plan:
         new_plan = True
 
+    agenda_versioncreated: datetime = agenda["versioncreated"]
+    plan_versioncreated: datetime = parse_date_str(planning_item.get("versioncreated")) or agenda_versioncreated
+
     plan["_id"] = planning_item.get("_id") or planning_item.get("guid")
     plan["guid"] = planning_item.get("guid")
     plan["slugline"] = planning_item.get("slugline")
@@ -519,8 +529,8 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     plan["coverages"] = planning_item.get("coverages") or []
     plan["ednote"] = planning_item.get("ednote")
     plan["internal_note"] = planning_item.get("internal_note")
-    plan["versioncreated"] = parse_date_str(planning_item.get("versioncreated"))
-    plan["firstcreated"] = parse_date_str(planning_item.get("firstcreated"))
+    plan["versioncreated"] = plan_versioncreated
+    plan["firstcreated"] = parse_date_str(planning_item.get("firstcreated")) or agenda["firstcreated"]
     plan["state"] = planning_item.get("state")
     plan["state_reason"] = planning_item.get("state_reason")
     plan["products"] = planning_item.get("products")
@@ -531,6 +541,13 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
 
     if new_plan:
         agenda["planning_items"].append(plan)
+
+    # Update the versioncreated datetime from Planning item if it's newer than the parent item
+    try:
+        if plan_versioncreated > agenda_versioncreated:
+            agenda["versioncreated"] = plan_versioncreated
+    except (KeyError, TypeError):
+        pass
 
     return new_plan
 
@@ -799,15 +816,19 @@ def notify_new_item(item, check_topics=True):
             else:
                 users_with_realtime_subscription = notify_agenda_topic_matches(item, user_dict, company_dict)
 
+        if app.config.get("NOTIFY_MATCHING_USERS") == "never":
+            return
+
+        if app.config.get("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
+            return
+
         notify_user_matches(
             item,
             user_dict,
             company_dict,
             user_ids,
             company_ids,
-            users_with_realtime_subscription
-            if not item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]
-            else set(),
+            users_with_realtime_subscription if not is_canceled(item) else set(),
         )
     except Exception as e:
         logger.exception(e)
@@ -822,6 +843,9 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
     is_text = item.get("type") == "text"
 
     users_processed = []
+    users_with_paused_notifications = set(
+        [user["_id"] for user in users_dict.values() if users_service.user_has_paused_notifications(user)]
+    )
 
     def _get_users(section):
         """Get the list of users who have downloaded or bookmarked the items"""
@@ -840,7 +864,9 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
         user_list = [
             user_id
             for user_id in user_list
-            if user_id not in users_processed and ObjectId(user_id) not in users_with_realtime_subscription
+            if user_id not in users_processed
+            and ObjectId(user_id) not in users_with_realtime_subscription
+            and ObjectId(user_id) not in users_with_paused_notifications
         ]
 
         users_processed.extend(user_list)
@@ -885,7 +911,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
 def send_user_notification_emails(item, user_matches, users, section):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]:
+        if is_canceled(item):
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get("receive_email"):
@@ -1041,3 +1067,7 @@ def fix_updates(doc, next_item, service):
             break
     else:
         logger.warning("Didn't fix ancestors in 50 iterations", extra={"guid": doc["guid"]})
+
+
+def is_canceled(item) -> bool:
+    return item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]

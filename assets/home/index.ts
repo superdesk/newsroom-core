@@ -4,6 +4,7 @@ import homeReducer from './reducers';
 import HomeApp from './components/HomeApp';
 import {initData, pushNotification} from './actions';
 import {render} from 'render-utils';
+import 'user-profile';
 
 
 const store = createStore(homeReducer, 'Home');

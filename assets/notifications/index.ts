@@ -10,7 +10,7 @@ const store = createStore(notificationReducer, 'Notifications');
 
 
 if (window.notificationData) {
-    store.dispatch(initData(window.notificationData));
+    store.dispatch(initData(window.notificationData, window.profileData));
 }
 
 

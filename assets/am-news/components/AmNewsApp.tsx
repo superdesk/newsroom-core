@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
-import {get} from 'lodash';
+import {get, noop} from 'lodash';
 
 import {noNavigationSelected} from 'search/utils';
 
@@ -41,6 +41,7 @@ import {
     navigationsSelector,
     searchNavigationSelector,
 } from 'search/selectors';
+import NewItemsIcon from 'search/components/NewItemsIcon';
 
 
 const modals: any = {
@@ -110,10 +111,6 @@ class AmNewsApp extends SearchBase<any> {
             });
         }
 
-        const searchResultsLabel = !this.props.activeQuery ?
-            null :
-            this.props.activeQuery;
-
         return (
             [
                 <section key="contentHeader" className="content-header">
@@ -171,13 +168,23 @@ class AmNewsApp extends SearchBase<any> {
                             <SearchResultsBar
                                 minimizeSearchResults={this.state.minimizeSearchResults}
                                 totalItems={this.props.totalItems}
-                                totalItemsLabel={searchResultsLabel}
                                 activeTopic={this.props.activeNavigation}
                                 showTotalItems={this.props.activeQuery}
-                                newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
                                 setQuery={this.props.setQuery}
+                                topicType={this.props.context}
+                                setSortQuery={noop}
                             />
+                            {!(this.props.newItems || []).length ? null : (
+                                <div className="navbar navbar--flex navbar--small">
+                                    <div className="navbar__inner navbar__inner--end">
+                                        <NewItemsIcon
+                                            newItems={this.props.newItems}
+                                            refresh={this.props.fetchItems}
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
                             <AmNewsList
                                 actions={this.props.actions}
@@ -190,6 +197,7 @@ class AmNewsApp extends SearchBase<any> {
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
                                 <WirePreview
+                                    key={this.props.itemToPreview._id}
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     actions={this.filterActions(this.props.itemToPreview)}

@@ -6,7 +6,9 @@ import {
     IAgendaItem,
     IAgendaListGroup,
     IAgendaState,
-    AgendaThunkAction, ISearchState,
+    AgendaThunkAction,
+    ISearchState,
+    ISearchParams,
 } from 'interfaces';
 import server from 'server';
 import analytics from 'analytics';
@@ -83,14 +85,16 @@ export function previewItem(item?: any, group?: any, plan?: any) {
     };
 }
 
-export function fetchWireItemsForAgenda(item: any) {
+export function fetchWireItemsForAgenda(item?: IAgendaItem) {
     return (dispatch: any) => {
-        const wireIds: Array<any> = [];
-        (get(item, 'coverages') || []).forEach((c: any) => {
-            if (c.coverage_type === 'text' && c.delivery_id) {
-                wireIds.push(c.delivery_id);
-            }
-        });
+        const wireIds = (item?.coverages || [])
+            .filter((coverage) => coverage.coverage_type === 'text')
+            .map((coverage) => (
+                (coverage.deliveries || [])
+                    .map((delivery) => delivery.delivery_id || '')
+                    .filter((wireId) => wireId.length > 0)
+            ))
+            .flat();
 
         if (wireIds.length > 0){
             return server.get(`/wire/items/${wireIds.join(',')}`)
@@ -233,6 +237,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
     } = getAgendaSearchParamsFromState(state);
 
     const params: any = {
+        sort: searchParams.sortQuery == null ? null : searchParams.sortQuery,
         q: searchParams.query,
         bookmarks: state.bookmarks && state.user,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
@@ -281,7 +286,7 @@ export function fetchItems(): AgendaThunkAction {
 
 interface AgendaSearchParams {
     itemType: IAgendaState['agenda']['itemType'];
-    searchParams: any;
+    searchParams: ISearchParams;
     featured: boolean;
     fromDate?: string;
     toDate?: string;
@@ -327,10 +332,12 @@ function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams
 
 function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boolean): AgendaThunkAction {
     return (dispatch, getState) => {
+
         // If there are groups shown, then load the hidden items for those groups
         const state = getState();
         const {activeGrouping, featuredOnly} = state.agenda;
-        const {fromDate, toDate} = getAgendaSearchParamsFromState(state);
+        const {fromDate, toDate, searchParams} = getAgendaSearchParamsFromState(state);
+
         let minDate: moment.Moment | undefined;
         let maxDate: moment.Moment | undefined;
 
@@ -338,13 +345,22 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             if (toDate != null && fromDate?.startsWith('now/') != true) {
                 maxDate = moment(toDate);
             }
-            if (fromDate?.startsWith('now/')) {
+            if (fromDate?.startsWith('now')) {
                 if (fromDate === 'now/w') {
                     minDate = moment().startOf('week');
                     maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
                 } else if (fromDate === 'now/M') {
                     minDate = moment().startOf('month');
                     maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
+                } else if (fromDate == 'now-24h/h') {
+                    minDate = moment().subtract(24, 'hours').startOf('hour');
+                    maxDate = moment().startOf('hour');
+                } else if (fromDate === 'now-7d/d') {
+                    minDate = moment().subtract(7, 'days').startOf('day');
+                    maxDate = moment().startOf('day');
+                } else if (fromDate === 'now-30d/d') {
+                    minDate = moment().subtract(30, 'days').startOf('day');
+                    maxDate = moment().startOf('day');
                 } else {
                     minDate = moment().startOf('day');
                     maxDate = minDate.clone();
@@ -359,7 +375,13 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             }
         }
 
-        const groups = groupItems(items, minDate, maxDate, activeGrouping, featuredOnly);
+        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '') === '' ?
+            groupItems(items, minDate, maxDate, activeGrouping, featuredOnly) :
+            [{
+                date: '',
+                items: items.map((item) => item._id),
+                hiddenItems: [],
+            }];
 
         next === true ?
             dispatch(addItemsToListGroups(groups)) :

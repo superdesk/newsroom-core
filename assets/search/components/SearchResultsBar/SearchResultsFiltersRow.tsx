@@ -18,7 +18,8 @@ type IProps = Pick<IParentProps,
     'filterGroups' |
     'toggleFilter' |
     'setCreatedFilter' |
-    'resetFilter'
+    'resetFilter' |
+    'dateFilters'
 >;
 
 type IActiveFilter = {
@@ -146,7 +147,7 @@ function SearchResultsFiltersRow(props: IPropsAgendaExtended) {
     }
 
     if (searchParams.created) {
-        const created = getCreatedSearchParamLabel(searchParams.created);
+        const created = getCreatedSearchParamLabel(searchParams.created, props.dateFilters);
 
         if (created.relative) {
             tags.push(
@@ -162,6 +163,7 @@ function SearchResultsFiltersRow(props: IPropsAgendaExtended) {
                             ...searchParams.created,
                             from: null,
                             to: null,
+                            date_filter:null,
                         });
                     }}
                 />

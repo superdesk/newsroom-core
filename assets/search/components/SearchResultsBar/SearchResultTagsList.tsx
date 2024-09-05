@@ -8,6 +8,7 @@ import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} 
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';
 import {getTopicUrl} from 'search/utils';
+import {IDateFilter} from 'interfaces/common';
 
 export interface IProps {
     user: IUser;
@@ -22,7 +23,7 @@ export interface IProps {
     filterGroups: {[key: string]: IFilterGroup};
     availableFields: ISearchFields;
 
-    setQuery(): void;
+    setQuery(query: string): void;
     resetFilter(): void;
     refresh?(): void;
     toggleNavigation(navigation: INavigation): void;
@@ -34,6 +35,7 @@ export interface IProps {
 
     saveMyTopic?: (params: ISearchParams) => void;
     deselectMyTopic?: (topicId: ITopic['_id']) => void;
+    dateFilters?: IDateFilter;
 }
 
 export function SearchResultTagsList({
@@ -58,6 +60,7 @@ export function SearchResultTagsList({
     deselectMyTopic,
     resetFilter,
     refresh,
+    dateFilters
 }: IProps) {
     return (
         <ul
@@ -99,6 +102,7 @@ export function SearchResultTagsList({
                 setCreatedFilter={setCreatedFilter}
                 resetFilter={resetFilter}
                 readonly={readonly}
+                dateFilters={dateFilters}
             />
             {readonly === true && activeTopic._id && (
                 <SearchResultTagList

@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import {IUser} from 'interfaces';
 import {gettext, getScheduledNotificationConfig, TIME_FORMAT} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
-import {updateUserNotificationSchedules} from 'user-profile/actions';
+import {updateUserNotificationSchedule} from 'user-profile/actions';
 
 import Modal from 'components/Modal';
 import {TimezoneInput} from 'components/TimezoneInput';
@@ -14,7 +14,7 @@ import {TimePicker} from 'components/cards/TimePicker';
 interface IProps {
     modalFormInvalid(): void;
     modalFormValid(): void;
-    updateUserNotificationSchedules(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>): void;
+    updateUserNotificationSchedule(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>): void;
     data: {
         user: IUser;
     };
@@ -101,7 +101,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         if (hasErrors === true) {
             this.formRef.current.reportValidity();
         } else {
-            this.props.updateUserNotificationSchedules(this.state);
+            this.props.updateUserNotificationSchedule(this.state);
         }
     }
 
@@ -190,8 +190,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
 const mapDispatchToProps = (dispatch: any) => ({
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),
-    updateUserNotificationSchedules: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) => (
-        dispatch(updateUserNotificationSchedules(schedule))
+    updateUserNotificationSchedule: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) => (
+        dispatch(updateUserNotificationSchedule(schedule, gettext('Global schedule updated')))
     ),
 });
 

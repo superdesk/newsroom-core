@@ -58,10 +58,9 @@ def init_saml_auth(req):
 
 
 def prepare_flask_request(request):
-    scheme = request.scheme
     url_data = urlparse(request.url)
     return {
-        "https": "on" if scheme == "https" else "off",
+        "https": "off" if "http://localhost" in app.config.get("CLIENT_URL", "") else "on",
         "http_host": request.host,
         "server_port": url_data.port,
         "script_name": request.path,
@@ -88,6 +87,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         company = superdesk.get_resource_service("companies").find_one(req=None, auth_domains=domain)
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
@@ -96,6 +97,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         )
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # last option is global env variable
     if app.config.get("SAML_COMPANY") and not userdata.get("company"):

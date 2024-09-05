@@ -37,6 +37,7 @@ def get_items(args):
             "service",
             "versioncreated",
             "anpa_take_key",
+            "source",
         ],
     }
 
@@ -189,6 +190,7 @@ def export_csv(args, results):
             gettext("Place"),
             gettext("Category"),
             gettext("Subject"),
+            gettext("Source"),
             gettext("Companies"),
             gettext("Actions"),
         ]
@@ -239,6 +241,7 @@ def export_csv(args, results):
             "\r\n".join(sorted([place.get("name") or "" for place in item.get("place") or []])),
             "\r\n".join(sorted([service.get("name") or "" for service in item.get("service") or []])),
             "\r\n".join(sorted([subject.get("name") or "" for subject in item.get("subject") or []])),
+            item.get("source", ""),
             "\r\n".join(
                 sorted(
                     [
@@ -250,29 +253,10 @@ def export_csv(args, results):
             aggs.get("total") or 0,
         ]
 
-        if "download" in actions:
-            row.append((aggs.get("actions") or {}).get("download") or 0)
-
-        if "copy" in actions:
-            row.append((aggs.get("actions") or {}).get("copy") or 0)
-
-        if "share" in actions:
-            row.append((aggs.get("actions") or {}).get("share") or 0)
-
-        if "print" in actions:
-            row.append((aggs.get("actions") or {}).get("print") or 0)
-
-        if "open" in actions:
-            row.append((aggs.get("actions") or {}).get("open") or 0)
-
-        if "preview" in actions:
-            row.append((aggs.get("actions") or {}).get("preview") or 0)
-
-        if "clipboard" in actions:
-            row.append((aggs.get("actions") or {}).get("clipboard") or 0)
-
-        if "api" in actions:
-            row.append((aggs.get("actions") or {}).get("api") or 0)
+        action_names = ["download", "copy", "share", "print", "open", "preview", "clipboard", "api"]
+        for action_name in action_names:
+            if action_name in actions:
+                row.append((aggs.get("actions") or {}).get(action_name, 0))
 
         rows.append(row)
 

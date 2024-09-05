@@ -35,7 +35,6 @@ interface IStateProps {
     users: Array<IUser>;
     companyTypes: Array<ICompanyType>;
     apiEnabled: boolean;
-    ssoEnabled: boolean;
     authProviders: Array<IAuthProvider>;
     countries: Array<ICountry>;
 }
@@ -154,10 +153,6 @@ class EditCompany extends React.Component<IProps, IState> {
     }
 
     render() {
-        const currentAuthProvider =  this.props.authProviders.find(
-            (provider) => provider._id === (this.props.company.auth_provider ?? 'newshub')
-        );
-
         return (
             <div
                 data-test-id="edit-company-form"
@@ -229,7 +224,6 @@ class EditCompany extends React.Component<IProps, IState> {
                                 onChange={this.props.onChange}
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
-                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type !== 'password'}
                                 authProviders={this.props.authProviders}
                                 countries = {this.props.countries}
                             />
@@ -281,7 +275,6 @@ const mapStateToProps = (state: ICompanySettingsStore): IStateProps => ({
     users: state.companyUsers,
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
-    ssoEnabled: state.ssoEnabled,
     authProviders: state.authProviders,
     countries: state.countries,
 });

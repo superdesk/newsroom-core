@@ -4,7 +4,7 @@
     inset-inline-start: 0;
     inset-inline-end: 0;
     inset-block-end: 0;
-    z-index: 1010;
+    z-index: 1000000000;
     display: flex;
     flex-grow: 1;
     overflow-y: auto;
@@ -84,7 +84,7 @@
 .profile__info {
     color: var(--profile-sidebar-color-fg);
     opacity: 0.7;
-    font-size: var(--text-size--small); // 13px
+    font-size: var(--text-size--small); // 12px
 }
 
 .profile__characters {

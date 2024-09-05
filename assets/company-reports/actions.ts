@@ -1,6 +1,8 @@
 import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from '../utils';
 import server from '../server';
-import {get, cloneDeep} from 'lodash';
+import {cloneDeep} from 'lodash';
+import {type ICompanyReportsData} from './types';
+import {Store, Dispatch} from 'redux';
 
 export const REPORTS_NAMES = {
     'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
@@ -13,6 +15,7 @@ export const REPORTS_NAMES = {
     'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
     'PRODUCT_COMPANIES': 'product-companies',
     'EXPIRED_COMPANIES': 'expired-companies',
+    'COMPANY_AND_USER_SAVED_SEARCHES': 'company-and-user-saved-searches',
 };
 
 
@@ -27,13 +30,14 @@ export const REPORTS: any = {
     [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
     [REPORTS_NAMES.PRODUCT_COMPANIES]: '/reports/product-companies',
     [REPORTS_NAMES.EXPIRED_COMPANIES]: '/reports/expired-companies',
+    [REPORTS_NAMES.COMPANY_AND_USER_SAVED_SEARCHES]: '/reports/company-and-user-saved-searches',
 };
 
-function getReportQueryString(currentState: any, next: any, exportReport: any, notify: any) {
+function getReportQueryString(currentState: any, next: boolean, exportReport: boolean, notify: any) {
     const params = cloneDeep(currentState.reportParams);
     if (params) {
         if (params.company) {
-            params.company = get(getItemFromArray(params.company, currentState.companies, 'name'), '_id');
+            params.company = getItemFromArray(params.company, currentState.companies, 'name')?._id;
         }
 
         if (params.date_from > params.date_to) {
@@ -49,28 +53,29 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
         }
 
         if (params.section) {
-            params.section = get(getItemFromArray(params.section, currentState.sections, 'name'), '_id');
+            params.section = getItemFromArray(params.section, currentState.sections, 'name')?._id;
         }
 
         if (params.product) {
-            params.product = get(getItemFromArray(params.product, currentState.products, 'name'), '_id');
+            params.product = getItemFromArray(params.product, currentState.products, 'name')?._id;
         }
 
         if (exportReport) {
             params.export = true;
         }
 
-        params['from'] = next ? get(currentState, 'results.length') : 0;
+        params['from'] = next ? currentState?.results?.length : 0;
         const queryString = Object.keys(params)
-            .filter((key: any) => params[key])
-            .map((key: any) => [key, params[key]].join('='))
+            .filter((key) => params[key])
+            .map((key) => [key, params[key]].join('='))
             .join('&');
+
         return queryString;
     }
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data: any): any {
+export function initData(data: ICompanyReportsData): any {
     return function (dispatch: any) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});
@@ -119,9 +124,9 @@ export function runReport() {
     };
 }
 
-export function fetchAggregations(url: any) {
+export function fetchAggregations(url: string) {
     return function(dispatch: any, getState: any) {
-        const queryString = getReportQueryString(getState(), 0, false, notify);
+        const queryString = getReportQueryString(getState(), false, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
             .then((data: any) => {
@@ -144,7 +149,6 @@ export function fetchReport(url: any, next?: any, exportReport?: any) {
         }
 
         const queryString = getReportQueryString(getState(), next, exportReport, notify);
-        let apiRequest: any;
 
         if (exportReport) {
             if (getState().results.length <= 0) {
@@ -156,18 +160,14 @@ export function fetchReport(url: any, next?: any, exportReport?: any) {
             return;
         }
 
-        if (queryString) {
-            apiRequest = server.get(`${url}?${queryString}`);
-        } else {
-            apiRequest = server.get(url);
-        }
+        const apiRequest = server.get(queryString ? `${url}?${queryString}` : url);
 
         return apiRequest.then((data: any) => {
             if (!next) {
                 dispatch(receivedData(data));
             } else {
                 dispatch(isLoading(false));
-                dispatch(addResults(get(data, 'results', [])));
+                dispatch(addResults(data?.results ?? []));
             }
         })
             .catch((error: any) => errorHandler(error, dispatch, setError));
@@ -193,17 +193,23 @@ export function toggleFilterAndQuery(filter: any, value: any) {
 }
 
 export function printReport() {
-    return function (dispatch: any, getState: any) {
+    const queryStringRequiredReports = [
+        REPORTS_NAMES.SUBSCRIBER_ACTIVITY,
+        REPORTS_NAMES.CONTENT_ACTIVITY
+    ];
+    const REPORTS_URL_BASE = '/reports/print/';
+
+    return async function (_: Dispatch, getState: Store['getState']) {
         const state = getState();
         const activeReport = state.activeReport;
+        let url = `${REPORTS_URL_BASE}${activeReport}`;
 
-        if (activeReport === REPORTS_NAMES.SUBSCRIBER_ACTIVITY) {
+        if (queryStringRequiredReports.includes(activeReport)) {
             const queryString = getReportQueryString(state, false, false, notify);
-            window.open(`/reports/print/${activeReport}?${queryString}`, '_blank');
-        } else {
-            window.open(`/reports/print/${activeReport}`, '_blank');
+            url += `?${queryString}`;
         }
 
+        window.open(url, '_blank');
         return Promise.resolve();
     };
 }

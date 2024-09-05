@@ -1,6 +1,7 @@
 import {get} from 'lodash';
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
+import {IUser} from 'interfaces';
 
 export const UPDATE_NOTIFICATION_COUNT = 'UPDATE_NOTIFICATION_COUNT';
 export function updateNotificationCount(count: any) {
@@ -8,8 +9,13 @@ export function updateNotificationCount(count: any) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data: any) {
-    return {type: INIT_DATA, data};
+export function initData(notificationData: any, profileData: any) {
+    return {type: INIT_DATA, data: {...notificationData, fullUser: profileData.user}};
+}
+
+export const GET_USER = 'GET_USER';
+export function getUser(user: IUser): {type: string, user: IUser} {
+    return {type: GET_USER, user};
 }
 
 
@@ -106,5 +112,16 @@ export function pushNotification(push: any): any {
             }
             break;
         }
+    };
+}
+
+export function updateFullUser(userId: string) {
+    return (dispatch: any, getState: any) => {
+        return server.get(`/users/${userId}`)
+            .then((data: IUser) => {
+                dispatch(getUser(data));
+                return data;
+            })
+            .catch((error: any) => errorHandler(error, dispatch));
     };
 }

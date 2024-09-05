@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {IUser} from 'interfaces';
-import {gettext, getSubscriptionTimesString} from 'utils';
+import {gettext, getSubscriptionTimesString, formatDate, parseISODate, notificationsArePaused, notificationsWillBePaused} from 'utils';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -15,6 +15,8 @@ import {
     saveUser,
     setError,
     openEditTopicNotificationsModal,
+    openPauseNotificationModal,
+    updateUserNotificationSchedule,
 } from '../../actions';
 import {IUserProfileState} from 'user-profile/reducers';
 import {IUserProfileUpdates} from 'interfaces/user';
@@ -27,7 +29,9 @@ interface IProps {
     setError(errors: {[key: string]: string}): void;
     fetchUser(userId: IUser['_id']): void;
     openEditTopicNotificationsModal(): void;
+    openPauseNotificationModal(): void;
     authProviderFeatures: IUserProfileState['authProviderFeatures'];
+    updateUserNotificationPause(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string): void;
 }
 
 class UserProfile extends React.PureComponent<IProps> {
@@ -69,6 +73,8 @@ class UserProfile extends React.PureComponent<IProps> {
         const {user, onChange, errors, authProviderFeatures} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
         const localeOptions = getLocaleInputOptions();
+        const pausedFrom = parseISODate(this.props.user.notification_schedule?.pause_from);
+        const pausedTo = parseISODate(this.props.user.notification_schedule?.pause_to);
         return (
             <form className="profile-content profile-content--user">
                 <div className="profile-content__main">
@@ -160,7 +166,7 @@ class UserProfile extends React.PureComponent<IProps> {
                             </div>
 
                             <div className="col-lg-6">
-                                <div className="nh-container nh-container--highlight mb-3 mt-3">
+                                <div className="nh-container nh-container--highlight mb-1 mt-3">
                                     <p className="nh-container__text--small">
                                         {gettext('You will receive email notifications daily, sent in a digest ' +
                                             'format at regular intervals. This setting will apply to all subscribed ' +
@@ -180,6 +186,45 @@ class UserProfile extends React.PureComponent<IProps> {
                                     </button>
                                 </div>
                             </div>
+                            
+                            <div className='row'>
+                                <div className="col-lg-6">
+                                    {(notificationsArePaused(pausedFrom, pausedTo) || notificationsWillBePaused(pausedFrom, pausedTo)) ?
+                                        (
+                                            <div className="nh-container nh-container__text--alert">
+                                                <div className='d-flex flex-column gap-3 p-3'>
+                                                    <div>
+                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom, true), dateTo: formatDate(pausedTo, true)})}
+                                                    </div>
+                                                    <div>
+                                                        <button
+                                                            type="button"
+                                                            className="nh-button nh-button--small nh-button--tertiary"
+                                                            onClick={() => {
+                                                                this.props.updateUserNotificationPause({pause_from: '', pause_to: ''}, gettext('Notifications resumed'));
+                                                            }}
+                                                        >
+                                                            {gettext('Clear Pausing')}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                        : (
+                                            <div className="nh-container nh-container--highlight mb-3 mt-1">
+                                                <button
+                                                    type="button"
+                                                    className="nh-button nh-button--small nh-button--tertiary"
+                                                    onClick={this.props.openPauseNotificationModal}
+                                                >
+                                                    {gettext('Pause All Notifications')}
+                                                </button>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </div>
+
                             <div className="col-lg-12"></div>
 
 
@@ -229,6 +274,10 @@ const mapDispatchToProps = (dispatch: any) => ({
     onChange: (updates: IUserProfileUpdates) => dispatch(editUser(updates)),
     setError: (errors: {[key: string]: string}) => dispatch(setError(errors)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
+    openPauseNotificationModal: () => dispatch(openPauseNotificationModal()),
+    updateUserNotificationPause: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string) => (
+        dispatch(updateUserNotificationSchedule(schedule, message))
+    ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

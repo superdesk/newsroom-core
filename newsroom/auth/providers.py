@@ -1,30 +1,19 @@
 import abc
 
+from typing import TypedDict
+
 from newsroom.types import AuthProviderConfig, AuthProviderType
 
 
-class AuthProviderFeatures(object):
+class AuthProviderFeatures(TypedDict):
     verify_email: bool
     change_password: bool
-
-    def __init__(self, *, verify_email=False, change_password=False):
-        self.verify_email = verify_email
-        self.change_password = change_password
-
-    def __iter__(self):
-        """Needed for export to json for client."""
-        return iter(
-            [
-                ("verify_email", self.verify_email),
-                ("change_password", self.change_password),
-            ]
-        )
 
 
 class AuthProvider(abc.ABC):
     type: AuthProviderType
     config: AuthProviderConfig
-    features = AuthProviderFeatures()
+    features: AuthProviderFeatures
 
     def __init__(self, config: AuthProviderConfig):
         self._id = config["_id"]
@@ -49,14 +38,14 @@ class PasswordAuthProvider(AuthProvider):
 
 class GoogleOauthAuthProvider(AuthProvider):
     type = AuthProviderType.GOOGLE_OAUTH
-    features = AuthProviderFeatures()
+    features = AuthProviderFeatures(verify_email=False, change_password=False)
 
 
 class SAMLAuthProvider(AuthProvider):
     type = AuthProviderType.SAML
-    features = AuthProviderFeatures()
+    features = AuthProviderFeatures(verify_email=False, change_password=False)
 
 
 class FirebaseAuthProvider(AuthProvider):
     type = AuthProviderType.FIREBASE
-    features = AuthProviderFeatures(change_password=True)
+    features = AuthProviderFeatures(verify_email=False, change_password=True)

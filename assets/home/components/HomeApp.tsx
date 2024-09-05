@@ -1,8 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {get} from 'lodash';
 
-import {ITopic, IItemAction} from 'interfaces';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getCard} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
@@ -20,7 +18,7 @@ import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
-import {IPersonalizedDashboardsWithData} from 'home/reducers';
+import {IHomeState} from 'home/reducers';
 
 import {DashboardPanels} from './DashboardPanels';
 
@@ -32,45 +30,11 @@ const modals: any = {
     personalizeHome: PersonalizeHomeSettingsModal,
 };
 
-interface IState {
-    activeOptionId: 'default' | 'my-home';
-}
-
-interface IStateProps {
-    cards: Array<any>;
-    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
-    itemsByCard: any;
-    products: Array<any>;
-    user: string;
-    userType: string;
-    userSections: any;
-    company: string;
-    itemToOpen: any;
-    modal: any;
-    activeCard: string;
-    previewConfig: any;
-    listConfig: any;
-    detailsConfig: any;
-    topics: Array<ITopic>;
-    isSearchEnabled: boolean;
-    filterGroupLabels: any;
-    currentUser: any;
-}
-
-interface IDispatchProps {
-    openItemDetails: (item: any, state: any) => void;
-    fetchItems: () => any;
-    personalizeHome: () => void;
-    actions: Array<IItemAction>;
-    fetchCardExternalItems: (cardId: string, cardLabel: string) => any;
-    fetchCompanyCardItems: () => any;
-    followStory: (item: any) => void;
-    downloadMedia: (href: any, id: any) => any;
-}
-
 type IProps = IStateProps & IDispatchProps;
 
-class HomeApp extends React.Component<IProps, IState>  {
+class HomeApp extends React.Component<IProps, {
+    activeOptionId: 'default' | 'my-home';
+}>{
     static propTypes: any;
 
     height: number;
@@ -117,32 +81,38 @@ class HomeApp extends React.Component<IProps, IState>  {
 
     getPanelsForPersonalizedDashboard() {
         const {personalizedDashboards} = this.props;
-        const Card = getCard('4-picture-text');
-        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}) => _id);
-        const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
+        return personalizedDashboards?.map((dashboard) => {
+            const Card = getCard(dashboard.dashboard_card_type);
+            const personalizedDashboardTopicIds = dashboard.topic_items?.map(({_id}) => _id);
+            const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
 
-        return (
-            personalizedDashboards?.[0].topic_items?.map((item) => {
-                const currentTopic = topicItems.find(({_id}) => _id === item._id);
+            if (Card == null || Card._id === '2x2-events' || Card._id === '4-photo-gallery' || Card._id === '6-navigation-row') {
+                return;
+            }
 
-                return (
-                    Card?._id === '4-picture-text' && currentTopic && (
-                        <Card.dashboardComponent
-                            kind="topic"
-                            key={item._id}
-                            type="4-picture-text"
-                            items={item.items}
-                            title={currentTopic?.label}
-                            id={currentTopic?._id}
-                            openItem={this.props.openItemDetails}
-                            isActive={this.props.activeCard === item._id}
-                            cardId={item._id}
-                            listConfig={this.props.listConfig}
-                        />
-                    )
-                );
-            })
-        );
+            return (
+                dashboard.topic_items?.map((item) => {
+                    const currentTopic = topicItems.find(({_id}) => _id === item._id);
+
+                    return (
+                        currentTopic && (
+                            <Card.dashboardComponent
+                                kind="topic"
+                                key={item._id}
+                                type={dashboard.dashboard_card_type}
+                                items={item.items}
+                                title={currentTopic?.label}
+                                id={currentTopic?._id}
+                                openItem={this.props.openItemDetails}
+                                isActive={this.props.activeCard === item._id}
+                                cardId={item._id}
+                                listConfig={this.props.listConfig}
+                            />
+                        )
+                    );
+                })
+            );
+        });
     }
 
     filterActions(item: any, config: any) {
@@ -151,7 +121,7 @@ class HomeApp extends React.Component<IProps, IState>  {
     }
 
     renderContent(children?: any): any {
-        const isWireSectionConfigured = this.props.userSections[WIRE_SECTION] != null;
+        const isWireSectionConfigured = this.props.userSections?.[WIRE_SECTION] != null;
 
         return (
             <React.Fragment>
@@ -275,13 +245,14 @@ class HomeApp extends React.Component<IProps, IState>  {
 
     renderMobile() {
         const modal = this.renderModal(this.props.modal);
-        const isFollowing = get(this.props, 'itemToOpen.slugline') && this.props.topics &&
-            this.props.topics.find((topic: any) => topic.query === `slugline:"${this.props.itemToOpen.slugline}"`);
+        const isFollowing = this.props.itemToOpen?.slugline && this.props.topics &&
+            this.props.topics.find((topic: any) => topic.query === `slugline:"${this.props.itemToOpen?.slugline}"`);
 
         return this.renderContent([
             <div key='preview_test' className={`wire-column__preview ${this.props.itemToOpen ? 'wire-column__preview--open' : ''}`}>
                 {this.props.itemToOpen && (
                     <WirePreview
+                        key={this.props.itemToOpen._id}
                         item={this.props.itemToOpen}
                         user={this.props.user}
                         actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
@@ -306,9 +277,9 @@ class HomeApp extends React.Component<IProps, IState>  {
     }
 }
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IHomeState) => ({
     cards: state.cards,
-    personalizedDashboards: state.personalizedDashboards,
+    personalizedDashboards: state.personalizedDashboards || [],
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,
@@ -327,7 +298,7 @@ const mapStateToProps = (state: any) => ({
     currentUser: getCurrentUser(state),
 });
 
-const mapDispatchToProps = (dispatch: any, state: any) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     openItemDetails: (item: any, cardId: any) => {
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));
@@ -343,10 +314,12 @@ const mapDispatchToProps = (dispatch: any, state: any) => ({
     downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
+type IStateProps = ReturnType<typeof mapStateToProps>;
+type IDispatchProps = ReturnType<typeof mapDispatchToProps>;
 
 export default connect<
     IStateProps,
     IDispatchProps,
-    {},
-    any
+    null,
+    IHomeState
 >(mapStateToProps, mapDispatchToProps)(HomeApp);

@@ -1,94 +1,110 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
+import {IAgendaItem, ICoverageItemAction, IUser, IAgendaPreviewConfig, IArticle, IAgendaState} from 'interfaces';
 
-export class AgendaPreviewPlanning extends React.Component<any, any> {
-    static propTypes: any;
-    render() {
-        const {
-            item,
-            planningId,
-            wireItems,
-            coverageActions,
-            user,
-            previewGroup,
-            restrictCoverageInfo,
-        } = this.props;
+interface IOwnProps {
+    item: IAgendaItem;
+    planningId?: IAgendaItem['_id'];
+    user?: IUser['_id'];
+    coverageActions?: Array<ICoverageItemAction>;
+    previewGroup?: string;
+    restrictCoverageInfo?: boolean;
+    previewConfig: IAgendaPreviewConfig;
+}
 
-        const planningItems = get(item, 'planning_items') || [];
-        const plan = planningItems.find((p: any) => p.guid === planningId);
-        const otherPlanningItems = planningItems.filter((p: any) => p.guid !== planningId);
+interface IReduxStateProps {
+    wireItems?: Array<IArticle>;
+}
 
-        if (isPlanningItem(item) || restrictCoverageInfo) {
-            return (
-                <AgendaPreviewCoverages
-                    key={item.guid}
-                    item={item}
-                    plan={plan}
-                    wireItems={wireItems}
-                    actions={coverageActions}
-                    user={user}
-                    previewGroup={previewGroup}
-                    restrictCoverageInfo={restrictCoverageInfo}
-                />
-            );
-        }
+type IProps = IOwnProps & IReduxStateProps;
 
+function AgendaPreviewPlanningComponent({
+    item,
+    planningId,
+    wireItems,
+    coverageActions,
+    user,
+    previewGroup,
+    restrictCoverageInfo,
+    previewConfig,
+}: IProps) {
+    const planningItems = item.planning_items || [];
+    const plan = planningItems.find((p) => p.guid === planningId);
+    const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
+
+    if (isPlanningItem(item) || restrictCoverageInfo) {
         return (
-            <React.Fragment>
-                {!plan ? null : (
-                    <div className="agenda-planning__container info-box">
-                        <div className="info-box__content">
-                            <span className="info-box__label">
-                                {gettext('Planning Item')}
-                            </span>
+            <AgendaPreviewCoverages
+                key={item.guid}
+                item={item}
+                plan={plan}
+                wireItems={wireItems}
+                actions={coverageActions}
+                user={user}
+                previewGroup={previewGroup}
+                restrictCoverageInfo={restrictCoverageInfo}
+                previewConfig={previewConfig}
+            />
+        );
+    }
+
+    return (
+        <React.Fragment>
+            {!plan ? null : (
+                <div className="agenda-planning__container info-box">
+                    <div className="info-box__content">
+                        <span className="info-box__label">
+                            {gettext('Planning Item')}
+                        </span>
+                        <AgendaPreviewCoverages
+                            key={plan.guid}
+                            item={item}
+                            plan={plan}
+                            wireItems={wireItems}
+                            actions={coverageActions}
+                            user={user}
+                            previewGroup={previewGroup}
+                            previewConfig={previewConfig}
+                        />
+                    </div>
+                </div>
+            )}
+            {!otherPlanningItems.length ? null : (
+                <div className="agenda-planning__container info-box">
+                    <div className="info-box__content">
+                        <span className="info-box__label">
+                            {plan == null ? gettext('Planning Items') : gettext('Other Planning Items')}
+                        </span>
+                        {otherPlanningItems.map((planningItem) => (
                             <AgendaPreviewCoverages
-                                key={plan.guid}
+                                key={planningItem.guid}
                                 item={item}
-                                plan={plan}
+                                plan={planningItem}
                                 wireItems={wireItems}
                                 actions={coverageActions}
                                 user={user}
                                 previewGroup={previewGroup}
+                                previewConfig={previewConfig}
                             />
-                        </div>
+                        ))}
                     </div>
-                )}
-                {!otherPlanningItems.length ? null : (
-                    <div className="agenda-planning__container info-box">
-                        <div className="info-box__content">
-                            <span className="info-box__label">
-                                {plan == null ? gettext('Planning Items') : gettext('Other Planning Items')}
-                            </span>
-                            {otherPlanningItems.map((planningItem: any) => (
-                                <AgendaPreviewCoverages
-                                    key={planningItem.guid}
-                                    item={item}
-                                    plan={planningItem}
-                                    wireItems={wireItems}
-                                    actions={coverageActions}
-                                    user={user}
-                                    previewGroup={previewGroup}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </React.Fragment>
-        );
-    }
+                </div>
+            )}
+        </React.Fragment>
+    );
 }
 
-AgendaPreviewPlanning.propTypes = {
-    user: PropTypes.string,
-    item: PropTypes.object,
-    planningId: PropTypes.string,
-    wireItems: PropTypes.array,
-    coverageActions: PropTypes.array,
-    previewGroup: PropTypes.string,
-    restrictCoverageInfo: PropTypes.bool,
-};
+const mapStateToProps = (state: IAgendaState): IReduxStateProps => ({
+    wireItems: state.agenda.agendaWireItems || [],
+});
+
+export const AgendaPreviewPlanning = connect<
+    IReduxStateProps,
+    {},
+    IOwnProps,
+    IAgendaState
+>(mapStateToProps)(AgendaPreviewPlanningComponent);

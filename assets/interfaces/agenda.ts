@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
-import {IFilterGroup, IResourceItem, ISection} from './common';
+import {IFilterGroup, IOccurStatus, ISingleItemAction, IResourceItem, ISection, ISubject, TDatetime, IDateFilter} from './common';
 import {IAgendaUIConfig} from './configs';
 import {IUser, IUserType} from './user';
 import {ITopic, ITopicFolder} from './topic';
@@ -53,6 +53,7 @@ export interface IEvent {
     actioned_date?: string;
     _time_to_be_confirmed?: boolean;
     files?: Array<string>;
+    occur_status?: IOccurStatus;
 }
 
 export type ICoverageStatus = 'coverage intended' |
@@ -73,22 +74,113 @@ export interface ICoverage {
     coverage_id: IAgendaItem['_id'];
     scheduled: string;
     coverage_type: string;
-    planning?: {
-        scheduled: string;
-    };
-    watches?: Array<IUser['_id']>;
-    coverage_status: ICoverageStatus;
     workflow_status: ICoverageWorkflowStatus;
+    coverage_status: ICoverageStatus;
+    coverage_provider?: string;
+    delivery_id?: string;
+    delivery_href?: string;
+    publish_time?: TDatetime;
+    _time_to_be_confirmed?: boolean;
+    deliveries?: Array<{
+        delivery_state: string; // TODO: Check what values this could be
+        sequence_no: number;
+        publish_time: TDatetime;
 
+        // These next 2 are only populated for text wire items
+        delivery_id?: IArticle['_id'];
+        delivery_href?: string;
+    }>;
+    watches?: Array<IUser['_id']>;
     assigned_desk_name?: string;
     assigned_desk_email?: string;
     assigned_user_name?: string;
     assigned_user_email?: string;
+    slugline?: string;
     genre?: Array<{
         qcode: string,
         name: string
     }>;
-    coverage_provider?: string;
+}
+
+export interface IPlanningNewsCoverageStatus {
+    qcode: 'ncostat:int' | 'ncostat:notdec' | 'ncostat:notint' | 'ncostat:onreq';
+    name: string;
+    label: string;
+}
+
+export interface ICoverageScheduledUpdate {
+    coverage_id: ICoverage['coverage_id'];
+    scheduled_update_id: ICoverage['coverage_id'];
+    workflow_status: ICoverageWorkflowStatus;
+    previous_status?: ICoverageWorkflowStatus;
+    news_coverage_status: IPlanningNewsCoverageStatus;
+    assigned_to?: {
+        assignment_id: string;
+        state: ICoverageWorkflowStatus;
+        contact: string;
+        user: IUser['_id'];
+        desk: string;
+        coverage_provider: {
+            qcode: string;
+            name: string;
+            contact_type: string;
+        }
+    };
+    planning: {
+        internal_note: string;
+        contact_info: string;
+        scheduled: string | Date;
+        genre: Array<{
+            qcode: string;
+            name: string;
+        }>;
+        workflow_status_reason: string;
+    };
+}
+
+export interface IG2ContentType {
+    qcode: string;
+    name: string;
+    'content item type': string;
+}
+
+export interface IFullCoverage extends Omit<ICoverage, 'deliveries'> {
+    original_coverage_id?: ICoverage['coverage_id'];
+    news_coverage_status: IPlanningNewsCoverageStatus;
+    previous_status?: ICoverageWorkflowStatus;
+    planning?: {
+        ednote?: string;
+        g2_content_type: IG2ContentType['qcode'];
+        coverage_provider?: string;
+        contact_info?: string;
+        scheduled: TDatetime;
+        service: Array<{
+            qcode: string;
+            name: string;
+        }>;
+        subject?: Array<ISubject>;
+        genre?: Array<{
+            qcode: string,
+            name: string
+        }>;
+        headline?: string;
+        keyword?: Array<string>;
+        language?: string;
+        slugline?: string;
+        internal_note?: string;
+        workflow_status_reason?: string;
+        priority?: number;
+    };
+    deliveries?: Array<{
+        item_id: IArticle['_id'];
+        item_state: string;
+        sequence_no: number;
+        publish_time: TDatetime;
+        scheduled_update_id?: ICoverage['coverage_id'];
+    }>;
+    scheduled_updates?: Array<ICoverageScheduledUpdate>;
+    workflow_status_reason?: string;
+    internal_note?: string;
 }
 
 export interface IAgendaItem extends IResourceItem {
@@ -99,7 +191,7 @@ export interface IAgendaItem extends IResourceItem {
     location?: IEvent['location'];
     version?: number | string;
     plan?: IAgendaItem;
-    planning_items?: Array<IAgendaItem>;
+    planning_items?: Array<IPlanningItem>;
     _hits?: {
         matched_planning_items?: Array<IAgendaItem['_id']>;
         matched_coverages?: Array<ICoverage['coverage_id']>;
@@ -126,6 +218,16 @@ export interface IAgendaItem extends IResourceItem {
     watches?: Array<IUser['_id']>;
     es_highlight?: {[field: string]: Array<string>};
     state: string;
+    subject?: Array<ISubject>;
+    ednote?: string;
+    state_reason?: string;
+    firstcreated: string;
+    versioncreated: string;
+    internal_note?: string;
+}
+
+export interface IPlanningItem extends Omit<IAgendaItem, 'coverages'> {
+    coverages?: Array<IFullCoverage>;
 }
 
 export interface IAgendaListGroup {
@@ -140,6 +242,14 @@ export interface IAgendaListGroupItem {
     plan?: IAgendaItem['_id'];
 }
 
+export interface IAggregation {  // incomplete
+    field: string;
+    buckets: Array<{
+        key: string;
+        doc_count: number;
+    }>;
+}
+
 export interface IAgendaState {
     items: Array<IAgendaItem['_id']>;
     fetchFrom: number;
@@ -148,7 +258,7 @@ export interface IAgendaState {
         groups: Array<IAgendaListGroup>;
         hiddenGroupsShown: {[dateString: string]: boolean};
     };
-    aggregations?: {[field: string]: any}; // Too complex to even bother
+    aggregations?: {[field: string]: IAggregation};
     activeItem?: IAgendaListGroupItem;
     previewItem?: IAgendaItem['_id'];
     previewGroup?: string;
@@ -203,6 +313,7 @@ export interface IAgendaState {
     };
     errors?: {[field: string]: Array<string>};
     loadingAggregations?: boolean;
+    dateFilters?: IDateFilter
 }
 
 export type AgendaGetState = () => IAgendaState;
@@ -213,3 +324,18 @@ export type AgendaThunkAction<ReturnType = void> = ThunkAction<
     AnyAction
 >;
 export type AgendaThunkDispatch = ThunkDispatch<IAgendaState, unknown, AnyAction>;
+
+export interface ICoverageItemAction extends Pick<ISingleItemAction, 'name' | 'icon' | 'tooltip'> {
+    when(coverage: ICoverage, user?: IUser['_id']): boolean;
+    action(coverage: ICoverage, item: IAgendaItem): void;
+}
+
+export interface ICoverageMetadataPreviewProps {
+    agenda: IAgendaItem;
+    coverage: ICoverage;
+    fullCoverage?: IFullCoverage;
+    wireItems?: Array<IArticle>;
+    actions?: Array<ICoverageItemAction>;
+    user?: IUser['_id'];
+    hideViewContentItems?: Array<IArticle['_id']>;
+}

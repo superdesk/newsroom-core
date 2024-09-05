@@ -11,6 +11,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email, get_company, get_user_required
 from newsroom.auth.utils import (
+    get_auth_providers,
     send_token,
     add_token_data,
     is_current_user_admin,
@@ -45,6 +46,7 @@ def get_settings_data():
         "sections": app.sections,
         "products": list(query_resource("products")),
         "countries": app.countries,
+        "auth_provider_features": {key: provider.features for key, provider in get_auth_providers().items()},
     }
 
 
@@ -150,12 +152,12 @@ def create():
         company = get_company(new_user)
         auth_provider = get_company_auth_provider(company)
 
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             add_token_data(new_user)
 
         ids = get_resource_service("users").post([new_user])
 
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             send_token(new_user, token_type="new_account", update_token=False)
 
         return jsonify({"success": True, "_id": ids[0]}), 201
@@ -177,7 +179,7 @@ def resent_invite(_id):
     elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
         # Company admins can only resent invites for members of their company only
         flask.abort(403)
-    elif not auth_provider.features.verify_email:
+    elif not auth_provider.features["verify_email"]:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         flask.abort(403)
 

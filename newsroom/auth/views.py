@@ -213,6 +213,9 @@ def logout():
 
 @blueprint.route("/signup", methods=["GET", "POST"])
 def signup():
+    if not app.config.get("SIGNUP_EMAIL_RECIPIENTS"):
+        flask.abort(404)
+
     form = (app.signup_form_class or SignupForm)()
     if len(app.countries):
         form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
@@ -335,7 +338,9 @@ def token(token_type: Literal["reset_password", "validate"]):
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
 
-        if auth_provider.features.verify_email:
+        assert user
+
+        if auth_provider.features["verify_email"]:
             send_token(user, token_type)
 
         flask.flash(

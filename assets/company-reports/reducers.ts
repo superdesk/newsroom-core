@@ -12,6 +12,7 @@ import {
     SET_IS_LOADING,
     GET_PRODUCTS,
 } from './actions';
+import {type ICompanyReportsData} from './types';
 
 const initialState: any = {
     isLoading: false,
@@ -38,14 +39,17 @@ export default function companyReportReducer(state: any = initialState, action: 
     switch (action.type) {
 
     case INIT_DATA:
+    {
+        const data = action.data as ICompanyReportsData;
         return {
             ...state,
-            companies: action.data.companies,
-            sections: action.data.sections,
-            apiEnabled: action.data.api_enabled || false,
-            products: action.data.products,
+            companies: data.companies,
+            sections: data.sections,
+            apiEnabled: data.api_enabled || false,
+            products: data.products,
+            currentUserType: data.current_user_type
         };
-
+    }
     case QUERY_REPORT: {
         return {
             ...state,

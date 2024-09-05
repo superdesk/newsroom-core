@@ -169,3 +169,24 @@ def test_companies(client):
     assert report["results"][0]["name"] == "Example 2 Company"
     assert report["results"][1]["name"] == "Example Company"
     assert report["results"][2]["name"] == "Paper Co."
+
+
+def test_content_activity_csv(client):
+    today = datetime.now().date()
+    resp = client.get(
+        "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
+            today.isoformat(), today.isoformat()
+        )
+    )
+    assert 200 == resp.status_code
+
+    report = resp.get_data(as_text=True)
+    lines = report.splitlines()
+    assert len(lines) > 1
+
+    fields = lines[0].split(",")
+    assert "Headline" == fields[1]
+
+    values = lines[1].split(",")
+    assert "Amazon Is Opening More Bookstores" == values[1]
+    assert "0" == values[-1]

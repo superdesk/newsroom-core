@@ -9,6 +9,7 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from newsroom.auth import get_auth_user_by_email
+from newsroom.types import User
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_user
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.tests.users import ADMIN_USER_ID
@@ -550,7 +551,7 @@ def test_signals(client, app):
         resp = client.post(f"/users/{user_id}/reset_password")
         assert 200 == resp.status_code, resp.get_data(as_text=True)
         password_email.assert_called_once()
-        reset_token = password_email.call_args.args[2]
+        reset_token = password_email.call_args.args[1]
         assert reset_token
 
     updated_listener.reset_mock()
@@ -694,3 +695,14 @@ def test_filter_and_sorting_user(app, client):
     # filter by products
     users = client.get('/users/search?q=&where={"products._id":"random"}').get_json()
     assert len(users) == 0
+
+
+def test_user_has_paused_notifications(app):
+    user = User(email="foo", user_type="public")
+    assert not get_resource_service("users").user_has_paused_notifications(user)
+
+    user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2024-01-01"}
+    assert not get_resource_service("users").user_has_paused_notifications(user)
+
+    user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2050-01-01"}
+    assert get_resource_service("users").user_has_paused_notifications(user)

@@ -3,10 +3,9 @@ import settingsReducer from './reducers';
 import GeneralSettingsApp from './components/GeneralSettingsApp';
 import {initViewData} from './actions';
 import {render} from 'render-utils';
-
+import 'user-profile';
 
 const store = createStore(settingsReducer, 'GeneralSettings');
-
 
 if (window.viewData) {
     store.dispatch(initViewData(window.viewData));

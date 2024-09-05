@@ -1,9 +1,10 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
+
+import {COLLAPSED_SEARCH_BY_DEFAULT, gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
 import {getAdvancedSearchFields} from '../../utils';
 import {
@@ -16,41 +17,98 @@ import {
     clearAdvancedSearchParams,
     resetFilter,
     deselectMyTopic,
+    saveMyTopic,
 } from '../../actions';
 
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
+import {IDateFilter} from 'interfaces/common';
+import {ToolTip} from 'ui/components/ToolTip';
+
+interface ISortOption {
+    label: string;
+    value: ISearchSortValue;
+}
+
+interface IReduxStoreProps {
+    user: IUser;
+    searchParams: ISearchParams;
+    navigations: {[key: string]: INavigation};
+    filterGroups: {[key: string]: IFilterGroup};
+    availableFields: ISearchFields;
+}
+
+interface IDispatchProps {
+    toggleNavigation(navigation: INavigation): void;
+    toggleAdvancedSearchField(field: string): void;
+    setAdvancedSearchKeywords(field: string, keywords: string): void;
+    toggleFilter(key: string, value: any, single: any): void;
+    setCreatedFilter(createdFilter: ITopic['created']): void;
+    resetSearchParamsAndUpdateURL(): void;
+    clearAdvancedSearchParams(): void;
+    deselectMyTopic?: (topicId: ITopic['_id']) => void;
+    resetFilter(): void;
+}
+
+const defaultSortOptions: ISortOption[] = [
+    {
+        value: '', // versioncreated:desc is default
+        label: gettext('Newest first'),
+    },
+    {
+        value: 'versioncreated:asc',
+        label: gettext('Oldest first'),
+    },
+    {
+        value: '_score',
+        label: gettext('Relevance'),
+    },
+];
+
+interface IOwnProps {
+    initiallyOpen?: boolean;
+    minimizeSearchResults?: boolean;
+    showTotalItems?: boolean;
+    showTotalLabel?: boolean;
+    showSaveTopic?: boolean;
+    showSortDropdown?: boolean;
+    totalItems?: number;
+    activeTopic: ITopic;
+    topicType: ITopic['topic_type'];
+    saveMyTopic?: (params: ISearchParams) => void;
+    sortOptions?: ISortOption[];
+
+    refresh(): void;
+    onClearAll?(): void;
+    setQuery(query: string): void;
+    setSortQuery(query: ISearchSortValue): void;
+    dateFilters?: IDateFilter
+}
+
+type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
+
+interface IState {
+    isTagSectionShown: boolean;
+}
 
 
-class SearchResultsBarComponent extends React.Component<any, any> {
-    private sortValues: Array<{value: string; sortFunction: () => void;}>;
+class SearchResultsBarComponent extends React.Component<IProps, IState> {
     private topicNotNull: boolean;
 
-    static propTypes: any;
-    static defaultProps: any;
+    static defaultProps: Partial<IOwnProps> = {
+        minimizeSearchResults: false,
+        showTotalItems: true,
+        showTotalLabel: true,
+        showSaveTopic: false,
+    };
     constructor(props: any) {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
-        this.sortValues = [
-            {
-                value: gettext('Newest first'),
-                sortFunction: () => this.setSortQuery('versioncreated:desc'),
-            },
-            {
-                value: gettext('Oldest first'),
-                sortFunction: () => this.setSortQuery('versioncreated:asc'),
-            },
-            {
-                value: gettext('Relevance'),
-                sortFunction: () => this.setSortQuery('_score'),
-            },
-        ];
 
         this.state = {
-            isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
-            sortValue: this.sortValues[0].value,
+            isTagSectionShown: COLLAPSED_SEARCH_BY_DEFAULT === true ? false : (this.props.initiallyOpen || this.topicNotNull),
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -87,7 +145,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.props.refresh();
     }
 
-    setSortQuery(sortQuery: string) {
+    setSortQuery(sortQuery: ISearchSortValue) {
         this.props.setSortQuery(sortQuery);
         this.props.refresh();
     }
@@ -126,6 +184,9 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
 
+        const sortOptions = this.props.sortOptions || defaultSortOptions;
+        const selectedSortOption = sortOptions.find((option) => option.value === (this.props.searchParams.sortQuery || ''));
+
         return (
             <React.Fragment>
                 <div
@@ -145,28 +206,27 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
-                                {this.props.topicType === 'wire' ? <Dropdown
-                                    label={gettext('Sort by:')}
-                                    value={gettext('{{sort}}', {sort: this.state.sortValue})}
-                                    className={'sorting-dropdown'}
-                                    dropdownMenuHeader={gettext('Sort results by')}
-                                >
-                                    {
-                                        this.sortValues.map((option) => (
+                                {this.props.showSortDropdown !== true ? null : (
+                                    <Dropdown
+                                        label={gettext('Sort by:')}
+                                        value={selectedSortOption?.label}
+                                        className={'sorting-dropdown'}
+                                        dropdownMenuHeader={gettext('Sort results by')}
+                                    >
+                                        {sortOptions.map((sortOption) => (
                                             <button
-                                                key={option.value}
-                                                type='button'
-                                                className='dropdown-item'
+                                                key={sortOption.value}
+                                                type="button"
+                                                className="dropdown-item"
                                                 onClick={() => {
-                                                    option.sortFunction();
-                                                    this.setState({sortValue: option.value});
+                                                    this.setSortQuery(sortOption.value);
                                                 }}
                                             >
-                                                {gettext(option.value)}
+                                                {sortOption.label}
                                             </button>
-                                        ))
-                                    }
-                                </Dropdown>: null}
+                                        ))}
+                                    </Dropdown>
+                                )}
                                 <button
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
@@ -177,19 +237,26 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 >
                                     {gettext('Clear All')}
                                 </button>
-                                <button
-                                    data-test-id="toggle-search-bar"
-                                    onClick={this.toggleTagSection}
-                                    className="icon-button icon-button--tertiary icon-button--bordered"
-                                >
-                                    <i className={classNames(
-                                        'icon--arrow-right',
-                                        {
-                                            'icon--collapsible-open': isTagSectionShown,
-                                            'icon--collapsible-closed': !isTagSectionShown,
+                                <ToolTip key={`${isTagSectionShown}--state`} placement="left">
+                                    <button
+                                        title={
+                                            isTagSectionShown
+                                                ? gettext('Hide search terms')
+                                                : gettext('Show search terms')
                                         }
-                                    )} />
-                                </button>
+                                        data-test-id="toggle-search-bar"
+                                        onClick={this.toggleTagSection}
+                                        className="icon-button icon-button--tertiary icon-button--bordered"
+                                    >
+                                        <i className={classNames(
+                                            'icon--arrow-right',
+                                            {
+                                                'icon--collapsible-open': isTagSectionShown,
+                                                'icon--collapsible-closed': !isTagSectionShown,
+                                            }
+                                        )} />
+                                    </button>
+                                </ToolTip>
                             </div>
                         </div>
                     )}
@@ -214,6 +281,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             resetFilter={this.resetFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
+                            dateFilters={this.props.dateFilters}
                         />
                     )}
 
@@ -224,56 +292,13 @@ class SearchResultsBarComponent extends React.Component<any, any> {
     }
 }
 
-SearchResultsBarComponent.propTypes = {
-    user: PropTypes.object,
-    initiallyOpen: PropTypes.bool,
-
-    minimizeSearchResults: PropTypes.bool,
-    showTotalItems: PropTypes.bool,
-    showTotalLabel: PropTypes.bool,
-    showSaveTopic: PropTypes.bool,
-
-    totalItems: PropTypes.number,
-    totalItemsLabel: PropTypes.string,
-
-    saveMyTopic: PropTypes.func,
-    searchParams: PropTypes.object,
-    activeTopic: PropTypes.object,
-    topicType: PropTypes.string,
-
-    refresh: PropTypes.func,
-
-    navigations: PropTypes.object,
-    filterGroups: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-
-    toggleNavigation: PropTypes.func.isRequired,
-    toggleAdvancedSearchField: PropTypes.func.isRequired,
-    setQuery: PropTypes.func.isRequired,
-    setAdvancedSearchKeywords: PropTypes.func.isRequired,
-    toggleFilter: PropTypes.func.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
-    resetSearchParamsAndUpdateURL: PropTypes.func.isRequired,
-    clearAdvancedSearchParams: PropTypes.func.isRequired,
-    deselectMyTopic: PropTypes.func.isRequired,
-    resetFilter: PropTypes.func.isRequired,
-
-    children: PropTypes.node,
-};
-
-SearchResultsBarComponent.defaultProps = {
-    minimizeSearchResults: false,
-    showTotalItems: true,
-    showTotalLabel: true,
-    showSaveTopic: false,
-};
-
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IAgendaState) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(state.context),
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = {
@@ -286,6 +311,12 @@ const mapDispatchToProps = {
     clearAdvancedSearchParams,
     deselectMyTopic,
     resetFilter,
+    saveMyTopic,
 };
 
-export const SearchResultsBar: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);
+export const SearchResultsBar = connect<
+    IReduxStoreProps,
+    IDispatchProps,
+    IOwnProps,
+    IAgendaState
+>(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);

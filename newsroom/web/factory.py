@@ -6,6 +6,7 @@ from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
     datetime_long,
+    get_ga_user_properties,
     time_short,
     date_short,
     notification_time,
@@ -25,6 +26,7 @@ from newsroom.template_filters import (
     get_company_sidenavs,
     is_admin_or_account_manager,
     is_company_admin,
+    is_admin_manager_or_company_admin,
     authorized_settings_apps,
     theme_url,
     to_json,
@@ -128,6 +130,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(is_admin_or_account_manager)
         self.add_template_global(is_company_admin)
+        self.add_template_global(is_admin_manager_or_company_admin)
         self.add_template_global(authorized_settings_apps)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
@@ -144,6 +147,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(get_agenda_dates, "agenda_dates_string")
         self.add_template_filter(get_item_category_names, "category_names")
         self.add_template_filter(format_event_datetime)
+        self.add_template_global(get_ga_user_properties)
 
         self.context_processor(lambda: {"auth_user": get_user()})
 
@@ -162,7 +166,6 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_url_rule(
             self.static_url_path.replace("static", "theme") + "/<path:filename>",
             endpoint="theme",
-            host=self.static_host,
             view_func=self.send_theme_file,
         )
 

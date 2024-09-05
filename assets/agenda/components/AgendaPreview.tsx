@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get} from 'lodash';
+
+import {IAgendaItem, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
 
 import {isEqualItem} from 'wire/utils';
 import {hasCoverages, isPostponed, isRescheduled, getInternalNote, planHasEvent} from '../utils';
@@ -22,12 +22,28 @@ import AgendaListItemLabels from './AgendaListItemLabels';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
+import TopStoryLabel from './TopStoryLabel';
+import ToBeConfirmedLabel from './ToBeConfirmedLabel';
+import {LabelGroup} from 'ui/components/LabelGroup';
 
-class AgendaPreview extends React.PureComponent<any, any> {
-    static propTypes: any;
-    static defaultProps: any;
+interface IProps {
+    item: IAgendaItem;
+    user: IUser['_id'];
+    actions?: Array<IItemAction>;
+    closePreview(): void;
+    openItemDetails(item: IAgendaItem): void;
+    requestCoverage(item: IAgendaItem, message: string): void;
+    previewGroup?: string;
+    previewPlan?: IAgendaItem['_id'];
+    eventsOnly?: boolean;
+    coverageActions?: Array<ICoverageItemAction>;
+    previewConfig: IPreviewConfig;
+    restrictCoverageInfo?: boolean;
+}
+
+class AgendaPreview extends React.PureComponent<IProps, {}> {
     preview: any;
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
     }
 
@@ -53,12 +69,12 @@ class AgendaPreview extends React.PureComponent<any, any> {
             previewGroup,
             previewPlan,
             eventsOnly,
-            wireItems,
             coverageActions,
             restrictCoverageInfo,
+            previewConfig,
         } = this.props;
 
-        const isWatching = get(item, 'watches', []).includes(user);
+        const isWatching = (item.watches || []).includes(user);
 
         const previewClassName = classNames('wire-column__preview', {
             'wire-column__preview--covering': hasCoverages(item),
@@ -69,7 +85,7 @@ class AgendaPreview extends React.PureComponent<any, any> {
             'wire-column__preview--watched': isWatching,
         });
 
-        const plan = (get(item, 'planning_items') || []).find((p: any) => p.guid === previewPlan);
+        const plan = (item.planning_items || []).find((p) => p.guid === previewPlan);
         const previewInnerElement = (<AgendaListItemLabels item={item} />);
 
         return (
@@ -87,7 +103,13 @@ class AgendaPreview extends React.PureComponent<any, any> {
                             {noselect: this.props.previewConfig.disable_text_selection}
                         )}
                     >
-                        <AgendaName item={item} />
+                        <hgroup>
+                            <LabelGroup>
+                                <TopStoryLabel item={item} config={previewConfig} size='big' />
+                                <ToBeConfirmedLabel item={item} size='big' />
+                            </LabelGroup>
+                            <AgendaName item={item} noMargin/>
+                        </hgroup>
                         <AgendaTime item={item}>
                             <AgendaListItemLabels
                                 item={item}
@@ -102,10 +124,10 @@ class AgendaPreview extends React.PureComponent<any, any> {
                             user={user}
                             item={item}
                             planningId={previewPlan}
-                            wireItems={wireItems}
                             coverageActions={coverageActions}
                             previewGroup={previewGroup}
                             restrictCoverageInfo={restrictCoverageInfo}
+                            previewConfig={previewConfig}
                         />
                         {!planHasEvent(item) ? null : (
                             <AgendaPreviewEvent item={item} />
@@ -119,36 +141,13 @@ class AgendaPreview extends React.PureComponent<any, any> {
                         />
                         <AgendaEdNote item={item} plan={{}} secondaryNoteField='state_reason' />
                         <AgendaInternalNote internalNote={getInternalNote(item, {})}
-                            mt2={!!(item.ednote || get(plan, 'ednote') || item.state_reason)} />
-                        {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
+                            mt2={!!(item.ednote || plan?.ednote || item.state_reason)} />
+                        {eventsOnly !== true && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                     </div>
                 </Preview>
             </div>
         );
     }
 }
-
-AgendaPreview.propTypes = {
-    user: PropTypes.string,
-    item: PropTypes.object,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        action: PropTypes.func,
-        url: PropTypes.func,
-    })),
-    followEvent: PropTypes.func,
-    closePreview: PropTypes.func,
-    openItemDetails: PropTypes.func,
-    requestCoverage: PropTypes.func,
-    previewGroup: PropTypes.string,
-    previewPlan: PropTypes.string,
-    eventsOnly: PropTypes.bool,
-    wireItems: PropTypes.array,
-    coverageActions: PropTypes.array,
-    previewConfig: PropTypes.object,
-    restrictCoverageInfo: PropTypes.bool,
-};
-
-AgendaPreview.defaultProps = {eventsOnly: false};
 
 export default AgendaPreview;

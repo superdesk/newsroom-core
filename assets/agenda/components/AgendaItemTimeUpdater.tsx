@@ -1,19 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
-import {get} from 'lodash';
 import classNames from 'classnames';
 
+import {IAgendaItem} from 'interfaces';
 import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 import {Label} from 'components/Label';
 
-class AgendaItemTimeUpdater extends React.Component<any, any> {
-    static propTypes: any;
-    static defaultProps: any;
+interface IProps {
+    item: IAgendaItem;
+    borderRight?: boolean;
+    alignCenter?: boolean;
+}
 
+interface IState {
+    timeText: string;
+}
+
+class AgendaItemTimeUpdater extends React.Component<IProps, IState> {
     interval: number;
-    timerIntervalId: any;
+    timerIntervalId: number;
 
     constructor(props: any) {
         super(props);
@@ -25,14 +31,16 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         this.updateState = this.updateState.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.activateTimer(this.props.item);
     }
 
-    componentWillReceiveProps(nextProps: any) {
-        if (get(this.props, 'item._created') !== get(nextProps, 'item._created') ||
-            get(this.props, 'item._updated') !== get(nextProps, 'item._updated')) {
-            this.activateTimer(nextProps.item);
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (
+            this.props.item._created !== prevProps.item._created ||
+            this.props.item._updated !== prevProps.item._updated
+        ) {
+            this.activateTimer(this.props.item);
         }
     }
 
@@ -40,7 +48,7 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         this.deactivateTimer();
     }
 
-    activateTimer(item: any) {
+    activateTimer(item: IAgendaItem) {
         // Deactivate if a timer already exits
         this.deactivateTimer();
 
@@ -52,7 +60,7 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         this.updateState(item, false);
 
         // timer set for minute interval
-        this.timerIntervalId = setInterval(this.updateState, 60000, item);
+        this.timerIntervalId = window.setInterval(this.updateState, 60000, item);
     }
 
     deactivateTimer() {
@@ -68,14 +76,14 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
             moment().diff(moment(item._updated), 'minutes') >= this.interval);
     }
 
-    updateState(item: any, checkPastTime: any = true) {
+    updateState(item: IAgendaItem, checkPastTime = true) {
         if (checkPastTime && this.isItemPastTime(item)) {
             this.deactivateTimer();
             return;
         }
 
-        const created = moment(item._created);
-        const updated = moment(item._updated);
+        const created = moment(item.firstcreated);
+        const updated = moment(item.versioncreated);
         const createdDiff = moment().diff(created, 'minutes');
         const updatedDiff = moment().diff(updated, 'minutes');
 
@@ -98,13 +106,17 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
     }
 
     render() {
-        if (get(this.state.timeText, 'length', 0) <= 0) {
+        if (this.state.timeText.length === 0) {
             return null;
         }
 
         const className = classNames(
-            bem('wire-articles__item', 'meta-time', {'border-right': this.props.borderRight}),
-            {'align-self-center': this.props.alignCenter}
+            bem(
+                'wire-articles__item',
+                'meta-time',
+                {'border-right': this.props.borderRight === true}
+            ),
+            {'align-self-center': this.props.alignCenter === true}
         );
 
         return(
@@ -114,16 +126,5 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         );
     }
 }
-
-AgendaItemTimeUpdater.propTypes = {
-    item: PropTypes.object,
-    borderRight: PropTypes.bool,
-    alignCenter: PropTypes.bool,
-};
-
-AgendaItemTimeUpdater.defaultProps = {
-    alignCenter: false,
-    borderRight: false,
-};
 
 export default AgendaItemTimeUpdater;

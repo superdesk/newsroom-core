@@ -22,6 +22,7 @@ import {
 } from '../../../agenda/actions';
 
 import {resultsFilteredSelector} from 'search/selectors';
+import {ICreatedFilter} from 'interfaces/search';
 
 class FiltersTab extends React.Component<any, any> {
     static propTypes: any;
@@ -83,7 +84,7 @@ class FiltersTab extends React.Component<any, any> {
         this.setState({activeFilter: currentFilters});
     }
 
-    setCreatedFilterAndSearch(createdFilter: any) {
+    setCreatedFilterAndSearch(createdFilter: ICreatedFilter) {
         const created = pickBy(
             assign(
                 cloneDeep(this.state.createdFilter),
@@ -114,8 +115,10 @@ class FiltersTab extends React.Component<any, any> {
         });
     }
 
-    search(event: any) {
-        event.preventDefault();
+    search(event: any = null) {
+        if (event) {
+            event.preventDefault();
+        }
         this.props.updateFilterStateAndURL(this.state.activeFilter, this.state.createdFilter);
         this.props.fetchItems();
     }
@@ -131,20 +134,22 @@ class FiltersTab extends React.Component<any, any> {
         const {activeFilter, createdFilter} = this.state;
         const isResetActive = Object.keys(activeFilter).find((key: any) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key: any) => !isEmpty(createdFilter[key]));
+        const createdFilterChanged = !isEqual(createdFilter, this.props.createdFilter);
 
         return (
             <div className="d-contents">
                 <div className='tab-pane__inner'>
-                    {this.getFilterGroups().filter((group: any) => !!group).concat([(
+                    {[
                         <NavCreatedPicker
                             key="created"
                             createdFilter={createdFilter}
                             setCreatedFilter={this.setCreatedFilterAndSearch}
-                            context = {this.props.context}
+                            context={this.props.context}
+                            dateFilters={this.props.dateFilters}
                         />
-                    )])}
+                    ].concat(this.getFilterGroups().filter((group: any) => !!group))}
                 </div>
-                {!isResetActive && !this.props.resultsFiltered ? null : ([
+                {!isResetActive && !this.props.resultsFiltered && !createdFilterChanged ? null : ([
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>
 
                         <button

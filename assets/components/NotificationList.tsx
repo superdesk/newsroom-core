@@ -1,15 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get} from 'lodash';
 import {Tooltip} from 'bootstrap';
-
 import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
-import NotificationListItem from './NotificationListItem';
+import {NotificationPopup, IProps as INotificationPopupProps} from './NotificationPopup';
 
-class NotificationList extends React.Component<any, any> {
-    static propTypes: any;
+interface IState {
+    displayItems: boolean;
+    connected: boolean;
+}
+
+type IProps = INotificationPopupProps;
+
+class NotificationList extends React.Component<IProps, IState> {
     tooltip: any;
     elem: any;
 
@@ -60,19 +63,21 @@ class NotificationList extends React.Component<any, any> {
     }
 
     toggleDisplay() {
-        this.setState({displayItems:!this.state.displayItems});
-        if (!this.state.displayItems) {
-            this.props.loadNotifications();
-            (document.getElementById('header-notification') as HTMLElement).classList.add('navbar-notifications--open');
-        } else {
-            (document.getElementById('header-notification') as HTMLElement).classList.remove('navbar-notifications--open');
-        }
+        this.setState({displayItems: !this.state.displayItems}, (() => {
+            if (this.state.displayItems) {
+                this.props.loadNotifications();
+                (document.getElementById('header-notification') as HTMLElement).classList.add('navbar-notifications--open');
+            } else {
+                (document.getElementById('header-notification') as HTMLElement).classList.remove('navbar-notifications--open');
+            }
+        }));
     }
 
     render() {
+        
         return (
             <div className="navbar-notifications__inner">
-                <h3 className="a11y-only">Notification Bell</h3>
+                <h3 className="a11y-only">{gettext('Notifications')}</h3>
                 {this.props.count > 0 &&
                     <div className="navbar-notifications__badge">
                         {this.props.count}
@@ -85,63 +90,28 @@ class NotificationList extends React.Component<any, any> {
                         {'navbar-notifications__inner-circle--disconnected': !this.state.connected}
                     )}
                     ref={(elem: any) => this.elem = elem}
-                    title={gettext('Notifications')}>
-                    <h3 className="a11y-only">Notification bell</h3>
+                    title={gettext('Notifications')}
+                >
+                    <h3 className="a11y-only">{gettext('Notifications')}</h3>
                     <i className='icon--alert' onClick={this.toggleDisplay} />
                 </span>
 
-                {!this.state.displayItems ? null : this.props.count === 0 ? (
-                    <div className="notif__list dropdown-menu dropdown-menu-right show">
-                        <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
-                        </div>
-                        <div className='notif__list__message'>
-                            {gettext('No new notifications!')}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="notif__list dropdown-menu dropdown-menu-right show">
-                        <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
-                            <button
-                                type="button"
-                                className="button-pill ms-auto me-3"
-                                onClick={this.props.clearAll}>{gettext('Clear All')}
-                            </button>
-                        </div>
-                        {this.props.loading ? (
-                            <div className='notif__list__message'>
-                                {gettext('Loading...')}
-                            </div>
-                        ) : (
-                            this.props.notifications.map((notification: any) => (
-                                <NotificationListItem
-                                    key={get(this.props.items, `${notification.item}._id`, 'test')}
-                                    item={get(
-                                        this.props.items,
-                                        `${notification.item}`,
-                                        get(notification, 'data.item', {})
-                                    )}
-                                    notification={notification}
-                                    clearNotification={this.props.clearNotification}
-                                />
-                            ))
-                        )}
-                    </div>
+                {this.state.displayItems === true && (
+                    <NotificationPopup
+                        fullUser={this.props.fullUser}
+                        items={this.props.items}
+                        count={this.props.count}
+                        notifications={this.props.notifications}
+                        loading={this.props.loading}
+                        clearNotification={this.props.clearNotification}
+                        clearAll={this.props.clearAll}
+                        loadNotifications={this.props.loadNotifications}
+                        resumeNotifications={this.props.resumeNotifications}
+                    />
                 )}
             </div>
         );
     }
 }
-
-NotificationList.propTypes = {
-    items: PropTypes.object,
-    count: PropTypes.number,
-    notifications: PropTypes.array,
-    clearNotification: PropTypes.func,
-    clearAll: PropTypes.func,
-    loadNotifications: PropTypes.func,
-    loading: PropTypes.bool,
-};
 
 export default NotificationList;

@@ -30,6 +30,7 @@ from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
 )
+from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import (
     get_user_dict,
@@ -440,8 +441,8 @@ def _set_event_date_range(search):
 aggregations: Dict[str, Dict[str, Any]] = {
     "language": {"terms": {"field": "language"}},
     "calendar": {"terms": {"field": "calendars.name", "size": 100}},
-    "service": {"terms": {"field": "service.name", "size": 50}},
-    "subject": {"terms": {"field": "subject.name", "size": 50}},
+    "service": {"terms": {"field": "service.name", "size": 100}},
+    "subject": {"terms": {"field": "subject.name", "size": 200}},
     "urgency": {"terms": {"field": "urgency"}},
     "place": {"terms": {"field": "place.name", "size": 50}},
     "coverage": {
@@ -453,8 +454,8 @@ aggregations: Dict[str, Dict[str, Any]] = {
             "path": "planning_items",
         },
         "aggs": {
-            "service": {"terms": {"field": "planning_items.service.name", "size": 50}},
-            "subject": {"terms": {"field": "planning_items.subject.name", "size": 50}},
+            "service": {"terms": {"field": "planning_items.service.name", "size": 100}},
+            "subject": {"terms": {"field": "planning_items.subject.name", "size": 200}},
             "urgency": {"terms": {"field": "planning_items.urgency"}},
             "place": {"terms": {"field": "planning_items.place.name", "size": 50}},
         },
@@ -502,7 +503,7 @@ coverage_filters = ["coverage", "coverage_status"]
 planning_filters = coverage_filters + ["agendas"]
 
 
-def _filter_terms(filters, item_type):
+def _filter_terms(filters, item_type, highlights=False):
     must_term_filters = []
     must_not_term_filters = []
     for key, val in filters.items():
@@ -624,6 +625,7 @@ def _filter_terms(filters, item_type):
                                     path="planning_items",
                                     query={"bool": {"filter": [{"terms": {f"planning_items.{agg_field}": val}}]}},
                                     name=key,
+                                    inner_hits=highlights,
                                 ),
                             ],
                         },
@@ -684,7 +686,10 @@ class AgendaService(BaseSearchService):
     section = "agenda"
     limit_days_setting = None
     default_sort = [{"dates.start": "asc"}]
-    default_page_size = 250
+
+    @property
+    def default_page_size(self) -> int:
+        return app.config.get("AGENDA_PAGE_SIZE", 250)
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         fields = super().get_advanced_search_fields(search)
@@ -865,12 +870,11 @@ class AgendaService(BaseSearchService):
 
         pass
 
-    def apply_filters(self, search, section_filters=None):
+    def apply_filters(self, search: SearchQuery, section_filters=None):
         """Generate and apply the different search filters
 
         :param newsroom.search.SearchQuery search: the search query instance
         """
-
         # First construct the product query
         self.apply_company_filter(search)
 
@@ -914,8 +918,8 @@ class AgendaService(BaseSearchService):
                             {
                                 # Match Events before ``item_type`` field was added
                                 "bool": {
-                                    "must_not": {"exists": {"field": "item_type"}},
-                                    "filter": {"exists": {"field": "event_id"}},
+                                    "must_not": [{"exists": {"field": "item_type"}}],
+                                    "filter": [{"exists": {"field": "event_id"}}],
                                 },
                             },
                         ],
@@ -944,18 +948,37 @@ class AgendaService(BaseSearchService):
                     }
                 }
             )
+        elif app.config.get("AGENDA_DEFAULT_FILTER_HIDE_PLANNING"):
+            search.query["bool"]["filter"].append(
+                {
+                    "bool": {
+                        "should": [
+                            {"term": {"item_type": "event"}},
+                            {
+                                # Match Events before ``item_type`` field was added
+                                "bool": {
+                                    "must_not": [{"exists": {"field": "item_type"}}],
+                                    "filter": [{"exists": {"field": "event_id"}}],
+                                },
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                    },
+                }
+            )
+            _remove_fields(search.source, ["planning_items", "display_dates"])
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
-                            {"bool": {"must_not": {"exists": {"field": "item_type"}}}},
+                            {"bool": {"must_not": [{"exists": {"field": "item_type"}}]}},
                             {"term": {"item_type": "event"}},
                             {
                                 "bool": {
-                                    "filter": {"term": {"item_type": "planning"}},
-                                    "must_not": {"exists": {"field": "event_id"}},
+                                    "filter": [{"term": {"item_type": "planning"}}],
+                                    "must_not": [{"exists": {"field": "event_id"}}],
                                 },
                             },
                         ],
@@ -980,14 +1003,14 @@ class AgendaService(BaseSearchService):
             if product.get("planning_item_query") and search.item_type != "events":
                 search.planning_items_should.append(planning_items_query_string(product.get("planning_item_query")))
 
-    def apply_request_filter(self, search):
+    def apply_request_filter(self, search: SearchQuery, highlights=False):
         """Generate the request filters
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
         if search.args.get("q"):
-            test_query = {"bool": {"should": []}}
+            test_query: BoolQuery = {"bool": {"should": []}}
             try:
                 q = json.loads(search.args.get("q"))
                 if isinstance(q, dict):
@@ -1015,16 +1038,20 @@ class AgendaService(BaseSearchService):
                 )
 
         if search.args.get("id"):
-            search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
+            search.query["bool"]["filter"].append({"ids": {"values": [search.args["id"]]}})
 
         if search.args.get("ids"):
-            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["filter"].append({"ids": {"values": search.args["ids"]}})
 
         if search.args.get("bookmarks"):
             set_saved_items_query(search.query, search.args["bookmarks"])
 
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
+
+        filters = self.parse_filters(search)
+        if filters:
+            self.set_bool_query_from_filters(search.query["bool"], filters, search.item_type, highlights=highlights)
 
         self.apply_request_advanced_search(search)
 
@@ -1039,8 +1066,6 @@ class AgendaService(BaseSearchService):
         if app.config.get("FILTER_BY_POST_FILTER", False):
             source["post_filter"] = {"bool": {}}
             self.set_bool_query_from_filters(source["post_filter"]["bool"], filters, item_type)
-        else:
-            self.set_bool_query_from_filters(source["query"]["bool"], filters, item_type)
 
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
@@ -1278,9 +1303,13 @@ class AgendaService(BaseSearchService):
         return agenda_items
 
     def set_bool_query_from_filters(
-        self, bool_query: Dict[str, Any], filters: Dict[str, Any], item_type: Optional[str] = None
+        self,
+        bool_query: BoolQueryParams,
+        filters: Dict[str, Any],
+        item_type: Optional[str] = None,
+        highlights=False,
     ):
-        filter_terms = _filter_terms(filters, item_type)
+        filter_terms = _filter_terms(filters, item_type, highlights=highlights)
         bool_query.setdefault("filter", [])
         bool_query["filter"] += filter_terms["must_term_filters"]
 

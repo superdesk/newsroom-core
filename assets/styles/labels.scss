@@ -42,6 +42,18 @@ $labels-palette: (
   gray-mid: $cool-gray-mid,
 );
 
+$flex-justify: (
+    justify-start: start,
+    justify-center: center,
+    justify-end: end,
+);
+
+$flex-align: (
+    align-start: start,
+    align-center: center,
+    align-end: end,
+);
+
 /// Generates base styles for a label.
 @mixin label {
     display: inline-flex;
@@ -103,6 +115,26 @@ $labels-palette: (
             }
         }
     }
+    &.label-wire--latest {
+        background-color:  var(--label-color-bg-wire-latest);
+        border-color: var(--label-color-bg-wire-latest);
+        color: white;
+    }
+    &.label-wire--alert {
+        background-color:  var(--label-color-bg-wire-alert);
+        border-color: var(--label-color-bg-wire-alert);
+        color: white;
+    }
+    &.label-wire--advisory {
+        background-color:  var(--label-color-bg-wire-advisory);
+        border-color: var(--label-color-bg-wire-advisory);
+        color: white;
+    }
+    &.label-wire--press-release {
+        background-color:  var(--label-color-bg-wire-press-release);
+        border-color: var(--label-color-bg-wire-press-release);
+        color: white;
+    }
 }
 
 .label--rounded {
@@ -139,4 +171,25 @@ $labels-palette: (
 
 .label + .label {
     margin-inline-start: var(--space--1);
+}
+
+.label-group {
+    display: flex;
+    gap: var(--space--0-5);
+}
+
+.label-group--vertical {
+    flex-direction: column;
+}
+
+@each $flex, $position in $flex-justify {
+    .label-group--#{$flex} {
+        justify-content: $position;
+    }
+}
+
+@each $flex, $position in $flex-align {
+    .label-group--#{$flex} {
+        align-items: $position;
+    }
 }

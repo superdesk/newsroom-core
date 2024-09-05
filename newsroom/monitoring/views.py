@@ -11,7 +11,7 @@ from newsroom.decorator import admin_only, login_required, account_manager_only,
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
-from newsroom.email import send_template_email
+from newsroom.email import send_user_email
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
@@ -274,8 +274,8 @@ def share():
         _file = get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(_file.read())
 
-        send_template_email(
-            to=[user["email"]],
+        send_user_email(
+            user,
             template="share_items",
             template_kwargs=template_kwargs,
             attachments_info=[

@@ -170,7 +170,7 @@ const CARD_TYPES: Array<ICardUnified> = [
     },
     {
         _id: 'wire-list',
-        text: gettext('wire-list'),
+        text: gettext('Wire list'),
         editComponent: ConfigWireList,
         dashboardComponent: WireListCard,
         size: 4,

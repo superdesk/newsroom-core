@@ -8,43 +8,62 @@ import {
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL, SET_USER} from '../actions';
-import {modalReducer} from '../reducers';
+import {IModalState, modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
-import {IArticle} from 'interfaces';
+import {IArticle, IDashboardCard, IProduct, ITopic, IUser} from 'interfaces';
+import {IHomeUIConfig} from 'interfaces/configs';
 
 export interface IPersonalizedDashboardsWithData {
     dashboard_id?: string;
     dashboard_name?: string;
+    dashboard_card_type: IDashboardCard['type'];
     topic_items?: Array<{_id: string, items: Array<any>}>;
 }
 
-interface IState {
-    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
-    cards: Array<any>;
-    topics: Array<any>;
-    products: Array<any>;
-    itemsByCard: any;
-    itemsById: {[_id: string]: IArticle};
-    activeCard: any;
-    uiConfig: any;
-    userProducts: Array<any>;
-    currentUser: any;
+export interface IPublicAppState {
+    cards: Array<IDashboardCard>;
+    itemsById: {[itemId: string]: IArticle};
+    itemsByCard: {[cardId: string]: Array<IArticle>};
+    uiConfig: IHomeUIConfig;
+    modal?: IModalState;
 }
 
-const initialState: IState = {
+export interface IHomeState extends IPublicAppState {
+    personalizedDashboards?: Array<IPersonalizedDashboardsWithData>;
+    topics?: Array<ITopic>;
+    products?: Array<IProduct>;
+    activeCard?: any;
+    userProducts?: Array<any>;
+    currentUser?: any;
+    user?: IUser['_id'];
+    userType?: IUser['user_type'];
+    userSections?: IUser['sections']
+    company?: IUser['company']
+    itemToOpen?: IArticle;
+    companyProducts?: Array<any>;
+    context?: string;
+    groups?: Array<any>;
+    formats?: Array<any>;
+}
+
+const initialState: IHomeState = {
     cards: [],
     topics: [],
     products: [],
     itemsByCard: {},
     itemsById: {},
     activeCard: null,
-    uiConfig: {},
+    uiConfig: {_id: 'home'},
     userProducts: [],
+    companyProducts: [],
     currentUser: {},
     personalizedDashboards: [],
+    context: 'wire',
+    formats: [],
+    groups: [],
 };
 
-export default function homeReducer(state: IState & any = initialState, action: any): IState {
+export default function homeReducer(state: IHomeState = initialState, action: any): IHomeState {
 
     switch (action.type) {
 
@@ -91,7 +110,7 @@ export default function homeReducer(state: IState & any = initialState, action: 
 
     case BOOKMARK_ITEMS: {
         const itemToOpen = Object.assign({}, state.itemToOpen);
-        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).concat([state.user]);
+        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).concat([state.user ?? '']);
 
         return {
             ...state,
@@ -151,7 +170,7 @@ export default function homeReducer(state: IState & any = initialState, action: 
     }
 }
 
-function setItemsById(itemsById: IState['itemsById'], items: Array<IArticle>) {
+function setItemsById(itemsById: IHomeState['itemsById'], items: Array<IArticle>) {
     items.forEach((item: IArticle) => {
         itemsById[item._id] = item;
     });

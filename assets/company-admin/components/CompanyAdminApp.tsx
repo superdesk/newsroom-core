@@ -40,10 +40,10 @@ interface IStateProps {
     sectionId: string;
     usersById: any;
     user: IUser;
-    userToEdit: IUser;
+    userToEdit?: Partial<IUser>;
     errors: any;
     products: Array<any>;
-    modal: {
+    modal?: {
         modal: string;
         data: any;
     };
@@ -111,7 +111,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
         let valid = true;
         const errors: any = {};
 
-        if (!this.props.userToEdit.email) {
+        if (!this.props.userToEdit?.email) {
             errors.email = [gettext('Please provide email')];
             valid = false;
         }
@@ -133,7 +133,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
     deleteUser(event: any) {
         event.preventDefault();
 
-        confirm(gettext('Would you like to delete user: {{ name }}', {name: this.props.userToEdit.first_name})) &&
+        confirm(gettext('Would you like to delete user: {{ name }}', {name: this.props.userToEdit?.first_name ?? ''})) &&
             this.props.deleteUser();
     }
 
@@ -249,10 +249,10 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                 </section>
                             </div>
                             {
-                                userToEdit !== null && (
+                                userToEdit != null && (
                                     <EditUser
                                         original={userToEdit._id != null ? this.props.usersById[userToEdit._id] : {}}
-                                        user={userToEdit}
+                                        user={userToEdit as IUser}
                                         onChange={this.props.editUser}
                                         onChange_DEPRECATED={this.props.editUser_DEPRECATED}
                                         errors={this.props.errors}
@@ -292,11 +292,11 @@ const mapStateToProps = (state: ICompanyAdminStore): IStateProps => ({
     errors: state.errors,
     products: productListSelector(state),
     modal: state.modal,
-    sort: state.sort,
+    sort: state.sort ?? 'first_name',
     sortDirection: state.sortDirection,
-    productId: state.productId,
+    productId: state.productId ?? '',
     companies: companyListSelector(state),
-    totalUsers:state.totalUsers
+    totalUsers: state.totalUsers || 0,
 });
 
 const mapDispatchToProps = (dispatch: any): IDispatchProps => ({

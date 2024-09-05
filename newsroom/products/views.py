@@ -7,7 +7,7 @@ from flask import jsonify, current_app
 from flask_babel import gettext
 from superdesk import get_resource_service
 
-from newsroom.decorator import admin_only, account_manager_only
+from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
 from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
 from newsroom.types import Product, ProductRef
@@ -49,7 +49,7 @@ def index():
 
 
 @blueprint.route("/products/search", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def search():
     lookup = None
     if flask.request.args.get("q"):

@@ -113,6 +113,7 @@ def test_get_latest_item_from_topic_queue(app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )
@@ -158,6 +159,7 @@ def test_get_topic_entries_and_match_table(app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )

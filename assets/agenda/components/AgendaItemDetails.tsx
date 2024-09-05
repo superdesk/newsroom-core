@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {isEmpty, get} from 'lodash';
 
+import {IAgendaItem, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
 import {gettext} from 'utils';
 
 import {getLocations, mapsKey} from 'maps/utils';
@@ -30,6 +30,20 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
+interface IProps {
+    item: IAgendaItem;
+    planningId?: IAgendaItem['_id'];
+    user: IUser['_id'];
+    actions?: Array<IItemAction>;
+    group?: string;
+    eventsOnly?: boolean;
+    coverageActions?: Array<ICoverageItemAction>;
+    detailsConfig: IPreviewConfig;
+    restrictCoverageInfo?: boolean;
+    onClose?(): void;
+    requestCoverage(item: IAgendaItem, message: string): void;
+}
+
 function AgendaItemDetails(
     {
         item,
@@ -40,11 +54,10 @@ function AgendaItemDetails(
         group,
         planningId,
         eventsOnly,
-        wireItems,
         coverageActions,
         detailsConfig,
         restrictCoverageInfo,
-    }: any)
+    }: IProps)
 {
     const locations = getLocations(item);
     let map = null;
@@ -75,6 +88,7 @@ function AgendaItemDetails(
                 item={item}
                 group={group}
                 disableTextSelection={detailsConfig.disable_text_selection}
+                detailsConfig={detailsConfig}
             >
                 <ArticleBody>
                     <AgendaMeta item={item} />
@@ -86,9 +100,9 @@ function AgendaItemDetails(
                         user={user}
                         item={item}
                         planningId={planningId}
-                        wireItems={wireItems}
                         coverageActions={coverageActions}
                         restrictCoverageInfo={restrictCoverageInfo}
+                        previewConfig={detailsConfig}
                     />
                     {!planHasEvent(item) ? null : (
                         <AgendaPreviewEvent item={item} />
@@ -113,25 +127,6 @@ function AgendaItemDetails(
         </Content>
     );
 }
-
-AgendaItemDetails.propTypes = {
-    item: PropTypes.object.isRequired,
-    user: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        action: PropTypes.func,
-        url: PropTypes.func,
-    })),
-    onClose: PropTypes.func,
-    requestCoverage: PropTypes.func,
-    group: PropTypes.string,
-    planningId: PropTypes.string,
-    eventsOnly: PropTypes.bool,
-    wireItems: PropTypes.array,
-    coverageActions: PropTypes.array,
-    detailsConfig: PropTypes.object,
-    restrictCoverageInfo: PropTypes.bool,
-};
 
 const component: React.ComponentType<any> = AgendaItemDetails;
 

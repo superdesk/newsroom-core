@@ -3,7 +3,7 @@ import pathlib
 import tzlocal
 import logging
 
-from typing import Dict, List
+from typing import Dict, List, Literal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -347,6 +347,7 @@ CLIENT_CONFIG = {
     "item_actions": {},
     "display_abstract": DISPLAY_ABSTRACT,
     "display_credits": False,
+    "display_author_role": True,
     "filter_panel_defaults": {
         "tab": {
             "wire": "nav",  # Options are 'nav', 'topics', 'filters'
@@ -396,6 +397,8 @@ CLIENT_CONFIG = {
             "button_label": lazy_gettext("Completed"),
         },
     },
+    "agenda_sort_events_with_coverage_on_top": False,
+    "collapsed_search_by_default": False,
 }
 
 # Enable rendering of the date in the base view
@@ -787,3 +790,63 @@ EMBARGO_QUERY_ROUNDING = "/m"
 #:
 EMAIL_DEFAULT_SENDER_NAME = None
 EMAIL_SENDER_NAME_LANGUAGE_MAP = {}
+
+#: Set the card type for personal dashboard
+#:
+#: .. versionadded: 2.7
+#:
+PERSONAL_DASHBOARD_CARD_TYPE = "4-picture-text"
+
+#: Hides Coverage assignee details for public users, such as desk and user details
+#:
+#: .. versionadded: 2.7
+#:
+AGENDA_HIDE_COVERAGE_ASSIGNEES = False
+
+#: Hides planning items from the default item type filter
+#:
+#: .. versionadded: 2.8
+#:
+AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
+
+#: Wire Date Time filters
+#:
+#: .. versionadded: 2.8
+#:
+WIRE_TIME_FILTERS = [
+    {"name": lazy_gettext("Today"), "filter": "today", "default": False, "query": {"gte": "now/d"}},
+    {
+        "name": lazy_gettext("Last Week"),
+        "filter": "last_week",
+        "default": False,
+        "query": {"gte": "now-1w/w", "lt": "now/w"},
+    },
+    {
+        "name": lazy_gettext("Last 30 days"),
+        "filter": "last_30_days",
+        "default": True,
+        "query": {"gte": "now-30d/d"},
+    },
+]
+
+#: Set when users who downloaded/bookmarked an item should be notified
+#:
+#: .. versionadded: 2.8
+#:
+NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
+
+#: Agenda Date Time filters
+#:
+#: .. versionadded: 2.8
+#:
+AGENDA_TIME_FILTERS = [
+    {"name": lazy_gettext("Today"), "query": "now/d"},
+    {
+        "name": lazy_gettext("This Week"),
+        "query": "now/w",
+    },
+    {
+        "name": lazy_gettext("This Month"),
+        "query": "now/M",
+    },
+]

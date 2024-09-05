@@ -1,4 +1,4 @@
-import {get, uniq} from 'lodash';
+import {get, uniq, cloneDeep} from 'lodash';
 
 import {
     IAgendaItem,
@@ -211,28 +211,64 @@ export default function agendaReducer(state: IAgendaState = initialState, action
     }
 
     case WATCH_COVERAGE: {
-        const itemsById = Object.assign({}, state.itemsById);
-        const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
-        if (coverage) {
-            coverage['watches'] = uniq([
-                ...(get(coverage, 'watches') || []),
-                state.user
-            ]);
+        const itemId = action.item._id;
+        const coverageId = action.coverage.coverage_id;
+
+        if (state.itemsById[itemId] == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, item not found in redux store`);
+            return state;
         }
 
-        return {...state, itemsById};
+        const item = cloneDeep(state.itemsById[itemId]);
+        const coverage = (item.coverages || [])
+            .find((c) => c.coverage_id === coverageId);
+
+        if (coverage == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, coverage not found in redux store`);
+            return state;
+        }
+
+        coverage['watches'] = uniq([
+            ...(coverage.watches || []),
+            state.user
+        ]);
+
+        return {
+            ...state,
+            itemsById: {
+                ...state.itemsById,
+                [itemId]: item,
+            },
+        };
     }
 
     case STOP_WATCHING_COVERAGE: {
-        const itemsById = Object.assign({}, state.itemsById);
-        const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
-        if (coverage) {
-            coverage['watches'] = (get(coverage, 'watches') || []).filter((u: any) => u !== state.user);
+        const itemId = action.item._id;
+        const coverageId = action.coverage.coverage_id;
+
+        if (state.itemsById[itemId] == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, item not found in redux store`);
+            return state;
         }
 
-        return {...state, itemsById};
+        const item = cloneDeep(state.itemsById[itemId]);
+        const coverage = (item.coverages || [])
+            .find((c) => c.coverage_id === coverageId);
+
+        if (coverage == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, coverage not found in redux store`);
+            return state;
+        }
+
+        coverage.watches = (coverage.watches || []).filter((u) => u !== state.user);
+
+        return {
+            ...state,
+            itemsById: {
+                ...state.itemsById,
+                [itemId]: item,
+            },
+        };
     }
 
     case STOP_WATCHING_EVENTS: {
@@ -300,6 +336,7 @@ export default function agendaReducer(state: IAgendaState = initialState, action
             hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
             userFolders: action.agendaData.user_folders,
             companyFolders: action.agendaData.company_folders,
+            dateFilters: action.agendaData.date_filters || []
         };
     }
 
