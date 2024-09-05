@@ -28,7 +28,7 @@ module.exports = function(config) {
         },
 
         reporters: ['dots'],
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'webpack'],
         browsers: ['ChromeHeadless'],
 
         // Allow typescript files
