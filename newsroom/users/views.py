@@ -12,7 +12,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
-from superdesk.core.resources.cursor import SearchRequest
+from superdesk.core.types import SearchRequest
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.user_roles import UserRole

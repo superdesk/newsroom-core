@@ -1,19 +1,6 @@
-from quart_babel import lazy_gettext
-import superdesk
-from superdesk.flask import Blueprint
+from .model import SectionFilter
+from .service import SectionFiltersService
 
-from .section_filters import SectionFiltersResource, SectionFiltersService
+from .module import module  # noqa
 
-blueprint = Blueprint("section_filters", __name__)
-
-from . import views  # noqa
-
-
-def init_app(app):
-    superdesk.register_resource("section_filters", SectionFiltersResource, SectionFiltersService, _app=app)
-    app.settings_app(
-        "section-filters",
-        lazy_gettext("Section Filters"),
-        weight=450,
-        data=views.get_settings_data,
-    )
+__all__ = ["SectionFilter", "SectionFiltersService"]
