@@ -124,6 +124,7 @@ export function postCard() {
             });
         }
 
+        delete card.size;
         const url = `/cards/${card._id ? card._id : 'new'}`;
 
         return server.postFiles(url, data)

@@ -125,7 +125,6 @@ BLUEPRINTS = [
     "newsroom.products",
     "newsroom.section_filters",
     "newsroom.navigations",
-    "newsroom.cards",
     "newsroom.reports",
     "newsroom.public",
     "newsroom.agenda",
@@ -152,7 +151,6 @@ CORE_APPS = [
     "newsroom.products",
     "newsroom.section_filters",
     "newsroom.navigations",
-    "newsroom.cards",
     "newsroom.reports",
     "newsroom.public",
     "newsroom.agenda",
@@ -178,6 +176,7 @@ MODULES = [
     "newsroom.companies",
     "newsroom.assets",
     "newsroom.users",
+    "newsroom.cards.module",
 ]
 
 SITE_NAME = "Newshub"

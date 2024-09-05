@@ -59,6 +59,8 @@ class NewsroomWebApp(BaseNewsroomApp):
         app.run()
     """
 
+    dashboards: list[dict]
+
     INSTANCE_CONFIG = "settings.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
@@ -290,7 +292,7 @@ class NewsroomWebApp(BaseNewsroomApp):
             )
         )
 
-    def dashboard(self, _id, name, cards=[]):
+    def dashboard(self, _id, name, cards=None):
         """Define new dashboard
 
         :param _id: id of the dashboard
@@ -298,7 +300,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param cards: list of cards id related to the dashboard to
         populate the drop down in dashboard config.
         """
-        self.dashboards.append({"_id": _id, "name": name, "cards": cards})
+        self.dashboards.append({"_id": _id, "name": name, "cards": cards or []})
 
 
 def get_app(config=None, **kwargs) -> NewsroomWebApp:

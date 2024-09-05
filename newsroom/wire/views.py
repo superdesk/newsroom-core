@@ -18,7 +18,7 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
 from newsroom.auth.utils import check_user_has_products, is_valid_session
 
-from newsroom.cards import get_card_size, get_card_type
+from newsroom.cards import get_card_size, get_card_type, CardsResourceService
 from newsroom.navigations.navigations import get_navigations
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -187,7 +187,7 @@ def get_personal_dashboards_data(user, company, topics):
 async def get_home_data():
     user = get_user()
     company = get_company(user)
-    cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
     company_id = str(user["company"]) if user and user.get("company") else None
     topics = get_user_topics(user["_id"]) if user else []
     ui_config_service = UiConfigResourceService()
@@ -247,7 +247,9 @@ async def get_media_card_external(card_id):
     if app.cache.get(cache_id):
         card_items = app.cache.get(cache_id)
     else:
-        card = get_entity_or_404(card_id, "cards")
+        card = await CardsResourceService().find_by_id_raw(card_id)
+        if not card:
+            abort(404)
         card_items = app.get_media_cards_external(card)
         app.cache.set(cache_id, card_items, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
 
@@ -258,7 +260,7 @@ async def get_media_card_external(card_id):
 @login_required
 async def get_card_items():
     user = get_user()
-    cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
     company_id = str(user["company"]) if user and user.get("company") else None
     items_by_card = get_items_by_card(cards, company_id)
     return jsonify({"_items": items_by_card})

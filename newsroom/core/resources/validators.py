@@ -6,6 +6,7 @@ from pydantic_core import PydanticCustomError
 from quart_babel import gettext
 
 from superdesk.core.app import get_current_async_app
+from newsroom.core import get_current_wsgi_app
 
 
 def validate_ip_address() -> AfterValidator:
@@ -42,3 +43,22 @@ def validate_auth_provider() -> AfterValidator:
         return value
 
     return AfterValidator(_validate_provider)
+
+
+def validate_supported_dashboard() -> AfterValidator:
+    """Validates that the dashboard is configured on the app"""
+
+    def _validate_dashboard_type_exists(value: str | None = None) -> str | None:
+        if not value:
+            return None
+
+        app = get_current_wsgi_app()
+        dashboard_ids = set((dashboard["_id"] for dashboard in app.dashboards))
+        if value not in dashboard_ids:
+            raise PydanticCustomError(
+                "", gettext("Dashboard type '{dashboard_id}' not found"), dict(dashboard_id=value)
+            )
+
+        return value
+
+    return AfterValidator(_validate_dashboard_type_exists)
