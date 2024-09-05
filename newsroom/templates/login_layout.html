@@ -9,7 +9,11 @@
         <div class="login-box__header">
             {% block login_logo %}
             {% endblock %}
-            <h3 class="login-box__title">{% block login_title %}{{ gettext("Login to Newshub") }}{% endblock %}</h3>
+            <h3 class="login-box__title">
+                {% block login_title %}
+                {{ gettext("Login to Newshub") }}
+                {% endblock %}
+            </h3>
         </div>
         <div class="">
             {% include "login_messages.html" %}
@@ -41,7 +45,7 @@
                     <span class="d-flex gap-1 text-md">
                         {% block reset_password %}
                         <span>{{ gettext('Forgot your password?') }}</span>
-                        <a class="link" href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
+                        <a class="link" href="{{ url_for('auth.token', token_type='reset_password') }}" title="{{ gettext('Reset password') }}">{{ gettext('Click here to reset') }}</a>
                         {% endblock %}
                     </span>
                 </div>
@@ -65,10 +69,9 @@
             <div class="sd-content-divider--with-text sd-content-divider sd-content-divider--horizontal sd-content-divider--margin-medium sd-content-divider--text-small" role="separator">
                 <span class="sd-content-divider__inner-text">{{ gettext('Or') }}</span>
             </div>
-            <form action="{{ url_for('auth.saml') }}">
-                <button type="submit" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--primary w-100">{{ gettext('Login with Company Credentials (SSO)') }}</button>
-            </form>
-            <p class="text-muted text-md mt-2">{{ gettext("Note! If your company credentials don't work for login, your company might not have an integration done to this system. Please contact your company IT.") }}</p>
+            {% block saml %}
+            <a href="{{ url_for('auth.saml') }}" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--secondary w-100">{{ config.SAML_LABEL }}</a>
+            {% endblock %}
         </div>
         {% endif %}
 

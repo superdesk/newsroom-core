@@ -4,7 +4,7 @@
 <h5 class="mb-0">{{ gettext("Login") }}</h5>
 {% endblock %}
 
-{% block login_content %}
+{% block login_form %}
 <div class="card-body pt-1">
     <a href="{{ url_for('auth.saml') }}" title="{{ gettext('Login using Single Sign On') }}" class="btn btn-primary w-100">{{ config.SAML_LABEL }}</a>
 </div>
