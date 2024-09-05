@@ -9,7 +9,7 @@ from newsroom.auth import get_user_by_email
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("create_user")
+@newsroom_cli.command("create_user")
 @click.argument("email")
 @click.argument("password")
 @click.argument("first_name")

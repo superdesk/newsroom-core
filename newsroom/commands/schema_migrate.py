@@ -11,7 +11,7 @@ from .cli import newsroom_cli
 VERSION_ID = "schema_version"
 
 
-@newsroom_cli.cli.command("schema_migrate")
+@newsroom_cli.command("schema_migrate")
 @click.argument("resource_name", required=False)
 @with_appcontext
 def schema_migrate(resource_name=None):
