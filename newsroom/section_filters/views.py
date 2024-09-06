@@ -41,6 +41,7 @@ async def get_settings_data():
 def validate_section_filter(section_filter: dict) -> Response | None:
     if not section_filter.get("name"):
         return Response({"name": gettext("Name not found")}, 400, ())
+    return None
 
 
 async def get_section_filter_or_abort(id: str) -> SectionFilter:
