@@ -151,6 +151,7 @@ CORE_APPS = [
     "newsroom.products",
     "newsroom.navigations",
     "newsroom.cards",
+    "newsroom.section_filters",
     "newsroom.reports",
     "newsroom.public",
     "newsroom.agenda",
