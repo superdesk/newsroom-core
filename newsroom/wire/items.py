@@ -14,8 +14,8 @@ from content_api.items_versions.service import ItemsVersionsService
 
 from superdesk.metadata.item import metadata_schema
 
-from newsroom.cards import get_card_size
-from newsroom.types import DashboardCard, Article
+from newsroom.cards import get_card_size, DashboardCardDict
+from newsroom.types import Article
 
 
 class ItemsResource(BaseItemsResource):
@@ -70,7 +70,7 @@ def init_app(app):
 
 
 def get_items_for_dashboard(
-    cards: List[DashboardCard], exclude_embargoed: bool = False, filter_public_fields: bool = False
+    cards: List[DashboardCardDict], exclude_embargoed: bool = False, filter_public_fields: bool = False
 ) -> Dict[str, List[Article]]:
     """Get dictionary of ``card.label`` to list of ``Article`` for the provided cards
 
