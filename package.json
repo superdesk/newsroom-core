@@ -28,7 +28,7 @@
     "@types/react-dom": "^17.0.1",
     "@types/react-toggle": "^4.0.5",
     "@types/redux-logger": "^3.0.9",
-    "@types/store": "^2.0.2",
+    "@types/store": "^2.0.5",
     "@types/webpack-env": "^1.18.5",
     "alertifyjs": "1.14.0",
     "bootstrap": "5.1.3",
