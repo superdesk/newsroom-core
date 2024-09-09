@@ -461,15 +461,18 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {!user.is_validated || isCompanyAdmin ? null : (
-                            <Button
-                                value={gettext('Reset Password')}
-                                variant='secondary'
-                                id='resetPassword'
-                                onClick={onResetPassword}
-                                data-test-id='reset-password-btn'
-                            />
-                        )}
+                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures.verify_email === false
+                            ? null
+                            : (
+                                <Button
+                                    value={gettext('Reset Password')}
+                                    variant='secondary'
+                                    id='resetPassword'
+                                    onClick={onResetPassword}
+                                    data-test-id='reset-password-btn'
+                                />
+                            )
+                        }
                         {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && (
                             <Button
                                 value={gettext('Delete')}
