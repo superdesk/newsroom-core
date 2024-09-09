@@ -49,7 +49,12 @@ const config = {
                 test: /\.scss$/,
                 use: [
                     'style-loader',
-                    'css-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            url: (url, resourcePath) => url.startsWith('/') === false,
+                        },
+                    },
                     'sass-loader',
                 ],
             },
