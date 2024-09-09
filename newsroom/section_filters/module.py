@@ -15,12 +15,14 @@ section_filters_config = ResourceConfig(
     service=SectionFiltersService,
     mongo=MongoResourceConfig(
         prefix=MONGO_PREFIX,
-        indexes=MongoIndexOptions(
-            name="name",
-            keys=[("name", 1)],
-            unique=True,
-            collation={"locale": "en", "strength": 2},
-        ),
+        indexes=[
+            MongoIndexOptions(
+                name="name",
+                keys=[("name", 1)],
+                unique=True,
+                collation={"locale": "en", "strength": 2},
+            )
+        ],
     ),
     default_sort=[("name", 1)],
 )

@@ -19,5 +19,8 @@
     "build": "export NODE_ENV=production && webpack --progress --profile --colors",
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "start-client-server": "http-server dist -p 8080 -s"
+  },
+  "volta": {
+    "node": "14.21.3"
   }
 }
