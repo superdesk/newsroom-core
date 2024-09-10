@@ -62,7 +62,7 @@
     "ts-loader": "8.4.0",
     "typescript": "5.5.4",
     "url-search-params-polyfill": "8.2.5",
-    "webpack": "~4.47.0",
+    "webpack": "~5.94.0",
     "webpack-cli": "~4.10.0",
     "webpack-dev-server": "~4.15.2",
     "webpack-manifest-plugin": "~4.1.1"
