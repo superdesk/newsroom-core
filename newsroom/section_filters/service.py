@@ -1,6 +1,7 @@
 from superdesk.flask import g
 from superdesk.core.resources import AsyncCacheableService
 
+from newsroom.search import BoolQuery
 from newsroom.search.service import query_string
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
@@ -11,7 +12,7 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilter], AsyncCac
     resource_name = "section_filters"
     cache_lookup = {"is_enabled": True}
 
-    async def get_section_filters(self, filter_type) -> list:
+    async def get_section_filters(self, filter_type: str) -> list[dict]:
         """Get the list of section filter by filter type
 
         :param filter_type: Type of filter
@@ -19,7 +20,7 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilter], AsyncCac
         section_filters = await self.get_section_filters_dict()
         return section_filters.get(filter_type) or []
 
-    async def get_section_filters_dict(self) -> dict[str, list]:
+    async def get_section_filters_dict(self) -> dict[str, list[dict]]:
         """Get the list of all section filters"""
         if not getattr(g, "section_filters", None):
             filters: dict[str, list] = {}
@@ -30,7 +31,7 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilter], AsyncCac
             g.section_filters = filters
         return g.section_filters
 
-    async def apply_section_filter(self, query, product_type, filters=None):
+    async def apply_section_filter(self, query: BoolQuery, product_type: str, filters=None):
         """Get the list of base products for product type
 
         :param query: Dict of elasticsearch query
@@ -46,5 +47,6 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilter], AsyncCac
             return
 
         for f in section_filters:
-            if f.get("query"):
-                query["bool"].setdefault("filter", []).append(query_string(f.get("query")))
+            filter_query = f.get("query")
+            if filter_query:
+                query["bool"].setdefault("filter", []).append(query_string(str(filter_query)))

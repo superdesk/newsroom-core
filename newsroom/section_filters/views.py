@@ -11,11 +11,7 @@ from superdesk.core.web import EndpointGroup, Response, Request
 
 from newsroom.decorator import admin_only
 from newsroom.core import get_current_wsgi_app
-from newsroom.utils import (
-    create_or_abort,
-    get_json_or_400,
-    success_response,
-)
+from newsroom.utils import create_or_abort, get_json_or_400
 
 from .service import SectionFiltersService
 from .model import SectionFilter
@@ -67,7 +63,7 @@ class IndexParams(BaseModel):
 async def index(_a: None, params: IndexParams, _r: None):
     cursor = await SectionFiltersService().search(lookup=params.q)
     section_filters = await cursor.to_list_raw()
-    return success_response(section_filters)
+    return Response(section_filters)
 
 
 class SearchParams(BaseModel):
@@ -84,7 +80,7 @@ async def search(_a: None, params: SearchParams, _q: Request):
 
     cursor = await SectionFiltersService().search(lookup=lookup)
     section_filters = await cursor.to_list_raw()
-    return success_response(section_filters)
+    return Response(section_filters)
 
 
 @section_filters_endpoints.endpoint("/section_filters/new", methods=["POST"])
@@ -106,7 +102,7 @@ async def create():
 
     section_filter_id = await create_or_abort(SectionFiltersService, SectionFilter, creation_data)
 
-    return success_response({"success": True, "_id": section_filter_id}, status_code=201)
+    return Response({"success": True, "_id": section_filter_id}, 201)
 
 
 class DetailArgs(BaseModel):
@@ -134,10 +130,10 @@ async def edit(args: DetailArgs, _p: None, _q: None):
 
     await SectionFiltersService().update(args.id, updates)
 
-    return success_response({"success": True})
+    return Response({"success": True})
 
 
-@section_filters_endpoints.endpoint("/section_filters/<id>", methods=["DELETE"])
+@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"])
 @admin_only
 async def delete(args: DetailArgs, _p: None, _r: None):
     """Deletes the section_filters by given id"""
@@ -145,4 +141,4 @@ async def delete(args: DetailArgs, _p: None, _r: None):
     section_filter = await get_section_filter_or_abort(args.id)
     await SectionFiltersService().delete(section_filter)
 
-    return success_response({"success": True})
+    return Response({"success": True})
