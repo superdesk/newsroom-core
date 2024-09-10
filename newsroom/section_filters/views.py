@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional
 
 from bson import ObjectId
 from quart import abort
-from quart_babel import gettext
 from pydantic import BaseModel, ValidationError, field_validator
 
 from superdesk.core.web import EndpointGroup, Response, Request
@@ -32,12 +31,6 @@ async def get_settings_data():
     }
 
     return data
-
-
-def validate_section_filter(section_filter: dict) -> Response | None:
-    if not section_filter.get("name"):
-        return Response({"name": gettext("Name not found")}, 400, ())
-    return None
 
 
 async def get_section_filter_or_abort(id: str) -> SectionFilter:
