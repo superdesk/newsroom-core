@@ -5,13 +5,13 @@ from typing import Any, Dict, Optional
 from bson import ObjectId
 from quart import abort
 from quart_babel import gettext
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ValidationError, field_validator
 
 from superdesk.core.web import EndpointGroup, Response, Request
 
 from newsroom.decorator import admin_only
 from newsroom.core import get_current_wsgi_app
-from newsroom.utils import create_or_abort, get_json_or_400
+from newsroom.utils import create_or_abort, get_json_or_400, response_from_validation
 
 from .service import SectionFiltersService
 from .model import SectionFilter
@@ -87,13 +87,10 @@ async def search(_a: None, params: SearchParams, _q: Request):
 @admin_only
 async def create():
     creation_data = await get_json_or_400()
-
-    validation = validate_section_filter(creation_data)
-    if validation:
-        return validation
+    app_sections = get_current_wsgi_app().sections
 
     section = next(
-        (s for s in get_current_wsgi_app().sections if s["_id"] == creation_data.get("filter_type")),
+        (s for s in app_sections if s["_id"] == creation_data.get("filter_type")),
         None,
     )
     if section and section.get("search_type"):
@@ -124,13 +121,11 @@ async def edit(args: DetailArgs, _p: None, _q: None):
         "filter_type": data.get("filter_type", "wire"),
     }
 
-    validation = validate_section_filter(updates)
-    if validation:
-        return validation
-
-    await SectionFiltersService().update(args.id, updates)
-
-    return Response({"success": True})
+    try:
+        await SectionFiltersService().update(args.id, updates)
+        return Response({"success": True})
+    except ValidationError as err:
+        return response_from_validation(err)
 
 
 @section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"])
