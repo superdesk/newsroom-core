@@ -10,20 +10,20 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2024
 # Sabina <sabina.gergel@thecanadianpress.com>, 2024
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2024
-# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
 # Simon Peacock <simon.peacock@gmail.com>, 2024
 # Petr Jašek <petr.jasek@sourcefabric.org>, 2024
 # Nefertiti Patell, 2024
 # Paemiga Sararithi, 2024
+# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-22 11:23+0200\n"
+"POT-Creation-Date: 2024-09-09 16:06+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Paemiga Sararithi, 2024\n"
+"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1032,8 +1032,7 @@ msgstr "Barre de navigation principale"
 #: assets/public/components/PublicApp.tsx:79
 #: newsroom/templates/base_layout.html:62
 #: newsroom/templates/login_client.html:4
-#: newsroom/templates/login_form.html:24
-#: newsroom/templates/login_layout.html:19
+#: newsroom/templates/login_layout.html:53
 msgid "Login"
 msgstr "Ouvrir une session"
 
@@ -1081,12 +1080,11 @@ msgid "Please use 8 or more characters."
 msgstr "Veuillez utiliser 8 caractères ou plus."
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
+#: newsroom/templates/login_layout.html:47
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
 #: newsroom/templates/password_reset_link_expiry.html:8
 msgid "Click here to reset."
 msgstr "Cliquez ici pour réinitialiser."
@@ -1117,7 +1115,7 @@ msgid "Stop impersonation"
 msgstr "Mettre fin à l'emprunt du compte"
 
 #: newsroom/templates/login_client.html:9
-#: newsroom/templates/login_layout.html:33
+#: newsroom/templates/login_layout.html:73
 msgid "Login using Single Sign On"
 msgstr "Connexion avec l'authentification unique"
 
@@ -1127,21 +1125,38 @@ msgstr ""
 "Si vous avez des difficultés à vous connecter, veuillez contacter votre "
 "service informatique."
 
-#: newsroom/templates/login_form.html:30
+#: newsroom/templates/login_layout.html:14
+msgid "Login to Newshub"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:48
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: newsroom/templates/login_layout.html:48
+msgid "Click here to reset"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:60
 msgid "Log In with Google"
 msgstr "Se connecter avec Google"
 
-#: newsroom/templates/login_layout.html:41
-msgid "Or you can"
-msgstr "Ou vous pouvez"
+#: newsroom/templates/login_layout.html:70
+msgid "Or"
+msgstr ""
 
-#: newsroom/templates/login_layout.html:41
-msgid "click here to register."
-msgstr "cliquez ici pour vous inscrire."
+#: newsroom/templates/login_layout.html:82
+msgid "Don't have an account?"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:83 newsroom/templates/signup.html:13
+#: newsroom/templates/signup_form.html:61
+msgid "Sign up"
+msgstr "S'inscrire"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:235
 #: assets/users/components/EditUser.tsx:308
-#: newsroom/templates/login_layout.html:50
+#: newsroom/templates/login_layout.html:93
 #: newsroom/templates/login_locale_dropdown.html:5
 msgid "Language"
 msgstr "Langue"
@@ -1213,10 +1228,6 @@ msgstr "Annuler"
 #: newsroom/templates/settings.html:17
 msgid "Settings Menu"
 msgstr "Menu des paramètres"
-
-#: newsroom/templates/signup.html:13 newsroom/templates/signup_form.html:61
-msgid "Sign up"
-msgstr "S'inscrire"
 
 #: newsroom/templates/signup_form.html:54
 msgid "the terms and conditions"
@@ -2129,11 +2140,11 @@ msgstr "Couvertures précédentes:"
 msgid "Associated Event"
 msgstr "Événement associé"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:24
+#: assets/agenda/components/AgendaPreviewImage.tsx:28
 msgid "Show Map"
 msgstr "Afficher la carte"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:25
+#: assets/agenda/components/AgendaPreviewImage.tsx:29
 msgid "Hide Map"
 msgstr "Masquer la carte"
 
@@ -3256,7 +3267,7 @@ msgstr "Filtres"
 msgid "Custom View"
 msgstr "Vue personnalisée"
 
-#: assets/maps/components/static.tsx:37
+#: assets/maps/components/static.tsx:43
 msgid "Map"
 msgstr "Carte"
 
