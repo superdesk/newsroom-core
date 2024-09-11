@@ -1,15 +1,13 @@
 import re
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from superdesk.core import json
 from superdesk.core.web import Request, Response, EndpointGroup
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.decorator import admin_only, login_required
-from newsroom.utils import response_from_validation
 
-from .model import CardResourceModel
 from .service import CardsResourceService
 
 
@@ -57,11 +55,7 @@ async def create(request: Request) -> Response:
     if not card_data.get("_id"):
         card_data["_id"] = service.generate_id()
 
-    try:
-        new_card = CardResourceModel.model_validate(card_data)
-        new_ids = await service.create([new_card])
-    except ValidationError as error:
-        return response_from_validation(error)
+    new_ids = await service.create([card_data])
 
     return Response({"success": True, "_id": new_ids[0]}, 201, ())
 
@@ -79,12 +73,9 @@ async def edit(args: CardItemUrlArgs, params: None, request: Request) -> Respons
     if not card_data:
         request.abort(400)
 
-    try:
-        await service.update(args.id, card_data, etag=request.get_header("If-Match"))
-    except ValidationError as error:
-        return response_from_validation(error)
+    await service.update(args.id, card_data, etag=request.get_header("If-Match"))
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
 
 
 @cards_endpoints.endpoint("/cards/<id>", methods=["DELETE"])
@@ -99,4 +90,4 @@ async def delete(args: CardItemUrlArgs, params: None, request: Request) -> Respo
 
     await service.delete(original, etag=request.get_header("If-Match"))
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})

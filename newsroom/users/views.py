@@ -3,7 +3,7 @@ import json
 
 from copy import deepcopy
 from typing import Any, Dict, Optional
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, field_validator
 
 from bson import ObjectId
 from quart_babel import gettext
@@ -43,7 +43,6 @@ from newsroom.utils import (
     get_json_or_400_async,
     query_resource,
     get_vocabulary,
-    response_from_validation,
     success_response,
 )
 from newsroom.monitoring.views import get_monitoring_for_company
@@ -172,7 +171,7 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
     mongo_cursor = await UsersService().find(SearchRequest(where=lookup, sort=sort, max_results=250))
     users = await mongo_cursor.to_list_raw()
 
-    return Response(users, 200, ())
+    return Response(users)
 
 
 @users_endpoints.endpoint("/users/new", methods=["POST"])
@@ -182,15 +181,11 @@ async def create(request: Request):
 
     if await form.validate():
         if not _is_email_address_valid(form.email.data):
-            return Response({"email": [gettext("Email address is already in use")]}, 400, ())
+            return Response({"email": [gettext("Email address is already in use")]}, 400)
 
         creation_data = get_updates_from_form(form, on_create=True)
         creation_data["id"] = ObjectId()
-
-        try:
-            new_user = UserResourceModel.model_validate(creation_data)
-        except ValidationError as error:
-            return response_from_validation(error)
+        new_user = UserResourceModel.model_validate(creation_data)
 
         if is_current_user_company_admin():
             company_from_admin = await get_company_from_user_or_session()
@@ -203,7 +198,7 @@ async def create(request: Request):
         elif form.company.data:
             new_user.company = ObjectId(form.company.data)
         elif new_user.user_type != "administrator":
-            return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
+            return Response({"company": [gettext("Company is required for non administrators")]}, 400)
 
         new_user.receive_email = True
         new_user.receive_app_notifications = True
@@ -215,18 +210,15 @@ async def create(request: Request):
             if auth_provider.features["verify_email"]:
                 add_token_data(new_user)
 
-        try:
-            ids = await UsersService().create([new_user])
-        except ValidationError as error:
-            return response_from_validation(error)
+        ids = await UsersService().create([new_user])
 
         if auth_provider.features["verify_email"]:
             user_dict = new_user.model_dump(by_alias=True, exclude_unset=True)
             await send_token(user_dict, token_type="new_account", update_token=False)
 
-        return Response({"success": True, "_id": ids[0]}, 201, ())
+        return Response({"success": True, "_id": ids[0]}, 201)
 
-    return Response(form.errors, 400, ())
+    return Response(form.errors, 400)
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/resend_invite", methods=["POST"])
@@ -246,7 +238,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
     if not user:
         return NotFound(gettext("User not found"))
     elif user.is_validated:
-        return Response({"is_validated": gettext("User is already validated")}, 400, ())
+        return Response({"is_validated": gettext("User is already validated")}, 400)
     elif user_is_company_admin and (company is None or user.company != company.id):
         # Company admins can only resent invites for members of their company only
         await request.abort(403)
@@ -294,10 +286,10 @@ async def edit(args: RouteArguments, params: None, request: Request):
 
         if await form.validate_on_submit():
             if form.email.data != user.email and not _is_email_address_valid(form.email.data):
-                return Response({"email": [gettext("Email address is already in use")]}, 400, ())
+                return Response({"email": [gettext("Email address is already in use")]}, 400)
 
             elif not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
-                return Response({"company": [gettext("Company is required for non administrators")]}, 400, ())
+                return Response({"company": [gettext("Company is required for non administrators")]}, 400)
 
             updates = get_updates_from_form(form)
 
@@ -320,14 +312,10 @@ async def edit(args: RouteArguments, params: None, request: Request):
                     if field not in allowed_fields:
                         updates.pop(field, None)
 
-            try:
-                await UsersService().update(args.user_id, updates)
-            except ValidationError as error:
-                return response_from_validation(error)
-
+            await UsersService().update(args.user_id, updates)
             return success_response({"success": True})
 
-        return Response(form.errors, 400, ())
+        return Response(form.errors, 400)
 
     return success_response(user)
 
@@ -372,14 +360,10 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
     form = await UserForm.create_form(user=user)
     if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
-        try:
-            await UsersService().update(args.user_id, updates)
-        except ValidationError as error:
-            return response_from_validation(error)
-
+        await UsersService().update(args.user_id, updates)
         return success_response({"success": True})
 
-    return Response(form.errors, 400, ())
+    return Response(form.errors, 400)
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/notification_schedules", methods=["POST"])
@@ -401,10 +385,7 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
 
     updates["notification_schedule"].update(data)
 
-    try:
-        await UsersService().update(args.user_id, updates)
-    except ValidationError as error:
-        return response_from_validation(error)
+    await UsersService().update(args.user_id, updates)
     return success_response({"success": True})
 
 
@@ -437,7 +418,7 @@ async def _resend_token(user_id, token_type):
     if await send_token(user.model_dump(by_alias=True), token_type):
         return success_response({"success": True})
 
-    return Response({"message": "Token could not be sent"}, 400, ())
+    return Response({"message": "Token could not be sent"}, 400)
 
 
 @users_endpoints.endpoint("/users/<string:user_id>", methods=["DELETE"])
@@ -493,7 +474,7 @@ async def approve_user(args: RouteArguments, params: None, request: Request):
         return NotFound(gettext("User not found"))
 
     if user.is_approved:
-        return Response({"error": gettext("User is already approved")}, 403, ())
+        return Response({"error": gettext("User is already approved")}, 403)
 
     await users_service.approve_user(user)
     return success_response({"success": True})

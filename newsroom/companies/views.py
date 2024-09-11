@@ -5,7 +5,7 @@ from bson import ObjectId
 from datetime import datetime
 from quart_babel import gettext
 from werkzeug.exceptions import NotFound, BadRequest
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.core.web import Request, Response
@@ -17,14 +17,13 @@ from newsroom.utils import (
     get_public_user_data,
     query_resource,
     get_json_or_400_async,
-    response_from_validation,
     success_response,
 )
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs
 from .utils import get_users_by_company
-from .companies_async import CompanyService, CompanyResource
+from .companies_async import CompanyService
 
 
 def get_company_types_options():
@@ -69,7 +68,7 @@ async def search_companies(args: None, params: CompanySearchArgs, request: Reque
         lookup = {"name": regex}
     cursor = await CompanyService().search(lookup)
     companies = await cursor.to_list_raw()
-    return Response(companies, 200, ())
+    return Response(companies)
 
 
 @company_endpoints.endpoint("/companies/new", methods=["POST"])
@@ -82,13 +81,8 @@ async def create_company(request: Request) -> Response:
     company_data = get_company_updates(company)
     company_data["_id"] = ObjectId()
 
-    try:
-        new_company = CompanyResource.model_validate(company_data)
-        ids = await CompanyService().create([new_company])
-    except ValidationError as error:
-        return response_from_validation(error)
-
-    return Response({"success": True, "_id": ids[0]}, 201, ())
+    ids = await CompanyService().create([company_data])
+    return Response({"success": True, "_id": ids[0]}, 201)
 
 
 def get_company_updates(data, original=None):
@@ -144,18 +138,14 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     if not original:
         raise NotFound(gettext("Company not found"))
     elif request.method == "GET":
-        return Response(original, 200, ())
+        return Response(original)
 
     request_json = await get_json_or_400_async(request)
     if not isinstance(request_json, dict):
         return request.abort(400)
 
     updates = get_company_updates(request_json, original)
-
-    try:
-        await service.update(args.company_id, updates)
-    except ValidationError as error:
-        return response_from_validation(error)
+    await service.update(args.company_id, updates)
 
     return success_response({"success": True})
 
@@ -174,14 +164,14 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
     try:
         await UsersService().delete_many(lookup={"company": args.company_id})
     except BadRequest as er:
-        return Response({"error": str(er)}, 403, ())
+        return Response({"error": str(er)}, 403)
 
     try:
         await service.delete(original)
     except Exception as e:
-        return Response({"error": str(e)}, 400, ())
+        return Response({"error": str(e)}, 400)
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>/users", methods=["GET"])
@@ -193,7 +183,7 @@ async def company_users(args: CompanyItemArgs, params: None, request: Request) -
         public_data = get_public_user_data(user.model_dump(by_alias=True))
         users_list.append(public_data)
 
-    return Response(users_list, 200, ())
+    return Response(users_list)
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>/approve", methods=["POST"])
@@ -206,7 +196,7 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     if not original:
         raise NotFound(gettext("Company not found"))
     elif original.is_approved:
-        return Response({"error": gettext("Company is already approved")}, 403, ())
+        return Response({"error": gettext("Company is already approved")}, 403)
 
     # Activate this Company
     updates = {
@@ -221,4 +211,4 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     async for user in company_users:
         await UsersService().approve_user(user)
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
