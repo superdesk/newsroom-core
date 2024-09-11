@@ -1,6 +1,5 @@
 import pytz
 import regex
-from newsroom.exceptions import ValidationException
 import superdesk
 from functools import reduce
 from pydantic import BaseModel, ValidationError
@@ -24,8 +23,6 @@ from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
-from superdesk.core.resources.model import ResourceModel
-from superdesk.core.resources.service import AsyncResourceService
 from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
 from newsroom.flask import flash
@@ -170,39 +167,6 @@ def parse_validation_error(error: ValidationError) -> dict[str, str]:
     return {
         field: list(err.values())[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
     }
-
-
-def response_from_validation(error: ValidationError, code=400):
-    """
-    Constructs a Response object with pydantic model validation error.
-    """
-    errors = parse_validation_error(error)
-
-    return Response(errors, code, ())
-
-
-async def create_or_abort(
-    service_class: type[AsyncResourceService], model_class: type[ResourceModel], creation_data: dict
-) -> int:
-    """
-    Validate creation data using the provided model class. If valid, creates a new record
-    using the provided service class. Raises ValidationException on validation errors.
-
-    Args:
-        service_class (type[AsyncResourceService]): The service class used to create the record.
-        model_class (type[ResourceModel]): The model class used for validation.
-        creation_data (dict): The data to be validated and used for creation.
-
-    Raises:
-        ValidationException: If validation errors are encountered.
-    """
-    try:
-        new_model = model_class.model_validate(creation_data)
-        ids = await service_class().create([new_model])
-        return ids[0]
-    except ValidationError as err:
-        errors = parse_validation_error(err)
-        raise ValidationException(errors=errors)
 
 
 def get_type(type: Optional[str] = None) -> str:
