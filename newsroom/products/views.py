@@ -10,6 +10,7 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
 from newsroom.navigations import NavigationsService, Navigation
+from newsroom.navigations.utils import get_navigations_as_list
 from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
 from newsroom.types import Product, ProductRef
@@ -22,10 +23,10 @@ from newsroom.utils import (
 )
 
 
-def get_settings_data():
+async def get_settings_data():
     return {
         "products": list(query_resource("products")),
-        "navigations": list(query_resource("navigations")),
+        "navigations": await get_navigations_as_list(),
         "companies": list(query_resource("companies")),
         "sections": [
             s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"

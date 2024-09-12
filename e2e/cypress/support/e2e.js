@@ -59,7 +59,9 @@ export function addResources(resources) {
 
 export function addDefaultResources() {
     addResources([{
-        resource: 'navigations', items: [
+        resource: 'navigations',
+        use_db_collection: true,
+        items: [
             NAVIGATIONS.wire.all,
             NAVIGATIONS.wire.sports,
             NAVIGATIONS.agenda.sports,

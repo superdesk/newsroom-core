@@ -8,6 +8,7 @@ from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 from newsroom import MONGO_PREFIX
 from newsroom.core import get_current_wsgi_app
 from newsroom.utils import query_resource
+from newsroom.navigations import NavigationsService
 
 from .model import CardResourceModel
 from .service import CardsResourceService
@@ -26,11 +27,14 @@ cards_resource_config = ResourceConfig(
 async def get_settings_data():
     app = get_current_wsgi_app()
 
+    cursor = await NavigationsService().search(lookup={"is_enabled": True})
+    navigations = await cursor.to_list_raw()
+
     return {
         "products": list(query_resource("products", lookup={"is_enabled": True})),
         "cards": await (await CardsResourceService().find({})).to_list_raw(),
         "dashboards": app.dashboards,
-        "navigations": list(query_resource("navigations", lookup={"is_enabled": True})),
+        "navigations": navigations,
     }
 
 

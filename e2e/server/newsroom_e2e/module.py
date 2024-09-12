@@ -9,6 +9,7 @@ from superdesk.timer import timer
 
 from newsroom.auth.utils import start_user_session
 from newsroom.tests.db import drop_mongo, reset_elastic
+from tests.core.utils import get_db_collection
 
 from .utils import create_default_user
 
@@ -19,7 +20,7 @@ async def init_e2e_app(_request: Request) -> Response:
         await reset_dbs()
         create_default_user()
 
-    return Response("OK", 200, ())
+    return Response("OK")
 
 
 async def reset_dbs():
@@ -45,7 +46,12 @@ async def populate_resources(request: Request) -> Response:
             resource = entry.get("resource")
             items = entry.get("items") or []
 
-            if entry.get("use_resource_service", True):
+            if entry.get("use_db_collection", False):
+                db_collection = get_db_collection(resource)
+                for item in items:
+                    result = await db_collection.insert_one(item)
+                    ids.append(result.inserted_id)
+            elif entry.get("use_resource_service", True):
                 service = get_resource_service(resource)
                 for item in items:
                     app.data.mongo._mongotize(item, resource)
@@ -54,7 +60,7 @@ async def populate_resources(request: Request) -> Response:
                 for item in items:
                     app.data.mongo._mongotize(item, resource)
                     ids.extend(app.data.insert(resource, [item]))
-    return Response(ids, 200, ())
+    return Response(ids)
 
 
 module = Module("newsroom_e2e", endpoints=[init_e2e_app, populate_resources])

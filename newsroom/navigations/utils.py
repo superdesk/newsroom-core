@@ -6,6 +6,13 @@ from newsroom.products.products import get_products_by_company, get_products_by_
 from .service import NavigationsService
 
 
+async def get_navigations_as_list():
+    """
+    Returns a list of all navigations in raw mode
+    """
+    return [obj async for obj in NavigationsService().get_all_raw()]
+
+
 async def get_navigations(user: UserData | None, company: Company | None, product_type="wire") -> list[Navigation]:
     """
     Returns list of navigations for given user and company
@@ -42,5 +49,6 @@ async def get_navigations_by_ids(navigation_ids: list[str | ObjectId]) -> list[N
     if not navigation_ids:
         return []
 
+    navigation_ids = [str(x) for x in navigation_ids]
     cursor = await NavigationsService().search(lookup={"_id": {"$in": navigation_ids}, "is_enabled": True})
     return await cursor.to_list_raw()

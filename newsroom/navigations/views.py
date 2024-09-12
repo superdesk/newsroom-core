@@ -15,13 +15,10 @@ from newsroom.flask import get_file_from_request
 from newsroom.assets import save_file_and_get_url
 
 from .service import NavigationsService
+from .utils import get_navigations_as_list
 
 
 navigations_endpoints = EndpointGroup("navigations", __name__)
-
-
-async def get_navigations_as_list():
-    return [obj async for obj in NavigationsService().get_all_raw()]
 
 
 async def get_settings_data():
