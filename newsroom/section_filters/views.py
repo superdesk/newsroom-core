@@ -33,7 +33,7 @@ async def get_settings_data():
 async def get_section_filter_or_abort(id: str, request: Request) -> SectionFilter:
     section_filter = await SectionFiltersService().find_by_id(id)
     if section_filter is None:
-        request.abort(404)
+        await request.abort(404)
 
     return section_filter
 
