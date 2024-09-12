@@ -1,5 +1,6 @@
 import multiprocessing
 
+from bson import ObjectId
 from superdesk import get_resource_service
 from superdesk.core import get_current_app
 from superdesk.core.module import Module
@@ -33,6 +34,29 @@ async def reset_dbs():
         app.init_indexes()
 
 
+def objectize_ids(source: dict) -> dict:
+    """
+    Simplied implementation of python-eve's `_mongotize` to recursively
+    iterates a JSON dictionary, turning strings into ObjectIds.
+
+    Note: this does not take care of datetime conversion
+    """
+
+    def try_cast(v):
+        try:
+            return ObjectId(v)
+        except:
+            return v
+
+    for k, v in source.items():
+        if isinstance(v, dict):
+            objectize_ids(v)
+        elif isinstance(v, str):
+            source[k] = try_cast(v)
+
+    return source
+
+
 @endpoint("e2e/populate_resources", methods=["POST"])
 async def populate_resources(request: Request) -> Response:
     json = await request.get_json()
@@ -49,6 +73,7 @@ async def populate_resources(request: Request) -> Response:
             if entry.get("use_db_collection", False):
                 db_collection = get_db_collection(resource)
                 for item in items:
+                    objectize_ids(item)
                     result = await db_collection.insert_one(item)
                     ids.append(result.inserted_id)
             elif entry.get("use_resource_service", True):

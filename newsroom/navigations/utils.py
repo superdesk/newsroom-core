@@ -49,6 +49,5 @@ async def get_navigations_by_ids(navigation_ids: list[str | ObjectId]) -> list[N
     if not navigation_ids:
         return []
 
-    navigation_ids = [str(x) for x in navigation_ids]
     cursor = await NavigationsService().search(lookup={"_id": {"$in": navigation_ids}, "is_enabled": True})
     return await cursor.to_list_raw()
