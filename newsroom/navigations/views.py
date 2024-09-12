@@ -1,12 +1,11 @@
 import re
+from typing import Any
 
 from bson import ObjectId
 from pydantic import BaseModel
-from quart_babel import gettext
 
 from superdesk.core import json
 from superdesk.cache import cache
-from superdesk.flask import jsonify, request
 from superdesk.core.web import EndpointGroup, Response, Request
 
 from newsroom.decorator import admin_only
@@ -45,6 +44,15 @@ class RouteArguments(BaseModel):
     id: str
 
 
+async def get_nav_data_from_request(request: Request) -> dict[str, Any]:
+    form_data = await request.get_form()
+    nav_data = form_data.get("navigation")
+    if nav_data is None:
+        await request.abort(400)
+
+    return json.loads(nav_data)
+
+
 @navigations_endpoints.endpoint("/navigations", methods=["GET"])
 async def index():
     navigations = await get_navigations_as_list()
@@ -64,14 +72,11 @@ async def search(_a, params: SearchParams, _q):
 
 @navigations_endpoints.endpoint("/navigations/new", methods=["POST"])
 @admin_only
-async def create():
-    data = json.loads((await request.form)["navigation"])
-
-    if not data.get("name"):
-        return jsonify(gettext("Name not found")), 400
-
+async def create(request: Request):
+    nav_data = await get_nav_data_from_request(request)
     service = NavigationsService()
-    creation_data = await _get_navigation_data(data)
+
+    creation_data = await prepare_navigation_data(nav_data)
     creation_data["id"] = service.generate_id()
     product_ids = creation_data.pop("products", [])
     created_ids = await service.create([creation_data])
@@ -86,12 +91,11 @@ async def create():
 async def edit(args: RouteArguments, _p: None, request: Request):
     service = NavigationsService()
     nav = await service.find_by_id(args.id)
-
     if not nav:
         await request.abort(404)
 
-    data = json.loads((await request.form)["navigation"])
-    updates = await _get_navigation_data(data)
+    data = await get_nav_data_from_request(request)
+    updates = await prepare_navigation_data(data)
     product_ids = updates.pop("products", [])
 
     await service.update(args.id, updates)
@@ -111,7 +115,7 @@ async def delete(args: RouteArguments, _p: None, request: Request):
     return Response({"success": True})
 
 
-async def _get_navigation_data(data):
+async def prepare_navigation_data(data: dict[str, Any]) -> dict[str, Any]:
     navigation_data = {
         "name": data.get("name"),
         "description": data.get("description", ""),
