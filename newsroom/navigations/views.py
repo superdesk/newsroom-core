@@ -6,8 +6,8 @@ from quart_babel import gettext
 
 from superdesk.core import json
 from superdesk.cache import cache
-from superdesk.flask import jsonify, request, abort
-from superdesk.core.web import EndpointGroup, Response
+from superdesk.flask import jsonify, request
+from superdesk.core.web import EndpointGroup, Response, Request
 
 from newsroom.decorator import admin_only
 from newsroom.utils import query_resource
@@ -83,12 +83,12 @@ async def create():
 
 @navigations_endpoints.endpoint("/navigations/<string:id>", methods=["POST"])
 @admin_only
-async def edit(args: RouteArguments, _p: None, _q: None):
+async def edit(args: RouteArguments, _p: None, request: Request):
     service = NavigationsService()
     nav = await service.find_by_id(args.id)
 
     if not nav:
-        abort(404)
+        await request.abort(404)
 
     data = json.loads((await request.form)["navigation"])
     updates = await _get_navigation_data(data)
@@ -102,11 +102,11 @@ async def edit(args: RouteArguments, _p: None, _q: None):
 
 @navigations_endpoints.endpoint("/navigations/<string:id>", methods=["DELETE"])
 @admin_only
-async def delete(args: RouteArguments, _p: None, _q: None):
+async def delete(args: RouteArguments, _p: None, request: Request):
     service = NavigationsService()
     nav = await service.find_by_id(args.id)
     if not nav:
-        abort(404)
+        await request.abort(404)
     await service.delete(nav)
     return Response({"success": True})
 
