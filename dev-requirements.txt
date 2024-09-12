@@ -471,7 +471,7 @@ six==1.16.0
     #   python-dateutil
 sniffio==1.3.1
     # via asgi-tools
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@hg/minor-improvements
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
