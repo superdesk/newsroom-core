@@ -3,6 +3,8 @@ from quart_babel import lazy_gettext
 from wtforms import StringField, PasswordField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
+from .recaptcha import RecaptchaField, validate_recaptcha_request
+
 
 class SignupForm(QuartForm):
     company_sizes = [("0-10", "0-10"), ("11-100", "11-100"), (">100", ">100")]
@@ -32,9 +34,10 @@ class SignupForm(QuartForm):
     referred_by = TextAreaField(lazy_gettext("How did you hear about us? (Referral, social media, web search)"))
 
     consent = BooleanField(lazy_gettext("I agree to"), validators=[])
-    # TODO-ASYNC: RecaptchaField is not possible in quart-wtf, as it requires getting request details which is async
-    #             Might need to add a `async_validators_<recaptcha>` here, and make recaptcha a simple stirng field
-    # recaptcha = RecaptchaField()
+    recaptcha = RecaptchaField()
+
+    async def async_validators_recaptcha(self, _field):
+        await validate_recaptcha_request()
 
 
 class LoginForm(QuartForm):
