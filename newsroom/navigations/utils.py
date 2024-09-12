@@ -1,3 +1,4 @@
+from bson import ObjectId
 from newsroom.utils import is_admin
 from newsroom.types import Company, Navigation, UserData
 from newsroom.products.products import get_products_by_company, get_products_by_user
@@ -34,7 +35,7 @@ async def get_navigations_by_company(company: Company, product_type="wire") -> l
     return await get_navigations(None, company, product_type)
 
 
-async def get_navigations_by_ids(navigation_ids: list[str]) -> list[Navigation]:
+async def get_navigations_by_ids(navigation_ids: list[str | ObjectId]) -> list[Navigation]:
     """
     Returns the list of navigations for navigation_ids
     """
@@ -42,4 +43,4 @@ async def get_navigations_by_ids(navigation_ids: list[str]) -> list[Navigation]:
         return []
 
     cursor = await NavigationsService().search(lookup={"_id": {"$in": navigation_ids}, "is_enabled": True})
-    return cursor.to_list_raw()
+    return await cursor.to_list_raw()

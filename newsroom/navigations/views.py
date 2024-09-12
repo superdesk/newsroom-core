@@ -78,7 +78,7 @@ async def create():
 
     if product_ids is not None:
         await add_remove_products_for_navigation(ObjectId(created_ids[0]), product_ids)
-    return Response({"success": True, "_id": created_ids[0]})
+    return Response({"success": True, "_id": created_ids[0]}, 201)
 
 
 @navigations_endpoints.endpoint("/navigations/<string:id>", methods=["POST"])

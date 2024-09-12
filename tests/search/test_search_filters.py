@@ -9,6 +9,7 @@ from newsroom.search.service import SearchQuery, BaseSearchService
 from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import get_local_date
 from newsroom.wire.search import WireSearchResource
+from tests.core.utils import insert_into
 
 from .fixtures import (
     PUBLIC_USER_ID,
@@ -34,7 +35,7 @@ async def init(app):
 
     app.data.insert("users", USERS)
     app.data.insert("companies", COMPANIES)
-    app.data.insert("navigations", NAVIGATIONS)
+    await insert_into("navigations", NAVIGATIONS)
     app.data.insert("products", PRODUCTS)
     app.data.insert("section_filters", SECTION_FILTERS)
 

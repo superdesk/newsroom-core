@@ -7,6 +7,7 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
 from newsroom.search.service import SearchQuery, BaseSearchService
+from tests.core.utils import insert_into
 
 from .fixtures import (
     PUBLIC_USER_ID,
@@ -40,7 +41,7 @@ async def init(app):
 
     app.data.insert("users", USERS)
     app.data.insert("companies", COMPANIES)
-    app.data.insert("navigations", NAVIGATIONS)
+    await insert_into("navigations", NAVIGATIONS)
     app.data.insert("products", PRODUCTS)
 
 

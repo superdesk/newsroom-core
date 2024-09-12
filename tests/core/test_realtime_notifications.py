@@ -9,6 +9,7 @@ from superdesk import get_resource_service
 from newsroom.push import notify_new_agenda_item, notify_new_wire_item
 from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from newsroom.tests.users import ADMIN_USER_ID
+from tests.core.utils import insert_into
 
 from ..utils import mock_send_email
 
@@ -29,7 +30,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
         },
     ]
 
-    app.data.insert("navigations", navigations)
+    await insert_into("navigations", navigations)
 
     for product in company_products:
         if "*" in product["query"]:

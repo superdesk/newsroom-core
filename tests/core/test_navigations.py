@@ -9,7 +9,7 @@ from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations.utils import get_navigations
 from newsroom.types import Product
-from tests.core.utils import add_company_products
+from tests.core.utils import add_company_products, insert_into
 
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -17,8 +17,8 @@ AGENDA_NAV_ID = ObjectId()
 
 
 @fixture(autouse=True)
-async def navigations(app):
-    app.data.insert(
+async def navigations():
+    await insert_into(
         "navigations",
         [
             {
@@ -94,7 +94,7 @@ async def test_delete_navigation_removes_references(client):
         json={
             "name": "Breaking",
             "description": "Breaking news",
-            "navigations": [("59b4c5c61d41c8d736852fbf")],
+            "navigations": ["59b4c5c61d41c8d736852fbf"],
             "is_enabled": True,
             "product_type": "wire",
             "query": "foo",
@@ -187,7 +187,7 @@ async def test_update_navigation_with_products(client, app):
     await test_login_succeeds_for_admin(client)
     await client.post(
         f"navigations/{NAV_ID}",
-        form={"navigation": json.dumps({"name": "Sports 2", "products": ["p-1"]})},
+        form={"navigation": json.dumps({"name": "Sports 2", "is_enabled": True, "products": ["p-1"]})},
     )
 
     response = await client.get("/products")
@@ -197,7 +197,7 @@ async def test_update_navigation_with_products(client, app):
 
 
 async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
-    app.data.insert(
+    await insert_into(
         "navigations",
         [
             {
@@ -222,7 +222,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
             },
             {
                 "name": "A News",
-                "navigations": ["59b4c5c61d41c8d736852fbf"],
+                "navigations": [ObjectId("59b4c5c61d41c8d736852fbf")],
                 "description": "news product",
                 "is_enabled": True,
                 "product_type": "wire",
@@ -241,7 +241,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
 
 async def test_get_products_by_navigation_caching(app):
     nav_id = ObjectId()
-    app.data.insert(
+    await insert_into(
         "navigations",
         [
             {

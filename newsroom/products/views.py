@@ -5,10 +5,11 @@ from bson import ObjectId
 from quart_babel import gettext
 
 from superdesk.core import get_current_app
-from superdesk.flask import jsonify, request
+from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
+from newsroom.navigations import NavigationsService, Navigation
 from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
 from newsroom.types import Product, ProductRef
@@ -67,6 +68,13 @@ def validate_product(product):
         return jsonify({"name": gettext("Name not found")}), 400
 
 
+async def find_nav_or_404(id: str) -> Navigation:
+    nav = await NavigationsService().find_by_id(id)
+    if nav is None:
+        abort(404)
+    return nav
+
+
 @blueprint.route("/products/new", methods=["POST"])
 @admin_only
 async def create():
@@ -77,9 +85,8 @@ async def create():
         return validation
 
     if product.get("navigations"):
-        product["navigations"] = [
-            ObjectId(get_entity_or_404(_id, "navigations")["_id"]) for _id in product.get("navigations")
-        ]
+        # TODO-ASYNC: when products are migrated, we won't need `find_nav_or_404` as it could be replaced with a model validation
+        product["navigations"] = [(await find_nav_or_404(_id)).id for _id in product.get("navigations")]
     set_original_creator(product)
     ids = get_resource_service("products").post([product])
     return jsonify({"success": True, "_id": ids[0]}), 201
