@@ -45,7 +45,7 @@ def objectize_ids(source: dict) -> dict:
     def try_cast(v):
         try:
             return ObjectId(v)
-        except:
+        except:  # noqa
             return v
 
     for k, v in source.items():
