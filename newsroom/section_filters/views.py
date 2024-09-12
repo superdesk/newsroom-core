@@ -1,8 +1,6 @@
 import re
 import json
 from typing import Any, Dict, Optional
-
-from quart import abort
 from pydantic import BaseModel, field_validator
 
 from superdesk.core.web import EndpointGroup, Response, Request
@@ -32,10 +30,10 @@ async def get_settings_data():
     return data
 
 
-async def get_section_filter_or_abort(id: str) -> SectionFilter:
+async def get_section_filter_or_abort(id: str, request: Request) -> SectionFilter:
     section_filter = await SectionFiltersService().find_by_id(id)
     if section_filter is None:
-        abort(404)
+        request.abort(404)
 
     return section_filter
 
@@ -64,7 +62,7 @@ class SearchParams(BaseModel):
 
 @section_filters_endpoints.endpoint("/section_filters/search", methods=["GET"])
 @admin_only
-async def search(_a: None, params: SearchParams, _q: Request):
+async def search(_a: None, params: SearchParams, _r: None):
     lookup = None
     if params.q:
         regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
@@ -91,7 +89,7 @@ async def create():
     creation_data["id"] = service.generate_id()
 
     section_filter_id = await service.create([creation_data])
-    return Response({"success": True, "_id": section_filter_id}, 201)
+    return Response({"success": True, "_id": section_filter_id[0]}, 201)
 
 
 class DetailArgs(BaseModel):
@@ -100,8 +98,8 @@ class DetailArgs(BaseModel):
 
 @section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["POST"])
 @admin_only
-async def edit(args: DetailArgs, _p: None, _q: None):
-    await get_section_filter_or_abort(args.id)
+async def edit(args: DetailArgs, _p: None, request: Request):
+    await get_section_filter_or_abort(args.id, request)
 
     data = await get_json_or_400()
     updates = {
@@ -119,10 +117,10 @@ async def edit(args: DetailArgs, _p: None, _q: None):
 
 @section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"])
 @admin_only
-async def delete(args: DetailArgs, _p: None, _r: None):
+async def delete(args: DetailArgs, _p: None, request: Request):
     """Deletes the section_filters by given id"""
 
-    section_filter = await get_section_filter_or_abort(args.id)
+    section_filter = await get_section_filter_or_abort(args.id, request)
     await SectionFiltersService().delete(section_filter)
 
     return Response({"success": True})
