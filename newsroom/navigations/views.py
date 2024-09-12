@@ -114,9 +114,9 @@ async def delete(args: RouteArguments, _p: None, _q: None):
 async def _get_navigation_data(data):
     navigation_data = {
         "name": data.get("name"),
-        "description": data.get("description"),
+        "description": data.get("description", ""),
         "is_enabled": data.get("is_enabled"),
-        "product_type": data.get("product_type"),
+        "product_type": data.get("product_type", "wire"),
         "tile_images": data.get("tile_images"),
         "products": data.get("products"),
     }
