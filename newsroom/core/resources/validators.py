@@ -82,7 +82,7 @@ def validate_multi_field_iunique_value_async(resource_name: str, field_names: li
         resource_config = app.resources.get_config(resource_name)
         collection = app.mongo.get_collection_async(resource_config.name)
 
-        query: Mapping[str, Any] = {"_id": {"$ne": item.id}}
+        query: dict[str, Any] = {"_id": {"$ne": item.id}}
         for field_name, value in fields.items():
             query[field_name] = re.compile("^{}$".format(re.escape(value.strip())), re.IGNORECASE)
 
