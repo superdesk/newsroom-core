@@ -178,12 +178,11 @@ async def create_entries_for(resource: str, items: list[Any]):
     sync resources.
     """
     app = get_current_async_app()
-    if not is_user_resource(resource):
-        try:
-            for item in items:
-                await app.resources.get_resource_service(resource).create([item])
-        except KeyError:
-            get_resource_service(resource).post(items)
+    try:
+        for item in items:
+            await app.resources.get_resource_service(resource).create([item])
+    except KeyError:
+        get_resource_service(resource).post(items)
 
 
 @given('newsroom "{resource}"')
