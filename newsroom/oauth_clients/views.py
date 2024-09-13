@@ -40,7 +40,7 @@ async def search(args: None, params: ClientSearchArgs, request: Request) -> Resp
         lookup = {"name": regex}
     cursor = await ClientService().search(lookup)
     data = await cursor.to_list_raw()
-    return Response(data, 200, ())
+    return Response(data)
 
 
 @clients_endpoints.endpoint("/oauth_clients/new", methods=["POST"])
@@ -72,7 +72,7 @@ async def create(request: Request) -> Response:
             (),
         )
 
-    return Response({"success": True, "_id": ids[0], "password": password}, 201, ())
+    return Response({"success": True, "_id": ids[0], "password": password}, 201)
 
 
 @clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["GET", "POST"])
@@ -86,7 +86,7 @@ async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     if not original:
         return NotFound(gettext("Client not found"))
     elif request.method == "GET":
-        return Response(original, 200, ())
+        return Response(original)
 
     request_json = await get_json_or_400_async(request)
     if not isinstance(request_json, dict):
@@ -95,7 +95,7 @@ async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     updates = {}
     updates["name"] = request_json.get("name")
     await service.update(args.client_id, updates)
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
 
 
 @clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["DELETE"])
@@ -112,5 +112,5 @@ async def delete(args: ClientArgs, params: None, request: Request) -> Response:
     try:
         await service.delete(original)
     except Exception as e:
-        return Response({"error": str(e)}, 400, ())
-    return Response({"success": True}, 200, ())
+        return Response({"error": str(e)}, 400)
+    return Response({"success": True})
