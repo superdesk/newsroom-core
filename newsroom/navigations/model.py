@@ -1,9 +1,11 @@
-from typing import Optional
+from typing import Annotated, Optional
+
+from superdesk.core.resources.validators import validate_iunique_value_async
 from newsroom.core.resources.model import NewshubResourceModel
 
 
 class Navigation(NewshubResourceModel):
-    name: str
+    name: Annotated[str, validate_iunique_value_async("navigations", "name")]
     description: str = ""
     is_enabled: bool = True
     order: Optional[int] = None

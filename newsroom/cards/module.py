@@ -1,5 +1,5 @@
 from typing import cast
-
+from asyncio import gather
 from quart_babel import lazy_gettext
 
 from superdesk.core.module import Module, SuperdeskAsyncApp
@@ -27,12 +27,14 @@ cards_resource_config = ResourceConfig(
 async def get_settings_data():
     app = get_current_wsgi_app()
 
-    cursor = await NavigationsService().search(lookup={"is_enabled": True})
-    navigations = await cursor.to_list_raw()
+    cards_task = CardsResourceService().find({})
+    navs_task = NavigationsService().search(lookup={"is_enabled": True})
+
+    cards, navigations = await gather((await cards_task).to_list_raw(), (await navs_task).to_list_raw())
 
     return {
         "products": list(query_resource("products", lookup={"is_enabled": True})),
-        "cards": await (await CardsResourceService().find({})).to_list_raw(),
+        "cards": cards,
         "dashboards": app.dashboards,
         "navigations": navigations,
     }

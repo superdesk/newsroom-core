@@ -15,7 +15,7 @@ from newsroom.auth.utils import check_user_has_products
 from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
-from newsroom.navigations.utils import get_navigations
+from newsroom.navigations import get_navigations
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
 from newsroom.utils import (

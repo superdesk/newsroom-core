@@ -7,7 +7,7 @@ from newsroom.products.products import get_products_by_navigation
 from newsroom.products.views import get_product_ref
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
-from newsroom.navigations.utils import get_navigations
+from newsroom.navigations import get_navigations
 from newsroom.types import Product
 from tests.core.utils import add_company_products, insert_into
 

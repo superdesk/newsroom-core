@@ -8,7 +8,7 @@ from superdesk.flask import render_template, jsonify, request
 from newsroom.am_news import blueprint
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, section
-from newsroom.navigations.utils import get_navigations_by_company
+from newsroom.navigations import get_navigations_by_company
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import (
     update_action_list,
