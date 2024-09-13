@@ -1,6 +1,6 @@
 import re
 import ipaddress
-from typing import Any, Mapping, Optional
+from typing import Any, Optional
 from pydantic import AfterValidator
 from pydantic_core import PydanticCustomError
 from quart_babel import gettext
