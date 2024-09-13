@@ -1,9 +1,10 @@
+from typing import Any
 from behave import then, when, given
 from behave.api.async_step import async_run_until_complete
 from eve.methods.common import parse
 
 from superdesk import get_resource_service
-from superdesk.core import json
+from superdesk.core import json, get_current_async_app
 from superdesk.tests.steps import (
     assert_200,
     get_json_data,
@@ -158,15 +159,40 @@ async def then_we_get_users_with_products(context):
             )
 
 
+async def delete_entries_for(resource: str):
+    """
+    Attemps to delete everything from an resource. First tries with async, otherwise it falls back to
+    sync resources.
+    """
+    app = get_current_async_app()
+    if not is_user_resource(resource):
+        try:
+            await app.resources.get_resource_service(resource).delete_many({})
+        except KeyError:
+            get_resource_service(resource).delete_action()
+
+
+async def create_entries_for(resource: str, items: list[Any]):
+    """
+    Attemps create a new resource entry. First tries with async, otherwise it falls back to
+    sync resources.
+    """
+    app = get_current_async_app()
+    if not is_user_resource(resource):
+        try:
+            for item in items:
+                await app.resources.get_resource_service(resource).create([item])
+        except KeyError:
+            get_resource_service(resource).post(items)
+
+
 @given('newsroom "{resource}"')
 @async_run_until_complete
 async def step_impl_given_newsroom_resource(context, resource):
     async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
-        if not is_user_resource(resource):
-            get_resource_service(resource).delete_action()
-
         items = [parse(item, resource) for item in json.loads(context.text)]
-        get_resource_service(resource).post(items)
+        await delete_entries_for(resource)
+        await create_entries_for(resource, items)
 
         context.data = items
         context.resource = resource

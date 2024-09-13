@@ -5,7 +5,7 @@ from newsroom.core.resources.model import NewshubResourceModel
 
 
 class Navigation(NewshubResourceModel):
-    name: Annotated[str, validate_iunique_value_async("navigations", "name")]
+    name: str
     description: str = ""
     is_enabled: bool = True
     order: Optional[int] = None
