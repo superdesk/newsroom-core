@@ -88,35 +88,41 @@ def push():
     assert "guid" in item or "_id" in item, {"guid": 1}
     assert "type" in item, {"type": 1}
 
-    signals.push.send(app._get_current_object(), item=item)
+    lock_name = f"push-{item.get('guid') or item.get('_id')}"
+    if not lock(lock_name, expire=60):
+        return flask.abort(503)
+    try:
+        signals.push.send(app._get_current_object(), item=item)
 
-    if item.get("type") == "event":
-        orig = app.data.find_one("agenda", req=None, _id=item["guid"])
-        _id = publish_event(item, orig)
-        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
-    elif item.get("type") == "planning":
-        orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
-        item["planning_date"] = parse_date_str(item["planning_date"])
-        plan_id = publish_planning_item(item, orig)
-        event_id = publish_planning_into_event(item)
-        # Prefer parent Event when sending notificaitons
-        _id = event_id or plan_id
-        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
-    elif item.get("type") == "text":
-        orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
-        item["_id"] = publish_item(item, orig)
-        if not item.get("nextversion"):
-            notify_new_wire_item.delay(
-                item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
-            )
-    elif item["type"] == "planning_featured":
-        publish_planning_featured(item)
-    else:
-        flask.abort(400, gettext("Unknown type {}".format(item.get("type"))))
+        if item.get("type") == "event":
+            orig = app.data.find_one("agenda", req=None, _id=item["guid"])
+            _id = publish_event(item, orig)
+            notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
+        elif item.get("type") == "planning":
+            orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
+            item["planning_date"] = parse_date_str(item["planning_date"])
+            plan_id = publish_planning_item(item, orig)
+            event_id = publish_planning_into_event(item)
+            # Prefer parent Event when sending notificaitons
+            _id = event_id or plan_id
+            notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
+        elif item.get("type") == "text":
+            orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
+            item["_id"] = publish_item(item, orig)
+            if not item.get("nextversion"):
+                notify_new_wire_item.delay(
+                    item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+                )
+        elif item["type"] == "planning_featured":
+            publish_planning_featured(item)
+        else:
+            flask.abort(400, gettext("Unknown type {}".format(item.get("type"))))
 
-    if app.config.get("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
-        delete_dashboard_caches()
-    return flask.jsonify({})
+        if app.config.get("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
+            delete_dashboard_caches()
+        return flask.jsonify({})
+    finally:
+        unlock(lock_name)
 
 
 def set_dates(doc):
