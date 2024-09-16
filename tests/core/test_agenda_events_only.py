@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from newsroom.notifications import get_user_notifications
 from newsroom.tests import markers
-from tests.core.utils import add_company_products, insert_into
+from tests.core.utils import add_company_products, create_entries_for
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -42,7 +42,7 @@ async def set_events_only_company(app):
 
 @fixture
 async def agenda_products(app):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {
@@ -123,7 +123,7 @@ async def test_search(client, app, agenda_products):
 
 
 async def set_watch_products(app):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {

@@ -1,7 +1,5 @@
 import multiprocessing
 
-from bson import ObjectId
-from superdesk import get_resource_service
 from superdesk.core import get_current_app
 from superdesk.core.module import Module
 from superdesk.core.web import endpoint, Request, Response
@@ -10,7 +8,7 @@ from superdesk.timer import timer
 
 from newsroom.auth.utils import start_user_session
 from newsroom.tests.db import drop_mongo, reset_elastic
-from tests.core.utils import get_db_collection
+from tests.core.utils import create_entries_for
 
 from .utils import create_default_user
 
@@ -34,29 +32,6 @@ async def reset_dbs():
         app.init_indexes()
 
 
-def objectize_ids(source: dict) -> dict:
-    """
-    Simplied implementation of python-eve's `_mongotize` to recursively
-    iterates a JSON dictionary, turning strings into ObjectIds.
-
-    Note: this does not take care of datetime conversion
-    """
-
-    def try_cast(v):
-        try:
-            return ObjectId(v)
-        except:  # noqa
-            return v
-
-    for k, v in source.items():
-        if isinstance(v, dict):
-            objectize_ids(v)
-        elif isinstance(v, str):
-            source[k] = try_cast(v)
-
-    return source
-
-
 @endpoint("e2e/populate_resources", methods=["POST"])
 async def populate_resources(request: Request) -> Response:
     json = await request.get_json()
@@ -70,17 +45,8 @@ async def populate_resources(request: Request) -> Response:
             resource = entry.get("resource")
             items = entry.get("items") or []
 
-            if entry.get("use_db_collection", False):
-                db_collection = get_db_collection(resource)
-                for item in items:
-                    objectize_ids(item)
-                    result = await db_collection.insert_one(item)
-                    ids.append(result.inserted_id)
-            elif entry.get("use_resource_service", True):
-                service = get_resource_service(resource)
-                for item in items:
-                    app.data.mongo._mongotize(item, resource)
-                    ids.extend(service.post([item]))
+            if entry.get("use_resource_service", True):
+                ids.extend(await create_entries_for(resource, items))
             else:
                 for item in items:
                     app.data.mongo._mongotize(item, resource)

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
-from tests.core.utils import add_company_products, insert_into
+from tests.core.utils import add_company_products, create_entries_for
 from newsroom.wire.search import WireSearchService, SearchQuery
 
 from ..fixtures import (  # noqa: F401
@@ -33,7 +33,7 @@ PROD_2 = ObjectId()
 
 @fixture
 async def setup_products(app):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {
@@ -341,7 +341,7 @@ async def test_search_filter_by_individual_navigation(client, app, setup_product
 
 
 async def test_search_filtered_by_query_product(client, app, public_user):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {
@@ -464,7 +464,7 @@ async def test_item_detail_access(client, app, public_user):
 
 
 async def test_search_using_section_filter_for_public_user(client, app, public_user):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {

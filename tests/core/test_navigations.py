@@ -9,7 +9,7 @@ from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations import get_navigations
 from newsroom.types import Product
-from tests.core.utils import add_company_products, insert_into
+from tests.core.utils import add_company_products, create_entries_for
 
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -18,7 +18,7 @@ AGENDA_NAV_ID = ObjectId()
 
 @fixture(autouse=True)
 async def navigations():
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {
@@ -197,11 +197,11 @@ async def test_update_navigation_with_products(client, app):
 
 
 async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {
-                "_id": "n-1",
+                "_id": "66e7f7806fe6d08ae60a15b9",
                 "name": "Uber",
                 "is_enabled": True,
                 "product_type": "agenda",
@@ -215,7 +215,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         [
             {
                 "name": "Top Things",
-                "navigations": ["n-1"],
+                "navigations": [ObjectId("66e7f7806fe6d08ae60a15b9")],
                 "is_enabled": True,
                 "query": "_featured",
                 "product_type": "agenda",
@@ -241,7 +241,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
 
 async def test_get_products_by_navigation_caching(app):
     nav_id = ObjectId()
-    await insert_into(
+    await create_entries_for(
         "navigations",
         [
             {

@@ -1,4 +1,3 @@
-from typing import Any
 from behave import then, when, given
 from behave.api.async_step import async_run_until_complete
 from eve.methods.common import parse
@@ -14,6 +13,7 @@ from superdesk.tests.steps import (
     is_user_resource,
 )
 from newsroom.utils import deep_get
+from tests.core.utils import create_entries_for
 
 
 async def expect_status_in(response, codes):
@@ -170,19 +170,6 @@ async def delete_entries_for(resource: str):
             await app.resources.get_resource_service(resource).delete_many({})
         except KeyError:
             get_resource_service(resource).delete_action()
-
-
-async def create_entries_for(resource: str, items: list[Any]):
-    """
-    Attemps create a new resource entry. First tries with async, otherwise it falls back to
-    sync resources.
-    """
-    app = get_current_async_app()
-    try:
-        for item in items:
-            await app.resources.get_resource_service(resource).create([item])
-    except KeyError:
-        get_resource_service(resource).post(items)
 
 
 @given('newsroom "{resource}"')

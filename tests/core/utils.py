@@ -1,6 +1,6 @@
 from typing import Any
+from superdesk import get_resource_service
 from newsroom.core import get_current_wsgi_app
-from motor.motor_asyncio import AsyncIOMotorCollection
 
 
 def add_company_products(app, company_id, products):
@@ -14,27 +14,19 @@ def add_company_products(app, company_id, products):
     app.data.update("companies", company["_id"], {"products": company_products}, company)
 
 
-def get_db_collection(collection_name: str) -> AsyncIOMotorCollection:
+async def create_entries_for(resource: str, items: list[Any]):
     """
-    Retrieve an asynchronous MongoDB collection.
-
-    Args:
-        collection_name (str): The name of the MongoDB collection.
-
-    Returns:
-        AsyncIOMotorCollection: The asynchronous MongoDB collection object.
+    Attemps create a new resource entries. First tries with async, otherwise it falls back to
+    sync resources.
     """
-    async_app = get_current_wsgi_app().async_app
-    return async_app.mongo.get_collection_async(collection_name)
+    app = get_current_wsgi_app()
+    async_app = app.async_app
 
-
-async def insert_into(collection_name: str, data: list[Any]):
-    """
-    Insert multiple documents into a specified MongoDB collection asynchronously.
-
-    Args:
-        collection_name (str): The name of the MongoDB collection.
-        data (list[Any]): A list of documents to insert into the collection.
-    """
-    db_collection = get_db_collection(collection_name)
-    await db_collection.insert_many(data)
+    try:
+        return await async_app.resources.get_resource_service(resource).create(items)
+    except KeyError:
+        ids = []
+        for item in items:
+            app.data.mongo._mongotize(item, resource)
+            ids.extend(get_resource_service(resource).post([item]))
+        return ids
