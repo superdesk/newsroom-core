@@ -123,7 +123,6 @@ BLUEPRINTS = [
     "newsroom.topics",
     "newsroom.notifications",
     "newsroom.products",
-    "newsroom.section_filters",
     "newsroom.reports",
     "newsroom.public",
     "newsroom.agenda",
@@ -174,6 +173,7 @@ MODULES = [
     "newsroom.companies",
     "newsroom.assets",
     "newsroom.users",
+    "newsroom.section_filters",
     "newsroom.cards.module",
     "newsroom.navigations",
 ]

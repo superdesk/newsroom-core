@@ -56,7 +56,7 @@ async def update_values(request: Request):
 
     update_settings_document(updates)
     g.settings = None  # reset cache on update
-    return Response(updates, 200, ())
+    return Response(updates)
 
 
 def validate_general_settings(values):
