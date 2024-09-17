@@ -21,7 +21,6 @@ def mock_collection():
     return AsyncMock()
 
 
-@pytest.mark.asyncio
 async def test_validate_unique_combination_no_errors(mock_app, mock_collection):
     with patch("newsroom.core.resources.validators.get_current_async_app", return_value=mock_app):
         mock_app.mongo.get_collection_async.return_value = mock_collection
@@ -34,7 +33,6 @@ async def test_validate_unique_combination_no_errors(mock_app, mock_collection):
         mock_collection.find_one.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_validate_unique_combination_existent_registry(mock_app, mock_collection):
     with patch("newsroom.core.resources.validators.get_current_async_app", return_value=mock_app):
         mock_app.mongo.get_collection_async.return_value = mock_collection
@@ -48,7 +46,6 @@ async def test_validate_unique_combination_existent_registry(mock_app, mock_coll
         mock_collection.find_one.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_validate_skip_if_field_is_none(mock_app, mock_collection):
     with patch("newsroom.core.resources.validators.get_current_async_app", return_value=mock_app):
         mock_app.mongo.get_collection_async.return_value = mock_collection
