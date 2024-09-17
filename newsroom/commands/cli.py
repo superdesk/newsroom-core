@@ -1,3 +1,3 @@
-from superdesk.flask import Blueprint
+from superdesk.commands.async_cli import create_commands_blueprint
 
-newsroom_cli = Blueprint("newsroom", __name__, cli_group=None)
+commands_blueprint, newsroom_cli = create_commands_blueprint("newsroom")

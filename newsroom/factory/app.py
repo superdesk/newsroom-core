@@ -14,6 +14,7 @@ import importlib
 from flask_mail import Mail
 from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
+from pydantic import ValidationError
 
 from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -31,7 +32,7 @@ from superdesk.factory.app import SuperdeskEve
 import newsroom
 from newsroom.auth import SessionAuth
 from newsroom.exceptions import AuthorizationError
-from newsroom.utils import is_json_request
+from newsroom.utils import is_json_request, parse_validation_error
 from newsroom.gettext import setup_babel
 
 
@@ -214,11 +215,20 @@ class BaseNewsroomApp(SuperdeskEve):
         async def authorization_error(err: AuthorizationError):
             return await render_template("authorization_error.html", message=err.message), err.code
 
+        def handle_validation_error(error: ValidationError):
+            """
+            Gets the ValidationException error raised from Core framework's models/services, parses and returns it
+            to the client in a valid json format.
+            """
+            errors = parse_validation_error(error)
+            return jsonify(errors), 400
+
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
         self.register_error_handler(AuthorizationError, authorization_error)
+        self.register_error_handler(ValidationError, handle_validation_error)
 
     def general_setting(
         self,

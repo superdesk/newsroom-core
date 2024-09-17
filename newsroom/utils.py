@@ -149,7 +149,7 @@ async def get_json_or_400_async(req: Request):
     return data
 
 
-def success_response(data: Any, headers: Sequence = ()):
+def success_response(data: Any, headers: Sequence = (), status_code: int = 200):
     """
     Shortcut to return a `superdesk.core.web.Response` with a
     status_code 200 and empty headers by default
@@ -157,17 +157,16 @@ def success_response(data: Any, headers: Sequence = ()):
     if isinstance(data, BaseModel):
         data = data.model_dump(by_alias=True, exclude_unset=True)
 
-    return Response(data, 200, headers)
+    return Response(data, status_code, headers)
 
 
-def response_from_validation(error: ValidationError, code=400):
+def parse_validation_error(error: ValidationError) -> dict[str, str]:
     """
-    Constructs a Response object with pydantic model validation error.
+    Parses pydantic model validation error and returns a key -> value dict from it
     """
-    errors = {
+    return {
         field: list(err.values())[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
     }
-    return Response(errors, code, ())
 
 
 def get_type(type: Optional[str] = None) -> str:

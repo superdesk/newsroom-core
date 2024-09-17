@@ -3,7 +3,7 @@ import os
 from newsroom.flask import send_from_directory
 
 from newsroom.auth import get_user
-from newsroom.commands.cli import newsroom_cli
+from newsroom.commands.cli import commands_blueprint, newsroom_cli
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
@@ -58,6 +58,8 @@ class NewsroomWebApp(BaseNewsroomApp):
         app = NewsroomWebApp(__name__)
         app.run()
     """
+
+    dashboards: list[dict]
 
     INSTANCE_CONFIG = "settings.py"
 
@@ -290,7 +292,7 @@ class NewsroomWebApp(BaseNewsroomApp):
             )
         )
 
-    def dashboard(self, _id, name, cards=[]):
+    def dashboard(self, _id, name, cards=None):
         """Define new dashboard
 
         :param _id: id of the dashboard
@@ -298,13 +300,14 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param cards: list of cards id related to the dashboard to
         populate the drop down in dashboard config.
         """
-        self.dashboards.append({"_id": _id, "name": name, "cards": cards})
+        self.dashboards.append({"_id": _id, "name": name, "cards": cards or []})
 
 
 def get_app(config=None, **kwargs) -> NewsroomWebApp:
     app = NewsroomWebApp(__name__, config=config, **kwargs)
 
     # register newsroom commands group
-    app.register_blueprint(newsroom_cli)
+    newsroom_cli.set_current_app(app)
+    app.register_blueprint(commands_blueprint)
 
     return app

@@ -12,7 +12,7 @@ from newsroom.search.config import nested_agg_groups, SearchGroupNestedConfig
 from .cli import newsroom_cli
 
 
-@newsroom_cli.cli.command("fix_topic_nested_filters")
+@newsroom_cli.command("fix_topic_nested_filters")
 @with_appcontext
 def _fix_topic_nested_filters():
     fix_topic_nested_filters()

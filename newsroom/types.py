@@ -235,38 +235,6 @@ class SectionFilter(TypedDict, total=False):
     version_creator: ObjectId
 
 
-class DashboardCardConfig(TypedDict, total=False):
-    product: str
-    size: int
-
-
-DashboardCardType = Literal[
-    "6-text-only",
-    "4-picture-text",
-    "4-text-only",
-    "4-media-gallery",
-    "4-photo-gallery",
-    "1x1-top-news",
-    "2x2-top-news",
-    "3-text-only",
-    "3-picture-text",
-    "2x2-events",
-    "6-navigation-row",
-    "wire-list",
-]
-
-
-class DashboardCard(TypedDict):
-    _id: ObjectId
-    label: str
-    type: DashboardCardType
-    config: DashboardCardConfig
-    order: int
-    dashboard: str
-    original_creator: ObjectId
-    version_creator: ObjectId
-
-
 Article = Dict[str, Any]
 
 

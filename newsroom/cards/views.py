@@ -1,125 +1,93 @@
 import re
 
-from bson import ObjectId
-from quart_babel import gettext
+from pydantic import BaseModel
 
-from newsroom.flask import get_file_from_request
-from superdesk.core import json, get_current_app
-from superdesk.flask import jsonify, request, abort
-from superdesk import get_resource_service
+from superdesk.core import json
+from superdesk.core.web import Request, Response, EndpointGroup
+from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.decorator import admin_only, login_required
-from newsroom.cards import blueprint
-from newsroom.utils import (
-    get_entity_or_404,
-    query_resource,
-    set_original_creator,
-    set_version_creator,
-)
-from newsroom.assets import save_file_and_get_url
-from newsroom.wire.views import delete_dashboard_caches
+
+from .service import CardsResourceService
 
 
-def get_settings_data():
-    return {
-        "products": list(query_resource("products", lookup={"is_enabled": True})),
-        "cards": list(query_resource("cards")),
-        "dashboards": get_current_app().as_any().dashboards,
-        "navigations": list(query_resource("navigations", lookup={"is_enabled": True})),
-    }
+cards_endpoints = EndpointGroup("cards", __name__)
 
 
-@blueprint.route("/cards", methods=["GET"])
+@cards_endpoints.endpoint("/cards", methods=["GET"])
 @login_required
-async def index():
-    cards = list(query_resource("cards", lookup=None))
-    return jsonify(cards), 200
+async def index() -> Response:
+    return Response(await (await CardsResourceService().find({})).to_list_raw(), 200, ())
 
 
-@blueprint.route("/cards/search", methods=["GET"])
+class CardSearchParams(BaseModel):
+    q: str | None = None
+    sort: str | None = None
+    max_results: int = 250
+    page: int = 1
+
+
+@cards_endpoints.endpoint("/cards/search", methods=["GET"])
 @admin_only
-async def search():
-    lookup = None
-    if request.args.get("q"):
-        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
-        lookup = {"label": regex}
-    products = list(query_resource("cards", lookup=lookup))
-    return jsonify(products), 200
+async def search(args: None, params: CardSearchParams, request: Request) -> Response:
+    return Response(
+        await (
+            await CardsResourceService().find(
+                {} if not params.q else {"label": re.compile(".*{}.*".format(params.q), re.IGNORECASE)},
+                sort=params.sort,
+                max_results=params.max_results,
+                page=params.page,
+            )
+        ).to_list_raw(),
+        200,
+        (),
+    )
 
 
-@blueprint.route("/cards/new", methods=["POST"])
+@cards_endpoints.endpoint("/cards/new", methods=["POST"])
 @admin_only
-async def create():
-    data = json.loads((await request.form)["card"])
-    card_data = await _get_card_data(data)
-    set_original_creator(card_data)
-    ids = get_resource_service("cards").post([card_data])
-    delete_dashboard_caches()
-    return jsonify({"success": True, "_id": ids[0]}), 201
+async def create(request: Request) -> Response:
+    card_data = json.loads((await request.get_form()).get("card"))
+    if not card_data:
+        request.abort(400)
+
+    service = CardsResourceService()
+    if not card_data.get("_id"):
+        card_data["_id"] = service.generate_id()
+
+    new_ids = await service.create([card_data])
+
+    return Response({"success": True, "_id": new_ids[0]}, 201, ())
 
 
-async def _get_card_data(data):
-    if not data:
-        abort(400)
-
-    if not data.get("label"):
-        raise ValueError(gettext("Label not found"))
-
-    if not data.get("type"):
-        raise ValueError(gettext("Type not found"))
-
-    if data.get("dashboard") and data["dashboard"] not in {d["_id"] for d in get_current_app().as_any().dashboards}:
-        raise ValueError(gettext("Dashboard type not found"))
-
-    card_data = {
-        "label": data.get("label"),
-        "type": data.get("type"),
-        "dashboard": data.get("dashboard", "newsroom"),
-        "config": data.get("config"),
-        "order": int(data.get("order", 0) or 0),
-    }
-
-    if data.get("type") == "2x2-events":
-        for index, event in enumerate(card_data["config"]["events"]):
-            file = await get_file_from_request(f"file{index}")
-
-            if file:
-                file_url = await save_file_and_get_url(file)
-                if file_url:
-                    event["file_url"] = file_url
-
-    if data.get("type") == "4-photo-gallery":
-        for source in (data.get("config") or {}).get("sources"):
-            if source.get("url") and source.get("count"):
-                source["count"] = int(source.get("count")) if source.get("count") else source.get("count")
-            else:
-                source.pop("url", None)
-                source.pop("count", None)
-
-    return card_data
+class CardItemUrlArgs(BaseModel):
+    id: ObjectIdField
 
 
-@blueprint.route("/cards/<id>", methods=["POST"])
+@cards_endpoints.endpoint("/cards/<id>", methods=["POST"])
 @admin_only
-async def edit(id):
-    get_entity_or_404(id, "cards")
+async def edit(args: CardItemUrlArgs, params: None, request: Request) -> Response:
+    service = CardsResourceService()
 
-    data = json.loads((await request.form)["card"])
-    if not data:
-        abort(400)
+    card_data = json.loads((await request.get_form()).get("card"))
+    if not card_data:
+        request.abort(400)
 
-    card_data = await _get_card_data(data)
-    set_version_creator(card_data)
-    get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)
-    delete_dashboard_caches()
-    return jsonify({"success": True}), 200
+    await service.update(args.id, card_data, etag=request.get_header("If-Match"))
+
+    return Response({"success": True})
 
 
-@blueprint.route("/cards/<id>", methods=["DELETE"])
+@cards_endpoints.endpoint("/cards/<id>", methods=["DELETE"])
 @admin_only
-async def delete(id):
+async def delete(args: CardItemUrlArgs, params: None, request: Request) -> Response:
     """Deletes the cards by given id"""
-    get_entity_or_404(id, "cards")
-    get_resource_service("cards").delete({"_id": ObjectId(id)})
-    delete_dashboard_caches()
-    return jsonify({"success": True}), 200
+    service = CardsResourceService()
+
+    original = await service.find_by_id(args.id)
+    if not original:
+        request.abort(404)
+
+    await service.delete(original, etag=request.get_header("If-Match"))
+
+    return Response({"success": True})

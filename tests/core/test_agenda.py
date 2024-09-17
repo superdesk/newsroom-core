@@ -21,7 +21,7 @@ from tests.utils import (
     mock_send_email,
 )
 from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
-from .utils import add_company_products
+from .utils import add_company_products, create_entries_for
 
 from copy import deepcopy
 from bson import ObjectId
@@ -233,7 +233,7 @@ async def test_agenda_search_filtered_by_query_product(client, app, public_compa
     NAV_1 = ObjectId("5e65964bf5db68883df561c0")
     NAV_2 = ObjectId("5e65964bf5db68883df561c1")
 
-    app.data.insert(
+    await create_entries_for(
         "navigations",
         [
             {
