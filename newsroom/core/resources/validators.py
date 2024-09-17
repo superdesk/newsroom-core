@@ -75,7 +75,7 @@ def validate_multi_field_iunique_value_async(resource_name: str, field_names: li
 
     async def _validate_iunique_value(item: ResourceModel, value: Any) -> None:
         fields = {field: getattr(item, field) for field in field_names}
-        if any(value for value in fields.values()):
+        if any(value is None for value in fields.values()):
             return
 
         app = get_current_async_app()
