@@ -20,7 +20,7 @@ from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 from superdesk.core.resources.validators import validate_data_relation_async
-from superdesk.core.resources.cursor import SearchRequest
+from superdesk.core.types import SearchRequest
 
 
 @unique
@@ -102,12 +102,12 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
         await super().on_delete(doc)
         # remove topic from users personal dashboards
         # TODO-ASYNC: use async users resource here
-        users = superdesk.get_resource_service("users").get(req=None, lookup={"dashboards.topic_ids": doc.id})
-        for user in users:
-            updates = {"dashboards": user["dashboards"].copy()}
+        users = await UsersService().search(lookup={"dashboards.topic_ids": doc.id})
+        async for user in users:
+            updates = {"dashboards": user.dashboards.copy()}
             for dashboard in updates["dashboards"]:
                 dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc.id]
-            superdesk.get_resource_service("users").system_update(user["_id"], updates, user)
+            await UsersService().update(user.id, updates)
 
     async def on_user_deleted(self, sender, user, **kwargs):
         # delete user private topics
@@ -210,7 +210,7 @@ async def auto_enable_user_emails(updates, original, user):
 
     # If current user is already subscribed to this topic,
     # then no need to enable their email notifications
-    data = original.dict(by_alias=True, exclude_unset=True) if isinstance(original, TopicResourceModel) else original
+    data = original.to_dict() if isinstance(original, TopicResourceModel) else original
     for subscriber in data.get("subscribers", []):
         if subscriber.user_id == user["_id"]:
             return

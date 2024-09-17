@@ -34,7 +34,7 @@ async def get_topics(args: RouteArguments, params: None, request: Request):
     if session["user"] != str(args.user_id):
         abort(403)
     topics = await _get_user_topics(args.user_id)
-    return Response({"_items": topics}, 200, ())
+    return Response({"_items": topics})
 
 
 @topic_endpoints.endpoint("/users/<string:user_id>/topics", methods=["POST"])
@@ -75,7 +75,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     else:
         push_user_notification("topic_created")
 
-    return Response({"success": True, "_id": ids[0]}, 201, ())
+    return Response({"success": True, "_id": ids[0]}, 201)
 
 
 @topic_endpoints.endpoint("/topics/my_topics", methods=["GET"])
@@ -130,7 +130,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
     else:
         push_user_notification("topics")
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
 
 
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["DELETE"])
@@ -151,7 +151,7 @@ async def delete(args: RouteArguments, params: None, request: Request):
     else:
         push_user_notification("topics")
 
-    return Response({"success": True}, 200, ())
+    return Response({"success": True})
 
 
 async def can_user_manage_topic(topic, user):
@@ -242,4 +242,4 @@ async def share(args: RouteArguments, params: None, request: Request):
                 template="share_topic",
                 template_kwargs=template_kwargs,
             )
-    return Response({"success": True}, 201, ())
+    return Response({"success": True}, 201)
