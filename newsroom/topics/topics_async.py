@@ -64,7 +64,6 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
     async def on_create(self, docs: List[TopicResourceModel]) -> None:
         await super().on_create(docs)
         for doc in docs:
-            doc.original_creator = get_user_id()
             doc.version_creator = get_user_id()
             if doc.folder:
                 doc.folder = ObjectId(doc.folder)
