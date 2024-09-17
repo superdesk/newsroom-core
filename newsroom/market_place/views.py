@@ -9,7 +9,7 @@ from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.auth import get_user, get_user_id, get_company_from_user
 from newsroom.decorator import login_required, section
 from newsroom.topics import get_user_topics
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations import get_navigations_by_company
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import (
     update_action_list,
@@ -35,7 +35,7 @@ async def get_view_data():
     """Get the view data"""
     user = get_user()
     topics = get_user_topics(user["_id"]) if user else []
-    navigations = get_navigations_by_company(
+    navigations = await get_navigations_by_company(
         str(user["company"]) if user and user.get("company") else None,
         product_type=SECTION_ID,
     )
@@ -68,7 +68,7 @@ def get_story_count(navigations, user):
 async def get_home_page_data():
     """Get home page data for market place"""
     user = get_user()
-    navigations = get_navigations_by_company(
+    navigations = await get_navigations_by_company(
         str(user["company"]) if user and user.get("company") else None,
         product_type=SECTION_ID,
     )

@@ -1,15 +1,15 @@
 Feature: Company Products
     Background: Setup companies and products
-        Given "navigations"
+        Given newsroom "navigations"
         """
         [{
             "_id": "59b4c5c61d41c8d736852fbf", "product_type": "wire", "is_enabled": true,
             "name": "All wire", "description": "All wire content"
         }, {
-            "_id": "59b4c5c61d41c8d736852fbg", "product_type": "wire", "is_enabled": true,
+            "_id": "66e40d2a7f9d10eaa90135f5", "product_type": "wire", "is_enabled": true,
             "name": "Sports", "description": "Sports content"
         }, {
-            "_id": "59b4c5c61d41c8d736852fbh", "product_type": "agenda", "is_enabled": true,
+            "_id": "66e40d3a7f9d10eaa90135f6", "product_type": "agenda", "is_enabled": true,
             "name": "Sports", "description": "Sports coverages"
         }]
         """
@@ -26,7 +26,7 @@ Feature: Company Products
         }, {
             "_id": "69b4c5c61d41c8d736852fbb", "product_type": "agenda", "is_enabled": true,
             "name": "Sports coverages", "query": "slugline:sports",
-            "navigations": ["59b4c5c61d41c8d736852fbh"]
+            "navigations": ["66e40d3a7f9d10eaa90135f6"]
         }]
         """
         And "companies"
@@ -42,7 +42,7 @@ Feature: Company Products
             ]
         }]
         """
-        Given newsroom "users"
+        And newsroom "users"
         """
         [{
             "_id": "4e65964bf5db68883df561b0", "user_type": "public",

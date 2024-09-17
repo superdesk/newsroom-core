@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from newsroom.notifications import get_user_notifications
 from newsroom.tests import markers
-from tests.core.utils import add_company_products
+from tests.core.utils import add_company_products, create_entries_for
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -42,7 +42,7 @@ async def set_events_only_company(app):
 
 @fixture
 async def agenda_products(app):
-    app.data.insert(
+    await create_entries_for(
         "navigations",
         [
             {
@@ -122,8 +122,8 @@ async def test_search(client, app, agenda_products):
     assert "coverages" not in data["_items"][0]
 
 
-def set_watch_products(app):
-    app.data.insert(
+async def set_watch_products(app):
+    await create_entries_for(
         "navigations",
         [
             {
@@ -156,7 +156,7 @@ def set_watch_products(app):
 async def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
-    set_watch_products(app)
+    await set_watch_products(app)
 
     async with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)
@@ -196,7 +196,7 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
-    set_watch_products(app)
+    await set_watch_products(app)
     await post_json(client, "/push", event)
 
     async with client.session_transaction() as session:
@@ -233,7 +233,7 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
 async def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
-    set_watch_products(app)
+    await set_watch_products(app)
 
     async with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)
@@ -258,7 +258,7 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
 async def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
-    set_watch_products(app)
+    await set_watch_products(app)
     await post_json(client, "/push", event)
     await post_json(client, "/push", planning)
 
@@ -286,7 +286,7 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
 async def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
-    set_watch_products(app)
+    await set_watch_products(app)
     await post_json(client, "/push", event)
     await post_json(client, "/push", planning)
 

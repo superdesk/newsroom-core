@@ -236,7 +236,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
     auth_provider = get_company_auth_provider(user_company.model_dump(by_alias=True))
 
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
     elif user.is_validated:
         return Response({"is_validated": gettext("User is already validated")}, 400)
     elif user_is_company_admin and (company is None or user.company != company.id):
@@ -275,7 +275,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
         await request.abort(403)
 
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
     etag = request.get_header("If-Match")
     if etag and user.etag != etag:
@@ -355,7 +355,7 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
 
     user = await UsersService().find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
     form = await UserForm.create_form(user=user)
     if await form.validate_on_submit():
@@ -374,7 +374,7 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
 
     user: Optional[UserResourceModel] = await UsersService().find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
     data = await get_json_or_400_async(request)
 
@@ -413,7 +413,7 @@ async def _resend_token(user_id, token_type):
 
     user = await UsersService().find_by_id(user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
     if await send_token(user.model_dump(by_alias=True), token_type):
         return success_response({"success": True})
@@ -471,7 +471,7 @@ async def approve_user(args: RouteArguments, params: None, request: Request):
     users_service = UsersService()
     user = await users_service.find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
     if user.is_approved:
         return Response({"error": gettext("User is already approved")}, 403)

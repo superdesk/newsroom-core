@@ -1,6 +1,5 @@
 import multiprocessing
 
-from superdesk import get_resource_service
 from superdesk.core import get_current_app
 from superdesk.core.module import Module
 from superdesk.core.web import endpoint, Request, Response
@@ -9,6 +8,7 @@ from superdesk.timer import timer
 
 from newsroom.auth.utils import start_user_session
 from newsroom.tests.db import drop_mongo, reset_elastic
+from tests.core.utils import create_entries_for
 
 from .utils import create_default_user
 
@@ -19,7 +19,7 @@ async def init_e2e_app(_request: Request) -> Response:
         await reset_dbs()
         create_default_user()
 
-    return Response("OK", 200, ())
+    return Response("OK")
 
 
 async def reset_dbs():
@@ -46,15 +46,12 @@ async def populate_resources(request: Request) -> Response:
             items = entry.get("items") or []
 
             if entry.get("use_resource_service", True):
-                service = get_resource_service(resource)
-                for item in items:
-                    app.data.mongo._mongotize(item, resource)
-                    ids.extend(service.post([item]))
+                ids.extend(await create_entries_for(resource, items))
             else:
                 for item in items:
                     app.data.mongo._mongotize(item, resource)
                     ids.extend(app.data.insert(resource, [item]))
-    return Response(ids, 200, ())
+    return Response(ids)
 
 
 module = Module("newsroom_e2e", endpoints=[init_e2e_app, populate_resources])

@@ -5,10 +5,12 @@ from bson import ObjectId
 from quart_babel import gettext
 
 from superdesk.core import get_current_app
-from superdesk.flask import jsonify, request
+from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
+from newsroom.navigations import NavigationsService, Navigation
+from newsroom.navigations import get_navigations_as_list
 from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
 from newsroom.types import Product, ProductRef
@@ -21,10 +23,10 @@ from newsroom.utils import (
 )
 
 
-def get_settings_data():
+async def get_settings_data():
     return {
         "products": list(query_resource("products")),
-        "navigations": list(query_resource("navigations")),
+        "navigations": await get_navigations_as_list(),
         "companies": list(query_resource("companies")),
         "sections": [
             s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
@@ -67,6 +69,13 @@ def validate_product(product):
         return jsonify({"name": gettext("Name not found")}), 400
 
 
+async def find_nav_or_404(nav_id: str) -> Navigation:
+    nav = await NavigationsService().find_by_id(nav_id)
+    if nav is None:
+        abort(404)
+    return nav
+
+
 @blueprint.route("/products/new", methods=["POST"])
 @admin_only
 async def create():
@@ -77,9 +86,8 @@ async def create():
         return validation
 
     if product.get("navigations"):
-        product["navigations"] = [
-            ObjectId(get_entity_or_404(_id, "navigations")["_id"]) for _id in product.get("navigations")
-        ]
+        # TODO-ASYNC: when products are migrated, we won't need `find_nav_or_404` as it could be replaced with a model validation
+        product["navigations"] = [(await find_nav_or_404(_id)).id for _id in product.get("navigations")]
     set_original_creator(product)
     ids = get_resource_service("products").post([product])
     return jsonify({"success": True, "_id": ids[0]}), 201
