@@ -19,7 +19,13 @@ users_resource_config = ResourceConfig(
                 keys=[("email", 1)],
                 unique=True,
                 collation={"locale": "en", "strength": 2},
-            )
+            ),
+            MongoIndexOptions(
+                name="unique_topic_folder_name",
+                keys=[("company", 1), ("user", 1), ("section", 1), ("parent", 1), ("name", 1)],
+                unique=True,
+                collation={"locale": "en", "strength": 2},
+            ),
         ],
     ),
 )

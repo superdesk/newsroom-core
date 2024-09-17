@@ -11,7 +11,7 @@ from newsroom.email import send_user_email
 from newsroom.decorator import login_required
 from newsroom.auth import get_user, get_user_id
 from newsroom.topics.topics_async import get_user_topics as _get_user_topics, auto_enable_user_emails
-from newsroom.utils import get_json_or_400, get_entity_or_404, response_from_validation
+from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.notifications import (
     push_user_notification,
     push_company_notification,
@@ -61,10 +61,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     for subscriber in topic.get("subscribers") or []:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
-    try:
-        data = TopicResourceModel.model_validate(topic)
-    except ValidationError as error:
-        return response_from_validation(error)
+    data = TopicResourceModel.model_validate(topic)
 
     ids = await TopicService().create([data])
 
@@ -116,10 +113,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
         # reset folder when going from company to user and vice versa
         updates["folder"] = None
 
-    try:
-        await TopicService().update(args.topic_id, updates)
-    except ValidationError as error:
-        return response_from_validation(error)
+    await TopicService().update(args.topic_id, updates)
 
     topic = await TopicService().find_by_id(args.topic_id)
 

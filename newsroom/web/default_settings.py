@@ -176,6 +176,7 @@ MODULES = [
     "newsroom.section_filters",
     "newsroom.cards.module",
     "newsroom.navigations",
+    "newsroom.topics_folders",
 ]
 
 SITE_NAME = "Newshub"
