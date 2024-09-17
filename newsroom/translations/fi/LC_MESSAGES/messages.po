@@ -16,9 +16,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-22 11:23+0200\n"
+"POT-Creation-Date: 2024-09-09 16:06+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Maija Paikkala, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
@@ -1013,8 +1013,7 @@ msgstr "Päävalikko"
 #: assets/public/components/PublicApp.tsx:79
 #: newsroom/templates/base_layout.html:62
 #: newsroom/templates/login_client.html:4
-#: newsroom/templates/login_form.html:24
-#: newsroom/templates/login_layout.html:19
+#: newsroom/templates/login_layout.html:53
 msgid "Login"
 msgstr "Kirjaudu sisään"
 
@@ -1062,12 +1061,11 @@ msgid "Please use 8 or more characters."
 msgstr "Käytä vähintään 8:aa merkkiä"
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
+#: newsroom/templates/login_layout.html:47
 msgid "Forgot your password?"
 msgstr "Unohditko salasanasi?"
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
 #: newsroom/templates/password_reset_link_expiry.html:8
 msgid "Click here to reset."
 msgstr "Klikkaa tästä uusiaksesi salasanasi."
@@ -1098,7 +1096,7 @@ msgid "Stop impersonation"
 msgstr "Lopeta käyttäjätesti"
 
 #: newsroom/templates/login_client.html:9
-#: newsroom/templates/login_layout.html:33
+#: newsroom/templates/login_layout.html:73
 msgid "Login using Single Sign On"
 msgstr "Kirjaudu sisään käyttäen organisaatiosi kirjautumistapaa"
 
@@ -1108,21 +1106,38 @@ msgstr ""
 "Jos sinulla on vaikeuksia kirjautumisen kanssa, ole yhteydessä oman "
 "organisaatiosi tietohallintoon."
 
-#: newsroom/templates/login_form.html:30
+#: newsroom/templates/login_layout.html:14
+msgid "Login to Newshub"
+msgstr "Kirjaudu Medipankkiin"
+
+#: newsroom/templates/login_layout.html:48
+msgid "Reset password"
+msgstr "Uusi salasanasi"
+
+#: newsroom/templates/login_layout.html:48
+msgid "Click here to reset"
+msgstr "Klikkaa tästä uusiaksesi salasanasi"
+
+#: newsroom/templates/login_layout.html:60
 msgid "Log In with Google"
 msgstr "Kirjaudu Googlella."
 
-#: newsroom/templates/login_layout.html:41
-msgid "Or you can"
-msgstr "Tai voit"
+#: newsroom/templates/login_layout.html:70
+msgid "Or"
+msgstr "TAI"
 
-#: newsroom/templates/login_layout.html:41
-msgid "click here to register."
-msgstr "klikkaa rekisteröityäksesi"
+#: newsroom/templates/login_layout.html:82
+msgid "Don't have an account?"
+msgstr "Puuttuko sinulta tunnukset?"
+
+#: newsroom/templates/login_layout.html:83 newsroom/templates/signup.html:13
+#: newsroom/templates/signup_form.html:61
+msgid "Sign up"
+msgstr "Rekisteröidy"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:235
 #: assets/users/components/EditUser.tsx:308
-#: newsroom/templates/login_layout.html:50
+#: newsroom/templates/login_layout.html:93
 #: newsroom/templates/login_locale_dropdown.html:5
 msgid "Language"
 msgstr "Kieli"
@@ -1193,10 +1208,6 @@ msgstr "Peruuta"
 #: newsroom/templates/settings.html:17
 msgid "Settings Menu"
 msgstr "Asetukset-valikko"
-
-#: newsroom/templates/signup.html:13 newsroom/templates/signup_form.html:61
-msgid "Sign up"
-msgstr "Rekisteröidy"
 
 #: newsroom/templates/signup_form.html:54
 msgid "the terms and conditions"
@@ -1848,6 +1859,18 @@ msgstr "Avaa suodattimet"
 msgid "Side filter panel"
 msgstr "Suodatinnäkymä"
 
+#: assets/agenda/components/AgendaApp.tsx:256
+msgid "Date"
+msgstr "Päivämäärä"
+
+#: assets/agenda/components/AgendaApp.tsx:257
+msgid "Newest updates"
+msgstr "Uusimmat päivitykset"
+
+#: assets/agenda/components/AgendaApp.tsx:258
+msgid "Oldest updates"
+msgstr "Vanhimmat päivitykset"
+
 #: assets/agenda/components/AgendaApp.tsx:259
 #: assets/search/components/SearchResultsBar/index.tsx:65
 msgid "Relevance"
@@ -2098,11 +2121,11 @@ msgstr "Aiemmat sisällöt"
 msgid "Associated Event"
 msgstr "Aiheeseen liittyvä tapahtuma"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:24
+#: assets/agenda/components/AgendaPreviewImage.tsx:28
 msgid "Show Map"
 msgstr "Näytä kartta"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:25
+#: assets/agenda/components/AgendaPreviewImage.tsx:29
 msgid "Hide Map"
 msgstr "Piilota kartta"
 
@@ -3092,6 +3115,10 @@ msgstr "4-palstainen, vain teksti"
 msgid "2x2-events"
 msgstr "2x2, tapahtumat"
 
+#: assets/components/cards/utils.ts:173
+msgid "Wire list"
+msgstr "Uutisvirta"
+
 #: assets/components/cards/utils.ts:180
 msgid "6 Navigation Tiles Per Row"
 msgstr "6 navigaatiolohkoa rivillä"
@@ -3218,7 +3245,7 @@ msgstr "Suodattimet"
 msgid "Custom View"
 msgstr "Muokattu näkymä"
 
-#: assets/maps/components/static.tsx:37
+#: assets/maps/components/static.tsx:43
 msgid "Map"
 msgstr "Kartta"
 
@@ -4001,6 +4028,14 @@ msgstr "Järjestä:"
 #: assets/search/components/SearchResultsBar/index.tsx:214
 msgid "Sort results by"
 msgstr "Järjestä tulokset"
+
+#: assets/search/components/SearchResultsBar/index.tsx:244
+msgid "Hide search terms"
+msgstr "Piilota hakutermit"
+
+#: assets/search/components/SearchResultsBar/index.tsx:245
+msgid "Show search terms"
+msgstr "Näytä hakutermi"
 
 #: assets/section-filters/actions.ts:72
 msgid "Section Filter updated successfully"
