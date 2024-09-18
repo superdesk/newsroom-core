@@ -2055,7 +2055,7 @@ msgstr "Uutissuunnittelu"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:28
 msgid "Events & Coverages"
-msgstr "Tapahtumat ja uutissuunnittelu"
+msgstr "Tapahtumat"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:38
 msgid "Show"
