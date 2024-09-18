@@ -7,7 +7,6 @@ from newsroom.core.resources.service import NewshubAsyncResourceService
 
 from newsroom.topics.topics_async import TopicService
 
-from superdesk.core.web import EndpointGroup
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import (
     ResourceConfig,
@@ -33,14 +32,30 @@ class FolderResourceModel(NewshubResourceModel):
 
 
 class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
-    resource_name = "topic_folders"
-
     async def on_deleted(self, doc):
         await self.delete({"parent": doc["_id"]})
         await TopicService().delete({"folder": doc["_id"]})
 
     async def on_user_deleted(self, sender, user, **kwargs):
         await self.delete({"user": user["_id"]})
+
+
+topic_folders_resource_config = ResourceConfig(
+    name="topic_folders",
+    data_class=FolderResourceModel,
+    service=FolderResourceService,
+    mongo=MongoResourceConfig(
+        prefix=MONGO_PREFIX,
+        indexes=[
+            MongoIndexOptions(
+                name="unique_topic_folder_name",
+                keys=[("company", 1), ("user", 1), ("section", 1), ("parent", 1), ("name", 1)],
+                unique=True,
+                collation={"locale": "en", "strength": 2},
+            )
+        ],
+    ),
+)
 
 
 class UserFoldersResourceModel(FolderResourceModel):
@@ -61,7 +76,9 @@ user_topic_folders_resource_config = ResourceConfig(
     service=UserFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
-    rest_endpoints=RestEndpointConfig(parent_links=[RestParentLink(resource_name="users", model_id_field="user")]),
+    rest_endpoints=RestEndpointConfig(
+        parent_links=[RestParentLink(resource_name="users", model_id_field="user")], url="topic_folders"
+    ),
 )
 
 
@@ -84,6 +101,6 @@ company_topic_folder_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
     rest_endpoints=RestEndpointConfig(
-        parent_links=[RestParentLink(resource_name="companies", model_id_field="company")]
+        parent_links=[RestParentLink(resource_name="companies", model_id_field="company")], url="topic_folders"
     ),
 )

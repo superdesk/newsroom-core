@@ -3,6 +3,7 @@ from superdesk.core.module import Module
 from .folders import (
     company_topic_folder_resource_config,
     user_topic_folders_resource_config,
+    topic_folders_resource_config,
     CompanyFoldersResourceService,
     UserFoldersResourceService,
 )
@@ -10,7 +11,7 @@ from .folders import (
 
 module = Module(
     name="newsroom.topics_folders",
-    resources=[company_topic_folder_resource_config, user_topic_folders_resource_config],
+    resources=[company_topic_folder_resource_config, user_topic_folders_resource_config, topic_folders_resource_config],
 )
 
 
@@ -32,6 +33,3 @@ async def get_company_folders(company, section):
         },
     )
     return await mongo_cursor.to_list_raw()
-
-
-from . import views  # noqa

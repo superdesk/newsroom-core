@@ -13,12 +13,11 @@ from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.utils import set_version_creator, get_user_id
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
-import superdesk
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import dataclass
 from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig
+from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 from superdesk.core.resources.validators import validate_data_relation_async
 from superdesk.core.types import SearchRequest
 
@@ -39,7 +38,7 @@ class TopicType(str, Enum):
 @dataclass
 class TopicSubscriber:
     user_id: Annotated[ObjectIdField, validate_data_relation_async("users")]
-    notification_type: NotificationType = Field(default=NotificationType.REAL_TIME)
+    notification_type: NotificationType = NotificationType.REAL_TIME
 
 
 class TopicResourceModel(NewshubResourceModel):
@@ -47,9 +46,9 @@ class TopicResourceModel(NewshubResourceModel):
     query: Optional[str] = None
     filter: Optional[Dict[str, Any]] = None
     created_filter: Annotated[Optional[Dict[str, Any]], Field(alias="created")] = None
-    user: Annotated[Optional[ObjectIdField], validate_data_relation_async("users")]
-    company: Annotated[Optional[ObjectIdField], validate_data_relation_async("companies")]
-    is_global: Optional[bool] = False
+    user: Annotated[Optional[ObjectIdField], validate_data_relation_async("users")] = None
+    company: Annotated[Optional[ObjectIdField], validate_data_relation_async("companies")] = None
+    is_global: bool = False
     subscribers: Optional[List[TopicSubscriber]] = []
     timezone_offset: Optional[int] = None
     topic_type: TopicType
@@ -59,18 +58,12 @@ class TopicResourceModel(NewshubResourceModel):
 
 
 class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
-    resource_name = "topics"
 
     async def on_create(self, docs: List[TopicResourceModel]) -> None:
-        await super().on_create(docs)
-        for doc in docs:
-            doc.version_creator = get_user_id()
-            if doc.folder:
-                doc.folder = ObjectId(doc.folder)
+        return await super().on_create(docs)
 
     async def on_update(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_update(updates, original)
-        set_version_creator(updates)
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
         if original.is_global and "is_global" in updates and not updates.get("is_global"):
@@ -99,8 +92,6 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
     async def on_delete(self, doc: TopicResourceModel):
         await super().on_delete(doc)
-        # remove topic from users personal dashboards
-        # TODO-ASYNC: use async users resource here
         users = await UsersService().search(lookup={"dashboards.topic_ids": doc.id})
         async for user in users:
             updates = {"dashboards": user.dashboards.copy()}
@@ -237,6 +228,9 @@ topic_resource_config = ResourceConfig(
     data_class=TopicResourceModel,
     service=TopicService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
+    rest_endpoints=RestEndpointConfig(
+        parent_links=[RestParentLink(resource_name="users", model_id_field="user")], url="topics"
+    ),
 )
 
 topic_endpoints = EndpointGroup("topic", __name__)

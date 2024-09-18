@@ -1,6 +1,6 @@
 from bson import ObjectId
 from typing import Optional
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from superdesk.core import json, get_app_config
 from superdesk.flask import abort, url_for, session

@@ -4,7 +4,7 @@ import superdesk
 from newsroom.user_roles import UserRole
 from newsroom.signals import user_deleted
 
-from . import topics
+# from . import topics
 
 
 class FoldersResource(newsroom.Resource):
