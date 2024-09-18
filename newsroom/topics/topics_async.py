@@ -1,7 +1,7 @@
 from enum import Enum, unique
 from bson import ObjectId
 from pydantic import Field
-from typing import Optional, List, Dict, Any, Annotated
+from typing import Optional, List, Dict, Any, Annotated, Union
 
 from newsroom import MONGO_PREFIX
 from newsroom.auth import get_user
@@ -20,7 +20,6 @@ from superdesk.core.resources import dataclass
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 from superdesk.core.resources.validators import validate_data_relation_async
-from superdesk.core.types import SearchRequest
 
 
 @unique
@@ -125,17 +124,17 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             await self.update(topic.id, {"user": None})
 
 
-async def get_user_topics(user_id):
-    user = dict(await UsersService().find_by_id(user_id))
+async def get_user_topics(user_id: Union[ObjectId, str, None]):
+    if not user_id:
+        return []
+    user = await UsersService().find_by_id(user_id)
     data = await TopicService().find(
-        SearchRequest(
-            where={
-                "$or": [
-                    {"user": user["id"]},
-                    {"$and": [{"company": user.get("company")}, {"is_global": True}]},
-                ]
-            }
-        ),
+        {
+            "$or": [
+                {"user": user.id},
+                {"$and": [{"company": user.company}, {"is_global": True}]},
+            ]
+        }
     )
     return await data.to_list_raw()
 
