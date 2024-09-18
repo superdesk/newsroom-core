@@ -6,16 +6,17 @@ from typing import Optional, List, Dict, Any, Annotated
 from newsroom import MONGO_PREFIX
 from newsroom.auth import get_user
 from newsroom.types import Topic
-from newsroom.signals import user_deleted
+
+# from newsroom.signals import user_deleted
 
 from newsroom.users.service import UsersService
 from newsroom.core.resources.model import NewshubResourceModel
-from newsroom.utils import set_version_creator, get_user_id
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import dataclass
-from superdesk.core.module import SuperdeskAsyncApp
+
+# from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 from superdesk.core.resources.validators import validate_data_relation_async
@@ -58,7 +59,6 @@ class TopicResourceModel(NewshubResourceModel):
 
 
 class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
-
     async def on_create(self, docs: List[TopicResourceModel]) -> None:
         return await super().on_create(docs)
 
@@ -105,23 +105,22 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
         # remove user topic subscriptions from existing topics
 
-        mongo_cursor = await self.search(lookup={"subscribers.user_id": user["_id"]})
-        topics = await mongo_cursor.to_list_raw()
+        topics = await self.search(lookup={"subscribers.user_id": user["_id"]})
 
         user_object_id = ObjectId(user["_id"])
 
-        for topic in topics:
+        async for topic in topics:
             updates = dict(
-                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user_object_id],
+                subscribers=[s for s in topic.subscribers if s["user_id"] != user_object_id],
             )
 
-            if topic.get("user") == user_object_id:
-                topic["user"] = None
+            if topic.user == user_object_id:
+                topic.user = None
 
-            self.update(topic["_id"], updates)
+            self.update(topic.id, updates)
 
         # remove user as a topic creator for the rest
-        user_topics = await self.find_one(lookup={"user": user["_id"]})
+        user_topics = await self.search(lookup={"user": user["_id"]})
         async for topic in user_topics:
             await self.update(topic.id, {"user": None})
 
@@ -219,8 +218,10 @@ async def auto_enable_user_emails(updates, original, user):
     await UsersService().update(user["_id"], updates={"receive_email": True})
 
 
-async def init(app: SuperdeskAsyncApp):
-    user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
+# TODO:Async, need to wait for SDESK-7376
+
+# async def init(app: SuperdeskAsyncApp):
+#     user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
 
 
 topic_resource_config = ResourceConfig(

@@ -18,7 +18,7 @@ from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
 )
-from .topics_async import topic_endpoints, TopicService, TopicResourceModel
+from .topics_async import topic_endpoints, TopicService
 from newsroom.users.service import UsersService
 
 
@@ -61,9 +61,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     for subscriber in topic.get("subscribers") or []:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
-    data = TopicResourceModel.model_validate(topic)
-
-    ids = await TopicService().create([data])
+    ids = await TopicService().create([topic])
 
     await auto_enable_user_emails(topic, {}, user)
 
@@ -199,7 +197,7 @@ async def share(args: RouteArguments, params: None, request: Request):
     topic = get_entity_or_404(data.get("items")["_id"], "topics")
     for user_id in data["users"]:
         user_data = await UsersService().find_by_id(user_id)
-        user = user_data.dict(by_alias=True, exclude_unset=True)
+        user = user_data.to_dict()
         if not user or not user.get("email"):
             continue
 

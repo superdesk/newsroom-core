@@ -5,6 +5,8 @@ from newsroom import MONGO_PREFIX
 from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
+# from newsroom.signals import user_deleted
+
 from newsroom.topics.topics_async import TopicService
 
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
@@ -16,6 +18,8 @@ from superdesk.core.resources import (
     RestParentLink,
 )
 from superdesk.core.resources.validators import validate_data_relation_async
+
+# from superdesk.core.module import SuperdeskAsyncApp
 
 
 @unique
@@ -38,6 +42,12 @@ class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
 
     async def on_user_deleted(self, sender, user, **kwargs):
         await self.delete({"user": user["_id"]})
+
+
+# TODO:Async, need to wait for SDESK-7376
+
+# async def init(app: SuperdeskAsyncApp):
+#     user_deleted.connect(await FolderResourceService().on_user_deleted)  # type: ignore
 
 
 topic_folders_resource_config = ResourceConfig(
