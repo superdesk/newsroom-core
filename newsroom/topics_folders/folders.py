@@ -101,7 +101,7 @@ class CompanyFoldersResourceModel(FolderResourceModel):
 
 
 class CompanyFoldersResourceService(NewshubAsyncResourceService[CompanyFoldersResourceModel]):
-    resource_name = "company_topic_folders"
+    pass
 
 
 company_topic_folder_resource_config = ResourceConfig(
