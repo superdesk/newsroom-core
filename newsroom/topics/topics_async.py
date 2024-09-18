@@ -5,13 +5,13 @@ from typing import Optional, List, Dict, Any, Annotated, Union
 
 from newsroom import MONGO_PREFIX
 from newsroom.auth import get_user
-from newsroom.types import Topic
 
 # from newsroom.signals import user_deleted
 
 from newsroom.users.service import UsersService
 from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
+from newsroom.types import User, Topic
 
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import dataclass
@@ -192,19 +192,26 @@ async def get_agenda_notification_topics_for_query_by_id(item, users):
     return [t for t in topics if users.get(str(t["user"]))]
 
 
-async def auto_enable_user_emails(updates, original, user):
+async def auto_enable_user_emails(
+    updates: Union[Topic, Dict[str, Any]],
+    original: Union[TopicResourceModel, Dict[str, Any]],
+    user: Optional[Union[User, Dict[str, Any]]],  # Allow user to be None
+):
     if not updates.get("subscribers"):
+        return
+
+    if not user:
         return
 
     # If current user is already subscribed to this topic,
     # then no need to enable their email notifications
     data = original.to_dict() if isinstance(original, TopicResourceModel) else original
     for subscriber in data.get("subscribers", []):
-        if subscriber.user_id == user["_id"]:
-            return
+        if subscriber.get("user_id") == user["_id"]:
+            return  # User already subscribed, no need to enable emails
 
     user_newly_subscribed = False
-    for subscriber in updates.get("subscribers") or []:
+    for subscriber in updates.get("subscribers", []):
         if subscriber.get("user_id") == user["_id"]:
             user_newly_subscribed = True
             break
