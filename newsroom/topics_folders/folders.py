@@ -37,11 +37,11 @@ class FolderResourceModel(NewshubResourceModel):
 
 class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
     async def on_deleted(self, doc):
-        await self.delete({"parent": doc["_id"]})
-        await TopicService().delete({"folder": doc["_id"]})
+        await self.delete_many(lookup={"parent": doc["_id"]})
+        await TopicService().delete_many(lookup={"folder": doc["_id"]})
 
     async def on_user_deleted(self, sender, user, **kwargs):
-        await self.delete({"user": user["_id"]})
+        await self.delete_many(lookup={"user": user["_id"]})
 
 
 # TODO:Async, need to wait for SDESK-7376

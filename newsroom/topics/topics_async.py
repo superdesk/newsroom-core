@@ -100,7 +100,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
     async def on_user_deleted(self, sender, user, **kwargs):
         # delete user private topics
-        await self.delete({"is_global": False, "user": user["_id"]})
+        await self.delete_many(lookup={"is_global": False, "user": user["_id"]})
 
         # remove user topic subscriptions from existing topics
 
@@ -124,7 +124,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             await self.update(topic.id, {"user": None})
 
 
-async def get_user_topics(user_id: Union[ObjectId, str, None]):
+async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
     if not user_id:
         return []
     user = await UsersService().find_by_id(user_id)
