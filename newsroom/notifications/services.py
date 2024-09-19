@@ -8,7 +8,6 @@ from .model import Notification
 
 
 class NotificationsService(AsyncResourceService[Notification]):
-
     async def create_or_update(self, entries: list[dict[str, Any]]) -> list[str]:
         """
         Save the given notifications entries into the database. If the notification entry already
