@@ -1,5 +1,4 @@
 import pytest
-import importlib
 
 from bson import ObjectId
 from quart import json
