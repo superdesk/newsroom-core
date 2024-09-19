@@ -55,7 +55,7 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
             )
 
             # Perform the update in MongoDB
-            await self.mongo.insert_one({"_id": original.id}, {"$set": updates_dict})
+            await self.mongo.update_one({"_id": original.id}, {"$set": updates_dict})
 
             # Attempt to update Elasticsearch
             try:
