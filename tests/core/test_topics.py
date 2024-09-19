@@ -5,8 +5,9 @@ from bson import ObjectId
 from tests.core.utils import create_entries_for
 
 from newsroom.topics.views import get_topic_url
-from newsroom.users.model import UserResourceModel
-from newsroom.users.service import UsersService
+
+# from newsroom.users.model import UserResourceModel
+# from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
     PUBLIC_USER_EMAIL,
@@ -15,7 +16,7 @@ from ..fixtures import (  # noqa: F401
     TEST_USER_ID,
     COMPANY_1_ID,
 )
-from ..utils import mock_send_email, get_resource_by_id
+from ..utils import mock_send_email, get_resource_by_id  # noqa
 from tests import utils
 from newsroom.topics.topics_async import TopicService
 from newsroom.topics_folders.folders import UserFoldersResourceService

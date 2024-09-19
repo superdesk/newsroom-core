@@ -95,7 +95,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
         async for user in users:
             updates = {"dashboards": user.dashboards.copy()}
             for dashboard in updates["dashboards"]:
-                dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc.id]
+                dashboard.topic_ids = [topic_id for topic_id in dashboard.topic_ids if topic_id != doc.id]
             await UsersService().update(user.id, updates)
 
     async def on_user_deleted(self, sender, user, **kwargs):
