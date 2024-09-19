@@ -12,7 +12,7 @@ from superdesk import get_resource_service
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
 from newsroom.utils import get_company_dict, get_entity_or_404, get_user_dict
-from tests.core.utils import add_company_products
+from tests.core.utils import add_company_products, create_entries_for
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email
 
@@ -643,21 +643,11 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
-            {
-                "label": "topic-1",
-                "query": "test",
-                "user": user_ids[0],
-                "notifications": True,
-            },
-            {
-                "label": "topic-2",
-                "query": "mock",
-                "user": user_ids[0],
-                "notifications": True,
-            },
+            {"_id": bson.ObjectId(), "label": "topic-1", "query": "test", "user": user_ids[0], "topic_type": "wire"},
+            {"_id": bson.ObjectId(), "label": "topic-2", "query": "mock", "user": user_ids[0], "topic_type": "agenda"},
         ],
     )
 

@@ -7,6 +7,7 @@ from superdesk.core import get_app_config
 from superdesk.utc import utcnow
 from superdesk.flask import session
 import newsroom
+from newsroom.topics.topics_async import TopicService
 
 
 class NotificationsResource(newsroom.Resource):
@@ -106,7 +107,7 @@ def get_initial_notifications():
     }
 
 
-def get_notifications_with_items():
+async def get_notifications_with_items():
     """
     Returns the stories that user has notifications for
     :return: List of stories
@@ -126,7 +127,9 @@ def get_notifications_with_items():
     except (KeyError, TypeError):  # agenda disabled
         pass
     try:
-        items.extend(superdesk.get_resource_service("topics").get_items(item_ids))
+        mongo_cursor = await TopicService().search(lookup={"_id": {"$in": item_ids}})
+        topics_items = await mongo_cursor.to_list_raw()
+        items.extend(topics_items)
     except (KeyError, TypeError):  # topics disabled
         pass
     return {

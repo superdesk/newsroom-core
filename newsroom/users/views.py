@@ -438,7 +438,8 @@ async def get_notifications(args: RouteArguments, params: None, request: Request
         await request.abort(403)
 
     # TODO-ASYNC: migrate `get_notifications_with_items` to async
-    return success_response(get_notifications_with_items())
+    notifications = await get_notifications_with_items()
+    return success_response(notifications)
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["DELETE"])
