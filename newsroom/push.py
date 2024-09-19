@@ -22,11 +22,7 @@ from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
 from superdesk.lock import lock, unlock
 
-from newsroom.notifications import (
-    push_notification,
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import push_notification, save_user_notifications
 from newsroom.topics.topics import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
@@ -882,9 +878,9 @@ async def notify_user_matches(
         if not users_ids:
             return
 
-        save_user_notifications(
+        await save_user_notifications(
             [
-                UserNotification(
+                dict(
                     user=user,
                     item=item["_id"],
                     resource=item.get("type"),
@@ -977,9 +973,9 @@ async def send_topic_notification_emails(item, topics, topic_matches, users, com
             section = topic.get("topic_type") or "wire"
             if user["_id"] not in users_processed:
                 # Only send websocket notification once for each item
-                save_user_notifications(
+                await save_user_notifications(
                     [
-                        UserNotification(
+                        dict(
                             user=user["_id"],
                             item=item["_id"],
                             resource=section,

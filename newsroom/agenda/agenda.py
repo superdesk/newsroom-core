@@ -30,10 +30,7 @@ from newsroom.agenda.email import (
     send_agenda_notification_email,
 )
 from newsroom.auth import get_company, get_user
-from newsroom.notifications import (
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import save_user_notifications
 from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import (
@@ -1575,9 +1572,9 @@ class AgendaService(BaseSearchService):
                         users = users + [user_dict[str(user_id)] for user_id in notify_user_ids]
 
                 # Send notifications to users
-                save_user_notifications(
+                await save_user_notifications(
                     [
-                        UserNotification(
+                        dict(
                             user=user["_id"],
                             item=agenda.get("_id"),
                             resource="agenda",

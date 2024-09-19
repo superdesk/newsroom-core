@@ -11,12 +11,7 @@ from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_user_email
-from newsroom.notifications import (
-    push_user_notification,
-    push_company_notification,
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import push_user_notification, push_company_notification, save_user_notifications
 
 
 @blueprint.route("/users/<_id>/topics", methods=["GET"])
@@ -190,9 +185,9 @@ async def share():
             continue
 
         topic_url = get_topic_url(topic)
-        save_user_notifications(
+        await save_user_notifications(
             [
-                UserNotification(
+                dict(
                     user=user["_id"],
                     action="share",
                     resource="topic",

@@ -9,7 +9,6 @@ from bson import ObjectId
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from superdesk import get_resource_service
 from superdesk.core.web import Request, Response
 from superdesk.core import get_current_app, get_app_config
 from superdesk.core.types import SearchRequest
@@ -31,7 +30,7 @@ from newsroom.decorator import admin_only, login_required, account_manager_or_co
 from newsroom.companies import (
     get_company_sections_monitoring_data,
 )
-from newsroom.notifications.notifications import get_notifications_with_items
+from newsroom.notifications import get_notifications_with_items, NotificationsService
 from newsroom.topics import get_user_topics
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
@@ -43,7 +42,6 @@ from newsroom.utils import (
     get_json_or_400_async,
     query_resource,
     get_vocabulary,
-    success_response,
 )
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
@@ -231,9 +229,11 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
 
     user_company = await get_company_from_user_or_session(user)
     if not user_company:
-        return await request.abort(403)
+        await request.abort(403)
 
-    auth_provider = get_company_auth_provider(user_company.model_dump(by_alias=True))
+    assert user_company
+
+    auth_provider = get_company_auth_provider(user_company.to_dict())
 
     if not user:
         raise NotFound(gettext("User not found"))
@@ -248,7 +248,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
 
     await send_token(user.model_dump(by_alias=True), token_type="new_account")
 
-    return success_response({"success": True})
+    return Response({"success": True})
 
 
 def _is_email_address_valid(email):
@@ -313,11 +313,11 @@ async def edit(args: RouteArguments, params: None, request: Request):
                         updates.pop(field, None)
 
             await UsersService().update(args.user_id, updates)
-            return success_response({"success": True})
+            return Response({"success": True})
 
         return Response(form.errors, 400)
 
-    return success_response(user)
+    return Response(user)
 
 
 def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
@@ -361,7 +361,7 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
     if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
         await UsersService().update(args.user_id, updates)
-        return success_response({"success": True})
+        return Response({"success": True})
 
     return Response(form.errors, 400)
 
@@ -386,7 +386,7 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
     updates["notification_schedule"].update(data)
 
     await UsersService().update(args.user_id, updates)
-    return success_response({"success": True})
+    return Response({"success": True})
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/validate", methods=["POST"])
@@ -415,8 +415,10 @@ async def _resend_token(user_id, token_type):
     if not user:
         raise NotFound(gettext("User not found"))
 
-    if await send_token(user.model_dump(by_alias=True), token_type):
-        return success_response({"success": True})
+    assert user
+
+    if await send_token(user.to_dict(), token_type):
+        return Response({"success": True})
 
     return Response({"message": "Token could not be sent"}, 400)
 
@@ -428,7 +430,8 @@ async def delete(args: RouteArguments, params: None, request: Request):
     service = UsersService()
     user = await service.find_by_id(args.user_id)
     await service.delete(user)
-    return success_response({"success": True})
+
+    return Response({"success": True})
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["GET"])
@@ -437,8 +440,7 @@ async def get_notifications(args: RouteArguments, params: None, request: Request
     if not is_current_user(args.user_id):
         await request.abort(403)
 
-    # TODO-ASYNC: migrate `get_notifications_with_items` to async
-    return success_response(get_notifications_with_items())
+    return Response(await get_notifications_with_items())
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["DELETE"])
@@ -448,9 +450,9 @@ async def delete_all(args: RouteArguments, params: None, request: Request):
     if not is_current_user(args.user_id):
         await request.abort(403)
 
-    # TODO-ASYNC: adjust when notifications app is migrated to async
-    get_resource_service("notifications").delete_action({"user": ObjectId(args.user_id)})
-    return success_response({"success": True})
+    await NotificationsService().delete_many({"user": ObjectId(args.user_id)})
+
+    return Response({"success": True})
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/notifications/<string:notification_id>", methods=["DELETE"])
@@ -460,9 +462,13 @@ async def delete_notification(args: NotificationRouteArguments, params: None, re
     if not is_current_user(args.user_id):
         await request.abort(403)
 
-    # TODO-ASYNC: adjust when notifications app is migrated to async
-    get_resource_service("notifications").delete_action({"_id": args.notification_id})
-    return success_response({"success": True})
+    service = NotificationsService()
+    original = await service.find_by_id(args.notification_id)
+    if not original:
+        await request.abort(404)
+    await NotificationsService().delete(original)
+
+    return Response({"success": True})
 
 
 @users_endpoints.endpoint("/users/<string:user_id>/approve", methods=["POST"])
@@ -477,4 +483,4 @@ async def approve_user(args: RouteArguments, params: None, request: Request):
         return Response({"error": gettext("User is already approved")}, 403)
 
     await users_service.approve_user(user)
-    return success_response({"success": True})
+    return Response({"success": True})
