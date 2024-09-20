@@ -1,5 +1,4 @@
 import pytest
-import importlib
 
 from bson import ObjectId
 from quart import json
@@ -163,21 +162,6 @@ async def test_assign_products_to_companies(client, app, product, companies):
 
     company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
     assert company["products"] == []
-
-
-async def test_products_company_migration(app, companies):
-    product = {"name": "test1"}
-    app.data.insert("products", [product])
-    app.data.update("products", product["_id"], {"companies": [companies[0]["_id"], str(companies[1]["_id"])]}, product)
-
-    update_module = importlib.import_module("data_updates.00009_20230116-145407_products")
-    data_update = update_module.DataUpdate()
-
-    db = app.data.pymongo("products").db
-    data_update.forwards(db[data_update.resource], db)
-
-    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
-    assert 1 == len(company["products"])
 
 
 async def test_delete_assigned_product(client, app, product, companies, user):

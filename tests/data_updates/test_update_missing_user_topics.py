@@ -89,3 +89,4 @@ async def test_data_update(app):
     assert "topic2" == topics[1]["label"]
     assert 1 == len(topics[2]["subscribers"])
     assert users[1]["_id"] == topics[2]["subscribers"][0]["user_id"]
+
