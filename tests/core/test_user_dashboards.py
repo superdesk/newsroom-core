@@ -7,7 +7,7 @@ from newsroom.wire.views import get_personal_dashboards_data
 # from datetime import datetime
 # from tests.core.utils import create_entries_for
 
-# TODO:Async ;- Need to check why api/_users/<users_id> is not working got 404
+# TODO-ASYNC ;- Need to check why api/_users/<users_id> is not working got 404p
 
 # async def test_user_dashboards(app, client, public_user, public_company, company_products):
 #     topics = [

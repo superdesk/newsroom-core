@@ -140,6 +140,7 @@ async def app(request):
     async with app.app_context():
         await reset_elastic(app)
         cache.clean()
+        app.init_indexes(True)
         yield app
 
     # Clean up blueprints, so they can be re-registered

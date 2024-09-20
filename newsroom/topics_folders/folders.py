@@ -44,7 +44,7 @@ class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
         await self.delete_many(lookup={"user": user["_id"]})
 
 
-# TODO:Async, need to wait for SDESK-7376
+# TODO-ASYNC, need to wait for SDESK-7376
 
 # async def init(app: SuperdeskAsyncApp):
 #     user_deleted.connect(await FolderResourceService().on_user_deleted)  # type: ignore

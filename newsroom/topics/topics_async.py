@@ -224,7 +224,7 @@ async def auto_enable_user_emails(
     await UsersService().update(user["_id"], updates={"receive_email": True})
 
 
-# TODO:Async, need to wait for SDESK-7376
+# TODO-ASYNC, need to wait for SDESK-7376
 
 # async def init(app: SuperdeskAsyncApp):
 #     user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore

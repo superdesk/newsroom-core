@@ -3,6 +3,7 @@ from unittest import mock
 from copy import deepcopy
 from bson import ObjectId
 from tests.core.utils import create_entries_for
+import pymongo
 
 from newsroom.topics.views import get_topic_url
 
@@ -280,37 +281,54 @@ async def test_topic_folders_crud(client):
         assert 0 == len((await resp.get_json())["_items"]), "topics in folders should be deleted"
 
 
-# TODO - Need to know can we handle 409 case ?
+async def test_topic_folders_unique_validation(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    folder = {"name": "test", "section": "wire"}
 
+    # create user topic
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-# async def test_topic_folders_unique_validation(client):
-#     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-#     folder = {"name": "test", "section": "wire"}
+    # second one should raise DuplicateKeyError
+    try:
+        resp = await client.post(user_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        # assert that the DuplicateKeyError occurred as expected
+        print("DuplicateKeyError for user topic folder as expected")
+    else:
+        # If no exception is raised, fail the test
+        assert False, "Expected DuplicateKeyError for user topic folder, but got success"
 
-#     # create user topic
-#     resp = await client.post(user_topic_folders_url, json=folder)
-#     assert 201 == resp.status_code, await resp.get_data(as_text=True)
+    # create company topic with same name
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-#     # second one fails
-#     resp = await client.post(user_topic_folders_url, json=folder)
-#     assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    # second one should raise DuplicateKeyError for company topic
+    try:
+        resp = await client.post(company_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        # assert that the DuplicateKeyError occurred as expected
+        print("DuplicateKeyError for company topic folder as expected")
+    else:
+        # If no exception is raised, fail the test
+        assert False, "Expected DuplicateKeyError for company topic folder, but got success"
 
-#     # create company topic with same name
-#     resp = await client.post(company_topic_folders_url, json=folder)
-#     assert 201 == resp.status_code, await resp.get_data(as_text=True)
+    # check case-insensitive uniqueness for user topic
+    folder["name"] = "Test"
+    try:
+        resp = await client.post(user_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        print("DuplicateKeyError for case-insensitive user topic folder as expected")
+    else:
+        assert False, "Expected DuplicateKeyError for case-insensitive user topic folder, but got success"
 
-#     # second fails
-#     resp = await client.post(company_topic_folders_url, json=folder)
-#     assert 409 == resp.status_code, await resp.get_data(as_text=True)
-
-#     # check is case insensitive
-#     folder["name"] = "Test"
-#     resp = await client.post(user_topic_folders_url, json=folder)
-#     assert 409 == resp.status_code, await resp.get_data(as_text=True)
-
-#     # for both
-#     resp = await client.post(company_topic_folders_url, json=folder)
-#     assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    # check case-insensitive uniqueness for company topic
+    try:
+        resp = await client.post(company_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        print("DuplicateKeyError for case-insensitive company topic folder as expected")
+    else:
+        assert False, "Expected DuplicateKeyError for case-insensitive company topic folder, but got success"
 
 
 async def test_topic_subscriber_auto_enable_user_emails(app, client):
@@ -430,7 +448,7 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
-    # # TODO:- Test cases based on signal
+    # TODO-ASYNC:- Test cases based on signal
 
     # await client.delete(f"/users/{PUBLIC_USER_ID}")
 
