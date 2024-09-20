@@ -205,14 +205,14 @@ SECTION_FILTERS = [
     {
         "_id": ObjectId("5e65964bf5db68883df561e0"),
         "is_enabled": True,
-        "name": "test",
+        "name": "test1",
         "filter_type": "wire",
         "query": 'NOT genre.code:"AM Service"',
     },
     {
         "_id": ObjectId("5e65964bf5db68883df561e1"),
         "is_enabled": True,
-        "name": "test",
+        "name": "test2",
         "filter_type": "agenda",
         "query": 'NOT calendars.name:"Exclude Me"',
     },
