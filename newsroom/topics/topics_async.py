@@ -94,9 +94,18 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
         users = await UsersService().search(lookup={"dashboards.topic_ids": doc.id})
         async for user in users:
             updates = {"dashboards": user.dashboards.copy()}
+            updated_dashboards = []
+
             for dashboard in updates["dashboards"]:
-                dashboard.topic_ids = [topic_id for topic_id in dashboard.topic_ids if topic_id != doc.id]
-            await UsersService().update(user.id, updates)
+                dashboard_dict = dashboard.to_dict()
+                # Remove the deleted topic id from topic_ids
+                dashboard_dict["topic_ids"] = [
+                    topic_id for topic_id in dashboard_dict["topic_ids"] if topic_id != doc.id
+                ]
+                updated_dashboards.append(dashboard_dict)
+
+            updates["dashboards"] = updated_dashboards
+            await UsersService().system_update(user.id, updates=updates)
 
     async def on_user_deleted(self, sender, user, **kwargs):
         # delete user private topics
