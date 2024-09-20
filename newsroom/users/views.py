@@ -317,7 +317,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
 
         return Response(form.errors, 400)
 
-    return Response(user)
+    return Response(user.to_dict())
 
 
 def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:

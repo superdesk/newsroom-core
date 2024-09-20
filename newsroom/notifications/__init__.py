@@ -2,7 +2,7 @@ from superdesk.notification import push_notification
 from newsroom.auth import get_user, get_user_id
 
 from .module import module  # noqa
-from .services import NotificationsService
+from .services import NotificationsService, NotificationQueueService
 from .utils import (
     get_initial_notifications,
     get_notifications_with_items,
@@ -13,6 +13,7 @@ from .utils import (
 
 __all__ = [
     "NotificationsService",
+    "NotificationQueueService",
     "get_initial_notifications",
     "get_notifications_with_items",
     "save_user_notifications",

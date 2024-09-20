@@ -1,10 +1,11 @@
+from copy import deepcopy
 from typing import Any
 
 from bson import ObjectId
 from superdesk.utc import utcnow
 from superdesk.core.resources import AsyncResourceService
 
-from .model import Notification
+from .models import Notification, NotificationQueue, Topic
 
 
 class NotificationsService(AsyncResourceService[Notification]):
@@ -58,3 +59,59 @@ class NotificationsService(AsyncResourceService[Notification]):
         """
         cursor = await self.search({"_id": {"$in": item_ids}})
         return await cursor.to_list()
+
+
+class NotificationQueueService(AsyncResourceService[NotificationQueue]):
+    async def add_item_to_queue(self, user_id: ObjectId, section: str, topic_id: ObjectId, item: dict[str, Any]):
+        """Add an item to the user's notification queue for a specific topic.
+
+        If the queue or topic doesn't exist, create them. Then, append the item to the topic's item list.
+
+        Args:
+            user_id (ObjectId): The user's unique identifier.
+            section (str): The section associated with the topic.
+            topic_id (ObjectId): The topic's unique identifier.
+            item (dict[str, Any]): The item to add, containing at least '_id' and 'versioncreated' keys.
+        """
+        original = await self.find_one(user=user_id)
+
+        if not original:
+            # Create a new schedule
+            await self.create(
+                [
+                    {
+                        "id": ObjectId(),
+                        "user": user_id,
+                        "topics": [
+                            {
+                                "items": [item["_id"]],
+                                "topic_id": topic_id,
+                                "section": section,
+                                "last_item_arrived": item["versioncreated"],
+                            }
+                        ],
+                    }
+                ]
+            )
+        else:
+            # Update an existing schedule
+            updates = {"topics": deepcopy(original.topics or [])}
+
+            topic_queue = next((topic for topic in updates["topics"] if topic.topic_id == topic_id), None)
+
+            if topic_queue is None:
+                topic_queue = Topic(topic_id=topic_id, section=section, last_item_arrived=item["versioncreated"])
+                updates["topics"].append(topic_queue)
+
+            topic_queue.items.append(item["_id"])
+            topic_queue.last_item_arrived = item["versioncreated"]
+
+            await self.update(original.id, updates)
+
+    async def reset_queue(self, user_id: ObjectId):
+        """Delete all notification queue entries for a user.
+
+        Args:
+            user_id (ObjectId): The user's unique identifier.
+        """
+        await self.delete_many({"user": user_id})

@@ -22,7 +22,7 @@ from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
 from superdesk.lock import lock, unlock
 
-from newsroom.notifications import push_notification, save_user_notifications
+from newsroom.notifications import push_notification, save_user_notifications, NotificationQueueService
 from newsroom.topics.topics import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
@@ -989,9 +989,7 @@ async def send_topic_notification_emails(item, topics, topic_matches, users, com
             if not user.get("receive_email"):
                 continue
             elif subscriber.get("notification_type") == "scheduled":
-                superdesk.get_resource_service("notification_queue").add_item_to_queue(
-                    user["_id"], section, topic["_id"], item
-                )
+                await NotificationQueueService().add_item_to_queue(user["_id"], section, topic["_id"], item)
             elif user["_id"] in users_with_realtime_subscription:
                 # This user has already received a realtime notification email about this item
                 # No need to send another

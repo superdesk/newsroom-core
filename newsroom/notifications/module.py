@@ -1,4 +1,4 @@
-from superdesk.core.module import Module, SuperdeskAsyncApp
+from superdesk.core.module import Module
 from superdesk.core.resources import (
     ResourceConfig,
     RestParentLink,
@@ -9,8 +9,8 @@ from superdesk.core.resources import (
 
 from newsroom.users.module import users_resource_config
 from newsroom import MONGO_PREFIX
-from .model import Notification
-from .services import NotificationsService
+from .models import Notification, NotificationQueue
+from .services import NotificationQueueService, NotificationsService
 
 
 notifications_resource_config = ResourceConfig(
@@ -24,7 +24,6 @@ notifications_resource_config = ResourceConfig(
             MongoIndexOptions(
                 name="user_created",
                 keys=[("user", 1), ("created", -1)],
-                unique=True,
                 collation={"locale": "en", "strength": 2},
             )
         ],
@@ -42,16 +41,16 @@ notifications_resource_config = ResourceConfig(
     ),
 )
 
-
-def init_module(app: SuperdeskAsyncApp):
-    from superdesk import register_resource
-    from .notification_queue import NotificationQueueResource, NotificationQueueService
-
-    register_resource("notification_queue", NotificationQueueResource, NotificationQueueService, _app=app.wsgi)
-
+notification_queue_resource_config = ResourceConfig(
+    name="notification_queue",
+    data_class=NotificationQueue,
+    service=NotificationQueueService,
+    mongo=MongoResourceConfig(
+        prefix=MONGO_PREFIX,
+        indexes=[MongoIndexOptions(name="user_id", keys=[("user", 1)])],
+    ),
+)
 
 module = Module(
-    name="newsroom.notifications",
-    resources=[notifications_resource_config],
-    init=init_module,
+    name="newsroom.notifications", resources=[notifications_resource_config, notification_queue_resource_config]
 )
