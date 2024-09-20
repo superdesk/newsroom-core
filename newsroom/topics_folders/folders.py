@@ -37,8 +37,8 @@ class FolderResourceModel(NewshubResourceModel):
 
 class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
     async def on_deleted(self, doc):
-        await self.delete_many(lookup={"parent": doc["_id"]})
-        await TopicService().delete_many(lookup={"folder": doc["_id"]})
+        await self.delete_many(lookup={"parent": doc.id})
+        await TopicService().delete_many(lookup={"folder": doc.id})
 
     async def on_user_deleted(self, sender, user, **kwargs):
         await self.delete_many(lookup={"user": user["_id"]})
@@ -76,7 +76,7 @@ class UserFoldersResourceModel(FolderResourceModel):
     user: Annotated[ObjectIdField, validate_data_relation_async("users")]
 
 
-class UserFoldersResourceService(NewshubAsyncResourceService[UserFoldersResourceModel]):
+class UserFoldersResourceService(FolderResourceService):
     pass
 
 
@@ -100,7 +100,7 @@ class CompanyFoldersResourceModel(FolderResourceModel):
     company: Annotated[ObjectIdField, validate_data_relation_async("companies")]
 
 
-class CompanyFoldersResourceService(NewshubAsyncResourceService[CompanyFoldersResourceModel]):
+class CompanyFoldersResourceService(FolderResourceService):
     pass
 
 

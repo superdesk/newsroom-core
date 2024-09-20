@@ -6,8 +6,8 @@ from tests.core.utils import create_entries_for
 
 from newsroom.topics.views import get_topic_url
 
-# from newsroom.users.model import UserResourceModel
-# from newsroom.users.service import UsersService
+from newsroom.users.model import UserResourceModel
+from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
     PUBLIC_USER_EMAIL,
@@ -223,65 +223,65 @@ def if_match(doc):
     return {"if-match": doc["_etag"]}
 
 
-# TODO:- will update it shortly
+async def test_topic_folders_crud(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    urls = (user_topic_folders_url, company_topic_folders_url)
+    for folders_url in urls:
+        folder = {"name": "test", "section": "wire"}
 
-# async def test_topic_folders_crud(client):
-#     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-#     urls = (user_topic_folders_url, company_topic_folders_url)
-#     for folders_url in urls:
-#         folder = {"name": "test", "section": "wire"}
+        resp = await client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 0 == len((await resp.get_json())["_items"])
 
-#         resp = await client.get(folders_url)
-#         assert 200 == resp.status_code
-#         assert 0 == len((await resp.get_json())["_items"])
+        resp = await client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        parent_folder = await resp.get_json()
+        assert "_id" in parent_folder
 
-#         resp = await client.post(folders_url, json=folder)
-#         assert 201 == resp.status_code, await resp.get_data(as_text=True)
-#         parent_folder = await resp.get_json()
-#         assert "_id" in parent_folder
+        resp = await client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 1 == len((await resp.get_json())["_items"])
 
-#         resp = await client.get(folders_url)
-#         assert 200 == resp.status_code
-#         assert 1 == len((await resp.get_json())["_items"])
+        folder["name"] = "test"
+        folder["parent"] = parent_folder["_id"]
+        resp = await client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        child_folder = await resp.get_json()
 
-#         folder["name"] = "test"
-#         folder["parent"] = parent_folder["_id"]
-#         resp = await client.post(folders_url, json=folder)
-#         assert 201 == resp.status_code, await resp.get_data(as_text=True)
-#         child_folder = await resp.get_json()
+        topic = {
+            "label": "Test",
+            "query": "test",
+            "topic_type": "wire",
+            "folder": child_folder["_id"],
+        }
 
-#         topic = {
-#             "label": "Test",
-#             "query": "test",
-#             "topic_type": "wire",
-#             "folder": child_folder["_id"],
-#         }
+        resp = await client.post(topics_url, json=topic)
+        assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-#         resp = await client.post(topics_url, json=topic)
-#         assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        resp = await client.patch(self_href(parent_folder), json={"name": "bar"}, headers=if_match(parent_folder))
+        assert 200 == resp.status_code
 
-#         resp = await client.patch(self_href(parent_folder), json={"name": "bar"}, headers=if_match(parent_folder))
-#         assert 200 == resp.status_code
+        parent_folder.update(await resp.get_json())
 
-#         parent_folder.update(await resp.get_json())
+        resp = await client.get(self_href(parent_folder))
+        assert 200 == resp.status_code
 
-#         resp = await client.get(self_href(parent_folder))
-#         assert 200 == resp.status_code
+        resp = await client.delete(self_href(parent_folder), headers=if_match(parent_folder))
+        assert 204 == resp.status_code
 
-#         resp = await client.delete(self_href(parent_folder), headers=if_match(parent_folder))
-#         assert 204 == resp.status_code
+        # deleting parent will delete children
+        resp = await client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 0 == len((await resp.get_json())["_items"]), "child folders should be deleted"
 
-#         # deleting parent will delete children
-#         resp = await client.get(folders_url)
-#         assert 200 == resp.status_code
-#         assert 0 == len((await resp.get_json())["_items"]), "child folders should be deleted"
+        # deleting folders will delete topics
+        resp = await client.get(topics_url)
+        assert 200 == resp.status_code
+        assert 0 == len((await resp.get_json())["_items"]), "topics in folders should be deleted"
 
-#         # deleting folders will delete topics
-#         resp = await client.get(topics_url)
-#         assert 200 == resp.status_code
-#         assert 0 == len((await resp.get_json())["_items"]), "topics in folders should be deleted"
 
 # TODO - Need to know can we handle 409 case ?
+
 
 # async def test_topic_folders_unique_validation(client):
 #     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
@@ -313,65 +313,65 @@ def if_match(doc):
 #     assert 409 == resp.status_code, await resp.get_data(as_text=True)
 
 
-# async def test_topic_subscriber_auto_enable_user_emails(app, client):
-#     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-#     user: UserResourceModel = await UsersService().find_by_id(PUBLIC_USER_ID)
-#     user = json.loads(user.model_dump_json())
-#     topic = deepcopy(base_topic)
+async def test_topic_subscriber_auto_enable_user_emails(app, client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    user: UserResourceModel = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
+    topic = deepcopy(base_topic)
 
-#     async def disable_user_emails():
-#         user["receive_email"] = False
-#         resp = await client.post(f"/users/{PUBLIC_USER_ID}", form=user)
-#         assert resp.status_code == 200, await resp.get_data(as_text=True)
+    async def disable_user_emails():
+        user["receive_email"] = False
+        resp = await client.post(f"/users/{PUBLIC_USER_ID}", form=user)
+        assert resp.status_code == 200, await resp.get_data(as_text=True)
 
-#     # Make sure we start with user emails disabled
-#     await disable_user_emails()
-#     user = get_resource_by_id("users", PUBLIC_USER_ID)
-#     assert user["receive_email"] is False
+    # Make sure we start with user emails disabled
+    await disable_user_emails()
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
 
-#     # Create a new topic, with the current user as a subscriber
-#     topic["subscribers"] = [
-#         {
-#             "user_id": user["_id"],
-#             "notification_type": "real-time",
-#         }
-#     ]
-#     resp = await client.post(topics_url, json=topic)
-#     assert resp.status_code == 201, await resp.get_data(as_text=True)
-#     topic_id = (await resp.get_json())["_id"]
-#     topic = get_resource_by_id("topics", topic_id)
+    # Create a new topic, with the current user as a subscriber
+    topic["subscribers"] = [
+        {
+            "user_id": user["_id"],
+            "notification_type": "real-time",
+        }
+    ]
+    resp = await client.post(topics_url, json=topic)
+    assert resp.status_code == 201, await resp.get_data(as_text=True)
+    topic_id = (await resp.get_json())["_id"]
+    topic = get_resource_by_id("topics", topic_id)
 
-#     # Make sure user emails are enabled after creating the topic
-#     user = get_resource_by_id("users", PUBLIC_USER_ID)
-#     assert user["receive_email"] is True
+    # Make sure user emails are enabled after creating the topic
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is True
 
-#     # Disable the user emails again
-#     await disable_user_emails()
-#     user = get_resource_by_id("users", PUBLIC_USER_ID)
-#     assert user["receive_email"] is False
+    # Disable the user emails again
+    await disable_user_emails()
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
 
-#     # Update the topic, this time removing the user as a subscriber
-#     topic["subscribers"] = []
-#     resp = await client.post(f"/topics/{topic_id}", json=topic)
-#     assert resp.status_code == 200, await resp.get_data(as_text=True)
+    # Update the topic, this time removing the user as a subscriber
+    topic["subscribers"] = []
+    resp = await client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
-#     # Make sure user emails are still disabled
-#     user = get_resource_by_id("users", PUBLIC_USER_ID)
-#     assert user["receive_email"] is False
+    # Make sure user emails are still disabled
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
 
-#     # Update the topic, this time adding the user as a subscriber
-#     topic["subscribers"] = [
-#         {
-#             "user_id": user["_id"],
-#             "notification_type": "real-time",
-#         }
-#     ]
-#     resp = await client.post(f"/topics/{topic_id}", json=topic)
-#     assert resp.status_code == 200, await resp.get_data(as_text=True)
+    # Update the topic, this time adding the user as a subscriber
+    topic["subscribers"] = [
+        {
+            "user_id": user["_id"],
+            "notification_type": "real-time",
+        }
+    ]
+    resp = await client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
 
-#     # And make sure user emails are re-enabled again
-#     user = get_resource_by_id("users", PUBLIC_USER_ID)
-#     assert user["receive_email"] is True
+    # And make sure user emails are re-enabled again
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is True
 
 
 async def test_remove_user_topics_on_user_delete(client, app):
@@ -430,7 +430,7 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
-    # TODO:- Test cases based on signal
+    # # TODO:- Test cases based on signal
 
     # await client.delete(f"/users/{PUBLIC_USER_ID}")
 
