@@ -223,12 +223,12 @@ async def auto_enable_user_emails(
     # then no need to enable their email notifications
     data = original.to_dict() if isinstance(original, TopicResourceModel) else original
     for subscriber in data.get("subscribers", []):
-        if subscriber.get("user_id") == user["_id"]:
+        if str(subscriber.get("user_id")) == str(user["_id"]):
             return  # User already subscribed, no need to enable emails
 
     user_newly_subscribed = False
     for subscriber in updates.get("subscribers", []):
-        if subscriber.get("user_id") == user["_id"]:
+        if str(subscriber.get("user_id")) == str(user["_id"]):
             user_newly_subscribed = True
             break
 

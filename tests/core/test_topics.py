@@ -344,43 +344,49 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
 
     # Make sure we start with user emails disabled
     await disable_user_emails()
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Create a new topic, with the current user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["_id"],
+            "user_id": user["id"],
             "notification_type": "real-time",
         }
     ]
     resp = await client.post(topics_url, json=topic)
     assert resp.status_code == 201, await resp.get_data(as_text=True)
     topic_id = (await resp.get_json())["_id"]
-    topic = get_resource_by_id("topics", topic_id)
+    topic = await TopicService().find_by_id(topic_id)
+    topic = json.loads(topic.model_dump_json())
 
     # Make sure user emails are enabled after creating the topic
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is True
 
     # Disable the user emails again
     await disable_user_emails()
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Update the topic, this time removing the user as a subscriber
     topic["subscribers"] = []
+    topic.pop("created")
     resp = await client.post(f"/topics/{topic_id}", json=topic)
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # Make sure user emails are still disabled
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Update the topic, this time adding the user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["_id"],
+            "user_id": user["id"],
             "notification_type": "real-time",
         }
     ]
@@ -388,7 +394,8 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # And make sure user emails are re-enabled again
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is True
 
 
@@ -448,23 +455,24 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
-    # TODO-ASYNC:- Test cases based on signal
 
-    # await client.delete(f"/users/{PUBLIC_USER_ID}")
+#     # TODO-ASYNC:- Test cases based on signal
 
-    # # make sure it's editable later
-    # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
-    # assert 200 == resp.status_code
+#     # await client.delete(f"/users/{PUBLIC_USER_ID}")
 
-    # cursor = await TopicService().search(lookup={})
-    # topics = await cursor.to_list_raw()
-    # assert 2 == len(topics)
-    # assert "test2" == topics[0]["label"]
-    # assert 1 == len(topics[0]["subscribers"])
-    # assert "test3" == topics[1]["label"]
-    # assert None is topics[1].get("user")
+#     # # make sure it's editable later
+#     # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+#     # assert 200 == resp.status_code
 
-    # cursor = await UserFoldersResourceService().search(lookup={})
-    # folders = await cursor.to_list_raw()
-    # assert 1 == len(folders)
-    # assert "skip" == folders[0]["name"]
+#     # cursor = await TopicService().search(lookup={})
+#     # topics = await cursor.to_list_raw()
+#     # assert 2 == len(topics)
+#     # assert "test2" == topics[0]["label"]
+#     # assert 1 == len(topics[0]["subscribers"])
+#     # assert "test3" == topics[1]["label"]
+#     # assert None is topics[1].get("user")
+
+#     # cursor = await UserFoldersResourceService().search(lookup={})
+#     # folders = await cursor.to_list_raw()
+#     # assert 1 == len(folders)
+#     # assert "skip" == folders[0]["name"]
