@@ -957,6 +957,7 @@ async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[O
 async def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
     users_processed: Set[ObjectId] = set()
     users_with_realtime_subscription: Set[ObjectId] = set()
+    notification_queue_service = NotificationQueueService()
 
     for topic in topics:
         if topic["_id"] not in topic_matches:
@@ -989,7 +990,7 @@ async def send_topic_notification_emails(item, topics, topic_matches, users, com
             if not user.get("receive_email"):
                 continue
             elif subscriber.get("notification_type") == "scheduled":
-                await NotificationQueueService().add_item_to_queue(user["_id"], section, topic["_id"], item)
+                await notification_queue_service.add_item_to_queue(user["_id"], section, topic["_id"], item)
             elif user["_id"] in users_with_realtime_subscription:
                 # This user has already received a realtime notification email about this item
                 # No need to send another
