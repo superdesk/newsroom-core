@@ -74,7 +74,7 @@ async def create(request: Request):
     service = NavigationsService()
 
     creation_data = await prepare_navigation_data(nav_data)
-    creation_data["id"] = service.generate_id()
+    creation_data["_id"] = service.generate_id()
     product_ids = creation_data.pop("products", [])
     created_ids = await service.create([creation_data])
 

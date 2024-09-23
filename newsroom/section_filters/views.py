@@ -86,7 +86,7 @@ async def create():
     )
     if section and section.get("search_type"):
         creation_data["search_type"] = section["search_type"]
-    creation_data["id"] = service.generate_id()
+    creation_data["_id"] = service.generate_id()
 
     section_filter_id = await service.create([creation_data])
     return Response({"success": True, "_id": section_filter_id[0]}, 201)
