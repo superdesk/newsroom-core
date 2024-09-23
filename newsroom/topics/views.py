@@ -20,6 +20,7 @@ from newsroom.notifications import (
 )
 from .topics_async import topic_endpoints, TopicService
 from newsroom.users.service import UsersService
+from newsroom.users.utils import get_user_or_abort
 
 
 class RouteArguments(BaseModel):
@@ -42,17 +43,20 @@ async def get_topics(args: RouteArguments, params: None, request: Request):
 @login_required
 async def post_topic(args: RouteArguments, params: None, request: Request):
     """Creates a user topic"""
-    user = get_user()
+    current_user = await get_user_or_abort()
 
-    if not user or str(user["_id"]) != str(args.user_id):
+    if current_user:
+        user_dict = current_user.to_dict()
+
+    if not user_dict or str(user_dict["_id"]) != str(args.user_id):
         await request.abort(403)
 
     topic = await get_json_or_400()
 
-    if user:
+    if user_dict:
         data = {
-            "user": user.get("_id"),
-            "company": user.get("company"),
+            "user": user_dict.get("_id"),
+            "company": user_dict.get("company"),
             "_id": ObjectId(),
             "created_filter": topic.pop("created", None),
             "is_global": topic.get("is_global", False),
@@ -64,10 +68,10 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
 
     ids = await TopicService().create([topic])
 
-    await auto_enable_user_emails(topic, {}, user)
+    await auto_enable_user_emails(topic, {}, user_dict)
 
-    if user and topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user.get("_id")))
+    if user_dict and topic.get("is_global"):
+        push_company_notification("topic_created", user_id=str(user_dict.get("_id")))
     else:
         push_user_notification("topic_created")
 
@@ -86,10 +90,15 @@ async def get_list_my_topics(args: RouteArguments, params: None, request: Reques
 async def update_topic(args: RouteArguments, params: None, request: Request):
     """Updates a followed topic"""
     data = await get_json_or_400()
-    current_user = get_user(required=True)
+
+    current_user = await get_user_or_abort()
+
+    if current_user:
+        user_dict = current_user.to_dict()
+
     original = await TopicService().find_by_id(args.topic_id)
 
-    if not current_user or not await can_edit_topic(original, current_user):
+    if not user_dict or not await can_edit_topic(original, user_dict):
         await request.abort(403)
 
     updates: Topic = {
@@ -98,7 +107,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
         "created": data.get("created"),
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
-        "company": current_user.get("company", None),
+        "company": user_dict.get("company", None),
         "subscribers": data.get("subscribers") or [],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
@@ -116,7 +125,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
 
     topic = await TopicService().find_by_id(args.topic_id)
 
-    await auto_enable_user_emails(updates, original, current_user)
+    await auto_enable_user_emails(updates, original, user_dict)
 
     if topic.is_global or updates.get("is_global", False) != original.is_global:
         push_company_notification("topics")

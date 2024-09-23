@@ -87,7 +87,8 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
         current_user = await get_user_or_abort()
 
         if current_user:
-            await auto_enable_user_emails(updates, original, current_user)
+            user_dict = current_user.to_dict()
+            await auto_enable_user_emails(updates, original, user_dict)
 
     async def on_delete(self, doc: TopicResourceModel):
         await super().on_delete(doc)
