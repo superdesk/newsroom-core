@@ -5,7 +5,7 @@ from bson import ObjectId
 from superdesk.utc import utcnow
 from superdesk.core.resources import AsyncResourceService
 
-from .models import Notification, NotificationQueue, Topic
+from .models import Notification, NotificationQueue, NotificationTopic
 
 
 class NotificationsService(AsyncResourceService[Notification]):
@@ -80,7 +80,7 @@ class NotificationQueueService(AsyncResourceService[NotificationQueue]):
             await self.create(
                 [
                     {
-                        "id": ObjectId(),
+                        "_id": ObjectId(),
                         "user": user_id,
                         "topics": [
                             {
@@ -100,7 +100,9 @@ class NotificationQueueService(AsyncResourceService[NotificationQueue]):
             topic_queue = next((topic for topic in updates["topics"] if topic.topic_id == topic_id), None)
 
             if topic_queue is None:
-                topic_queue = Topic(topic_id=topic_id, section=section, last_item_arrived=item["versioncreated"])
+                topic_queue = NotificationTopic(
+                    topic_id=topic_id, section=section, last_item_arrived=item["versioncreated"]
+                )
                 updates["topics"].append(topic_queue)
 
             topic_queue.items.append(item["_id"])

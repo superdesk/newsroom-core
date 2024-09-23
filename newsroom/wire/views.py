@@ -377,9 +377,11 @@ async def share():
     assert data.get("users")
     assert data.get("items")
 
+    users_service = UsersService()
     items = get_items_for_user_action(data.get("items"), item_type)
+
     for user_id in data["users"]:
-        user = await UsersService().find_by_id(user_id)
+        user = await users_service.find_by_id(user_id)
 
         if not user or not user.email:
             continue

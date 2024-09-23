@@ -40,11 +40,13 @@ async def get_initial_notifications() -> dict[str, Any] | None:
     if not session.get("user"):
         return None
 
-    cursor = await NotificationsService().search(lookup=user_notifications_lookup(session["user"]))
+    user_id = session["user"]
+    lookup = user_notifications_lookup(user_id)
+    notifications = await NotificationsService().search(lookup)
 
     return {
-        "user": str(session["user"]) if session["user"] else None,
-        "notificationCount": await cursor.count(),
+        "user": str(user_id),
+        "notificationCount": await notifications.count(),
     }
 
 
@@ -74,7 +76,7 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
         pass
 
     return {
-        "user": str(session["user"]) if session["user"] else None,
+        "user": session["user"],
         "items": list(items),
         "notifications": saved_notifications,
     }

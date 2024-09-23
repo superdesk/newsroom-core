@@ -11,24 +11,24 @@ user_validated_type = Annotated[ObjectId, validate_data_relation_async(users_res
 
 
 class Notification(ResourceModel):
+    # item needs to be str | ObjectId as resource can be topic, agenda items, items
+    # and potentially other types of resources
     item: str | ObjectId
-    # TODO-async: replace the one above with the one below once `items` are migrated to async framework
-    # item: Annotated[Optional[ObjectId], validate_data_relation_async("items")] = None
+    resource: str
 
     user: user_validated_type
-    resource: Optional[str] = ""
-    action: Optional[str] = ""
+    action: str
     data: Optional[dict] = {}
 
 
 @dataclass
-class Topic:
+class NotificationTopic:
     topic_id: ObjectId
     last_item_arrived: datetime
     section: str
-    items: list[Annotated[ObjectId, validate_data_relation_async("items")]] = Field(default_factory=list)
+    items: list[str | ObjectId] = Field(default_factory=list)
 
 
 class NotificationQueue(ResourceModel):
     user: user_validated_type
-    topics: list[Topic]
+    topics: list[NotificationTopic]

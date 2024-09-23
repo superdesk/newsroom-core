@@ -115,7 +115,7 @@ async def test_gets_all_products(client):
             "section_filters",
             [
                 {
-                    "id": ObjectId(),
+                    "_id": ObjectId(),
                     "name": "Sport-%s" % i,
                     "description": "Top level sport product",
                     "is_enabled": True,

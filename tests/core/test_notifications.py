@@ -11,7 +11,7 @@ from ..fixtures import PUBLIC_USER_ID, TEST_USER_ID
 
 TEST_ITEM_ID = ObjectId()
 TEST_USER = str(PUBLIC_USER_ID)
-TEST_NOTIFICATION = {"item": TEST_ITEM_ID, "user": TEST_USER}
+TEST_NOTIFICATION = {"item": TEST_ITEM_ID, "user": TEST_USER, "resource": "test-resource", "action": "test-action"}
 USER_NOTIFICATIONS_URL = f"users/{TEST_USER}/notifications"
 
 
@@ -90,7 +90,12 @@ async def test_delete_notification(client, service):
 
 
 async def test_delete_all_notifications(client, service):
-    await service.create_or_update([TEST_NOTIFICATION, {"item": ObjectId(), "user": TEST_USER}])
+    await service.create_or_update(
+        [
+            TEST_NOTIFICATION,
+            {"item": ObjectId(), "user": TEST_USER, "resource": "test-resource", "action": "test-action"},
+        ]
+    )
 
     async with client.session_transaction() as session:
         session["user"] = TEST_USER
