@@ -2,6 +2,7 @@ from bson import ObjectId
 from typing import Optional
 from pydantic import BaseModel
 
+from superdesk.utc import utcnow
 from superdesk.core import json, get_app_config
 from superdesk.flask import url_for, session
 from superdesk.core.web import Request, Response
@@ -58,8 +59,11 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
             "user": user_dict.get("_id"),
             "company": user_dict.get("company"),
             "_id": ObjectId(),
-            "created_filter": topic.pop("created", None),
             "is_global": topic.get("is_global", False),
+            # `_created` needs to be set otherwise there is a clash given `TopicResourceModel` and
+            # the base `ResourceModel` both have the same member (`created`). Without this
+            # `created_filter` does not get converted/saved
+            "_created": utcnow(),
         }
         topic.update(data)
 
