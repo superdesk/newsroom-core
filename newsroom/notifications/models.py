@@ -23,7 +23,7 @@ class Notification(ResourceModel):
 
 @dataclass
 class NotificationTopic:
-    topic_id: ObjectId
+    topic_id: Annotated[ObjectId, validate_data_relation_async("topics")]
     last_item_arrived: datetime
     section: str
     items: list[str | ObjectId] = Field(default_factory=list)

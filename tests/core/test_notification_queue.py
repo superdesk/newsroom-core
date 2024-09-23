@@ -3,6 +3,7 @@ from bson import ObjectId
 from newsroom.notifications import NotificationQueueService
 from superdesk.utc import utcnow
 
+from tests.core.utils import create_entries_for
 from tests.fixtures import PUBLIC_USER_ID
 
 
@@ -13,7 +14,15 @@ async def test_adding_and_clearing_notification_queue():
     assert (await service.find_one(user=PUBLIC_USER_ID)) is None
 
     now = utcnow()
-    topic_id = ObjectId("54d9a786f87bc2ff88d04028")
+
+    ids = await create_entries_for(
+        "topics",
+        [
+            {"name": "label", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
+        ],
+    )
+
+    topic_id = ids[0]
     item1_id = ObjectId("64d9a786f87bc2ff88d04028")
     item = {
         "_id": item1_id,
