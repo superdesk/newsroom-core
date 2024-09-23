@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from superdesk.core import json, get_app_config
-from superdesk.flask import abort, url_for, session
+from superdesk.flask import url_for, session
 from superdesk.core.web import Request, Response
 
 from newsroom.types import Topic
@@ -32,7 +32,8 @@ class RouteArguments(BaseModel):
 async def get_topics(args: RouteArguments, params: None, request: Request):
     """Returns list of followed topics of given user"""
     if session["user"] != str(args.user_id):
-        abort(403)
+        await request.abort(403)
+
     topics = await _get_user_topics(args.user_id)
     return Response({"_items": topics})
 
@@ -44,7 +45,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     user = get_user()
 
     if not user or str(user["_id"]) != str(args.user_id):
-        abort(403)
+        await request.abort(403)
 
     topic = await get_json_or_400()
 
@@ -77,7 +78,7 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
 @login_required
 async def get_list_my_topics(args: RouteArguments, params: None, request: Request):
     topics = await _get_user_topics(get_user_id())
-    return Response(topics, 200, ())
+    return Response(topics)
 
 
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["POST"])
@@ -89,7 +90,7 @@ async def update_topic(args: RouteArguments, params: None, request: Request):
     original = await TopicService().find_by_id(args.topic_id)
 
     if not current_user or not await can_edit_topic(original, current_user):
-        return abort(403)
+        await request.abort(403)
 
     updates: Topic = {
         "label": data.get("label"),
@@ -134,7 +135,7 @@ async def delete(args: RouteArguments, params: None, request: Request):
     original = await service.find_by_id(args.topic_id)
 
     if not await can_edit_topic(original, current_user):
-        abort(403)
+        await request.abort(403)
 
     await service.delete(original)
 

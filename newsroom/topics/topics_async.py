@@ -4,7 +4,7 @@ from pydantic import Field
 from typing import Optional, List, Dict, Any, Annotated, Union
 
 from newsroom import MONGO_PREFIX
-from newsroom.auth import get_user
+from newsroom.users.utils import get_user_or_abort
 
 # from newsroom.signals import user_deleted
 
@@ -84,7 +84,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
     async def on_updated(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_updated(updates, original)
-        current_user = get_user()
+        current_user = await get_user_or_abort()
 
         if current_user:
             await auto_enable_user_emails(updates, original, current_user)
@@ -107,7 +107,13 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             updates["dashboards"] = updated_dashboards
             await UsersService().system_update(user.id, updates=updates)
 
-    async def on_user_deleted(self, sender, user, **kwargs):
+    async def on_user_deleted(self, sender, user: User, **kwargs):
+        """
+        Handle the cleanup of user-related topics when a user is deleted.
+
+        This function is tbriggered by the `user_deleted` signal
+
+        """
         # delete user private topics
         await self.delete_many(lookup={"is_global": False, "user": user["_id"]})
 
@@ -202,9 +208,9 @@ async def get_agenda_notification_topics_for_query_by_id(item, users):
 
 
 async def auto_enable_user_emails(
-    updates: Union[Topic, Dict[str, Any]],
-    original: Union[TopicResourceModel, Dict[str, Any]],
-    user: Optional[Union[User, Dict[str, Any]]],  # Allow user to be None
+    updates: Topic | dict[str, Any],
+    original: TopicResourceModel | dict[str, Any],
+    user: Optional[User | dict[str, Any]],
 ):
     if not updates.get("subscribers"):
         return
