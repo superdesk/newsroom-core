@@ -205,7 +205,7 @@ async def test_create_new_user_succeeds(app, client):
 async def test_new_user_fails_if_fields_not_provided(client):
     # Register a new account
     response = await client.post(
-        url_for("users.create"),
+        url_for("users_views.create"),
         form={
             "phone": "1234567",
         },

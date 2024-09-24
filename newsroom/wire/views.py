@@ -1,6 +1,7 @@
 import io
 import zipfile
 from inspect import iscoroutinefunction
+from newsroom.users.service import UsersService
 import superdesk
 
 from typing import Dict
@@ -40,12 +41,7 @@ from newsroom.utils import (
     get_links,
     get_items_for_user_action,
 )
-from newsroom.notifications import (
-    push_user_notification,
-    push_notification,
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import push_user_notification, push_notification, save_user_notifications
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.gettext import get_session_locale
 from newsroom.public.views import (
@@ -377,14 +373,22 @@ async def share():
     current_user = get_user(required=True)
     item_type = get_type()
     data = await get_json_or_400()
+
     assert data.get("users")
     assert data.get("items")
-    items = get_items_for_user_action(data.get("items"), item_type)
-    for user_id in data["users"]:
-        user = superdesk.get_resource_service("users").find_one(req=None, _id=user_id)
 
-        if not user or not user.get("email"):
+    users_service = UsersService()
+    items = get_items_for_user_action(data.get("items"), item_type)
+
+    for user_id in data["users"]:
+        user = await users_service.find_by_id(user_id)
+
+        if not user or not user.email:
             continue
+
+        assert user
+        user_dict = user.to_dict()
+
         template_kwargs = {
             "app_name": get_app_config("SITE_NAME"),
             "recipient": user,
@@ -394,20 +398,21 @@ async def share():
             "section": request.args.get("type", "wire"),
             "subject_name": items[0].get("headline") or items[0].get("name"),
         }
+
         if item_type == "agenda":
             template_kwargs["maps"] = data.get("maps") if get_app_config("GOOGLE_MAPS_KEY") else []
             template_kwargs["dateStrings"] = [get_agenda_dates(item) for item in items]
             template_kwargs["locations"] = [get_location_string(item) for item in items]
             template_kwargs["contactList"] = [get_public_contacts(item) for item in items]
             template_kwargs["linkList"] = [get_links(item) for item in items]
-            template_kwargs["is_admin"] = is_admin_or_internal(user)
+            template_kwargs["is_admin"] = is_admin_or_internal(user_dict)
 
-        save_user_notifications(
+        await save_user_notifications(
             [
-                UserNotification(
+                dict(
                     resource=item_type,
                     action="share",
-                    user=user["_id"],
+                    user=user.id,
                     item=items[0]["_id"],
                     data=dict(
                         shared_by=dict(
@@ -422,7 +427,7 @@ async def share():
         )
 
         await send_user_email(
-            user,
+            user_dict,
             template=f"share_{item_type}",
             template_kwargs=template_kwargs,
         )

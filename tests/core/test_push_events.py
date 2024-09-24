@@ -908,7 +908,7 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
-    notifications = get_user_notifications(user_id)
+    notifications = await get_user_notifications(user_id)
 
     # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
@@ -943,7 +943,7 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
-    notifications = get_user_notifications(user_id)
+    notifications = await get_user_notifications(user_id)
 
     # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
@@ -975,7 +975,7 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
-    notifications = get_user_notifications(user_id)
+    notifications = await get_user_notifications(user_id)
 
     # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
@@ -1012,7 +1012,7 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
-    notifications = get_user_notifications(user_id)
+    notifications = await get_user_notifications(user_id)
 
     # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
@@ -1066,7 +1066,7 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
-    notifications = get_user_notifications(user_id)
+    notifications = await get_user_notifications(user_id)
 
     # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
