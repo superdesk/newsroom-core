@@ -6,7 +6,7 @@ from bson import ObjectId
 
 from superdesk.utc import utcnow, utc_to_local
 from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule, NotificationQueue
-from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
+from newsroom.notifications.commands import SendScheduledNotificationEmails
 
 from newsroom.tests.users import ADMIN_USER_ID
 

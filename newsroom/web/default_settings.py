@@ -161,7 +161,7 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.company_admin",
     "newsroom.search",
-    "newsroom.notifications.send_scheduled_notifications",
+    "newsroom.notifications.commands",
 ]
 
 MODULES = [
@@ -461,7 +461,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
     },
     "newsroom:send_scheduled_notifications": {
-        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "task": "newsroom.notifications.commands.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
         "options": {"expires": 5 * 60 - 1},
     },
