@@ -5,9 +5,8 @@ from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from .cli import newsroom_cli
 
 
-@newsroom_cli.command("send_company_expiry_alerts")
-@with_appcontext
-def send_company_expiry_alerts():
+@newsroom_cli.register_async_command("send_company_expiry_alerts", with_appcontext=True)
+async def send_company_expiry_alerts():
     """
     Send expiry alerts for companies which are close to be expired (now + 7 days)
 
@@ -17,7 +16,7 @@ def send_company_expiry_alerts():
         $ python manage.py content_reset
 
     """
-    CompanyExpiryAlerts().send_alerts()
+    await CompanyExpiryAlerts().send_alerts()
 
 
 @newsroom_cli.command("send_monitoring_schedule_alerts")

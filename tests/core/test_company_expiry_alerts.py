@@ -1,19 +1,24 @@
-from superdesk.utc import utcnow
 import datetime
-from newsroom.company_expiry_alerts import CompanyExpiryAlerts
-from ..utils import post_json, mock_send_email
-from superdesk import get_resource_service
+
 from unittest import mock
+from bson import ObjectId
+from superdesk.utc import utcnow
+
+from newsroom.companies import CompanyServiceAsync
+from newsroom.company_expiry_alerts import CompanyExpiryAlerts
+
+from tests.core.utils import create_entries_for
+from ..utils import post_json, mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_company_expiry_alerts(client, app):
     now = utcnow()
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
-                "_id": "wont_expire",
+                "_id": ObjectId(),
                 "phone": "2132132134",
                 "sd_subscriber_id": "12345",
                 "name": "Press Co. Will Not Expire",
@@ -22,7 +27,7 @@ async def test_company_expiry_alerts(client, app):
                 "expiry_date": now + datetime.timedelta(days=9),
             },
             {
-                "_id": "will_expire",
+                "_id": ObjectId(),
                 "phone": "2132132134",
                 "sd_subscriber_id": "12345",
                 "name": "Press Co. That Will Expire",
@@ -39,9 +44,9 @@ async def test_company_expiry_alerts(client, app):
         {"company_expiry_alert_recipients": "admin@localhost.com, notanadmin@localhost.com"},
     )
 
-    companies = get_resource_service("companies").find({})
+    companies = await CompanyServiceAsync().search({})
     expiry_time = (now + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
-    assert companies.count() >= 2
+    assert (await companies.count()) >= 2
 
     with app.mail.record_messages() as outbox:
         async with app.app_context():

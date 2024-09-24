@@ -2,7 +2,7 @@ import base64
 import email.policy as email_policy
 
 from lxml import etree
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
 from typing_extensions import TypedDict
 
 from quart_babel import gettext
@@ -26,6 +26,10 @@ from newsroom.utils import (
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
+
+
+if TYPE_CHECKING:
+    from newsroom.users.model import UserResourceModel
 
 
 class NewsroomMessage(Message):
@@ -226,19 +230,23 @@ EmailKwargs = Dict[str, Any]
 TemplateKwargs = Dict[str, Any]
 
 
-# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel instead
+# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
 async def send_user_email(
-    user: User,
+    user: Union[User, "UserResourceModel"],
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
     **kwargs: EmailKwargs,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
+    if isinstance(user, UserResourceModel):
+        user = user.to_dict()
+
     if not user.get("receive_email") and not ignore_preferences:
         # If this is a user in the system, and has emails disabled
         # then skip this recipient
         return
+
     language = user.get("locale") or get_app_config("DEFAULT_LANGUAGE")
     timezone = get_user_timezone(user)
     await _send_localized_email([user["email"]], template, language, timezone, template_kwargs or {}, kwargs)
