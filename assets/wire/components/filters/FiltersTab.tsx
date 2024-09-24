@@ -22,6 +22,7 @@ import {
 } from '../../../agenda/actions';
 
 import {resultsFilteredSelector} from 'search/selectors';
+import {ICreatedFilter} from 'interfaces/search';
 
 class FiltersTab extends React.Component<any, any> {
     static propTypes: any;
@@ -83,7 +84,7 @@ class FiltersTab extends React.Component<any, any> {
         this.setState({activeFilter: currentFilters});
     }
 
-    setCreatedFilterAndSearch(createdFilter: any) {
+    setCreatedFilterAndSearch(createdFilter: ICreatedFilter) {
         const created = pickBy(
             assign(
                 cloneDeep(this.state.createdFilter),
@@ -91,15 +92,7 @@ class FiltersTab extends React.Component<any, any> {
             )
         );
 
-        this.setState({createdFilter: created}, () => {
-            const anyDefaultFilterExists = this.props.dateFilters?.some((filter: {
-                default: boolean, filter: string
-            }) => filter.default && filter.filter === createdFilter?.date_filter);
-            // If any default filter exists, trigger search
-            if (anyDefaultFilterExists) {
-                this.search();
-            }
-        });
+        this.setState({createdFilter: created});
     }
 
     getFilterGroups() {
@@ -141,6 +134,7 @@ class FiltersTab extends React.Component<any, any> {
         const {activeFilter, createdFilter} = this.state;
         const isResetActive = Object.keys(activeFilter).find((key: any) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key: any) => !isEmpty(createdFilter[key]));
+        const createdFilterChanged = !isEqual(createdFilter, this.props.createdFilter);
 
         return (
             <div className="d-contents">
@@ -155,7 +149,7 @@ class FiltersTab extends React.Component<any, any> {
                         />
                     ].concat(this.getFilterGroups().filter((group: any) => !!group))}
                 </div>
-                {!isResetActive && !this.props.resultsFiltered ? null : ([
+                {!isResetActive && !this.props.resultsFiltered && !createdFilterChanged ? null : ([
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>
 
                         <button

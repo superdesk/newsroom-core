@@ -8,7 +8,6 @@ export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
 const STATUS_KILLED = 'canceled';
 
-
 /**
  * Returns the item version as integer
  *

@@ -24,6 +24,7 @@ import {
     toggleNavigation,
 } from 'search/actions';
 
+import 'user-profile';
 
 let store: any;
 

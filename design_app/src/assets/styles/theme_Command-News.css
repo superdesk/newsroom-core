@@ -27,7 +27,7 @@
     --color-text-link--navbar: hsl(0, 0%, 100%);
     /* Logo main */
     --top-bar-logo-main-max-width: 224px;
-    --top-bar-logo-main-max-width--mobile: 200px;
+    --top-bar-logo-main-max-width--mobile: 160px;
     --top-bar-logo-main-margin-top: -9px;
     --top-bar-logo-main-margin-top--mobile: -6px;
     /* Logo additional */

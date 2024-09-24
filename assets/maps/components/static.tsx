@@ -1,12 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {getMapSource} from '../utils';
 import {gettext} from '../../utils';
 
+interface IProps {
+    scale?: number;
+    locations?: Array<any>;
+}
 
-class StaticMap extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface IState {
+    mapLoaded: boolean;
+}
+
+export default class StaticMap extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
         this.state = {
             mapLoaded: false
@@ -39,10 +45,3 @@ class StaticMap extends React.Component<any, any> {
         );
     }
 }
-
-StaticMap.propTypes = {
-    scale: PropTypes.number,
-    locations: PropTypes.arrayOf(PropTypes.object),
-};
-
-export default StaticMap;

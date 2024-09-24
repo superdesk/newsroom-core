@@ -4,6 +4,8 @@ import CompaniesApp from './components/CompaniesApp';
 import {initViewData, onURLParamsChanged} from './actions';
 import {render} from 'render-utils';
 
+import 'user-profile';
+
 const store = createStore(companyReducer, 'Company');
 
 if (window.viewData) {

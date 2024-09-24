@@ -223,9 +223,13 @@ def logout():
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
+# <<<<<<< HEAD
 async def signup():
+    if not get_app_config("SIGNUP_EMAIL_RECIPIENTS"):
+        abort(404)
     app = get_current_app().as_any()
     form = await (app.signup_form_class or SignupForm).create_form()
+
     if len(app.countries):
         form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
 

@@ -28,7 +28,6 @@
 
 {% if session.get('name') %}
     {{ javascript_tag('notifications_js') | safe }}
-    {{ javascript_tag('user_profile_js') | safe }}
 {% endif %}
 
 {% if get_setting('google_analytics') %}

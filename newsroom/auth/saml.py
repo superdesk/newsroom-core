@@ -38,6 +38,7 @@ SESSION_NAME_ID = "samlNameId"
 SESSION_SESSION_ID = "samlSessionIndex"
 SESSION_USERDATA_KEY = "samlUserdata"
 SESSION_SAML_CLIENT = "_saml_client"
+SAML_NAME_KEY = "http://schemas.microsoft.com/identity/claims/displayname"
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +84,21 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         if saml_data.get(saml_key):
             userdata[user_key] = saml_data[saml_key][0]  # type: ignore
 
+    if saml_data.get(SAML_NAME_KEY):
+        name_list = saml_data[SAML_NAME_KEY][0].split(" ")
+        userdata.setdefault("first_name", name_list[0])
+        userdata.setdefault(
+            "last_name", name_list[-1]
+        )  # this might be again first name, but we need something not empty
+
     # first we try to find company based on email domain
     domain = nameid.split("@")[-1]
     if domain:
         company = superdesk.get_resource_service("companies").find_one(req=None, auth_domains=domain)
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
@@ -97,6 +107,8 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         )
         if company is not None:
             userdata["company"] = company["_id"]
+            if not company.get("internal"):
+                userdata["user_type"] = "public"
 
     # last option is global env variable
     saml_company_config = get_app_config("SAML_COMPANY")

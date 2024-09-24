@@ -8,7 +8,7 @@ import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} 
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';
 import {getTopicUrl} from 'search/utils';
-import {IDateFilters} from 'interfaces/common';
+import {IDateFilter} from 'interfaces/common';
 
 export interface IProps {
     user: IUser;
@@ -35,7 +35,7 @@ export interface IProps {
 
     saveMyTopic?: (params: ISearchParams) => void;
     deselectMyTopic?: (topicId: ITopic['_id']) => void;
-    dateFilters?: IDateFilters;
+    dateFilters?: IDateFilter;
 }
 
 export function SearchResultTagsList({

@@ -38,6 +38,7 @@ def legacy_init_app(app: SuperdeskAsyncApp):
             "authentication": None,
             "mongo_prefix": MONGO_PREFIX,
             "internal_resource": True,
+            "mongo_indexes": {},
         },
     )
 

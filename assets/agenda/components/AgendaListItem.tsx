@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import {IAgendaItem, IItemAction, IListConfig, IUser} from 'interfaces';
+import {IAgendaItem, IAgendaListGroup, IItemAction, IListConfig, IUser} from 'interfaces';
 
 import ActionButton from 'components/ActionButton';
 import AgendaListItemIcons from './AgendaListItemIcons';
@@ -27,7 +27,7 @@ import {LabelGroup} from 'ui/components/LabelGroup';
 
 interface IProps {
     item: IAgendaItem;
-    group: string;
+    group: IAgendaListGroup;
     isActive: boolean;
     isSelected: boolean;
     isRead: boolean;
@@ -40,9 +40,9 @@ interface IProps {
     showShortcutActionIcons: boolean;
     listConfig: IListConfig;
 
-    onClick(item: IAgendaItem, group: string, planningId?: IAgendaItem['_id']): void;
-    onDoubleClick(item: IAgendaItem, group: string, planningId?: IAgendaItem['_id']): void;
-    onActionList(event: React.MouseEvent, item: IAgendaItem, group: string, plan?: IAgendaItem): void;
+    onClick(item: IAgendaItem, date: string, planningId?: IAgendaItem['_id']): void;
+    onDoubleClick(item: IAgendaItem, date: string, planningId?: IAgendaItem['_id']): void;
+    onActionList(event: React.MouseEvent, item: IAgendaItem, date: string, plan?: IAgendaItem): void;
     toggleSelected(): void;
     resetActioningItem(): void;
 }
@@ -83,11 +83,11 @@ class AgendaListItem extends React.Component<IProps> {
     }
 
     onArticleClick() {
-        this.props.onClick(this.props.item, this.props.group, this.props.planningId);
+        this.props.onClick(this.props.item, this.props.group.date, this.props.planningId);
     }
 
     onArticleDoubleClick() {
-        this.props.onDoubleClick(this.props.item, this.props.group, this.props.planningId);
+        this.props.onDoubleClick(this.props.item, this.props.group.date, this.props.planningId);
     }
 
     onMouseEnter() {
@@ -209,9 +209,9 @@ class AgendaListItem extends React.Component<IProps> {
                     if (segmentsRemainingToBeAdded > 0) {
                         paragraphsInnerText += paragraph.innerText;
                         paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
-    
+
                         segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
-    
+
                         descriptionHTMLArr.push(paragraph);
                     }
                 });
@@ -293,6 +293,14 @@ class AgendaListItem extends React.Component<IProps> {
             }
         })();
 
+        const renderTopStoryLabel = () => {
+            if (group.hiddenItems.includes(item._id) === false) {
+                return <TopStoryLabel item={item} config={listConfig} />;
+            } else {
+                return null;
+            }
+        };
+
         return (
             <article key={item._id}
                 className={classes.card}
@@ -305,7 +313,7 @@ class AgendaListItem extends React.Component<IProps> {
                 <div className={classes.wrap} tabIndex={0}>
                     <div className={classes.article} key="article">
                         <LabelGroup>
-                            <TopStoryLabel item={item} config={listConfig} />
+                            {renderTopStoryLabel()}
                             <ToBeConfirmedLabel item={item} />
                         </LabelGroup>
 
@@ -338,7 +346,7 @@ class AgendaListItem extends React.Component<IProps> {
 
                         <AgendaListItemIcons
                             item={item}
-                            group={group}
+                            group={group.date}
                             planningItem={planningItem}
                             isMobilePhone={isMobile}
                             user={this.props.user}
@@ -367,7 +375,7 @@ class AgendaListItem extends React.Component<IProps> {
                     item={this.props.item}
                     plan={planningItem}
                     user={this.props.user}
-                    group={this.props.group}
+                    group={this.props.group.date}
                     actions={this.props.actions}
                     onActionList={this.props.onActionList}
                     showActions={this.props.showActions}
@@ -418,7 +426,7 @@ class AgendaListItem extends React.Component<IProps> {
                         item={this.props.item}
                         plan={planningItem}
                         user={this.props.user}
-                        group={this.props.group}
+                        group={this.props.group.date}
                         actions={this.props.actions}
                         onActionList={this.props.onActionList}
                         showActions={this.props.showActions}

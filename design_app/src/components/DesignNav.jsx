@@ -10,6 +10,8 @@ function DesignNav() {
         { path: '/mytopics', title: 'My Topics' },
         { path: '/savetopic', title: 'Save Topic' },
         { path: '/mydashboard', title: 'My Dashboard' },
+        { path: '/login', title: 'Login' },
+        { path: '/drafts', title: 'Drafts' },
     ];
     
     return (        

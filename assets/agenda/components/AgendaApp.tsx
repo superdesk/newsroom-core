@@ -5,8 +5,8 @@ import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {getItemFromArray, gettext} from 'utils';
-import {noNavigationSelected} from 'search/utils';
+import {gettext} from 'utils';
+import {noNavigationSelected, searchParamsUpdated} from 'search/utils';
 
 import {
     fetchItems,
@@ -137,7 +137,7 @@ class AgendaApp extends SearchBase<any> {
             showTotalItems = showTotalLabel = true;
         }
 
-        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+        const showFilters = searchParamsUpdated(this.props.searchParams) ||
             this.props.activeTopic != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
             this.props.activeQuery != null ||
@@ -252,7 +252,12 @@ class AgendaApp extends SearchBase<any> {
                                             setQuery={this.props.setQuery}
                                             setSortQuery={this.props.setSortQuery}
                                             showSortDropdown={true}
-                                            defaultSortValue="_score"
+                                            sortOptions={[
+                                                {label: gettext('Date'), value: ''},
+                                                {label: gettext('Newest updates'), value: 'versioncreated:desc'},
+                                                {label: gettext('Oldest updates'), value: 'versioncreated:asc'},
+                                                {label: gettext('Relevance'), value: '_score'},
+                                            ]}
                                         />
                                     )
                                 }
@@ -428,6 +433,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query: any) => dispatch(setQuery(query)),
     setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
+    saveMyTopic: (params: any) => dispatch(saveMyTopic(params)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

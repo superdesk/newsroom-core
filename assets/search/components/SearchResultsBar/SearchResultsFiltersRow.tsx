@@ -163,6 +163,7 @@ function SearchResultsFiltersRow(props: IPropsAgendaExtended) {
                             ...searchParams.created,
                             from: null,
                             to: null,
+                            date_filter:null,
                         });
                     }}
                 />

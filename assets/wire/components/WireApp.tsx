@@ -5,8 +5,8 @@ import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
-import {getSingleFilterValue} from 'search/utils';
+import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
+import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 
 import {
     fetchItems,
@@ -132,7 +132,7 @@ class WireApp extends SearchBase<any> {
             );
         }
 
-        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+        const showFilters = searchParamsUpdated(this.props.searchParams) ||
             this.props.activeTopic != null ||
             this.props.activeProduct != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
@@ -339,7 +339,7 @@ WireApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
-    dateFilters: PropTypes.object,
+    dateFilters: PropTypes.arrayOf(PropTypes.object),
 };
 
 const mapStateToProps = (state: any) => ({
@@ -382,7 +382,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    followStory: (item: any) => followStory(item, 'wire'),
+    followStory: (item: any) => dispatch(followStory(item, 'wire')),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
