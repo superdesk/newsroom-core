@@ -50,6 +50,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Cheesy Stuff",
                 "query": "cheese",
@@ -62,6 +63,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Onions",
                 "query": "onions",
@@ -74,6 +76,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Company products",
                 "query": "*:*",
