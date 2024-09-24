@@ -2,12 +2,12 @@ import pytz
 import regex
 import superdesk
 from functools import reduce
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from uuid import uuid4
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import List, Dict, Any, Optional, Sequence, Union
+from typing import List, Dict, Any, Optional, Union
 from pymongo.cursor import Cursor as MongoCursor
 
 from bson import ObjectId
@@ -16,7 +16,7 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
-from superdesk.core.web import Request, Response
+from superdesk.core.web import Request
 from superdesk.core import json, get_current_app, get_app_config
 from superdesk.flask import abort, request, g, session, url_for
 from superdesk.utc import utcnow
@@ -147,17 +147,6 @@ async def get_json_or_400_async(req: Request):
     if not isinstance(data, dict):
         await req.abort(400)
     return data
-
-
-def success_response(data: Any, headers: Sequence = (), status_code: int = 200):
-    """
-    Shortcut to return a `superdesk.core.web.Response` with a
-    status_code 200 and empty headers by default
-    """
-    if isinstance(data, BaseModel):
-        data = data.model_dump(by_alias=True, exclude_unset=True)
-
-    return Response(data, status_code, headers)
 
 
 def parse_validation_error(error: ValidationError) -> dict[str, str]:

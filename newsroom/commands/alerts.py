@@ -1,5 +1,3 @@
-from quart.cli import with_appcontext
-
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from .cli import newsroom_cli
@@ -19,9 +17,8 @@ async def send_company_expiry_alerts():
     await CompanyExpiryAlerts().send_alerts()
 
 
-@newsroom_cli.command("send_monitoring_schedule_alerts")
-@with_appcontext
-def send_monitoring_schedule_alerts():
+@newsroom_cli.register_async_command("send_monitoring_schedule_alerts", with_appcontext=True)
+async def send_monitoring_schedule_alerts():
     """
     Send monitoring schedule alerts.
 
@@ -31,12 +28,11 @@ def send_monitoring_schedule_alerts():
         $ python manage.py send_monitoring_schedule_alerts
 
     """
-    MonitoringEmailAlerts().run()
+    await MonitoringEmailAlerts().run()
 
 
-@newsroom_cli.command("send_monitoring_immediate_alerts")
-@with_appcontext
-def send_monitoring_immediate_alerts():
+@newsroom_cli.register_async_command("send_monitoring_immediate_alerts", with_appcontext=True)
+async def send_monitoring_immediate_alerts():
     """
     Send monitoring immediate alerts.
 
@@ -46,4 +42,4 @@ def send_monitoring_immediate_alerts():
         $ python manage.py send_monitoring_immediate_alerts
 
     """
-    MonitoringEmailAlerts().run(True)
+    await MonitoringEmailAlerts().run(True)

@@ -59,21 +59,21 @@ class CompanyExpiryAlerts:
         companies_service = CompanyServiceAsync()
 
         companies_cursor = await companies_service.search({"expiry_date": {"$lte": expiry_time}, "is_enabled": True})
-        companies = await companies_cursor.to_list_raw()
 
         if (await companies_cursor.count()) > 0:
             users_service = UsersService()
+            companies = await companies_cursor.to_list_raw()
 
             # Send notifications to users who are nominated to receive expiry alerts
             for company in companies:
-                users_cursor = await users_service.search({"company": company.id, "expiry_alert": True})
+                users_cursor = await users_service.search({"company": company["_id"], "expiry_alert": True})
 
                 if (await users_cursor.count()) > 0:
                     template_kwargs = {
-                        "expiry_date": company.expiry_date,
-                        "expires_on": company.expiry_date.strftime("%d-%m-%Y"),
+                        "expiry_date": company["expiry_date"],
+                        "expires_on": company["expiry_date"].strftime("%d-%m-%Y"),
                     }
-                    logger.info(f"{self.log_msg} Sending to following users of company {company.name}: {recipients}")
+                    logger.info(f"{self.log_msg} Sending to following users of company {company['name']}: {recipients}")
 
                     async for user in users_cursor.to_list():
                         await send_user_email(

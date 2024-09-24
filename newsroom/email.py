@@ -3,6 +3,7 @@ import email.policy as email_policy
 
 from lxml import etree
 from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
+from pydantic import BaseModel
 from typing_extensions import TypedDict
 
 from quart_babel import gettext
@@ -239,7 +240,7 @@ async def send_user_email(
     **kwargs: EmailKwargs,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
-    if isinstance(user, UserResourceModel):
+    if isinstance(user, BaseModel):
         user = user.to_dict()
 
     if not user.get("receive_email") and not ignore_preferences:

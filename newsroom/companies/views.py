@@ -13,12 +13,7 @@ from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.types import AuthProviderConfig
-from newsroom.utils import (
-    get_public_user_data,
-    query_resource,
-    get_json_or_400_async,
-    success_response,
-)
+from newsroom.utils import get_public_user_data, query_resource, get_json_or_400_async
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs
@@ -147,7 +142,7 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     updates = get_company_updates(request_json, original)
     await service.update(args.company_id, updates)
 
-    return success_response({"success": True})
+    return Response({"success": True})
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])
