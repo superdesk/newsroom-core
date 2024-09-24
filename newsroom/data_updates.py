@@ -96,36 +96,13 @@ def get_data_updates_files(strip_file_extension=False):
     return files
 
 
-class DataUpdateCommand(superdesk.Command):
+class DataUpdateCommand:
     """Parent class for Upgrade and Downgrade commands.
 
     It defines options and initialize some variables in `run` method.
     """
 
-    option_list = [
-        superdesk.Option(
-            "--id",
-            "-i",
-            dest="data_update_id",
-            required=False,
-            choices=get_data_updates_files(strip_file_extension=True),
-            help="Data update id to run last",
-        ),
-        superdesk.Option(
-            "--fake-init",
-            dest="fake",
-            required=False,
-            action="store_true",
-            help="Mark data updates as run without actually running them",
-        ),
-        superdesk.Option(
-            "--dry-run",
-            dest="dry",
-            required=False,
-            action="store_true",
-            help="Does not mark data updates as done. This can be useful for development.",
-        ),
-    ]
+    # TODO-ASYNC: revisit when `data_updates` module is migrated to async
 
     def get_applied_updates(self):
         req = ParsedRequest()
@@ -262,7 +239,7 @@ class Downgrade(DataUpdateCommand):
             print("No data update to apply.")
 
 
-class GenerateUpdate(superdesk.Command):
+class GenerateUpdate:
     """Generate a file where to define a new data update.
 
     Example:
@@ -271,24 +248,6 @@ class GenerateUpdate(superdesk.Command):
         $ python manage.py data:generate_update --resource=archive
 
     """
-
-    option_list = [
-        superdesk.Option(
-            "--resource",
-            "-r",
-            dest="resource_name",
-            required=True,
-            help="Resource to update",
-        ),
-        superdesk.Option(
-            "--global",
-            "-g",
-            dest="global_update",
-            required=False,
-            action="store_true",
-            help="This data update belongs to superdesk core",
-        ),
-    ]
 
     def run(self, resource_name, global_update=False):
         timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -317,11 +276,6 @@ class GenerateUpdate(superdesk.Command):
             }
             f.write(Template(DATA_UPDATE_TEMPLATE).substitute(template_context))
             print("Data update file created %s" % (data_update_filename))
-
-
-superdesk.command("data:generate_update", GenerateUpdate())
-superdesk.command("data:upgrade", Upgrade())
-superdesk.command("data:downgrade", Downgrade())
 
 
 class DataUpdate:
