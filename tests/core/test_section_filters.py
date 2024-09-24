@@ -2,14 +2,15 @@ from bson import ObjectId
 from quart import json
 from pytest import fixture
 
-from newsroom.tests.users import test_login_succeeds_for_admin
 from tests import utils
+from tests.core.utils import create_entries_for
+from newsroom.tests.users import test_login_succeeds_for_admin
 
 
 @fixture(autouse=True)
-async def init(app):
-    collection = app.async_app.mongo.get_collection_async("section_filters")
-    collection.insert_many(
+async def init():
+    await create_entries_for(
+        "section_filters",
         [
             {
                 "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
@@ -21,7 +22,7 @@ async def init(app):
     )
 
 
-async def test_filter_list_fails_for_anonymous_user(app, anonymous_user, public_user):
+async def test_filter_list_fails_for_anonymous_user(app, public_user):
     async with app.test_client() as client:
         res = await client.get("/section_filters/search", follow_redirects=False)
         assert res.status_code == 302
@@ -106,15 +107,15 @@ async def test_delete_product(client):
     assert data[0]["name"] == "Breaking"
 
 
-async def test_gets_all_products(client, app):
+async def test_gets_all_products(client):
     await test_login_succeeds_for_admin(client)
 
-    collection = app.async_app.mongo.get_collection_async("section_filters")
-
     for i in range(250):
-        collection.insert_many(
+        await create_entries_for(
+            "section_filters",
             [
                 {
+                    "_id": ObjectId(),
                     "name": "Sport-%s" % i,
                     "description": "Top level sport product",
                     "is_enabled": True,

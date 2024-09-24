@@ -226,6 +226,7 @@ EmailKwargs = Dict[str, Any]
 TemplateKwargs = Dict[str, Any]
 
 
+# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel instead
 async def send_user_email(
     user: User,
     template: str,

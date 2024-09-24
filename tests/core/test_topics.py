@@ -134,7 +134,7 @@ async def test_share_wire_topics(client, app):
             },
         )
 
-        assert resp.status_code == 201, resp.get_data().decode("utf-8")
+        assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
@@ -162,7 +162,7 @@ async def test_share_agenda_topics(client, app):
             },
         )
 
-        assert resp.status_code == 201, resp.get_data().decode("utf-8")
+        assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"

@@ -13,12 +13,7 @@ from newsroom.decorator import login_required
 from newsroom.auth import get_user, get_user_id
 from newsroom.topics.topics_async import get_user_topics as _get_user_topics, auto_enable_user_emails
 from newsroom.utils import get_json_or_400, get_entity_or_404
-from newsroom.notifications import (
-    push_user_notification,
-    push_company_notification,
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import push_user_notification, push_company_notification, save_user_notifications
 from .topics_async import topic_endpoints, TopicService
 from newsroom.users.service import UsersService
 from newsroom.users.utils import get_user_or_abort
@@ -217,9 +212,9 @@ async def share(args: RouteArguments, params: None, request: Request):
 
         topic_url = await get_topic_url(topic)
         if current_user:
-            save_user_notifications(
+            await save_user_notifications(
                 [
-                    UserNotification(
+                    dict(
                         user=user["_id"],
                         action="share",
                         resource="topic",

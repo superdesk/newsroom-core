@@ -39,7 +39,7 @@ from newsroom.template_filters import (
     format_event_datetime,
 )
 from newsroom.template_loaders import LocaleTemplateLoader
-from newsroom.notifications.notifications import get_initial_notifications
+from newsroom.notifications import get_initial_notifications
 
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery

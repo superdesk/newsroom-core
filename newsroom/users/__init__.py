@@ -4,7 +4,10 @@ from quart_babel import lazy_gettext
 from inspect import iscoroutine
 
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service
+from .service import UsersService
 from .module import module  # noqa
+
+__all__ = ["UsersService"]
 
 
 def init_app(app):
