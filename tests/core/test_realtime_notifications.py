@@ -46,10 +46,11 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
         updates = {"navigations": [navigations[0]["_id"]]}
         app.data.update("products", product["_id"], updates, product)
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Cheesy Stuff",
                 "query": "cheese",
@@ -62,6 +63,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Onions",
                 "query": "onions",
@@ -74,6 +76,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": user.id,
                 "label": "Company products",
                 "query": "*:*",
@@ -143,10 +146,11 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_realtime_notifications_agenda(app, mocker):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Cheesy Stuff",
                 "query": "cheese",
@@ -162,6 +166,7 @@ async def test_realtime_notifications_agenda(app, mocker):
                 },
             },
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Onions",
                 "query": "onions",
@@ -174,6 +179,7 @@ async def test_realtime_notifications_agenda(app, mocker):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "Test",
                 "query": "cheese",
@@ -186,6 +192,7 @@ async def test_realtime_notifications_agenda(app, mocker):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Should not match anything",
                 "query": None,
@@ -350,10 +357,11 @@ async def test_pause_notifications(app, mocker, company_products):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "All wire",
                 "query": "*:*",
@@ -366,6 +374,7 @@ async def test_pause_notifications(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "All agenda",
                 "query": "*:*",

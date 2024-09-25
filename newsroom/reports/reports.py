@@ -33,6 +33,8 @@ def get_company_saved_searches():
     company_topics = defaultdict(int)
     companies = get_entity_dict(query_resource("companies"))
     users = get_entity_dict(query_resource("users"))
+
+    # TODO-Async:- update when this reports resource convert to async
     topics = query_resource("topics")
 
     for topic in topics:
@@ -60,6 +62,8 @@ def get_user_saved_searches():
     user_topics = defaultdict(int)
     companies = get_entity_dict(query_resource("companies"))
     users = get_entity_dict(query_resource("users"))
+
+    # TODO-Async:- update when this reports resource convert to async
     topics = query_resource("topics")
 
     for topic in topics:

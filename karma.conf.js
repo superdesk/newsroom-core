@@ -19,8 +19,8 @@ module.exports = function(config) {
         webpack: {
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
-            plugins: webpackConfig.plugins.filter((plugin) => plugin instanceof webpack.ProvidePlugin),
             devtool: 'inline-source-map',
+            mode: 'development',
         },
 
         webpackMiddleware: {
@@ -28,7 +28,7 @@ module.exports = function(config) {
         },
 
         reporters: ['dots'],
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'webpack'],
         browsers: ['ChromeHeadless'],
 
         // Allow typescript files

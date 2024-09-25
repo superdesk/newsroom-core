@@ -2,6 +2,8 @@ from quart import session as server_session
 
 from newsroom.wire.views import get_home_data
 from newsroom.tests.fixtures import PUBLIC_USER_ID
+from tests.core.utils import create_entries_for
+from bson import ObjectId
 
 
 async def test_personal_dashboard_data(client, app, company_products):
@@ -13,10 +15,10 @@ async def test_personal_dashboard_data(client, app, company_products):
         assert user
 
         topics = [
-            {"name": "label", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
+            {"_id": ObjectId(), "label": "fooo", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
         ]
 
-        app.data.insert("topics", topics)
+        await create_entries_for("topics", topics)
 
         app.data.update(
             "users",

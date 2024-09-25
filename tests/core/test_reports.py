@@ -3,6 +3,7 @@ from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
 from newsroom.tests.fixtures import COMPANY_1_ID
+from tests.core.utils import create_entries_for
 
 
 @fixture(autouse=True)
@@ -11,7 +12,7 @@ async def init(app):
         "users",
         [
             {
-                "_id": "u-1",
+                "_id": ObjectId("5cc94454bc43165c045ffec0"),
                 "email": "foo@foo.com",
                 "first_name": "Foo",
                 "last_name": "Smith",
@@ -19,14 +20,14 @@ async def init(app):
                 "company": COMPANY_1_ID,
             },
             {
-                "_id": "u-2",
+                "_id": ObjectId("5cc94454bc43165c045ffec1"),
                 "email": "bar@bar.com",
                 "first_name": "Bar",
                 "last_name": "Brown",
                 "is_enabled": True,
             },
             {
-                "_id": "u-3",
+                "_id": ObjectId("5cc94454bc43165c045ffec2"),
                 "email": "baz@bar.com",
                 "first_name": "Bar",
                 "last_name": "Brown",
@@ -80,15 +81,32 @@ async def init(app):
 
 
 async def test_company_saved_searches(client, app):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-2"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-3"},
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec0",
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec1",
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec2",
+            },
         ],
     )
-
     resp = await client.get("reports/company-saved-searches")
     report = json.loads(await resp.get_data())
     assert report["name"] == "Saved searches per company"
@@ -98,12 +116,30 @@ async def test_company_saved_searches(client, app):
 
 
 async def test_user_saved_searches(client, app):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-2"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec0"),
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec1"),
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec0"),
+            },
         ],
     )
 
@@ -169,3 +205,24 @@ async def test_companies(client):
     assert report["results"][0]["name"] == "Example 2 Company"
     assert report["results"][1]["name"] == "Example Company"
     assert report["results"][2]["name"] == "Paper Co."
+
+
+async def test_content_activity_csv(client):
+    today = datetime.now().date()
+    resp = await client.get(
+        "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
+            today.isoformat(), today.isoformat()
+        )
+    )
+    assert 200 == resp.status_code
+
+    report = await resp.get_data(as_text=True)
+    lines = report.splitlines()
+    assert len(lines) > 1
+
+    fields = lines[0].split(",")
+    assert "Headline" == fields[1]
+
+    values = lines[1].split(",")
+    assert "Amazon Is Opening More Bookstores" == values[1]
+    assert "0" == values[-1]

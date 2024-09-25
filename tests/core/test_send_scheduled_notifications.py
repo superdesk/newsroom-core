@@ -9,6 +9,8 @@ from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule, 
 from newsroom.notifications.commands import SendScheduledNotificationEmails
 
 from newsroom.tests.users import ADMIN_USER_ID
+from tests.core.utils import create_entries_for
+from newsroom.topics.topics_async import TopicService
 
 
 def test_convert_schedule_times():
@@ -94,17 +96,22 @@ def test_get_queue_entries_for_section():
 
 async def test_get_latest_item_from_topic_queue(app):
     user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
-    topic_id = app.data.insert(
+    topic_ids = await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "label": "Cheesy Stuff",
                 "query": "cheese",
                 "topic_type": "wire",
             }
         ],
-    )[0]
-    topic: Topic = app.data.find_one("topics", req=None, _id=topic_id)
+    )
+    topic_id = topic_ids[0]
+    topic = await TopicService().find_by_id(topic_id)
+    if topic:
+        topic_dict = topic.model_dump(by_alias=True)
+
     app.data.insert(
         "items",
         [
@@ -126,7 +133,7 @@ async def test_get_latest_item_from_topic_queue(app):
     }
 
     command = SendScheduledNotificationEmails()
-    item = command._get_latest_item_from_topic_queue(topic_queue, topic, user, None, set())
+    item = command._get_latest_item_from_topic_queue(topic_queue, topic_dict, user, None, set())
 
     assert item["_id"] == "topic1_item1"
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["body_html"][0]
@@ -135,22 +142,27 @@ async def test_get_latest_item_from_topic_queue(app):
 
 async def test_get_topic_entries_and_match_table(app):
     user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
-    topic_ids: List[ObjectId] = app.data.insert(
+    topic_ids: List[ObjectId] = await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "label": "Cheesy Stuff",
                 "query": "cheese",
                 "topic_type": "wire",
             },
             {
+                "_id": ObjectId(),
                 "label": "Onions",
                 "query": "onions",
                 "topic_type": "wire",
             },
         ],
     )
-    user_topics: Dict[ObjectId, Topic] = {topic["_id"]: topic for topic in app.data.find_all("topics")}
+    topics = await TopicService().search(lookup={})
+    if topics:
+        topics_list = await topics.to_list_raw()
+    user_topics: Dict[ObjectId, Topic] = {topic["_id"]: topic for topic in topics_list}
     app.data.insert(
         "items",
         [

@@ -17,6 +17,7 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
         await super().on_create(docs)
         for doc in docs:
             doc.original_creator = get_user_id()
+            doc.version_creator = get_user_id()
 
     async def on_update(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         await super().on_update(updates, original)

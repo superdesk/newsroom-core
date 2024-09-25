@@ -165,3 +165,27 @@ hr.dashed {
 }
 
 
+// FONT SIZE
+.text-xs {
+    font-size: var(--text-size--x-small) !important; // 10px;
+}
+.text-sm {
+    font-size: var(--text-size--small) !important; // 12px;
+}
+.text-md {
+    font-size: var(--text-size--medium) !important; // 14px;
+}
+.text-lg {
+    font-size: var(--text-size--large) !important; // 16px;
+}
+.text-xl {
+    font-size: var(--text-size--x-large) !important; // 20px;
+}
+.text-2xl {
+    font-size: var(--text-size--xx-large) !important; // 24px;
+}
+.text-3xl {
+    font-size: var(--text-size--xxx-large) !important; // 32px;
+}
+
+

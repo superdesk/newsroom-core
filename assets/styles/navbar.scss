@@ -424,6 +424,7 @@
     margin-inline: var(--top-bar-nav-brand-margin-x);
     padding-inline-start: var(--top-bar-nav-brand-padding-x);
     border-inline-start: 1px var(--top-bar-nav-brand-border-type) var(--top-bar-nav-brand-border-color);
+    overflow: hidden;
     @include phone {
         padding-inline: 0;
         border-inline-start: none;
@@ -431,12 +432,27 @@
         .breadcrumb-sub-item {
             display: none;
         }
+        .breadcrumb-item {
+            font-size: var(--text-size--small) !important;
+        }
+        .navbar__title {
+            font-size: var(--text-size--medium);
+        }
     }
     nav {
         display: flex;
         width: 100%;
         align-items: center;
     }
+}
+.navbar__title {
+    font-size: var(--text-size--large);
+    color: var(--top-bar-color-fg);
+    line-height: 1;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .navbar__right {
     display: flex;

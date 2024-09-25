@@ -23,7 +23,7 @@ from newsroom.celery_app import celery
 from superdesk.lock import lock, unlock
 
 from newsroom.notifications import push_notification, save_user_notifications, NotificationQueueService
-from newsroom.topics.topics import (
+from newsroom.topics.topics_async import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
 )
@@ -86,36 +86,42 @@ async def push():
     assert "guid" in item or "_id" in item, {"guid": 1}
     assert "type" in item, {"type": 1}
 
-    app = get_current_app()
-    signals.push.send(app.as_any(), item=item)
+    lock_name = f"push-{item.get('guid') or item.get('_id')}"
+    if not lock(lock_name, expire=60):
+        return abort(503)
+    try:
+        app = get_current_app()
+        signals.push.send(app.as_any()._get_current_object(), item=item)
 
-    if item.get("type") == "event":
-        orig = app.data.find_one("agenda", req=None, _id=item["guid"])
-        _id = publish_event(item, orig)
-        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
-    elif item.get("type") == "planning":
-        orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
-        item["planning_date"] = parse_date_str(item["planning_date"])
-        plan_id = publish_planning_item(item, orig)
-        event_id = publish_planning_into_event(item)
-        # Prefer parent Event when sending notificaitons
-        _id = event_id or plan_id
-        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
-    elif item.get("type") == "text":
-        orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
-        item["_id"] = publish_item(item, orig)
-        if not item.get("nextversion"):
-            notify_new_wire_item.delay(
-                item["_id"], check_topics=orig is None or get_app_config("WIRE_NOTIFICATIONS_ON_CORRECTIONS")
-            )
-    elif item["type"] == "planning_featured":
-        publish_planning_featured(item)
-    else:
-        abort(400, gettext("Unknown type {}".format(item.get("type"))))
+        if item.get("type") == "event":
+            orig = app.data.find_one("agenda", req=None, _id=item["guid"])
+            _id = publish_event(item, orig)
+            notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
+        elif item.get("type") == "planning":
+            orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
+            item["planning_date"] = parse_date_str(item["planning_date"])
+            plan_id = publish_planning_item(item, orig)
+            event_id = publish_planning_into_event(item)
+            # Prefer parent Event when sending notificaitons
+            _id = event_id or plan_id
+            notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
+        elif item.get("type") == "text":
+            orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
+            item["_id"] = publish_item(item, orig)
+            if not item.get("nextversion"):
+                notify_new_wire_item.delay(
+                    item["_id"], check_topics=orig is None or get_app_config("WIRE_NOTIFICATIONS_ON_CORRECTIONS")
+                )
+        elif item["type"] == "planning_featured":
+            publish_planning_featured(item)
+        else:
+            abort(400, gettext("Unknown type {}".format(item.get("type"))))
 
-    if get_app_config("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
-        delete_dashboard_caches()
-    return jsonify({})
+        if get_app_config("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
+            delete_dashboard_caches()
+        return jsonify({})
+    finally:
+        unlock(lock_name)
 
 
 def set_dates(doc):
@@ -276,8 +282,10 @@ def publish_event(event, orig):
             updates["coverages"] = None
             updates["planning_items"] = None
 
-        elif event.get("state") == WORKFLOW_STATE.SCHEDULED:
-            # event is reposted (possibly after a cancel)
+        elif parse_date_str(event.get("versioncreated")) > orig.get(
+            "versioncreated"
+        ):  # event is reposted (possibly after a cancel)
+            logger.info("Updating event %s", orig["_id"])
             updates = {
                 "event": event,
                 "version": event.get("version", event.get(VERSION)),
@@ -288,6 +296,9 @@ def publish_event(event, orig):
             }
 
             set_agenda_metadata_from_event(updates, event, False)
+
+        else:
+            logger.info("Ignoring event %s", orig["_id"])
 
         if updates:
             updated = orig.copy()
@@ -438,6 +449,7 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     agenda["definition_short"] = event.get("definition_short")
     agenda["definition_long"] = event.get("definition_long")
     agenda["version"] = event.get("version")
+    agenda["versioncreated"] = event.get("versioncreated")
     agenda["calendars"] = event.get("calendars")
     agenda["location"] = event.get("location")
     agenda["ednote"] = event.get("ednote")
@@ -920,7 +932,7 @@ async def send_user_notification_emails(item, user_matches, users, section):
 
 
 async def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
-    topics = get_topics_with_subscribers("wire")
+    topics = await get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
     )
@@ -933,7 +945,7 @@ async def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[Obj
 
 
 async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
-    topics = get_topics_with_subscribers("agenda")
+    topics = await get_topics_with_subscribers("agenda")
     topic_matches = superdesk.get_resource_service("agenda").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
     )
@@ -942,7 +954,7 @@ async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[O
     topic_matches.extend(
         [
             topic
-            for topic in get_agenda_notification_topics_for_query_by_id(item, users_dict)
+            for topic in await get_agenda_notification_topics_for_query_by_id(item, users_dict)
             if topic.get("_id") not in topic_matches
         ]
     )

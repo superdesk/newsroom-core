@@ -14,7 +14,8 @@ from newsroom.agenda import blueprint
 from newsroom.auth.utils import check_user_has_products
 from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
+from newsroom.topics import get_user_topics
+from newsroom.topics_folders import get_company_folders, get_user_folders
 from newsroom.navigations import get_navigations
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
@@ -129,7 +130,7 @@ async def search():
 
 async def get_view_data() -> Dict:
     user = get_user_required()
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     company = get_company(user)
     products = get_products_by_company(company, product_type="agenda") if company else []
 
@@ -153,8 +154,8 @@ async def get_view_data() -> Dict:
         "ui_config": await ui_config_service.get_section_config("agenda"),
         "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
-        "user_folders": get_user_folders(user, "agenda") if user else [],
-        "company_folders": get_company_folders(company, "agenda") if company else [],
+        "user_folders": await get_user_folders(user, "agenda") if user else [],
+        "company_folders": await get_company_folders(company, "agenda") if company else [],
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
     }
 

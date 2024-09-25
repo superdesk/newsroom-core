@@ -7,7 +7,6 @@ version: 2
 updates:
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
-    versioning-strategy: widen
     schedule:
       interval: "weekly"
       
@@ -15,3 +14,12 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "webpack"
+        versions: [">=5.0.0"]
+      - dependency-name: "webpack-dev-server"
+        versions: [">=5.0.0"]
+      - dependency-name: "css-loader"
+        versions: [">=6.0.0"]
+      - dependency-name: "style-loader"
+        versions: [">=2.0.0"]

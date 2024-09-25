@@ -3,6 +3,7 @@ import {render} from 'render-utils';
 import sectionFiltersReducer from './reducers';
 import SectionFiltersApp from './components/SectionFiltersApp';
 import {initViewData} from './actions';
+import 'user-profile';
 
 
 const store = createStore(sectionFiltersReducer, 'SectionFilters');

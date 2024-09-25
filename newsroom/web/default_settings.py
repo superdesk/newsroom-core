@@ -120,7 +120,6 @@ BLUEPRINTS = [
     "newsroom.design",
     "newsroom.history",
     "newsroom.push",
-    "newsroom.topics",
     "newsroom.products",
     "newsroom.reports",
     "newsroom.public",
@@ -171,10 +170,12 @@ MODULES = [
     "newsroom.companies",
     "newsroom.assets",
     "newsroom.users",
+    "newsroom.topics",
     "newsroom.section_filters",
     "newsroom.cards.module",
     "newsroom.navigations",
     "newsroom.notifications",
+    "newsroom.topics_folders",
 ]
 
 SITE_NAME = "Newshub"
@@ -395,6 +396,7 @@ CLIENT_CONFIG = {
         },
     },
     "agenda_sort_events_with_coverage_on_top": False,
+    "collapsed_search_by_default": False,
 }
 
 # Enable rendering of the date in the base view

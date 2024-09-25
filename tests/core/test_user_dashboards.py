@@ -3,11 +3,14 @@ import tests.utils as utils
 
 from newsroom.wire.views import get_personal_dashboards_data
 from datetime import datetime
+from tests.core.utils import create_entries_for
 
 
 async def test_user_dashboards(app, client, public_user, public_company, company_products):
-    topics = [{"label": "test", "user": public_user["_id"], "query": "bar"}]
-    app.data.insert("topics", topics)
+    topics = [
+        {"_id": bson.ObjectId(), "label": "test", "user": public_user["_id"], "query": "bar", "topic_type": "agenda"}
+    ]
+    await create_entries_for("topics", topics)
 
     app.data.remove("products")
     products = [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]

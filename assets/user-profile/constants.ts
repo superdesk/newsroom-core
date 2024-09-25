@@ -1,0 +1,1 @@
+export const WIRE_TOPIC_FOLDERS_UPDATED = 'reload-wire-folders';

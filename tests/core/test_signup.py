@@ -95,7 +95,8 @@ async def test_new_user_signup_sends_email(app, client):
     }
 
 
-async def test_new_user_signup_fails_if_fields_not_provided(client):
+async def test_new_user_signup_fails_if_fields_not_provided(client, app):
+    app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     # Register a new account
     response = await client.post(
         url_for("auth.signup"),
@@ -219,3 +220,15 @@ async def test_approve_company_and_users(app, client):
         assert outbox[0].recipients == ["jane@doe.org"]
         assert outbox[0].subject == "Newshub account created"
         assert auth_user["token"] in outbox[0].body
+
+
+async def test_signup_not_enabled_without_config(client, app):
+    app.config["SIGNUP_EMAIL_RECIPIENTS"] = ""
+
+    response = await client.get(url_for("auth.signup"))
+    assert response.status_code == 404
+
+    app.config["SIGNUP_EMAIL_RECIPIENTS"] = "foo"
+
+    response = await client.get(url_for("auth.signup"))
+    assert response.status_code == 200

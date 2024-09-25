@@ -13,7 +13,7 @@ from newsroom.types import User, NotificationSchedule, Company, Topic
 from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.email import send_user_email
 from newsroom.celery_app import celery
-from newsroom.topics.topics import get_user_id_to_topic_for_subscribers, TopicNotificationType
+from newsroom.topics.topics_async import get_user_id_to_topic_for_subscribers, NotificationType
 from newsroom.gettext import get_session_timezone, set_session_timezone
 
 from .services import NotificationQueueService, NotificationsService
@@ -51,9 +51,7 @@ class SendScheduledNotificationEmails:
             now_utc = utcnow().replace(second=0, microsecond=0)
             companies = get_company_dict(False)
             users = get_user_dict(False)
-
-            # TODO-ASYNC: Update once topic's PR gets merged
-            user_topic_map = get_user_id_to_topic_for_subscribers(TopicNotificationType.SCHEDULED.value)
+            user_topic_map = await get_user_id_to_topic_for_subscribers(NotificationType.SCHEDULED)
 
             schedules_cursor = await notification_queue_service.search({})
             schedules = await schedules_cursor.to_list()

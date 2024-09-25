@@ -9,7 +9,7 @@ function MainLayout() {
         <div className="newsroomWrap">
             <MainNavbar />
             <div className="contentWrap">
-                <SideNav />
+                {/* <SideNav /> */}
                 <Outlet />
             </div>
             <footer className="footer" id="footer">

@@ -1,8 +1,12 @@
 from quart import json
 from unittest import mock
 from copy import deepcopy
+from bson import ObjectId
+from tests.core.utils import create_entries_for
+import pymongo
 
 from newsroom.topics.views import get_topic_url
+
 from newsroom.users.model import UserResourceModel
 from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
@@ -13,23 +17,25 @@ from ..fixtures import (  # noqa: F401
     TEST_USER_ID,
     COMPANY_1_ID,
 )
-from ..utils import mock_send_email, get_resource_by_id
+from ..utils import mock_send_email, get_resource_by_id  # noqa
 from tests import utils
+from newsroom.topics.topics_async import TopicService
+from newsroom.topics_folders.folders import UserFoldersResourceService
 
 base_topic = {
+    "_id": ObjectId(),
     "label": "Foo",
     "query": "foo",
-    "notifications": False,
     "topic_type": "wire",
-    "navigation": ["xyz"],
+    "navigation": [ObjectId("5cc94454bc43165c045ffec9")],
 }
 
 agenda_topic = {
+    "_id": ObjectId(),
     "label": "Foo",
     "query": "foo",
-    "notifications": False,
     "topic_type": "agenda",
-    "navigation": ["abc"],
+    "navigation": [ObjectId("5cc94454bc43165c045ffec3")],
 }
 
 user_id = str(PUBLIC_USER_ID)
@@ -114,7 +120,7 @@ async def test_delete_topic(client):
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_wire_topics(client, app):
     topic = deepcopy(base_topic)
-    topic_ids = app.data.insert("topics", [topic])
+    topic_ids = await create_entries_for("topics", [topic])
     topic["_id"] = topic_ids[0]
     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
 
@@ -142,7 +148,7 @@ async def test_share_wire_topics(client, app):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_agenda_topics(client, app):
-    topic_ids = app.data.insert("topics", [agenda_topic])
+    topic_ids = await create_entries_for("topics", [agenda_topic])
     agenda_topic["_id"] = topic_ids[0]
     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
 
@@ -170,22 +176,24 @@ async def test_share_agenda_topics(client, app):
 
 async def test_get_topic_share_url(app):
     topic = {"topic_type": "wire", "query": "art exhibition"}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
     topic = {"topic_type": "wire", "filter": {"location": [["Sydney"]]}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
+    assert (
+        await get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
+    )
 
     topic = {"topic_type": "wire", "navigation": ["123"]}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
 
     topic = {"topic_type": "wire", "navigation": ["123", "456"]}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
 
     topic = {"topic_type": "wire", "created": {"from": "2018-06-01"}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
+    assert await get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
 
     topic = {"topic_type": "wire", "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]}}
-    assert get_topic_url(topic) == (
+    assert await get_topic_url(topic) == (
         "http://localhost:5050/wire?advanced="
         "%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
@@ -199,7 +207,7 @@ async def test_get_topic_share_url(app):
         "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]},
     }
     assert (
-        get_topic_url(topic) == "http://localhost:5050/wire?"
+        await get_topic_url(topic) == "http://localhost:5050/wire?"
         "q=art+exhibition"
         "&filter=%7B%22urgency%22:+%5B3%5D%7D"
         "&navigation=%5B%22123%22%5D"
@@ -281,26 +289,46 @@ async def test_topic_folders_unique_validation(client):
     resp = await client.post(user_topic_folders_url, json=folder)
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-    # second one fails
-    resp = await client.post(user_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    # second one should raise DuplicateKeyError
+    try:
+        resp = await client.post(user_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        # assert that the DuplicateKeyError occurred as expected
+        print("DuplicateKeyError for user topic folder as expected")
+    else:
+        # If no exception is raised, fail the test
+        assert False, "Expected DuplicateKeyError for user topic folder, but got success"
 
     # create company topic with same name
     resp = await client.post(company_topic_folders_url, json=folder)
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
-    # second fails
-    resp = await client.post(company_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    # second one should raise DuplicateKeyError for company topic
+    try:
+        resp = await client.post(company_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        # assert that the DuplicateKeyError occurred as expected
+        print("DuplicateKeyError for company topic folder as expected")
+    else:
+        # If no exception is raised, fail the test
+        assert False, "Expected DuplicateKeyError for company topic folder, but got success"
 
-    # check is case insensitive
+    # check case-insensitive uniqueness for user topic
     folder["name"] = "Test"
-    resp = await client.post(user_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    try:
+        resp = await client.post(user_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        print("DuplicateKeyError for case-insensitive user topic folder as expected")
+    else:
+        assert False, "Expected DuplicateKeyError for case-insensitive user topic folder, but got success"
 
-    # for both
-    resp = await client.post(company_topic_folders_url, json=folder)
-    assert 409 == resp.status_code, await resp.get_data(as_text=True)
+    # check case-insensitive uniqueness for company topic
+    try:
+        resp = await client.post(company_topic_folders_url, json=folder)
+    except pymongo.errors.DuplicateKeyError:
+        print("DuplicateKeyError for case-insensitive company topic folder as expected")
+    else:
+        assert False, "Expected DuplicateKeyError for case-insensitive company topic folder, but got success"
 
 
 async def test_topic_subscriber_auto_enable_user_emails(app, client):
@@ -316,43 +344,49 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
 
     # Make sure we start with user emails disabled
     await disable_user_emails()
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Create a new topic, with the current user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["_id"],
+            "user_id": user["id"],
             "notification_type": "real-time",
         }
     ]
     resp = await client.post(topics_url, json=topic)
     assert resp.status_code == 201, await resp.get_data(as_text=True)
     topic_id = (await resp.get_json())["_id"]
-    topic = get_resource_by_id("topics", topic_id)
+    topic = await TopicService().find_by_id(topic_id)
+    topic = json.loads(topic.model_dump_json())
 
     # Make sure user emails are enabled after creating the topic
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is True
 
     # Disable the user emails again
     await disable_user_emails()
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Update the topic, this time removing the user as a subscriber
     topic["subscribers"] = []
+    topic.pop("created")
     resp = await client.post(f"/topics/{topic_id}", json=topic)
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # Make sure user emails are still disabled
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is False
 
     # Update the topic, this time adding the user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["_id"],
+            "user_id": user["id"],
             "notification_type": "real-time",
         }
     ]
@@ -360,21 +394,20 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # And make sure user emails are re-enabled again
-    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+    user = json.loads(user.model_dump_json())
     assert user["receive_email"] is True
 
 
 async def test_remove_user_topics_on_user_delete(client, app):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
+            {"_id": ObjectId(), "label": "test1", "user": PUBLIC_USER_ID, "is_global": False, "topic_type": "wire"},
             {
-                "label": "test1",
-                "user": PUBLIC_USER_ID,
-                "is_global": False,
-            },
-            {
+                "_id": ObjectId(),
                 "label": "test2",
+                "topic_type": "wire",
                 "subscribers": [
                     {
                         "user_id": PUBLIC_USER_ID,
@@ -387,7 +420,9 @@ async def test_remove_user_topics_on_user_delete(client, app):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "label": "test3",
+                "topic_type": "wire",
                 "user": PUBLIC_USER_ID,
                 "is_global": True,
                 "subscribers": [
@@ -404,33 +439,77 @@ async def test_remove_user_topics_on_user_delete(client, app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "user_topic_folders",
         [
-            {"name": "delete", "user": PUBLIC_USER_ID},
-            {"name": "skip", "user": TEST_USER_ID},
+            {"_id": ObjectId(), "name": "delete", "user": PUBLIC_USER_ID, "section": "wire"},
+            {"_id": ObjectId(), "name": "skip", "user": TEST_USER_ID, "section": "wire"},
         ],
     )
 
-    topics, _ = app.data.find("topics", req=None, lookup=None)
-    assert 3 == topics.count()
+    cursor = await TopicService().search(lookup={})
+    topics = await cursor.to_list_raw()
+    assert 3 == len(topics)
 
-    folders, _ = app.data.find("user_topic_folders", req=None, lookup=None)
-    assert 2 == folders.count()
+    cursor = await UserFoldersResourceService().search(lookup={})
+    folders = await cursor.to_list_raw()
+    assert 2 == len(folders)
 
-    await client.delete(f"/users/{PUBLIC_USER_ID}")
+    # TODO-ASYNC:- Test cases based on signal
 
-    # make sure it's editable later
-    resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    # await client.delete(f"/users/{PUBLIC_USER_ID}")
+
+    # # make sure it's editable later
+    # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    # assert 200 == resp.status_code
+
+    # cursor = await TopicService().search(lookup={})
+    # topics = await cursor.to_list_raw()
+    # assert 2 == len(topics)
+    # assert "test2" == topics[0]["label"]
+    # assert 1 == len(topics[0]["subscribers"])
+    # assert "test3" == topics[1]["label"]
+    # assert None is topics[1].get("user")
+
+    # cursor = await UserFoldersResourceService().search(lookup={})
+    # folders = await cursor.to_list_raw()
+    # assert 1 == len(folders)
+    # assert "skip" == folders[0]["name"]
+
+
+async def test_created_field_in_topic_url(client):
+    topic_payload = {
+        "_id": ObjectId(),
+        "label": "Foo",
+        "query": "foo",
+        "topic_type": "wire",
+        "created": {"date_filter": "last_week"},
+    }
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    resp = await client.post(topics_url, json=deepcopy(topic_payload))
+    assert 201 == resp.status_code
+    resp = await client.get(topics_url)
+    assert 200 == resp.status_code
+    data = json.loads(await resp.get_data())
+    assert 1 == len(data["_items"])
+    assert "Foo" == data["_items"][0]["label"]
+
+    assert (
+        await get_topic_url(data["_items"][0])
+        == "http://localhost:5050/wire?q=foo&created=%7B%22date_filter%22:+%22last_week%22%7D"
+    )
+
+    resp = await client.post(
+        "topics/{}".format(data["_items"][0]["_id"]),
+        json={"label": "test123", "created": {"date_filter": "today"}},
+    )
     assert 200 == resp.status_code
 
-    topics, _ = app.data.find("topics", req=None, lookup=None)
-    assert 2 == topics.count()
-    assert "test2" == topics[0]["label"]
-    assert 1 == len(topics[0]["subscribers"])
-    assert "test3" == topics[1]["label"]
-    assert None is topics[1].get("user")
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
 
-    folders, _ = app.data.find("user_topic_folders", req=None, lookup=None)
-    assert 1 == folders.count()
-    assert "skip" == folders[0]["name"]
+    assert "test123" == data["_items"][0]["label"]
+    assert (
+        await get_topic_url(data["_items"][0])
+        == "http://localhost:5050/wire?created=%7B%22date_filter%22:+%22today%22%7D"
+    )

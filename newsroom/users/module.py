@@ -19,7 +19,7 @@ users_resource_config = ResourceConfig(
                 keys=[("email", 1)],
                 unique=True,
                 collation={"locale": "en", "strength": 2},
-            )
+            ),
         ],
     ),
 )

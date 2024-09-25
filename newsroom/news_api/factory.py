@@ -134,7 +134,8 @@ class NewsroomNewsAPI(BaseNewsroomApp):
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(Exception, base_exception_error)
 
-    def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
+    # TODO-ASYNC: Method signature removed in `develop` branch, investigate
+    def settings_app(self, *args, **kwargs):
         pass
 
 

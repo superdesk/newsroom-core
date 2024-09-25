@@ -15,6 +15,7 @@ from flask_mail import Mail
 from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
 from pydantic import ValidationError
+from eve.io.mongo import ensure_mongo_indexes
 
 from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -295,3 +296,8 @@ class BaseNewsroomApp(SuperdeskEve):
             if "localhost" in self.config["CLIENT_URL"] or self.debug:
                 return "testing"
         return "production"
+
+    def init_indexes(self):
+        for resource in self.config["DOMAIN"]:
+            ensure_mongo_indexes(self, resource)
+        self.async_app.mongo.create_indexes_for_all_resources()

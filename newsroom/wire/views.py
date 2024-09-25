@@ -26,7 +26,8 @@ from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, admin_only, section, clear_session_and_redirect_to_login
-from newsroom.topics import get_user_topics, get_user_folders, get_company_folders
+from newsroom.topics import get_user_topics
+from newsroom.topics_folders import get_user_folders, get_company_folders
 from newsroom.email import get_language_template_name, send_user_email
 from newsroom.utils import (
     get_entity_or_404,
@@ -92,10 +93,10 @@ def set_item_permission(item, permitted=True):
 async def get_view_data() -> Dict:
     user = get_user_required()
     company = get_company(user)
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     company_id = str(user["company"]) if user and user.get("company") else None
-    user_folders = get_user_folders(user, "wire") if user else []
-    company_folders = get_company_folders(company, "wire") if company else []
+    user_folders = await get_user_folders(user, "wire") if user else []
+    company_folders = await get_company_folders(company, "wire") if company else []
     products = get_products_by_company(company, product_type="wire") if company else []
     ui_config_service = UiConfigResourceService()
 
@@ -185,7 +186,7 @@ async def get_home_data():
     company = get_company(user)
     cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
     company_id = str(user["company"]) if user and user.get("company") else None
-    topics = get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user["_id"]) if user else []
     ui_config_service = UiConfigResourceService()
 
     return {

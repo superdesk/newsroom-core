@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import Field
 from typing import Annotated, List, Optional
+from dataclasses import asdict
 
 from newsroom.user_roles import UserRole
 from newsroom.companies.companies_async import CompanyProduct
@@ -22,6 +23,9 @@ class Dashboard:
     name: str
     type: str
     topic_ids: Annotated[list[ObjectIdField], validate_data_relation_async("topics")]
+
+    def to_dict(self):
+        return asdict(self)
 
 
 @dataclass
