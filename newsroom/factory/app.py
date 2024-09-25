@@ -300,3 +300,4 @@ class BaseNewsroomApp(SuperdeskEve):
     def init_indexes(self):
         for resource in self.config["DOMAIN"]:
             ensure_mongo_indexes(self, resource)
+        self.async_app.mongo.create_indexes_for_all_resources()
