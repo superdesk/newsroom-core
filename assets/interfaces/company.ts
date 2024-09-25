@@ -1,4 +1,4 @@
-import {TDatetime} from './common';
+import {IResourceItem, TDatetime} from './common';
 import {IUser} from './user';
 
 export interface IAuthProvider {
@@ -17,8 +17,7 @@ export interface IService {
     code: string;
 }
 
-export interface ICompany {
-    _id: string;
+export interface ICompany extends IResourceItem {
     name: string;
     url?: string;
     sd_subscriber_id?: string;
@@ -48,4 +47,5 @@ export interface ICompany {
     }>;
     auth_domains?: Array<string>;
     auth_provider?: IAuthProvider['_id']; // if not defined, system assumes a value of 'newshub'
+    internal?: boolean;
 }

@@ -97,7 +97,7 @@ $nav-sidebar-border: #323847;
 
 label {
     color: var(--color-text--muted);
-    font-size: 14px;
+    font-size: var(--text-size--medium);
 }
 label:not(.label--no-spacing) {
     margin-block-end: 0.3rem;
@@ -113,6 +113,7 @@ label:not(.label--no-spacing) {
 
 
 .alertify-notifier {
+    z-index: 1000000001 !important;
     .ajs-message {
         border: none;
         border-radius: var(--ajs-message-border-radius);
@@ -375,7 +376,7 @@ body.print {
     }
 
     @include phone {
-        padding: 0 2px;    
+        padding: 0 2px;
         overflow-y: hidden;
     }
     @include md {
@@ -431,7 +432,7 @@ body.print {
             line-height: var(--navbar-height--mobile);
             text-align: center;
             background-color: var(--sidenav-color-item-bg);
-            
+
             @include md {
                 width: var(--sidenav-item-width);
                 min-height: var(--navbar-height);
@@ -1220,7 +1221,7 @@ article.list {
         }
     }
     &.nh-collapsible-panel--open {
-        
+
         .nh-collapsible-panel__caret {
             transform: rotate(90deg);
         }
@@ -2828,7 +2829,7 @@ article.list {
             width: 12px;
             position: absolute;
             inset-block-end: -4px;
-            inset-inline-end: -4px; 
+            inset-inline-end: -4px;
             box-shadow: 0 0 0 2px var(--content-list-item-color-bg);
             background-repeat: no-repeat;
             background-size: 100%;
@@ -4376,7 +4377,20 @@ article.list {
 }
 
 .nh-login-page__content { // login page background color
+    flex-grow: 1;
     background-color: var(--login-page-color-bg);
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    overflow: auto;
+
+    .card--login {
+        width: 100%;
+        max-width: 640px;
+    }
+
 }
 .login-logo {
     padding-inline: var(--login-logo-padding--inline);

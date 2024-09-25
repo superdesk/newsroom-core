@@ -258,6 +258,8 @@ def export_csv(args, results):
             if action_name in actions:
                 row.append((aggs.get("actions") or {}).get(action_name, 0))
 
+        rows.append(row)
+
     return rows
 
 

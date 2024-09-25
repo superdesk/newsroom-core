@@ -109,7 +109,15 @@ def get_company_updates(data, original=None):
     }
 
     # "seats" are not in CompanyResource
-    for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
+    for field in [
+        "sections",
+        "archive_access",
+        "events_only",
+        "restrict_coverage_info",
+        "products",
+        "seats",
+        "internal",
+    ]:
         if field in data:
             updates[field] = data[field]
 

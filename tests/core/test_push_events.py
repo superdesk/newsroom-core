@@ -86,6 +86,7 @@ test_event: Dict[str, Any] = {
     },
     "source": "Test",
     "language": "en-CA",
+    "versioncreated": "2018-05-16T11:24:20+0000",
 }
 
 test_planning = {
@@ -230,7 +231,7 @@ async def test_push_updated_event(client, app):
     await client.post("/push", json=event)
 
     # update comes in
-    event["state"] = "rescheduled"
+    event["versioncreated"] = "2024-07-10T10:00:00+0000"
     event["dates"] = {
         "start": "2018-05-27T08:00:00+0000",
         "end": "2018-06-30T09:00:00+0000",
@@ -254,6 +255,7 @@ async def test_push_updated_event_dates_flags(client, app):
     # update comes in
     event["dates"]["no_end_time"] = True
     event["dates"].pop("all_day")
+    event["versioncreated"] = "2024-07-10T10:00:00+0000"
 
     await client.post("/push", json=event)
 

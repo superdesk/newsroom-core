@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
 
-import {gettext} from 'utils';
+import {COLLAPSED_SEARCH_BY_DEFAULT, gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
 import {getAdvancedSearchFields} from '../../utils';
 import {
@@ -17,12 +17,19 @@ import {
     clearAdvancedSearchParams,
     resetFilter,
     deselectMyTopic,
+    saveMyTopic,
 } from '../../actions';
 
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
-import {IDateFilters} from 'interfaces/common';
+import {IDateFilter} from 'interfaces/common';
+import {ToolTip} from 'ui/components/ToolTip';
+
+interface ISortOption {
+    label: string;
+    value: ISearchSortValue;
+}
 
 interface IReduxStoreProps {
     user: IUser;
@@ -44,16 +51,20 @@ interface IDispatchProps {
     resetFilter(): void;
 }
 
-function getSortValueLabel(sortValue: ISearchSortValue): string {
-    switch (sortValue) {
-    case 'versioncreated:desc':
-        return gettext('Newest first');
-    case 'versioncreated:asc':
-        return gettext('Oldest first');
-    case '_score':
-        return gettext('Relevance');
-    }
-}
+const defaultSortOptions: ISortOption[] = [
+    {
+        value: '', // versioncreated:desc is default
+        label: gettext('Newest first'),
+    },
+    {
+        value: 'versioncreated:asc',
+        label: gettext('Oldest first'),
+    },
+    {
+        value: '_score',
+        label: gettext('Relevance'),
+    },
+];
 
 interface IOwnProps {
     initiallyOpen?: boolean;
@@ -66,20 +77,19 @@ interface IOwnProps {
     activeTopic: ITopic;
     topicType: ITopic['topic_type'];
     saveMyTopic?: (params: ISearchParams) => void;
-    defaultSortValue?: ISearchSortValue;
+    sortOptions?: ISortOption[];
 
     refresh(): void;
     onClearAll?(): void;
     setQuery(query: string): void;
     setSortQuery(query: ISearchSortValue): void;
-    dateFilters?: IDateFilters
+    dateFilters?: IDateFilter
 }
 
 type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
 
 interface IState {
     isTagSectionShown: boolean;
-    sortValue: ISearchSortValue;
 }
 
 
@@ -96,9 +106,9 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
+
         this.state = {
-            isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
-            sortValue: this.props.defaultSortValue ?? 'versioncreated:desc',
+            isTagSectionShown: COLLAPSED_SEARCH_BY_DEFAULT === true ? false : (this.props.initiallyOpen || this.topicNotNull),
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -173,11 +183,9 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
     render() {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
-        const sortValues: Array<ISearchSortValue> = [
-            'versioncreated:desc',
-            'versioncreated:asc',
-            '_score',
-        ];
+
+        const sortOptions = this.props.sortOptions || defaultSortOptions;
+        const selectedSortOption = sortOptions.find((option) => option.value === (this.props.searchParams.sortQuery || ''));
 
         return (
             <React.Fragment>
@@ -201,21 +209,20 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                 {this.props.showSortDropdown !== true ? null : (
                                     <Dropdown
                                         label={gettext('Sort by:')}
-                                        value={getSortValueLabel(this.state.sortValue)}
+                                        value={selectedSortOption?.label}
                                         className={'sorting-dropdown'}
                                         dropdownMenuHeader={gettext('Sort results by')}
                                     >
-                                        {sortValues.map((sortValue) => (
+                                        {sortOptions.map((sortOption) => (
                                             <button
-                                                key={sortValue}
+                                                key={sortOption.value}
                                                 type="button"
                                                 className="dropdown-item"
                                                 onClick={() => {
-                                                    this.setSortQuery(sortValue);
-                                                    this.setState({sortValue: sortValue});
+                                                    this.setSortQuery(sortOption.value);
                                                 }}
                                             >
-                                                {getSortValueLabel(sortValue)}
+                                                {sortOption.label}
                                             </button>
                                         ))}
                                     </Dropdown>
@@ -230,19 +237,26 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                 >
                                     {gettext('Clear All')}
                                 </button>
-                                <button
-                                    data-test-id="toggle-search-bar"
-                                    onClick={this.toggleTagSection}
-                                    className="icon-button icon-button--tertiary icon-button--bordered"
-                                >
-                                    <i className={classNames(
-                                        'icon--arrow-right',
-                                        {
-                                            'icon--collapsible-open': isTagSectionShown,
-                                            'icon--collapsible-closed': !isTagSectionShown,
+                                <ToolTip key={`${isTagSectionShown}--state`} placement="left">
+                                    <button
+                                        title={
+                                            isTagSectionShown
+                                                ? gettext('Hide search terms')
+                                                : gettext('Show search terms')
                                         }
-                                    )} />
-                                </button>
+                                        data-test-id="toggle-search-bar"
+                                        onClick={this.toggleTagSection}
+                                        className="icon-button icon-button--tertiary icon-button--bordered"
+                                    >
+                                        <i className={classNames(
+                                            'icon--arrow-right',
+                                            {
+                                                'icon--collapsible-open': isTagSectionShown,
+                                                'icon--collapsible-closed': !isTagSectionShown,
+                                            }
+                                        )} />
+                                    </button>
+                                </ToolTip>
                             </div>
                         </div>
                     )}
@@ -297,6 +311,7 @@ const mapDispatchToProps = {
     clearAdvancedSearchParams,
     deselectMyTopic,
     resetFilter,
+    saveMyTopic,
 };
 
 export const SearchResultsBar = connect<

@@ -77,6 +77,7 @@ class CompaniesResource(newsroom.Resource):
         "auth_provider": {"type": "string"},
         "company_size": {"type": "string"},
         "referred_by": {"type": "string"},
+        "internal": {"type": "boolean", "default": False},
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}

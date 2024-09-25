@@ -8,6 +8,7 @@ import AgendaApp from './components/AgendaApp';
 import {fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem} from './actions';
 import {setView} from 'search/actions';
 import {render} from 'render-utils';
+import 'user-profile';
 
 const store = createStore<IAgendaState>(agendaReducer, 'Agenda');
 

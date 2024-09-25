@@ -7,6 +7,8 @@ function Home() {
         { path: '/', title: 'Home' },
         { path: '/settings', title: 'Settings' },
         { path: '/wire', title: 'Wire' },
+        { path: '/login', title: 'Login' },
+        { path: '/drafts', title: 'Drafts' },
     ];
     
     return (

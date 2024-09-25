@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
+import format from 'date-fns/format';
 
 import ExpiryButtonWrapper from './ExpiryButtonWrapper';
 
@@ -63,7 +64,7 @@ export default class ExpiryDateInput extends React.Component<any, any> {
 
     onDateChange(newExpiry: any) {
         this.setState({value: 'on'});
-        this.props.onChange(newExpiry.format('YYYY-MM-DD'));
+        this.props.onChange(format(newExpiry, 'yyyy-MM-dd'));
     }
 
     render() {
@@ -89,11 +90,11 @@ export default class ExpiryDateInput extends React.Component<any, any> {
                         dropdownMode="select"
                         disabled={this.state.value === 'never'}
                         customInput={<ExpiryButtonWrapper />}
-                        dateFormat="DD MMMM YYYY"
+                        dateFormat="dd MMMM yyyy"
                         todayButton={gettext('Today')}
-                        selected={this.props.value ? moment(this.props.value) : moment()}
+                        selected={(this.props.value ? moment(this.props.value) : moment()).toDate()}
                         onChange={this.onDateChange}
-                        highlightDates={[moment()]}
+                        highlightDates={[moment().toDate()]}
                         locale={window.locale || 'en'}
                         minDate={new Date()}
                         popperModifiers={[

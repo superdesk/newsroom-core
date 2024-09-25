@@ -375,7 +375,7 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             }
         }
 
-        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '_score') === '_score' ?
+        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '') === '' ?
             groupItems(items, minDate, maxDate, activeGrouping, featuredOnly) :
             [{
                 date: '',

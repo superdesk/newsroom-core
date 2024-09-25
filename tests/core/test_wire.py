@@ -1022,3 +1022,17 @@ async def test_date_filters_query(client, app):
         ] == _set_search_query(
             ADMIN_USER_ID, {"date_filter": "custom_date", "created_from": "2024-06-20", "created_to": "2024-06-23"}
         )
+
+
+async def test_bookmark_old_items(client, public_user, company_products):
+    await login(client, public_user)
+    resp = await client.get("/wire/search")
+    assert 200 == resp.status_code
+    assert len((await resp.get_json())["_items"])
+
+    resp = await client.post("/wire_bookmark", json={"items": ["tag:foo", "tag:out-of-default-range"]})
+    assert 200 == resp.status_code
+
+    resp = await client.get("/wire/search?bookmarks={}".format(public_user["_id"]))
+    assert resp.status_code == 200
+    assert 2 == len((await resp.get_json())["_items"])

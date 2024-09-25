@@ -19,7 +19,7 @@ import {IArticle, IUser} from 'interfaces';
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
-import {IDateFilters} from 'interfaces/common';
+import {IDateFilter} from 'interfaces/common';
 
 moment.locale(getLocale());
 window.moment = moment;
@@ -71,6 +71,7 @@ export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
 export const AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP = getConfig('agenda_sort_events_with_coverage_on_top', false);
+export const COLLAPSED_SEARCH_BY_DEFAULT = getConfig('collapsed_search_by_default', false);
 export const DISPLAY_AUTHOR_ROLE = getConfig('display_author_role', true);
 export const DISPLAY_AGENDA_FEATURED_STORIES_ONLY = getConfig('display_agenda_featured_stories_only', true);
 export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
@@ -170,7 +171,7 @@ export function getProductQuery(product: any) {
  * @param {Boolean} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString: any, ignoreTimezone: any = false) {
+export function parseDate(dateString: any, ignoreTimezone?: boolean) {
     const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
 
     parsed.locale(getLocale());
@@ -283,8 +284,8 @@ export function formatTime(dateString: any) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDate(dateString: any) {
-    return parseDate(dateString).format(DATE_FORMAT);
+export function formatDate(dateString: any, ignoreTimezone?: boolean) {
+    return parseDate(dateString, ignoreTimezone).format(DATE_FORMAT);
 }
 
 /**
@@ -697,10 +698,10 @@ export function getCreatedSearchParamLabel(created: any, dateFilters: any = null
             };
         }
     } else if (created.from) {
-        const value = dateFilters?.find((filter: IDateFilters) => filter?.query == created?.from);
+        const value = dateFilters?.find((filter: IDateFilter) => filter?.query == created?.from);
         return value && value.name ? {relative: value?.name} : {from: formatDate(created.from)};
     } else if (created.date_filter){
-        const value = dateFilters?.find((filter: IDateFilters) => filter?.filter == created?.date_filter);
+        const value = dateFilters?.find((filter: IDateFilter) => filter?.filter == created?.date_filter);
         return {relative: value?.name};
     }
 
@@ -751,4 +752,26 @@ export function getSubscriptionTimesString(user: IUser): string {
         time3: timeStrings[2],
         timezone: timezoneAbbreviation,
     });
+}
+
+// Returns the number of seconds since epoch for the given ISO date string
+export function parseISODate(date?: string): number {
+    return date ? Date.parse(date) : NaN;
+}
+
+// Will return number of seconds since epoch for today at 00:00:00
+function getTodayTimestamp(): number {
+    return (new Date()).setUTCHours(0, 0, 0, 0);
+}
+
+export function notificationsArePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom <= today && pausedTo >= today;
+}
+
+export function notificationsWillBePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom > today && pausedTo > today;
 }

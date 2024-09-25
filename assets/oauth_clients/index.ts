@@ -3,6 +3,7 @@ import {render} from 'render-utils';
 import clientReducer from './reducers';
 import ClientsApp from './components/ClientsApp';
 import {initViewData} from './actions';
+import 'user-profile';
 
 const store = createStore(clientReducer, 'oauth_clients');
 

@@ -1,5 +1,5 @@
-import {ITopic} from 'interfaces';
-import {get} from 'lodash';
+import {ISearchParams, ITopic} from 'interfaces';
+import {get, isEmpty} from 'lodash';
 import {getConfig} from 'utils';
 
 export const noNavigationSelected = (activeNavigation: any) => (
@@ -57,4 +57,15 @@ export function getAdvancedSearchFields(context: any) {
 
 export function getTopicUrl(topic: ITopic) {
     return `/${topic.topic_type}?topic=${topic._id}`;
+}
+
+export function searchParamsUpdated(searchParams: ISearchParams): boolean {
+    return (
+        searchParams.query != null ||
+        searchParams.navigation != null && searchParams.navigation.length > 0 || 
+        searchParams.product != null ||
+        Object.values(searchParams.advanced || {}).some((val) => !isEmpty(val)) ||
+        Object.values(searchParams.created || {}).some((val) => !isEmpty(val)) ||
+        Object.values(searchParams.filter || {}).some((val) => !isEmpty(val))
+    );
 }
