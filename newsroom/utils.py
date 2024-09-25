@@ -149,17 +149,6 @@ async def get_json_or_400_async(req: Request):
     return data
 
 
-def success_response(data: Any, headers: Sequence = (), status_code: int = 200):
-    """
-    Shortcut to return a `superdesk.core.web.Response` with a
-    status_code 200 and empty headers by default
-    """
-    if isinstance(data, BaseModel):
-        data = data.model_dump(by_alias=True, exclude_unset=True)
-
-    return Response(data, status_code, headers)
-
-
 def parse_validation_error(error: ValidationError) -> dict[str, str]:
     """
     Parses pydantic model validation error and returns a key -> value dict from it

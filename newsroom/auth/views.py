@@ -179,7 +179,7 @@ async def get_login_token():
         user_dict = {}
         user = await UsersService().find_by_id(user["_id"])
         if user:
-            user_dict = user.model_dump(by_alias=True)
+            user_dict = user.to_dict()
 
         company = get_company_from_user(user_dict)
 
@@ -392,7 +392,7 @@ async def impersonate_user():
     assert user_id
     user = await UsersService().find_by_id(user_id)
     assert user
-    start_user_session(user.model_dump(by_alias=True))
+    start_user_session(user.to_dict())
     return redirect(url_for("wire.index"))
 
 
@@ -401,7 +401,7 @@ async def impersonate_user():
 async def impersonate_stop():
     assert session.get("auth_user")
     user = await UsersService().find_by_id(session.get("auth_user"))
-    start_user_session(user.model_dump(by_alias=True))
+    start_user_session(user.to_dict())
     session.pop("auth_user")
     return redirect(url_for("settings.settings_app", app_id="users"))
 

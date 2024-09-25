@@ -44,6 +44,6 @@ def create_user(email, password, first_name, last_name, is_admin):
     else:
         print("Creating user...")
         run_async_to_sync(UsersService().create([new_user]))
-        print("User created successfully %s" % (new_user.model_dump(by_alias=True, exclude_unset=True)))
+        print("User created successfully %s" % (new_user.to_dict()))
 
     return new_user
