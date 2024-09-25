@@ -51,6 +51,9 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
             _id=ObjectId(),
             user=current_user.id,
             company=current_user.company,
+            # `_created` needs to be set otherwise there is a clash given `TopicResourceModel` and
+            # the base `ResourceModel` both have the same member (`created`). Without this
+            # `created_filter` does not get converted/saved
             _created=utcnow(),
         )
     )
