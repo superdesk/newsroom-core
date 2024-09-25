@@ -38,6 +38,8 @@ def fix_topic_nested_filters():
 
     try:
         group_configs = _get_nested_search_group_configs()
+
+        # TODO-ASYNC: adjust once topics PR is merged
         topics_service = get_resource_service("topics")
 
         search_value_to_nested_group: Dict[str, str] = {}
@@ -126,6 +128,7 @@ def _get_attribute_value_from_name(search_config: SearchGroupNestedConfig, searc
             "source": json.dumps({"query": {"bool": {"filter": [{"term": {f"{parent_field}.name": search_value}}]}}}),
             "size": 1,
         }
+        # TODO-ASYNC: revisit once "wire_search" and "agenda" are migrated
         response = get_resource_service(resource).internal_get(req=req, lookup={})
 
         if not response.count():

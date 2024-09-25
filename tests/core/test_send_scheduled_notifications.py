@@ -65,7 +65,7 @@ def test_get_queue_entries_for_section():
         ],
     }
 
-    entries = command._get_queue_entries_for_section(queue, "wire")
+    entries = command.get_queue_entries_for_section(queue, "wire")
     assert entries == [
         {
             "topic_id": topic3_id,
@@ -81,7 +81,7 @@ def test_get_queue_entries_for_section():
         },
     ]
 
-    entries = command._get_queue_entries_for_section(queue, "agenda")
+    entries = command.get_queue_entries_for_section(queue, "agenda")
     assert entries == [
         {
             "topic_id": topic2_id,
