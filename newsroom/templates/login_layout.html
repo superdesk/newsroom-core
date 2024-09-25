@@ -80,7 +80,7 @@
             <div class="d-flex align-items-center">
                 {% if config.SHOW_USER_REGISTER %}
                 <span>{{ gettext("Don't have an account?") }}</span>
-                <a class="link" href="{{ url_fr('auth.signup') }}">{{ gettext('Sign up') }}</a>
+                <a class="link" href="{{ url_for('auth.signup') }}">{{ gettext('Sign up') }}</a>
                 {% endif %}
             </div>
         </div>
