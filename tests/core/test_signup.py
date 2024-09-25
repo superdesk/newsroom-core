@@ -205,7 +205,7 @@ async def test_approve_company_and_users(app, client):
 
     # Approve the new User
     with app.mail.record_messages() as outbox:
-        response = await client.post(url_for("users.approve_user", user_id=str(new_user["_id"])))
+        response = await client.post(url_for("users_views.approve_user", user_id=str(new_user["_id"])))
         assert response.status_code == 200
 
         # Test the new User is now enabled and approved, but not yet validated

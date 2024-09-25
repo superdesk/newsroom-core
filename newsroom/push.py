@@ -22,11 +22,7 @@ from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
 from superdesk.lock import lock, unlock
 
-from newsroom.notifications import (
-    push_notification,
-    save_user_notifications,
-    UserNotification,
-)
+from newsroom.notifications import push_notification, save_user_notifications, NotificationQueueService
 from newsroom.topics.topics import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
@@ -894,9 +890,9 @@ async def notify_user_matches(
         if not users_ids:
             return
 
-        save_user_notifications(
+        await save_user_notifications(
             [
-                UserNotification(
+                dict(
                     user=user,
                     item=item["_id"],
                     resource=item.get("type"),
@@ -973,6 +969,7 @@ async def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[O
 async def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
     users_processed: Set[ObjectId] = set()
     users_with_realtime_subscription: Set[ObjectId] = set()
+    notification_queue_service = NotificationQueueService()
 
     for topic in topics:
         if topic["_id"] not in topic_matches:
@@ -989,9 +986,9 @@ async def send_topic_notification_emails(item, topics, topic_matches, users, com
             section = topic.get("topic_type") or "wire"
             if user["_id"] not in users_processed:
                 # Only send websocket notification once for each item
-                save_user_notifications(
+                await save_user_notifications(
                     [
-                        UserNotification(
+                        dict(
                             user=user["_id"],
                             item=item["_id"],
                             resource=section,
@@ -1005,9 +1002,7 @@ async def send_topic_notification_emails(item, topics, topic_matches, users, com
             if not user.get("receive_email"):
                 continue
             elif subscriber.get("notification_type") == "scheduled":
-                superdesk.get_resource_service("notification_queue").add_item_to_queue(
-                    user["_id"], section, topic["_id"], item
-                )
+                await notification_queue_service.add_item_to_queue(user["_id"], section, topic["_id"], item)
             elif user["_id"] in users_with_realtime_subscription:
                 # This user has already received a realtime notification email about this item
                 # No need to send another

@@ -24,7 +24,7 @@ users_resource_config = ResourceConfig(
     ),
 )
 
-users_endpoints = EndpointGroup("users", __name__)
+users_endpoints = EndpointGroup("users_views", __name__)
 
 module = Module(
     name="newsroom.users",
