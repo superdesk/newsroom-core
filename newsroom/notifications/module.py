@@ -17,13 +17,13 @@ notifications_resource_config = ResourceConfig(
     name="notifications",
     data_class=Notification,
     service=NotificationsService,
-    default_sort=[("created", -1)],
+    default_sort=[("_created", -1)],
     mongo=MongoResourceConfig(
         prefix=MONGO_PREFIX,
         indexes=[
             MongoIndexOptions(
                 name="user_created",
-                keys=[("user", 1), ("created", -1)],
+                keys=[("user", 1), ("_created", -1)],
                 collation={"locale": "en", "strength": 2},
             )
         ],

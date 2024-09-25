@@ -93,7 +93,13 @@ async def test_delete_all_notifications(client, service):
     await service.create_or_update(
         [
             TEST_NOTIFICATION,
-            {"item": ObjectId(), "user": TEST_USER, "resource": "test-resource", "action": "test-action"},
+            {
+                "item": ObjectId(),
+                "user": TEST_USER,
+                "resource": "test-resources",
+                "action": "test-action",
+                "created": utcnow() - datetime.timedelta(days=1),
+            },
         ]
     )
 
