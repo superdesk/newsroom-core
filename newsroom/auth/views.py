@@ -223,7 +223,6 @@ def logout():
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
-# <<<<<<< HEAD
 async def signup():
     if not get_app_config("SIGNUP_EMAIL_RECIPIENTS"):
         abort(404)

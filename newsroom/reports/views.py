@@ -73,9 +73,7 @@ async def export_reports(report):
 
     csv_file = data.getvalue().encode("utf-8")
 
-    response = get_current_app().response_class(
-        response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True
-    )
+    response = get_current_app().response_class(response=csv_file, status=200, mimetype="text/csv")
 
     response.content_length = len(csv_file)
     response.headers["Content-Type"] = "text/csv"

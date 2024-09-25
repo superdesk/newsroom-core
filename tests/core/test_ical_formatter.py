@@ -92,5 +92,5 @@ def test_onclusive_no_end_time():
     }
     formatter = iCalFormatter()
     output = formatter.format_item(event, item_type="agenda").decode("utf-8")
-    assert "DTSTART;VALUE=DATE-TIME:20240101T100000Z" in output
+    assert "DTSTART:20240101T100000Z" in output
     assert "DTEND;VALUE=DATE:20240103" in output

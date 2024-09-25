@@ -1,4 +1,3 @@
-from os import path
 from quart_babel import lazy_gettext
 
 from superdesk.flask import Blueprint

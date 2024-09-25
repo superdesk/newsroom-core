@@ -61,8 +61,8 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
 
     app.data.update("companies", company["_id"], {"internal": True}, company)
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
+    async with app.test_client() as c:
+        resp = await c.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)
@@ -70,12 +70,12 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
         assert user_data.get("user_type") == "internal"
 
 
-def test_get_userdata_without_first_last_name(app):
+async def test_get_userdata_without_first_last_name(app):
     saml_data = {
         "http://schemas.microsoft.com/identity/claims/displayname": ["Foo Bar"],
     }
 
-    with app.test_request_context():
+    async with app.test_request_context("/"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert "Foo" == user_data["first_name"]
         assert "Bar" == user_data["last_name"]

@@ -222,13 +222,13 @@ async def test_approve_company_and_users(app, client):
         assert auth_user["token"] in outbox[0].body
 
 
-def test_signup_not_enabled_without_config(client, app):
+async def test_signup_not_enabled_without_config(client, app):
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = ""
 
-    response = client.get(url_for("auth.signup"))
+    response = await client.get(url_for("auth.signup"))
     assert response.status_code == 404
 
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "foo"
 
-    response = client.get(url_for("auth.signup"))
+    response = await client.get(url_for("auth.signup"))
     assert response.status_code == 200

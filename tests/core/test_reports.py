@@ -171,16 +171,16 @@ async def test_companies(client):
     assert report["results"][2]["name"] == "Paper Co."
 
 
-def test_content_activity_csv(client):
+async def test_content_activity_csv(client):
     today = datetime.now().date()
-    resp = client.get(
+    resp = await client.get(
         "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
             today.isoformat(), today.isoformat()
         )
     )
     assert 200 == resp.status_code
 
-    report = resp.get_data(as_text=True)
+    report = await resp.get_data(as_text=True)
     lines = report.splitlines()
     assert len(lines) > 1
 

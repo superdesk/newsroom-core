@@ -1,8 +1,9 @@
 from typing import Dict, Any
 from os import path
-from quart import json, current_app as app, url_for
 from quart.testing import QuartClient
 
+from superdesk.core import get_current_app, get_app_config, json
+from superdesk.flask import url_for
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
 
@@ -13,7 +14,7 @@ async def post_json(client: QuartClient, url, data):
     assert resp.status_code in [200, 201], "error %d on post to %s:\n%s" % (
         resp.status_code,
         url,
-        (await resp.get_data()).decode("utf-8"),
+        await resp.get_data(),
     )
     return resp
 
@@ -54,7 +55,7 @@ async def get_json(client: QuartClient, url, expected_code=200):
     assert resp.status_code == expected_code, "error %d on get to %s:\n%s" % (
         resp.status_code,
         url,
-        (await resp.get_data()).decode("utf-8"),
+        await resp.get_data(),
     )
     return json.loads(await resp.get_data())
 
@@ -67,14 +68,14 @@ def get_admin_user_id(app):
 
 def mock_send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=[]):
     if sender is None:
-        sender = app.config["MAIL_DEFAULT_SENDER"]
+        sender = get_app_config("MAIL_DEFAULT_SENDER")
 
     msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
     msg.body = text_body
     msg.html = html_body
     msg.attachments = [a["file_name"] for a in attachments_info]
 
-    _app = app._get_current_object()
+    _app = get_current_app().as_any()._get_current_object()
     with _app.mail.connect() as connection:
         if connection:
             return connection.send(msg)
@@ -116,10 +117,9 @@ def load_json_fixture(filename: str) -> Dict[str, Any]:
 
 def add_fixture_to_db(resource: str, filename: str):
     item = load_json_fixture(filename)
-    _app = app._get_current_object()
-    _app.data.insert(resource, [item])
+    get_current_app().data.insert(resource, [item])
     return item
 
 
 def get_resource_by_id(resource: str, item_id: str):
-    return app.data.find_one(resource, req=None, _id=item_id)
+    return get_current_app().data.find_one(resource, req=None, _id=item_id)
