@@ -1,45 +1,19 @@
-import superdesk
-from superdesk.flask import Blueprint
+from superdesk.core.module import Module
 
-from .topics import get_user_topics  # noqa
-from . import folders, topics
+from .topics_async import topic_resource_config, topic_endpoints, get_user_topics
+from . import topics
 
-
-blueprint = Blueprint("topics", __name__)
+__all__ = ["get_user_topics", "topic_endpoints", "topic_resource_config"]
 
 
 def init_app(app):
     topics.TopicsResource("topics", app, topics.topics_service)
-    folders.FoldersResource("topic_folders", app, folders.folders_service)
-
-    superdesk.register_resource("user_topic_folders", folders.UserFoldersResource, folders.UserFoldersService, _app=app)
-    superdesk.register_resource(
-        "company_topic_folders", folders.CompanyFoldersResource, folders.CompanyFoldersService, _app=app
-    )
 
 
-def get_user_folders(user, section):
-    return list(
-        superdesk.get_resource_service("user_topic_folders").get(
-            req=None,
-            lookup={
-                "user": user["_id"],
-                "section": section,
-            },
-        )
-    )
-
-
-def get_company_folders(company, section):
-    return list(
-        superdesk.get_resource_service("company_topic_folders").get(
-            req=None,
-            lookup={
-                "company": company["_id"],
-                "section": section,
-            },
-        )
-    )
-
+module = Module(
+    name="newsroom.topics",
+    resources=[topic_resource_config],
+    endpoints=[topic_endpoints],
+)
 
 from . import views  # noqa

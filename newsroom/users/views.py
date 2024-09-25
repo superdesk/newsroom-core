@@ -90,7 +90,7 @@ async def get_view_data():
     view_data = {
         "user": user_as_dict,
         "company": getattr(company, "id", ""),
-        "topics": get_user_topics(user.id) if user else [],
+        "topics": await get_user_topics(user.id) if user else [],
         "companyName": getattr(user_company, "name", ""),
         "locators": get_vocabulary("locators"),
         "ui_configs": await ui_config_service.get_all_config(),

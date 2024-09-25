@@ -211,14 +211,14 @@ class Topic(TypedDict, total=False):
     filter: Dict[str, Any]
     created: Dict[str, Any]
     user: ObjectId
-    company: ObjectId
+    company: Optional[ObjectId]
     is_global: bool
     timezone_offset: int
     topic_type: Section
     navigation: NavigationIds
     original_creator: ObjectId
     version_creator: ObjectId
-    folder: ObjectId
+    folder: Optional[ObjectId]
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
 

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Dict, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, Optional, TypedDict, Union, cast
 
 from bson import ObjectId
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ async def get_user_async(required=False) -> Optional[UserResourceModel]:
     return user
 
 
-async def get_user_or_abort() -> Optional[UserResourceModel]:
+async def get_user_or_abort() -> UserResourceModel:
     """Use when there must be a user authenticated."""
 
     user = await get_user_async(True)
@@ -54,7 +54,8 @@ async def get_user_or_abort() -> Optional[UserResourceModel]:
     if not user:
         abort(401)
 
-    return user
+    # Force MyPy to realise this is not None here
+    return cast(UserResourceModel, user)
 
 
 async def get_company_from_user(

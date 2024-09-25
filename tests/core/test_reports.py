@@ -3,6 +3,7 @@ from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
 from newsroom.tests.fixtures import COMPANY_1_ID
+from tests.core.utils import create_entries_for
 
 
 @fixture(autouse=True)
@@ -11,7 +12,7 @@ async def init(app):
         "users",
         [
             {
-                "_id": "u-1",
+                "_id": ObjectId("5cc94454bc43165c045ffec0"),
                 "email": "foo@foo.com",
                 "first_name": "Foo",
                 "last_name": "Smith",
@@ -19,14 +20,14 @@ async def init(app):
                 "company": COMPANY_1_ID,
             },
             {
-                "_id": "u-2",
+                "_id": ObjectId("5cc94454bc43165c045ffec1"),
                 "email": "bar@bar.com",
                 "first_name": "Bar",
                 "last_name": "Brown",
                 "is_enabled": True,
             },
             {
-                "_id": "u-3",
+                "_id": ObjectId("5cc94454bc43165c045ffec2"),
                 "email": "baz@bar.com",
                 "first_name": "Bar",
                 "last_name": "Brown",
@@ -80,15 +81,32 @@ async def init(app):
 
 
 async def test_company_saved_searches(client, app):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-2"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-3"},
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec0",
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec1",
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": "5cc94454bc43165c045ffec2",
+            },
         ],
     )
-
     resp = await client.get("reports/company-saved-searches")
     report = json.loads(await resp.get_data())
     assert report["name"] == "Saved searches per company"
@@ -98,12 +116,30 @@ async def test_company_saved_searches(client, app):
 
 
 async def test_user_saved_searches(client, app):
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-2"},
-            {"label": "Foo", "query": "foo", "notifications": False, "user": "u-1"},
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec0"),
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec1"),
+            },
+            {
+                "_id": ObjectId(),
+                "label": "Foo",
+                "query": "foo",
+                "topic_type": "wire",
+                "user": ObjectId("5cc94454bc43165c045ffec0"),
+            },
         ],
     )
 

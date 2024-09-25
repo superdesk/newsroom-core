@@ -18,7 +18,7 @@ async def test_adding_and_clearing_notification_queue():
     ids = await create_entries_for(
         "topics",
         [
-            {"name": "label", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
+            {"_id": ObjectId(), "label": "topic", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
         ],
     )
 
