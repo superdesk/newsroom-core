@@ -18,7 +18,7 @@ section_filters_config = ResourceConfig(
         indexes=[
             MongoIndexOptions(
                 name="name",
-                keys=[("name", 1)],
+                keys=[("name", 1), ("filter_type", 1)],
                 unique=True,
                 collation={"locale": "en", "strength": 2},
             )
