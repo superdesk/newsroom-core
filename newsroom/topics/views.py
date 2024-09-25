@@ -41,17 +41,19 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     """Creates a user topic"""
     current_user = await get_user_or_abort()
 
-    if not current_user or str(current_user.id) != args.user_id:
+    if str(current_user.id) != args.user_id:
         await request.abort(403)
 
     topic = await get_json_or_400()
-    topic.update(dict(
-        # TODO-ASYNC: Remove this once auto-generate ID feature is merged in superdesk-core
-        _id=ObjectId(),
-        user=current_user.id,
-        company=current_user.company,
-        _created=utcnow(),
-    ))
+    topic.update(
+        dict(
+            # TODO-ASYNC: Remove this once auto-generate ID feature is merged in superdesk-core
+            _id=ObjectId(),
+            user=current_user.id,
+            company=current_user.company,
+            _created=utcnow(),
+        )
+    )
 
     for subscriber in topic.get("subscribers") or []:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
