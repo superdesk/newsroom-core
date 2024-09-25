@@ -41,36 +41,27 @@ async def post_topic(args: RouteArguments, params: None, request: Request):
     """Creates a user topic"""
     current_user = await get_user_or_abort()
 
-    if current_user:
-        user_dict = current_user.to_dict()
-
-    if not user_dict or str(user_dict["_id"]) != str(args.user_id):
+    if not current_user or str(current_user.id) != args.user_id:
         await request.abort(403)
 
     topic = await get_json_or_400()
-
-    if user_dict:
-        data = {
-            "user": user_dict.get("_id"),
-            "company": user_dict.get("company"),
-            "_id": ObjectId(),
-            "is_global": topic.get("is_global", False),
-            # `_created` needs to be set otherwise there is a clash given `TopicResourceModel` and
-            # the base `ResourceModel` both have the same member (`created`). Without this
-            # `created_filter` does not get converted/saved
-            "_created": utcnow(),
-        }
-        topic.update(data)
+    topic.update(dict(
+        # TODO-ASYNC: Remove this once auto-generate ID feature is merged in superdesk-core
+        _id=ObjectId(),
+        user=current_user.id,
+        company=current_user.company,
+        _created=utcnow(),
+    ))
 
     for subscriber in topic.get("subscribers") or []:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     ids = await TopicService().create([topic])
 
-    await auto_enable_user_emails(topic, {}, user_dict)
+    await auto_enable_user_emails(topic, {}, current_user.to_dict())
 
-    if user_dict and topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user_dict.get("_id")))
+    if topic.get("is_global"):
+        push_company_notification("topic_created", user_id=str(current_user.id))
     else:
         push_user_notification("topic_created")
 
