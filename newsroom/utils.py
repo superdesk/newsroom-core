@@ -2,12 +2,12 @@ import pytz
 import regex
 import superdesk
 from functools import reduce
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from uuid import uuid4
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import List, Dict, Any, Optional, Sequence, Union
+from typing import List, Dict, Any, Optional, Union
 from pymongo.cursor import Cursor as MongoCursor
 
 from bson import ObjectId
@@ -16,7 +16,7 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
-from superdesk.core.web import Request, Response
+from superdesk.core.web import Request
 from superdesk.core import json, get_current_app, get_app_config
 from superdesk.flask import abort, request, g, session, url_for
 from superdesk.utc import utcnow
