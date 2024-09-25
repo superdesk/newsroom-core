@@ -455,24 +455,61 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
+    # TODO-ASYNC:- Test cases based on signal
 
-#     # TODO-ASYNC:- Test cases based on signal
+    # await client.delete(f"/users/{PUBLIC_USER_ID}")
 
-#     # await client.delete(f"/users/{PUBLIC_USER_ID}")
+    # # make sure it's editable later
+    # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    # assert 200 == resp.status_code
 
-#     # # make sure it's editable later
-#     # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
-#     # assert 200 == resp.status_code
+    # cursor = await TopicService().search(lookup={})
+    # topics = await cursor.to_list_raw()
+    # assert 2 == len(topics)
+    # assert "test2" == topics[0]["label"]
+    # assert 1 == len(topics[0]["subscribers"])
+    # assert "test3" == topics[1]["label"]
+    # assert None is topics[1].get("user")
 
-#     # cursor = await TopicService().search(lookup={})
-#     # topics = await cursor.to_list_raw()
-#     # assert 2 == len(topics)
-#     # assert "test2" == topics[0]["label"]
-#     # assert 1 == len(topics[0]["subscribers"])
-#     # assert "test3" == topics[1]["label"]
-#     # assert None is topics[1].get("user")
+    # cursor = await UserFoldersResourceService().search(lookup={})
+    # folders = await cursor.to_list_raw()
+    # assert 1 == len(folders)
+    # assert "skip" == folders[0]["name"]
 
-#     # cursor = await UserFoldersResourceService().search(lookup={})
-#     # folders = await cursor.to_list_raw()
-#     # assert 1 == len(folders)
-#     # assert "skip" == folders[0]["name"]
+
+async def test_created_field_in_topic_url(client):
+    topic_payload = {
+        "_id": ObjectId(),
+        "label": "Foo",
+        "query": "foo",
+        "topic_type": "wire",
+        "created": {"date_filter": "last_week"},
+    }
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+    resp = await client.post(topics_url, json=deepcopy(topic_payload))
+    assert 201 == resp.status_code
+    resp = await client.get(topics_url)
+    assert 200 == resp.status_code
+    data = json.loads(await resp.get_data())
+    assert 1 == len(data["_items"])
+    assert "Foo" == data["_items"][0]["label"]
+
+    assert (
+        await get_topic_url(data["_items"][0])
+        == "http://localhost:5050/wire?q=foo&created=%7B%22date_filter%22:+%22last_week%22%7D"
+    )
+
+    resp = await client.post(
+        "topics/{}".format(data["_items"][0]["_id"]),
+        json={"label": "test123", "created": {"date_filter": "today"}},
+    )
+    assert 200 == resp.status_code
+
+    resp = await client.get(topics_url)
+    data = json.loads(await resp.get_data())
+
+    assert "test123" == data["_items"][0]["label"]
+    assert (
+        await get_topic_url(data["_items"][0])
+        == "http://localhost:5050/wire?created=%7B%22date_filter%22:+%22today%22%7D"
+    )
