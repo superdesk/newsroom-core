@@ -42,12 +42,9 @@ class NotificationsService(AsyncResourceService[Notification]):
                 creation_data = {
                     "_id": notification_id,
                     "user": ObjectId(doc["user"]),
-                    "item": doc["item"],
-                    "resource": doc.get("resource"),
-                    "action": doc.get("action"),
-                    "data": doc.get("data"),
                 }
-                await self.create([creation_data])
+                doc.update(creation_data)
+                await self.create([doc])
 
             ids.append(notification_id)
 
