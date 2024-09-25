@@ -98,7 +98,7 @@ async def test_delete_all_notifications(client, service):
                 "user": TEST_USER,
                 "resource": "test-resources",
                 "action": "test-action",
-                "created": utcnow() - datetime.timedelta(days=1),
+                "_created": utcnow() - datetime.timedelta(days=1),
             },
         ]
     )
