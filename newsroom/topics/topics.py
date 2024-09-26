@@ -1,3 +1,5 @@
+# TODO-ASYNC :- Remove this resource when Reports module is converted to async
+
 from typing import Optional, List, Dict, Any
 import enum
 
@@ -65,6 +67,7 @@ class TopicsResource(newsroom.Resource):
     datasource = {"source": "topics", "default_sort": [("label", 1)]}
     allowed_roles = [role for role in UserRole]
     allowed_item_roles = allowed_roles
+    internal_resource = True
 
 
 class TopicsService(newsroom.Service):

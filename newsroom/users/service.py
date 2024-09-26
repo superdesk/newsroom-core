@@ -164,3 +164,10 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
     def _get_password_hash(self, password):
         return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))
+
+    async def system_update(self, item_id, updates):
+        await self.mongo.update_one({"_id": item_id}, {"$set": updates})
+        try:
+            await self.elastic.update(item_id, updates)
+        except KeyError:
+            pass

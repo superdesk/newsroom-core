@@ -72,7 +72,7 @@ describe('Wire - Topic', function () {
     it('Rename folder in My Wire Topics', () => {
         addResources([
             {
-                resource: 'topic_folders',
+                resource: 'user_topic_folders',
                 items: [
                     {
                         "_id": "652d2535b7e10e09ec704d6d",
@@ -108,7 +108,7 @@ describe('Wire - Topic', function () {
     it('Delete a folder with content in My Wire Topic', () => {
         addResources([
             {
-                resource: 'topic_folders',
+                resource: 'user_topic_folders',
                 items: [
                     {
                         "_id": "652d2535b7e10e09ec704d6d",
@@ -122,7 +122,7 @@ describe('Wire - Topic', function () {
                 resource: 'topics',
                 items: [
                     {
-                        "_id": "672d3d26f27b4d56d8d5a27s",
+                        "_id": "672d3d26f27b4d56d8d5a272",
                         "query": "Topic 1",
                         "topic_type": "wire",
                         "label": "Topic 1",
@@ -169,16 +169,21 @@ describe('Wire - Topic', function () {
         beforeEach(() => {
             addResources([
                 {
-                    resource: 'topic_folders',
+                    resource: 'user_topic_folders',
                     items: [
                         {
-                            "_id": "652d2535b7e10e09ec704d6d",
+                            "_id": "652d2535b7e10e09ec704d64",
                             "name": "user folder",
                             "section": "wire",
                             "user": USERS.foobar.admin._id,
                         },
+                    ],
+                },
+                {
+                    resource: 'company_topic_folders',
+                    items: [
                         {
-                            "_id": "672d3d26f27b4d52d8d5a87s",
+                            "_id": "672d3d26f27b4d52d8d5a874",
                             "section": "wire",
                             "name": "company folder", 
                             "company": COMPANIES.foobar._id,
@@ -241,7 +246,7 @@ describe('Wire - Topic', function () {
     it('Move My Topic to another folder', () => {
         addResources([
             {
-                resource: 'topic_folders',
+                resource: 'user_topic_folders',
                 items: [
                     {
                         "_id": "652d2535b7e10e09ec704d6d",
@@ -297,7 +302,7 @@ describe('Wire - Topic', function () {
     it('Remove My Topic from folder ', () => {
         addResources([
             {
-                resource: 'topic_folders',
+                resource: 'user_topic_folders',
                 items: [
                     {
                         "_id": "652d2535b7e10e09ec704d6d",

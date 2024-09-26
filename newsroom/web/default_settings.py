@@ -120,7 +120,6 @@ BLUEPRINTS = [
     "newsroom.design",
     "newsroom.history",
     "newsroom.push",
-    "newsroom.topics",
     "newsroom.products",
     "newsroom.reports",
     "newsroom.public",
@@ -171,10 +170,12 @@ MODULES = [
     "newsroom.companies",
     "newsroom.assets",
     "newsroom.users",
+    "newsroom.topics",
     "newsroom.section_filters",
     "newsroom.cards.module",
     "newsroom.navigations",
     "newsroom.notifications",
+    "newsroom.topics_folders",
 ]
 
 SITE_NAME = "Newshub"
