@@ -51,11 +51,7 @@ async def create(request: Request) -> Response:
     if not card_data:
         request.abort(400)
 
-    service = CardsResourceService()
-    if not card_data.get("_id"):
-        card_data["_id"] = service.generate_id()
-
-    new_ids = await service.create([card_data])
+    new_ids = await CardsResourceService().create([card_data])
 
     return Response({"success": True, "_id": new_ids[0]}, 201, ())
 

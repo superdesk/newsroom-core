@@ -74,7 +74,6 @@ async def create_company(request: Request) -> Response:
         return request.abort(400)
 
     company_data = get_company_updates(company)
-    company_data["_id"] = ObjectId()
 
     ids = await CompanyService().create([company_data])
     return Response({"success": True, "_id": ids[0]}, 201)
@@ -183,7 +182,7 @@ async def company_users(args: CompanyItemArgs, params: None, request: Request) -
     users_list = []
     company_users = await get_users_by_company(args.company_id)
     async for user in company_users:
-        public_data = get_public_user_data(user.model_dump(by_alias=True))
+        public_data = get_public_user_data(user.to_dict())
         users_list.append(public_data)
 
     return Response(users_list)

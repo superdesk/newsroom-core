@@ -60,7 +60,7 @@ async def create(request: Request) -> Response:
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
     try:
-        new_client = ClientResource.model_validate(doc)
+        new_client = ClientResource.from_dict(doc)
         ids = await ClientService().create([new_client])
     except ValidationError as error:
         return Response(

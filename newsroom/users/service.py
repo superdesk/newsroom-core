@@ -75,7 +75,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
     async def on_deleted(self, doc):
         get_current_wsgi_app().cache.delete(str(doc.id))
-        user_deleted.send(self, user=doc.model_dump(by_alias=True))
+        user_deleted.send(self, user=doc.to_dict())
 
     async def on_delete(self, doc):
         from .utils import get_user_id
@@ -97,7 +97,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             return
 
         # convert to dict first
-        doc = user.model_dump(by_alias=True, exclude_unset=True)
+        doc = user.to_dict()
 
         if is_current_user_admin() or is_current_user_account_mgr():
             return
@@ -159,7 +159,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         company_as_dict = None
         company = await get_company_from_user_or_session(user)
         if company:
-            company_as_dict = company.model_dump(by_alias=True)
+            company_as_dict = company.to_dict()
 
         auth_provider = get_company_auth_provider(company_as_dict)
 
@@ -177,7 +177,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
 
         # Send new account / password reset email
         if auth_provider.features["verify_email"]:
-            updated_user = user.model_copy(update=user_updates).model_dump(by_alias=True)
+            updated_user = user.model_copy(update=user_updates).to_dict()
             await send_token(updated_user, token_type="new_account", update_token=False)
 
     def _get_password_hash(self, password):

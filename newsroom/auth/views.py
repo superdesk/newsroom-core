@@ -179,7 +179,7 @@ async def get_login_token():
         user_dict = {}
         user = await UsersService().find_by_id(user["_id"])
         if user:
-            user_dict = user.model_dump(by_alias=True)
+            user_dict = user.to_dict()
 
         company = get_company_from_user(user_dict)
 
@@ -286,7 +286,7 @@ async def signup():
             "sections": {section["_id"]: True for section in app.sections},
             "_id": ObjectId(),
         }
-        new_user = UserResourceModel.model_validate(new_user_dict)
+        new_user = UserResourceModel.from_dict(new_user_dict)
         await user_service.create([new_user])
         await send_new_signup_email(company, new_user_dict, is_new_company)
 
@@ -392,7 +392,7 @@ async def impersonate_user():
     assert user_id
     user = await UsersService().find_by_id(user_id)
     assert user
-    start_user_session(user.model_dump(by_alias=True))
+    start_user_session(user.to_dict())
     return redirect(url_for("wire.index"))
 
 
@@ -401,7 +401,7 @@ async def impersonate_user():
 async def impersonate_stop():
     assert session.get("auth_user")
     user = await UsersService().find_by_id(session.get("auth_user"))
-    start_user_session(user.model_dump(by_alias=True))
+    start_user_session(user.to_dict())
     session.pop("auth_user")
     return redirect(url_for("settings.settings_app", app_id="users"))
 

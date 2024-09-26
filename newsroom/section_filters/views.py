@@ -78,7 +78,6 @@ async def search(_a: None, params: SearchParams, _r: None):
 async def create():
     creation_data = await get_json_or_400()
     app_sections = get_current_wsgi_app().sections
-    service = SectionFiltersService()
 
     section = next(
         (s for s in app_sections if s["_id"] == creation_data.get("filter_type")),
@@ -86,9 +85,8 @@ async def create():
     )
     if section and section.get("search_type"):
         creation_data["search_type"] = section["search_type"]
-    creation_data["_id"] = service.generate_id()
 
-    section_filter_id = await service.create([creation_data])
+    section_filter_id = await SectionFiltersService().create([creation_data])
     return Response({"success": True, "_id": section_filter_id[0]}, 201)
 
 
