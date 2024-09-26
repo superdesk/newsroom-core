@@ -3,9 +3,8 @@ import newsroom
 import superdesk
 
 from datetime import datetime, date
-from copy import deepcopy
 
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.flask import request
 from newsroom.products.types import PRODUCT_TYPES
 from newsroom.types import User
@@ -226,15 +225,6 @@ class UsersService(newsroom.Service):
 
     # TODO-ASYNC: migrate these two pending methods below to `.service.UsersService`
     # and update the references
-
-    def update_notification_schedule_run_time(self, user: User, run_time: datetime):
-        notification_schedule = deepcopy(user["notification_schedule"])
-        notification_schedule["last_run_time"] = run_time
-        self.update(user["_id"], {"notification_schedule": notification_schedule}, user)
-
-        app = get_current_app().as_any()
-        app.cache.delete(str(user["_id"]))
-        app.cache.delete(user.get("email"))
 
     def user_has_paused_notifications(self, user: User) -> bool:
         schedule = user.get("notification_schedule") or {}

@@ -8,6 +8,7 @@ from quart import url_for
 from newsroom.types import Product
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
+from tests.core.utils import create_entries_for
 
 
 PUBLIC_USER_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -206,7 +207,9 @@ async def user(app):
         "receive_email": True,
         "receive_app_notifications": True,
     }
-    app.data.insert("users", [_user])
+
+    await create_entries_for("users", [_user])
+
     _user["password"] = "admin"
     return _user
 

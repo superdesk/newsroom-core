@@ -1,3 +1,5 @@
+from copy import deepcopy
+from datetime import datetime
 from typing import Any, Dict
 
 from quart_babel import gettext
@@ -133,6 +135,22 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             return
 
         abort(403)
+
+    async def update_notification_schedule_run_time(self, user: dict[str, Any], run_time: datetime):
+        """
+        Updates the user's notification schedule with the provided run time and clears related cache.
+
+        Args:
+            user: The user object containing the current notification schedule.
+            run_time: The new run time to be updated in the notification schedule.
+        """
+        notification_schedule = deepcopy(user["notification_schedule"])
+        notification_schedule["last_run_time"] = run_time
+        await self.update(user["_id"], {"notification_schedule": notification_schedule})
+
+        app = self.app.wsgi
+        app.cache.delete(str(user["_id"]))
+        app.cache.delete(user["email"])
 
     async def approve_user(self, user: UserResourceModel):
         """Approves & enables the supplied user, and sends an account validation email"""

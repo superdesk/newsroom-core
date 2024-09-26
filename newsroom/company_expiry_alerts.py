@@ -99,5 +99,5 @@ class CompanyExpiryAlerts:
 
 
 @celery.task(soft_time_limit=600)
-def company_expiry():
-    CompanyExpiryAlerts().send_alerts()
+async def company_expiry():
+    await CompanyExpiryAlerts().send_alerts()

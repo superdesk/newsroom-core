@@ -3,6 +3,7 @@ from bson import ObjectId
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, TypedDict, Tuple, Set
 
+from newsroom.users.service import UsersService
 from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
@@ -16,7 +17,7 @@ from newsroom.celery_app import celery
 from newsroom.topics.topics_async import get_user_id_to_topic_for_subscribers, NotificationType
 from newsroom.gettext import get_session_timezone, set_session_timezone
 
-from .services import NotificationQueueService, NotificationsService
+from .services import NotificationQueueService
 from .models import NotificationQueue, NotificationTopic
 
 logger = logging.getLogger(__name__)
@@ -27,9 +28,14 @@ class NotificationEmailTopicEntry(TypedDict):
     item: Dict[str, Any]
 
 
+TopicEntriesDict = Dict[str, List[NotificationEmailTopicEntry]]
+
+TopicMatchTable = Dict[str, List[Tuple[str, int]]]
+
+
 class SendScheduledNotificationEmails:
     async def run(self, force: bool = False):
-        self.log_msg = "Scheduled Notifications: {}".format()
+        self.log_msg = "Scheduled Notifications: {}".format(utcnow())
         logger.info(f"{self.log_msg} Starting to send scheduled notifications")
 
         lock_name = get_lock_id("newsroom", "send_scheduled_notifications")
@@ -98,14 +104,14 @@ class SendScheduledNotificationEmails:
     ):
         now_local = utc_to_local(user["notification_schedule"]["timezone"], now_utc)
 
-        if not self._is_scheduled_to_run_for_user(user["notification_schedule"], now_local, force):
+        if not self.is_scheduled_to_run_for_user(user["notification_schedule"], now_local, force):
             return
 
         # Set the timezone on the session, so Babel is able to get the timezone for this user
         # when rendering the email, otherwise it uses the system default
         set_session_timezone(user["notification_schedule"]["timezone"])
 
-        topic_entries, topic_match_table = self._get_topic_entries_and_match_table(schedule, user, company, user_topics)
+        topic_entries, topic_match_table = self.get_topic_entries_and_match_table(schedule, user, company, user_topics)
 
         template_kwargs = dict(
             app_name=get_app_config("SITE_NAME"),
@@ -130,9 +136,9 @@ class SendScheduledNotificationEmails:
             )
 
         # Now clear the topic match queue
-        self._clear_user_notification_queue(user)
+        await self._clear_user_notification_queue(user)
 
-    def _is_scheduled_to_run_for_user(self, schedule: NotificationSchedule, now_local: datetime, force: bool):
+    def is_scheduled_to_run_for_user(self, schedule: NotificationSchedule, now_local: datetime, force: bool):
         try:
             last_run_time_local = utc_to_local(schedule["timezone"], schedule["last_run_time"]).replace(
                 second=0, microsecond=0
@@ -153,9 +159,9 @@ class SendScheduledNotificationEmails:
 
         return False
 
-    def _clear_user_notification_queue(self, user: User):
-        get_resource_service("notification_queue").reset_queue(user["_id"])
-        get_resource_service("users").update_notification_schedule_run_time(user, utcnow())
+    async def _clear_user_notification_queue(self, user: User):
+        await NotificationQueueService().reset_queue(user["_id"])
+        await UsersService().update_notification_schedule_run_time(user, utcnow())
 
     def _convert_schedule_times(self, now_local: datetime, times: List[str]) -> List[datetime]:
         schedule_datetimes: List[datetime] = []
@@ -167,13 +173,17 @@ class SendScheduledNotificationEmails:
         return schedule_datetimes
 
     def get_queue_entries_for_section(self, queue: NotificationQueue, section: str) -> List[NotificationTopic]:
+        """
+        Return the entries in the queue for a given section sorted by `last_item_arrived` attribute
+        """
+
         return sorted(
             [topic for topic in queue.topics if topic.section == section and topic.last_item_arrived],
             key=lambda d: d.last_item_arrived,
             reverse=True,
         )
 
-    def _get_latest_item_from_topic_queue(
+    def get_latest_item_from_topic_queue(
         self,
         topic_queue: NotificationTopic,
         topic: Topic,
@@ -181,9 +191,11 @@ class SendScheduledNotificationEmails:
         company: Optional[Company],
         exclude_items: Set[str],
     ) -> Optional[Dict[str, Any]]:
-        for item_id in reversed(topic_queue["items"]):
+        for item_id in reversed(topic_queue.items):
             if item_id in exclude_items:
                 continue
+
+            # TODO-ASYNC: update when `wire_search` is migrated to async
             search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
 
             query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
@@ -198,16 +210,20 @@ class SendScheduledNotificationEmails:
 
         return None
 
-    def _get_topic_entries_and_match_table(
-        self, schedule: NotificationQueue, user: User, company: Optional[Company], user_topics: Dict[ObjectId, Topic]
-    ) -> Tuple[Dict[str, List[NotificationEmailTopicEntry]], Dict[str, List[Tuple[str, int]]]]:
-        topic_entries: Dict[str, List[NotificationEmailTopicEntry]] = {
+    def get_topic_entries_and_match_table(
+        self,
+        schedule: NotificationQueue,
+        user: User,
+        company: Optional[Company],
+        user_topics: Dict[ObjectId, Topic],
+    ) -> Tuple[TopicEntriesDict, TopicMatchTable]:
+        topic_entries: TopicEntriesDict = {
             "wire": [],
             "agenda": [],
         }
 
         topics_matched: List[ObjectId] = []
-        topic_match_table: Dict[str, List[Tuple[str, int]]] = {
+        topic_match_table: TopicMatchTable = {
             "wire": [],
             "agenda": [],
         }
@@ -217,23 +233,21 @@ class SendScheduledNotificationEmails:
 
         for section in ["wire", "agenda"]:
             items_in_entries: Set[str] = set()
+
             for topic_queue in self.get_queue_entries_for_section(schedule, section):
-                if not len(topic_queue.get("items") or []):
+                if not len(topic_queue.items):
                     # This Topic Queue didn't match any items during this period
                     continue
 
-                topic = user_topics.get(topic_queue["topic_id"])
-
+                topic = user_topics.get(topic_queue.topic_id)
                 if topic is None:
                     # Topic was not found for some reason
                     continue
 
-                topic_match_table[section].append((topic["label"], len(topic_queue["items"])))
+                topic_match_table[section].append((topic["label"], len(topic_queue.items)))
                 topics_matched.append(topic["_id"])
 
-                latest_item = self._get_latest_item_from_topic_queue(
-                    topic_queue, topic, user, company, items_in_entries
-                )
+                latest_item = self.get_latest_item_from_topic_queue(topic_queue, topic, user, company, items_in_entries)
 
                 if latest_item is None:
                     # Latest item was not found. It may have matched multiple topics
@@ -247,7 +261,7 @@ class SendScheduledNotificationEmails:
                     )
                 )
 
-        for topic_id, topic in user_topics.items():
+        for _, topic in user_topics.items():
             if topic["_id"] not in topics_matched:
                 topic_match_table[topic["topic_type"]].append((topic["label"], 0))
 

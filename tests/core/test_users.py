@@ -580,7 +580,8 @@ async def test_user_can_update_notification_schedule(app, client):
 
     # Update the schedules ``last_run_time``
     now = utcnow()
-    get_resource_service("users").update_notification_schedule_run_time(user, now)
+    await UsersService().update_notification_schedule_run_time(user, now)
+
     user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
     assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
