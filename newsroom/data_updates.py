@@ -112,6 +112,7 @@ class DataUpdateCommand:
     def run(self, data_update_id=None, fake=False, dry=False):
         self.data_updates_service = superdesk.get_resource_service("data_updates")
         self.data_updates_files = get_data_updates_files(strip_file_extension=True)
+
         # retrieve existing data updates in database
         data_updates_applied = self.get_applied_updates()
         self.last_data_update = data_updates_applied and data_updates_applied[-1] or None

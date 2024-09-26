@@ -339,8 +339,8 @@ async def test_active_users_and_active_companies(app):
     )
 
     async with app.test_request_context("/"):
-        users = get_user_dict()
-        companies = get_company_dict()
+        users = await get_user_dict()
+        companies = await get_company_dict()
 
         assert str(users_ids[0]) in users  # active user
         assert str(users_ids[1]) not in users  # not active
@@ -368,14 +368,14 @@ async def test_expired_company_does_not_restrict_activity(app):
     )
 
     async with app.test_request_context("/"):
-        companies = get_company_dict()
+        companies = await get_company_dict()
 
         assert COMP_1 in companies
         assert COMP_2 not in companies
         assert COMP_3 not in companies
 
         app.config["ALLOW_EXPIRED_COMPANY_LOGINS"] = True
-        companies = get_company_dict()
+        companies = await get_company_dict()
 
         assert COMP_1 in companies
         assert COMP_2 not in companies

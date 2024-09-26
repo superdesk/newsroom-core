@@ -1,7 +1,7 @@
 import logging
 from bson import ObjectId
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, TypedDict, Tuple, Set
+from typing import List, Dict, Any, Optional, TypedDict, Tuple, Set, cast
 
 from newsroom.users.service import UsersService
 from superdesk.core import get_app_config
@@ -67,8 +67,8 @@ class SendScheduledNotificationEmails:
 
         try:
             now_utc = utcnow().replace(second=0, microsecond=0)
-            companies = get_company_dict(False)
-            users = get_user_dict(False)
+            companies = await get_company_dict(False)
+            users = await get_user_dict(False)
             user_topic_map = await get_user_id_to_topic_for_subscribers(NotificationType.SCHEDULED)
 
             schedules_cursor = await notification_queue_service.search({})
@@ -183,7 +183,7 @@ class SendScheduledNotificationEmails:
 
     async def _clear_user_notification_queue(self, user: User):
         await NotificationQueueService().reset_queue(user["_id"])
-        await UsersService().update_notification_schedule_run_time(user, utcnow())
+        await UsersService().update_notification_schedule_run_time(cast(dict, user), utcnow())
 
     def _convert_schedule_times(self, now_local: datetime, times: List[str]) -> List[datetime]:
         schedule_datetimes: List[datetime] = []
