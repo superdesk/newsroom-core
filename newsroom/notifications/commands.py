@@ -35,6 +35,11 @@ TopicMatchTable = Dict[str, List[Tuple[str, int]]]
 
 class SendScheduledNotificationEmails:
     async def run(self, force: bool = False):
+        """
+        Initiates the process to send scheduled notification emails. Acquires a lock
+        to ensure no concurrent execution and invokes the schedule runner.
+        """
+
         self.log_msg = "Scheduled Notifications: {}".format(utcnow())
         logger.info(f"{self.log_msg} Starting to send scheduled notifications")
 
@@ -51,6 +56,11 @@ class SendScheduledNotificationEmails:
         logger.info(f"{self.log_msg} Completed sending scheduled notifications")
 
     async def run_schedules(self, force: bool):
+        """
+        Retrieves and processes schedules for all users, running scheduled notifications.
+        Handles missing user or company data and processes each schedule.
+        """
+
         notification_queue_service = NotificationQueueService()
 
         try:
@@ -102,6 +112,11 @@ class SendScheduledNotificationEmails:
         user_topics: Dict[ObjectId, Topic],
         force: bool,
     ):
+        """
+        Processes a user's notification schedule. Sends an email based on whether
+        topics matched or not for the user's scheduled notification period.
+        """
+
         now_local = utc_to_local(user["notification_schedule"]["timezone"], now_utc)
 
         if not self.is_scheduled_to_run_for_user(user["notification_schedule"], now_local, force):
@@ -139,6 +154,11 @@ class SendScheduledNotificationEmails:
         await self._clear_user_notification_queue(user)
 
     def is_scheduled_to_run_for_user(self, schedule: NotificationSchedule, now_local: datetime, force: bool):
+        """
+        Determines if the notification schedule should run for the user based on their scheduled times
+        and the current time.
+        """
+
         try:
             last_run_time_local = utc_to_local(schedule["timezone"], schedule["last_run_time"]).replace(
                 second=0, microsecond=0
@@ -191,6 +211,10 @@ class SendScheduledNotificationEmails:
         company: Optional[Company],
         exclude_items: Set[str],
     ) -> Optional[Dict[str, Any]]:
+        """
+        Retrieves the latest item from a topic queue for the user and company, excluding specific items from the result.
+        """
+
         for item_id in reversed(topic_queue.items):
             if item_id in exclude_items:
                 continue
@@ -217,6 +241,17 @@ class SendScheduledNotificationEmails:
         company: Optional[Company],
         user_topics: Dict[ObjectId, Topic],
     ) -> Tuple[TopicEntriesDict, TopicMatchTable]:
+        """
+        Generates the topic entries and a match table for a user's scheduled notifications.
+
+        This method processes the notification queue and matches topics based on user preferences and available topics.
+
+        It returns two key outputs:
+        - `topic_entries`: A dictionary containing lists of matched topics from the 'wire' and 'agenda' sections that
+        will be included in the notification email.
+        - `topic_match_table`: A table indicating the topics that matched items and the number of items found per topic.
+        """
+
         topic_entries: TopicEntriesDict = {
             "wire": [],
             "agenda": [],
