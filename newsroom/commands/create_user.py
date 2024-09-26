@@ -36,7 +36,7 @@ def create_user(email, password, first_name, last_name, is_admin):
         "is_approved": True,
         "id": ObjectId(),
     }
-    new_user = UserResourceModel.model_validate(new_user)
+    new_user = UserResourceModel.from_dict(new_user)
     user = get_user_by_email(email)
 
     if user:
@@ -44,6 +44,6 @@ def create_user(email, password, first_name, last_name, is_admin):
     else:
         print("Creating user...")
         run_async_to_sync(UsersService().create([new_user]))
-        print("User created successfully %s" % (new_user.model_dump(by_alias=True, exclude_unset=True)))
+        print("User created successfully %s" % (new_user.to_dict()))
 
     return new_user

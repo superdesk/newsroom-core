@@ -75,12 +75,12 @@ def get_settings_data():
 
 async def get_view_data():
     user = await get_user_or_abort()
-    user_as_dict = user.model_dump(by_alias=True, exclude_unset=True)
+    user_as_dict = user.to_dict()
     company = await get_company_from_user_or_session(user)
 
     company_as_dict = None
     if company:
-        company_as_dict = company.model_dump(by_alias=True, exclude_unset=True)
+        company_as_dict = company.to_dict()
 
     auth_provider = get_company_auth_provider(company_as_dict)
     ui_config_service = UiConfigResourceService()
@@ -182,8 +182,7 @@ async def create(request: Request):
             return Response({"email": [gettext("Email address is already in use")]}, 400)
 
         creation_data = get_updates_from_form(form, on_create=True)
-        creation_data["_id"] = ObjectId()
-        new_user = UserResourceModel.model_validate(creation_data)
+        new_user = UserResourceModel.from_dict(creation_data)
 
         if is_current_user_company_admin():
             company_from_admin = await get_company_from_user_or_session()
@@ -203,7 +202,7 @@ async def create(request: Request):
 
         company = await get_company_from_user_or_session(new_user)
         if company:
-            auth_provider = get_company_auth_provider(company.model_dump(by_alias=True))
+            auth_provider = get_company_auth_provider(company.to_dict())
 
             if auth_provider.features["verify_email"]:
                 add_token_data(new_user)
@@ -211,7 +210,7 @@ async def create(request: Request):
         ids = await UsersService().create([new_user])
 
         if auth_provider.features["verify_email"]:
-            user_dict = new_user.model_dump(by_alias=True, exclude_unset=True)
+            user_dict = new_user.to_dict()
             await send_token(user_dict, token_type="new_account", update_token=False)
 
         return Response({"success": True, "_id": ids[0]}, 201)
@@ -246,7 +245,7 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         await request.abort(403)
 
-    await send_token(user.model_dump(by_alias=True), token_type="new_account")
+    await send_token(user.to_dict(), token_type="new_account")
 
     return Response({"success": True})
 
@@ -380,7 +379,7 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
 
     updates: Dict[str, Any] = {"notification_schedule": {}}
     if user.notification_schedule:
-        user_dict = user.model_dump(by_alias=True)
+        user_dict = user.to_dict()
         updates["notification_schedule"] = deepcopy(user_dict.get("notification_schedule") or {})
 
     updates["notification_schedule"].update(data)
