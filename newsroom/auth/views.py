@@ -286,7 +286,7 @@ async def signup():
             "sections": {section["_id"]: True for section in app.sections},
             "_id": ObjectId(),
         }
-        new_user = UserResourceModel.model_validate(new_user_dict)
+        new_user = UserResourceModel.from_dict(new_user_dict)
         await user_service.create([new_user])
         await send_new_signup_email(company, new_user_dict, is_new_company)
 

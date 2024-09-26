@@ -182,7 +182,7 @@ async def create(request: Request):
             return Response({"email": [gettext("Email address is already in use")]}, 400)
 
         creation_data = get_updates_from_form(form, on_create=True)
-        new_user = UserResourceModel.model_validate(creation_data)
+        new_user = UserResourceModel.from_dict(creation_data)
 
         if is_current_user_company_admin():
             company_from_admin = await get_company_from_user_or_session()

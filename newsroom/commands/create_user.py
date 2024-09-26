@@ -36,7 +36,7 @@ def create_user(email, password, first_name, last_name, is_admin):
         "is_approved": True,
         "id": ObjectId(),
     }
-    new_user = UserResourceModel.model_validate(new_user)
+    new_user = UserResourceModel.from_dict(new_user)
     user = get_user_by_email(email)
 
     if user:
