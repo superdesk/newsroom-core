@@ -50,6 +50,8 @@ class SendScheduledNotificationEmails:
 
         try:
             await self.run_schedules(force)
+        except Exception as e:
+            logger.exception("Error occurred while running scheduled notifications: %s", e)
         finally:
             unlock(lock_name)
 
