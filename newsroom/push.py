@@ -33,7 +33,7 @@ from newsroom.email import (
     send_history_match_notification_email,
     send_item_killed_notification_email,
 )
-from newsroom.history import get_history_users
+from newsroom.history_async import get_history_users
 from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
 from newsroom.assets import ASSETS_RESOURCE
@@ -859,10 +859,10 @@ async def notify_user_matches(
         [user["_id"] for user in users_dict.values() if users_service.user_has_paused_notifications(user)]
     )
 
-    def _get_users(section):
+    async def _get_users(section):
         """Get the list of users who have downloaded or bookmarked the items"""
         # Get users who have downloaded any of the items
-        user_list = get_history_users(related_items, user_ids, company_ids, section, "download")
+        user_list = await get_history_users(related_items, user_ids, company_ids, section, "download")
 
         if is_text and section != "agenda":
             # Add users who have bookmarked any of the items
@@ -908,7 +908,7 @@ async def notify_user_matches(
     # First add users for the 'wire' section and send the notification
     # As this takes precedence over all other sections
     # (in case items appear in multiple sections)
-    await _send_notification("wire", _get_users("wire"))
+    await _send_notification("wire", await _get_users("wire"))
 
     # Next iterate over the registered sections (excluding wire and api)
     app = get_current_app().as_any()
@@ -918,7 +918,7 @@ async def notify_user_matches(
         if section["_id"] != "wire" and section["group"] not in ["api", "monitoring"]
     ]:
         # Add the users for those sections and send the notification
-        await _send_notification(section_id, _get_users(section_id))
+        await _send_notification(section_id, await _get_users(section_id))
 
 
 async def send_user_notification_emails(item, user_matches, users, section):
