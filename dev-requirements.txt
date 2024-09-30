@@ -34,7 +34,6 @@ black==23.12.1
 blinker==1.8.2
     # via
     #   elastic-apm
-    #   flask
     #   flask-mail
     #   raven
     #   sentry-sdk
@@ -382,7 +381,7 @@ redis==5.0.8
     #   superdesk-core
 regex==2024.7.24
     # via superdesk-core
-reportlab==4.2.2
+reportlab==4.2.4
     # via
     #   -r requirements.txt
     #   superdesk-core
