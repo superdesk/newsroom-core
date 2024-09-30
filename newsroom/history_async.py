@@ -4,7 +4,7 @@ import werkzeug.exceptions
 
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, Dict, Annotated, List, Any, Union
+from typing import Optional, Dict, Annotated, List, Any
 
 from newsroom import MONGO_PREFIX
 from newsroom.users.utils import get_user_or_abort
@@ -18,14 +18,13 @@ from quart_babel import gettext
 from superdesk.utc import utcnow
 from superdesk.core.web import EndpointGroup, Response, Request
 from superdesk.flask import abort
-from superdesk.core import json
-from superdesk.core.resources.fields import ObjectId as ObjectIdField
-from eve.utils import ParsedRequest
+from superdesk.core.resources.fields import ObjectId as ObjectIdField, Keyword
 from superdesk.core.resources.validators import validate_data_relation_async
 from superdesk.core.resources import (
     ResourceConfig,
     MongoResourceConfig,
     MongoIndexOptions,
+    ElasticResourceConfig,
 )
 
 
@@ -36,25 +35,24 @@ class RouteParams(BaseModel):
 
 
 class HistoryResourceModel(NewshubResourceModel):
-    action: Optional[str] = None
-    versioncreated: Optional[datetime] = None
+    action: Keyword
+    versioncreated: datetime
     user: Optional[Annotated[ObjectIdField, validate_data_relation_async("users")]] = None
     company: Optional[Annotated[ObjectIdField, validate_data_relation_async("companies")]] = None
-    item: Optional[str] = None
-    version: Optional[str] = None
-    section: Optional[str] = None
+    item: Keyword
+    version: str
+    section: Keyword
     extra_data: Optional[Dict] = None
 
 
 class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
-    async def create(
+    async def create_history_record(
         self, docs: List[Dict[str, Any]], action: str, user: UserResourceModel, section: str = "wire", **kwargs: Any
     ):
         now = utcnow()
 
-        async def transform(item: Dict[str, Any]) -> Dict[str, Any]:
+        def transform(item: Dict[str, Any]) -> Dict[str, Any]:
             return {
-                "_id": ObjectId(),
                 "action": action,
                 "versioncreated": now,
                 "user": user.id,
@@ -64,42 +62,45 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
                 "section": section,
             }
 
-        for doc in docs:
-            try:
-                await super().create([await transform(doc)])
-            except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
-                continue
-
-    async def create_history_record(
-        self, items: List[Dict[str, Any]], action: str, user: UserResourceModel, section: str
-    ):
-        await self.create(items, action, user, section)
+        transformed_docs = [transform(doc) for doc in docs]
+        try:
+            await super().create(transformed_docs)
+        except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
+            pass
 
     async def query_items(self, query: Dict[str, Any]):
         if query["from"] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
-            return abort(400)
+            abort(400)
 
-        req = ParsedRequest()
-        req.args = {"source": json.dumps(query)}
-        return await super().get(req, None)
+        # Use self.find to execute the query and get the cursor
+        cursor = await self.find(query)
+        return cursor
 
     async def fetch_history(self, query: Dict[str, Any], all: bool = False):
-        results = await self.query_items(query)
-        docs = results.docs
-        if all:
-            while results.hits["hits"]["total"]["value"] > len(docs):
-                query["from"] = len(docs)
-                results = await self.query_items(query)
-                docs.extend(results.docs)
+        cursor = await self.query_items(query)
 
-        return {"_items": docs, "hits": results.hits}
+        # Fetch the documents from the cursor
+        docs = []
+        async for doc in cursor:
+            docs.append(doc)
+
+        if all:
+            # Handle pagination and retrieve additional results
+            while cursor.hits["hits"]["total"]["value"] > len(docs):
+                query["from"] = len(docs)
+                cursor = await self.query_items(query)
+                async for doc in cursor:
+                    docs.append(doc)
+
+        # Return the results
+        return {"_items": docs, "hits": cursor.hits}
 
 
 async def get_history_users(
-    item_ids: List[Union[ObjectId, str]],
-    active_user_ids: List[Union[ObjectId, str]],
-    active_company_ids: List[Union[ObjectId, str]],
+    item_ids: list[ObjectId | str],
+    active_user_ids: list[ObjectId | str],
+    active_company_ids: list[ObjectId | str],
     section: str,
     action: str,
 ) -> List[str]:
@@ -126,12 +127,16 @@ async def get_history_users(
         "from": 0,
     }
 
-    # Get the results
-    histories = await HistoryService().fetch_history(source, all=True)
-    histories_items = histories._items or []
+    histories_cursor = await HistoryService().find(source)
+
+    # Collect the history items
+    histories_items = []
+    async for history in histories_cursor:
+        histories_items.append(history)
+
     # Filter out the users
     user_ids = [str(uid) for uid in active_user_ids]
-    return [str(h.user) for h in histories_items if h.user in user_ids]
+    return [str(h["user"]) for h in histories_items if str(h["user"]) in user_ids]
 
 
 history_resource_config = ResourceConfig(
@@ -151,6 +156,7 @@ history_resource_config = ResourceConfig(
             ),
         ],
     ),
+    elastic=ElasticResourceConfig(),
 )
 
 history_endpoint = EndpointGroup("history", __name__)
@@ -169,7 +175,7 @@ async def create(args: None, params: RouteParams, request: Request) -> Response:
     user = await get_user_or_abort()
 
     if not params_dict.get("item") or not params_dict.get("action") or not params_dict.get("section"):
-        return "", gettext("Activity History: Inavlid request")
+        return Response({"error": str(gettext("Activity History: Invalid request"))}, 400)
 
     await HistoryService().create_history_record(
         [params_dict["item"]], params_dict["action"], user, params_dict["section"]
