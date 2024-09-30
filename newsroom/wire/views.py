@@ -57,6 +57,7 @@ from .items import get_items_for_dashboard
 from newsroom.assets import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
+from newsroom.history_async import HistoryService
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -359,7 +360,7 @@ async def download():
         _file.seek(0)
 
     update_action_list(data["items"], "downloads", force_insert=True)
-    get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
+    await HistoryService().create_history_record(items, "download", user, request.args.get("type", "wire"))
     return await send_file(
         _file,
         mimetype=mimetype,
@@ -433,9 +434,7 @@ async def share():
             template_kwargs=template_kwargs,
         )
     update_action_list(data.get("items"), "shares", item_type=item_type)
-    get_resource_service("history").create_history_record(
-        items, "share", current_user, request.args.get("type", "wire")
-    )
+    await HistoryService().create_history_record(items, "share", current_user, request.args.get("type", "wire"))
     return jsonify(), 201
 
 
@@ -511,7 +510,7 @@ async def copy(_id):
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
-    get_resource_service("history").create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
+    await HistoryService().create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
     return jsonify({"data": copy_data}), 200
 
 
@@ -555,9 +554,7 @@ async def item(_id):
             template = "wire_item_print.html"
 
         update_action_list([_id], "prints", force_insert=True)
-        get_resource_service("history").create_history_record(
-            [item], "print", get_user(), request.args.get("type", "wire")
-        )
+        await HistoryService().create_history_record([item], "print", get_user(), request.args.get("type", "wire"))
 
     return await render_template(
         template,

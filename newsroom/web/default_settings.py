@@ -141,6 +141,7 @@ CORE_APPS = [
     "newsroom.companies",
     "newsroom.wire",
     "newsroom.topics",
+    "newsroom.history",
     "newsroom.products",
     "newsroom.section_filters",
     "newsroom.reports",

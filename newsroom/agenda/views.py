@@ -40,6 +40,7 @@ from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
+from newsroom.history_async import HistoryService
 
 
 @blueprint.route("/agenda")
@@ -90,9 +91,7 @@ async def item(_id):
         map = request.args.get("map")
         template = "agenda_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
-        get_resource_service("history").create_history_record(
-            [item], "print", get_user(), request.args.get("type", "agenda")
-        )
+        await HistoryService().create_history_record([item], "print", get_user(), request.args.get("type", "agenda"))
         return await render_template(
             template,
             item=item,
