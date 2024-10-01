@@ -55,8 +55,8 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             return {
                 "action": action,
                 "versioncreated": now,
-                "user": user.id,
-                "company": user.company,
+                "user": user["_id"],
+                "company": user.get("company"),
                 "item": item["_id"],
                 "version": str(item.get("version", item.get("_current_version"))),
                 "section": section,
@@ -178,7 +178,7 @@ async def create(args: None, params: RouteParams, request: Request) -> Response:
         return Response({"error": str(gettext("Activity History: Invalid request"))}, 400)
 
     await HistoryService().create_history_record(
-        [params_dict["item"]], params_dict["action"], user, params_dict["section"]
+        [params_dict["item"]], params_dict["action"], user.to_dict(), params_dict["section"]
     )
 
     return Response({"success": True}, 201)
