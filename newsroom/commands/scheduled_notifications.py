@@ -1,5 +1,4 @@
 import click
-from quart.cli import with_appcontext
 
 from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
 from .cli import newsroom_cli
@@ -14,8 +13,7 @@ from .cli import newsroom_cli
     required=False,
     help="Runs a schedule if one has not been run for that user's schedule",
 )
-@with_appcontext
-def send_scheduled_notifications(force=False):
+async def send_scheduled_notifications(force=False):
     """
     Send scheduled notifications
 
@@ -24,4 +22,4 @@ def send_scheduled_notifications(force=False):
 
         $ python manage.py send_scheduled_notifications
     """
-    SendScheduledNotificationEmails().run(force)
+    await SendScheduledNotificationEmails().run(force)

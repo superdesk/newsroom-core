@@ -1,15 +1,14 @@
-from quart.cli import with_appcontext
 from elasticsearch import exceptions as es_exceptions
 from eve_elastic import get_es
 
 from superdesk.core import get_current_app
 from superdesk.commands.flush_elastic_index import FlushElasticIndex
+
 from .cli import newsroom_cli
 
 
 @newsroom_cli.command("elastic_rebuild")
-@with_appcontext
-def elastic_rebuild():
+async def elastic_rebuild():
     """
     It removes elastic index, creates a new one(s) and index it from mongo.
 
@@ -19,11 +18,15 @@ def elastic_rebuild():
         $ flask newsroom elastic_rebuild
 
     """
+    await run_elastic_rebuild()
+
+
+async def run_elastic_rebuild():
     app = get_current_app()
 
     delete_elastic(app.config["ELASTICSEARCH_INDEX"])
     delete_elastic(app.config["CONTENTAPI_ELASTICSEARCH_INDEX"])
-    FlushElasticIndex().run(sd_index=True, capi_index=True)
+    await FlushElasticIndex().run(sd_index=True, capi_index=True)
 
 
 def delete_elastic(index_prefix: str):

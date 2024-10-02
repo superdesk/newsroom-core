@@ -1,5 +1,4 @@
 import click
-from quart.cli import with_appcontext
 
 from superdesk.core import get_current_app
 from superdesk.commands.index_from_mongo import IndexFromMongo
@@ -16,14 +15,13 @@ from .cli import newsroom_cli
 @click.option("-c", "--collection", default=None, help="Name of the collection to index")
 @click.option("-t", "--timestamp", default=None, help="Timestamp to start indexing from")
 @click.option("-d", "--direction", type=click.Choice(["older", "newer"]), default="older", help="Direction of indexing")
-@with_appcontext
-def index_from_mongo_period(hours, collection, timestamp, direction):
+async def index_from_mongo_period(hours, collection, timestamp, direction):
     """
     It allows to reindex up to a certain period.
     """
     app = get_current_app()
     print("Checking if elastic index exists, a new one will be created if not")
-    app.data.init_elastic(app)
+    await app.data.init_elastic(app)
     print("Elastic index check has been completed")
 
     if timestamp:
@@ -36,7 +34,6 @@ def index_from_mongo_period(hours, collection, timestamp, direction):
 @click.option("--from", "-f", "collection_name", help="Name of the collection to index")
 @click.option("--all", "all_collections", is_flag=True, help="Index all collections")
 @click.option("--page-size", "-p", default=500, help="Page size for indexing")
-@with_appcontext
 def index_from_mongo(collection_name, all_collections, page_size):
     """Index the specified mongo collection in the specified elastic collection/type.
 

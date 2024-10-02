@@ -1,7 +1,6 @@
 from typing import List, Dict, Optional, Any
 from copy import deepcopy
 
-from quart.cli import with_appcontext
 from eve.utils import ParsedRequest
 
 from superdesk.core import json
@@ -13,7 +12,6 @@ from .cli import newsroom_cli
 
 
 @newsroom_cli.command("fix_topic_nested_filters")
-@with_appcontext
 def _fix_topic_nested_filters():
     fix_topic_nested_filters()
 
