@@ -5,8 +5,6 @@ import elasticsearch.exceptions
 
 from collections import OrderedDict
 
-from quart.cli import with_appcontext
-
 from superdesk.core import get_current_app
 from apps.prepopulate.app_initialize import import_file
 from .cli import newsroom_cli
@@ -101,7 +99,6 @@ class AppInitializeWithDataCommand:
     required=False,
     help="if True, it only initializes index only",
 )
-@with_appcontext
 def initialize_data(entity_name, force, init_index_only):
     """Initialize application with predefined data for various entities.
 

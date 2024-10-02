@@ -3,7 +3,7 @@ import os
 from newsroom.flask import send_from_directory
 
 from newsroom.auth import get_user
-from newsroom.commands.cli import commands_blueprint, newsroom_cli
+from newsroom.commands.cli import commands_blueprint
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
