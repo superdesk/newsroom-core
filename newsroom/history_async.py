@@ -6,7 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, Dict, Annotated, List, Any
 
-from newsroom import MONGO_PREFIX
+from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
 from newsroom.users.utils import get_user_or_abort
 from newsroom.utils import get_json_or_400
 from newsroom.core.resources.model import NewshubResourceModel
@@ -156,7 +156,7 @@ history_resource_config = ResourceConfig(
             ),
         ],
     ),
-    elastic=ElasticResourceConfig(),
+    elastic=ElasticResourceConfig(prefix=ELASTIC_PREFIX),
 )
 
 history_endpoint = EndpointGroup("history", __name__)
