@@ -9,14 +9,14 @@ from newsroom.data_updates import (
 from .cli import newsroom_cli
 
 
-@newsroom_cli.register_async_command("data_generate_update", with_appcontext=True)
+@newsroom_cli.command("data_generate_update")
 @click.option("-r", "--resource", required=True, help="The resource for which you want to generate the update")
 async def data_generate_update(resource):
     cmd = GenerateUpdate()
     await cmd.run(resource)
 
 
-@newsroom_cli.register_async_command("data_upgrade", with_appcontext=True)
+@newsroom_cli.command("data_upgrade")
 @click.option(
     "-i",
     "--id",
@@ -46,7 +46,7 @@ async def data_upgrade(data_update_id=None, fake=False, dry=False):
     await cmd.run(data_update_id, fake, dry)
 
 
-@newsroom_cli.register_async_command("data_downgrade", with_appcontext=True)
+@newsroom_cli.command("data_downgrade")
 @click.option(
     "-i",
     "--id",

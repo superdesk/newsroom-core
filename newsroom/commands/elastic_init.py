@@ -2,7 +2,7 @@ from newsroom.core import get_current_wsgi_app
 from .cli import newsroom_cli
 
 
-@newsroom_cli.register_async_command("elastic_init", with_appcontext=True)
+@newsroom_cli.command("elastic_init")
 async def elastic_init():
     """Init elastic index.
 

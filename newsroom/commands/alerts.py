@@ -3,7 +3,7 @@ from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from .cli import newsroom_cli
 
 
-@newsroom_cli.register_async_command("send_company_expiry_alerts", with_appcontext=True)
+@newsroom_cli.command("send_company_expiry_alerts")
 async def send_company_expiry_alerts():
     """
     Send expiry alerts for companies which are close to be expired (now + 7 days)
@@ -17,7 +17,7 @@ async def send_company_expiry_alerts():
     await CompanyExpiryAlerts().send_alerts()
 
 
-@newsroom_cli.register_async_command("send_monitoring_schedule_alerts", with_appcontext=True)
+@newsroom_cli.command("send_monitoring_schedule_alerts")
 async def send_monitoring_schedule_alerts():
     """
     Send monitoring schedule alerts.
@@ -31,7 +31,7 @@ async def send_monitoring_schedule_alerts():
     await MonitoringEmailAlerts().run()
 
 
-@newsroom_cli.register_async_command("send_monitoring_immediate_alerts", with_appcontext=True)
+@newsroom_cli.command("send_monitoring_immediate_alerts")
 async def send_monitoring_immediate_alerts():
     """
     Send monitoring immediate alerts.
