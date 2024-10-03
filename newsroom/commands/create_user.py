@@ -20,7 +20,7 @@ async def create_user(email, password, first_name, last_name, is_admin):
     Example:
     ::
 
-        $ flask newsroom create_user admin@admin.com adminadmin admin admin True
+        $ python manage.py create_user admin@admin.com adminadmin admin admin True
     """
     new_user = {
         "email": email,
