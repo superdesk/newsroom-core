@@ -50,21 +50,26 @@ def strtobool(val):
 def query_string(
     query: str,
     default_operator: Literal["AND", "OR"] = "AND",
-    fields: List[str] = ["*"],
+    fields: list[str] | None = None,
     multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
     analyze_wildcard=False,
 ) -> QueryStringQuery:
-    query_string_settings = get_app_config("ELASTICSEARCH_SETTINGS")["settings"]["query_string"]
-    return {
-        "query_string": {
-            "query": query,
-            "default_operator": default_operator,
-            "analyze_wildcard": query_string_settings["analyze_wildcard"] or analyze_wildcard,
-            "lenient": True,
-            "fields": fields,
-            "type": multimatch_type,
-        }
-    }
+    query_string_params = get_app_config("ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS", {}).copy()
+
+    query_string_params.update(
+        dict(
+            query=query,
+            default_operator=default_operator,
+            lenient=True,
+            fields=fields if fields is not None else ["*"],
+            type=multimatch_type,
+            # We only set ``analyze_wildcard`` if the default is turned off
+            # otherwise if default is turned on, then we always set it to True
+            analyze_wildcard=query_string_params.get("analyze_wildcard") or analyze_wildcard,
+        )
+    )
+
+    return dict(query_string=query_string_params)
 
 
 def get_filter_query(
