@@ -34,7 +34,7 @@ def index_from_mongo_period(hours, collection, timestamp, direction):
 @click.option("--from", "-f", "collection_name", help="Name of the collection to index")
 @click.option("--all", "all_collections", is_flag=True, help="Index all collections")
 @click.option("--page-size", "-p", default=500, help="Page size for indexing")
-def index_from_mongo(collection_name, all_collections, page_size):
+async def index_from_mongo(collection_name, all_collections, page_size):
     """Index the specified mongo collection in the specified elastic collection/type.
 
     This will use the default APP mongo DB to read the data and the default Elastic APP index.
@@ -44,8 +44,8 @@ def index_from_mongo(collection_name, all_collections, page_size):
     Example:
     ::
 
-        $ flask newsroom index_from_mongo --from=items
-        $ flask newsroom index_from_mongo --all
+        $ python manage.py index_from_mongo --from=items
+        $ python manage.py index_from_mongo --all
 
     """
-    IndexFromMongo().run(collection_name, all_collections, page_size, None, None)
+    await IndexFromMongo().run(collection_name, all_collections, page_size, None, None)

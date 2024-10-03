@@ -24,9 +24,11 @@ def schema_migrate(resource_name=None):
     Example:
     ::
 
-        $ python manage.py schema:migrate
+        $ python manage.py schema_migrate
 
     """
+
+    # TODO-ASYNC: Revisit when "wire" and "agenda" are migrated to async
 
     lock_name = "schema_migrate"
 

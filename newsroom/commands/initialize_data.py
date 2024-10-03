@@ -24,7 +24,7 @@ __entities__: OrderedDict = OrderedDict(
 
 
 class AppInitializeWithDataCommand:
-    def run(self, entity_name=None, force=False, init_index_only=False):
+    async def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info("Starting data initialization")
         app = get_current_app()
 
@@ -39,9 +39,10 @@ class AppInitializeWithDataCommand:
 
         # create indexes in mongo
         app.init_indexes()
+
         # put mapping to elastic
         try:
-            app.data.init_elastic(app)
+            await app.data.init_elastic(app)
         except elasticsearch.exceptions.TransportError as err:
             logger.error("Error when initializing elastic %s", err)
 
@@ -99,7 +100,7 @@ class AppInitializeWithDataCommand:
     required=False,
     help="if True, it only initializes index only",
 )
-def initialize_data(entity_name, force, init_index_only):
+async def initialize_data(entity_name, force, init_index_only):
     """Initialize application with predefined data for various entities.
 
     Loads predefined data (users, ui_config, email_templates, etc..) for instance.
@@ -115,11 +116,11 @@ def initialize_data(entity_name, force, init_index_only):
     Example:
     ::
 
-        $ flask newsroom initialize_data
+        $ python manage.py initialize_data
 
     """
     cmd = AppInitializeWithDataCommand()
-    cmd.run(
+    await cmd.run(
         entity_name=entity_name,
         force=force,
         init_index_only=init_index_only,
