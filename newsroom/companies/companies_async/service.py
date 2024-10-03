@@ -15,7 +15,7 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
     async def on_create(self, docs: List[CompanyResource]) -> None:
         await super().on_create(docs)
         for company in docs:
-            company_create.send(self, company=company.model_dump(by_alias=True, exclude_unset=True))
+            company_create.send(self, company=company.to_dict())
 
     async def on_update(self, updates: Dict[str, Any], original: CompanyResource) -> None:
         await super().on_update(updates, original)
@@ -32,7 +32,7 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
 
         await super().on_updated(updates, original)
 
-        original_dict = original.model_dump(by_alias=True, exclude_unset=True)
+        original_dict = original.to_dict()
         updated = deepcopy(original_dict)
         updated.update(updates)
 

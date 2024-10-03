@@ -71,12 +71,10 @@ async def search(_a, params: SearchParams, _q):
 @admin_only
 async def create(request: Request):
     nav_data = await get_nav_data_from_request(request)
-    service = NavigationsService()
 
     creation_data = await prepare_navigation_data(nav_data)
-    creation_data["_id"] = service.generate_id()
     product_ids = creation_data.pop("products", [])
-    created_ids = await service.create([creation_data])
+    created_ids = await NavigationsService().create([creation_data])
 
     if product_ids is not None:
         await add_remove_products_for_navigation(ObjectId(created_ids[0]), product_ids)

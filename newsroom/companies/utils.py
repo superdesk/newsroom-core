@@ -45,7 +45,7 @@ def get_updated_sections(updates, original, company: Optional[CompanyResource]) 
     if not company:
         return sections
 
-    company_section_names = get_company_section_names(company.model_dump(by_alias=True))
+    company_section_names = get_company_section_names(company.to_dict())
     return {section: enabled and section in company_section_names for section, enabled in sections.items()}
 
 
@@ -59,7 +59,7 @@ def get_updated_products(updates, original, company: Optional[CompanyResource]) 
     if not company:
         return products
 
-    company_dict = company.model_dump(by_alias=True)
+    company_dict = company.to_dict()
     company_section_names = get_company_section_names(company_dict)
     company_product_ids = get_company_product_ids(company_dict)
 
