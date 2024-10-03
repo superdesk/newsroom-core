@@ -2,7 +2,6 @@ from quart import json
 from time import sleep
 from datetime import datetime, timedelta
 from eve.utils import ParsedRequest
-from unittest.mock import patch
 from bson import ObjectId
 
 from newsroom.mongo_utils import (
@@ -10,7 +9,6 @@ from newsroom.mongo_utils import (
     index_elastic_from_mongo_from_timestamp,
 )
 
-from newsroom.users.service import UsersService
 from newsroom.wire.search import (
     WireSearchResource,
     get_aggregations as get_wire_aggregations,
@@ -171,9 +169,7 @@ async def test_fix_topic_nested_filters(app, admin):
         ],
     )
 
-    admin_user = await UsersService().find_by_id(admin["_id"])
-    with patch("newsroom.topics.topics_async.get_user_or_abort", return_value=admin_user) as _:
-        await fix_topic_nested_filters()
+    await fix_topic_nested_filters()
 
     updated_topic = app.data.find_one("topics", None, topic_id)
 

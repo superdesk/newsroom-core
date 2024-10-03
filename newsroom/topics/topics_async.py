@@ -4,7 +4,7 @@ from pydantic import Field
 from typing import Optional, List, Dict, Any, Annotated, Union
 
 from newsroom import MONGO_PREFIX
-from newsroom.users.utils import get_user_or_abort
+from newsroom.users.utils import get_user_async, get_user_or_abort
 
 # from newsroom.signals import user_deleted
 
@@ -84,7 +84,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
     async def on_updated(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_updated(updates, original)
-        current_user = await get_user_or_abort()
+        current_user = await get_user_async()
 
         if current_user:
             user_dict = current_user.to_dict()
