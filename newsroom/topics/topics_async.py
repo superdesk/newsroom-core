@@ -4,7 +4,7 @@ from pydantic import Field
 from typing import Optional, List, Dict, Any, Annotated, Union
 
 from newsroom import MONGO_PREFIX
-from newsroom.users.utils import get_user_async, get_user_or_abort
+from newsroom.users.utils import get_user_async
 
 # from newsroom.signals import user_deleted
 
