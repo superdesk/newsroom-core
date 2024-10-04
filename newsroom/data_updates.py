@@ -1,25 +1,16 @@
-# -*- coding: utf-8; -*-
-#
-# This file is part of Superdesk.
-#
-# Copyright 2013, 2014 Sourcefabric z.u. and contributors.
-#
-# For the full copyright and license information, please see the
-# AUTHORS and LICENSE files distributed with this source code, or
-# at https://www.sourcefabric.org/superdesk/license
-
-
-import getpass
 import os
 import re
 import time
+import getpass
+import superdesk
+
 from string import Template
 from types import ModuleType
 
 from eve.utils import ParsedRequest
 
-import superdesk
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_app_config
+from newsroom.core import get_current_wsgi_app
 
 
 DEFAULT_DATA_UPDATE_DIR_NAME = "data_updates"
@@ -96,45 +87,22 @@ def get_data_updates_files(strip_file_extension=False):
     return files
 
 
-class DataUpdateCommand(superdesk.Command):
+class DataUpdateCommand:
     """Parent class for Upgrade and Downgrade commands.
 
     It defines options and initialize some variables in `run` method.
     """
-
-    option_list = [
-        superdesk.Option(
-            "--id",
-            "-i",
-            dest="data_update_id",
-            required=False,
-            choices=get_data_updates_files(strip_file_extension=True),
-            help="Data update id to run last",
-        ),
-        superdesk.Option(
-            "--fake-init",
-            dest="fake",
-            required=False,
-            action="store_true",
-            help="Mark data updates as run without actually running them",
-        ),
-        superdesk.Option(
-            "--dry-run",
-            dest="dry",
-            required=False,
-            action="store_true",
-            help="Does not mark data updates as done. This can be useful for development.",
-        ),
-    ]
 
     def get_applied_updates(self):
         req = ParsedRequest()
         req.sort = "-name"
         return tuple(self.data_updates_service.get(req=req, lookup={}))
 
-    def run(self, data_update_id=None, fake=False, dry=False):
+    async def run(self, data_update_id=None, fake=False, dry=False):
+        # TODO-ASYNC: revisit when `data_updates` module is migrated to async
         self.data_updates_service = superdesk.get_resource_service("data_updates")
         self.data_updates_files = get_data_updates_files(strip_file_extension=True)
+
         # retrieve existing data updates in database
         data_updates_applied = self.get_applied_updates()
         self.last_data_update = data_updates_applied and data_updates_applied[-1] or None
@@ -146,27 +114,36 @@ class DataUpdateCommand(superdesk.Command):
                 )
 
     def compile_update_in_module(self, data_update_name):
-        date_update_script_file = None
+        data_update_script_file = None
         for folder in get_dirs():
-            date_update_script_file = os.path.join(folder, "%s.py" % (data_update_name))
-            if os.path.exists(date_update_script_file):
+            data_update_script_file = os.path.join(folder, "%s.py" % (data_update_name))
+            if os.path.exists(data_update_script_file):
                 break
-        assert date_update_script_file is not None, "File %s has not been found" % (data_update_name)
+        assert data_update_script_file is not None, "File %s has not been found" % (data_update_name)
         # create a module instance to use as scope for our data update
         module = ModuleType("data_update_module")
-        with open(date_update_script_file) as f:
+        with open(data_update_script_file) as f:
             # compile data update script file
-            script = compile(f.read(), date_update_script_file, "exec")
-            # excecute the script in the module
+            script = compile(f.read(), data_update_script_file, "exec")
+            # execute the script in the module
             exec(script, module.__dict__)
         return module
 
     def in_db(self, update):
         return update in map(lambda _: _["name"], self.get_applied_updates())
 
-    def resource_registered(self, module_scope):
+    def is_resource_registered(self, module_scope) -> bool:
+        """
+        Checks whether a resource is registered in either the asynchronous resource service or
+        falls back to checking the legacy sync data collection.
+        """
+        app = get_current_wsgi_app()
+        async_app = app.async_app
+        resource_name = module_scope.DataUpdate.resource
+
         try:
-            get_current_app().data.get_mongo_collection(module_scope.DataUpdate.resource)
+            # TODO-ASYNC: remove `app.data` call once all is migrated to async
+            async_app.resources.get_resource_service(resource_name) or app.data.get_mongo_collection(resource_name)
             return True
         except KeyError:
             return False
@@ -180,33 +157,38 @@ class Upgrade(DataUpdateCommand):
     Example:
     ::
 
-        $ python manage.py data:upgrade
+        $ python manage.py data_upgrade
 
     """
 
-    def run(self, data_update_id=None, fake=False, dry=False):
-        super().run(data_update_id, fake, dry)
+    async def run(self, data_update_id=None, fake=False, dry=False):
+        await super().run(data_update_id, fake, dry)
+
         data_updates_files = self.data_updates_files
         # drops updates that already have been applied
         data_updates_files = [update for update in data_updates_files if not self.in_db(update)]
+
         # drop versions after given one
         if data_update_id:
             if data_update_id not in data_updates_files:
                 print("Given data update id not found in available updates. It may have been already applied")
                 return False
             data_updates_files = data_updates_files[: data_updates_files.index(data_update_id) + 1]
+
         # apply data updates
         for data_update_name in data_updates_files:
             print("data update %s running forward..." % (data_update_name))
             module_scope = self.compile_update_in_module(data_update_name)
             # run the data update forward
-            if not self.resource_registered(module_scope):
+            if not self.is_resource_registered(module_scope):
                 print(f"skipping data update {data_update_name}, resource not registered")
             elif not fake:
-                module_scope.DataUpdate().apply("forwards")
+                await module_scope.DataUpdate().apply("forwards")
             if not dry:
+                # TODO-ASYNC: update when `data_updates` module is migrated to async
                 # store the applied data update in the database
                 self.data_updates_service.create([{"name": data_update_name}])
+                pass
         if not data_updates_files:
             print("No data update to apply.")
 
@@ -219,12 +201,12 @@ class Downgrade(DataUpdateCommand):
     Example:
     ::
 
-        $ python manage.py data:downgrade
+        $ python manage.py data_downgrade
 
     """
 
-    def run(self, data_update_id=None, fake=False, dry=False):
-        super().run(data_update_id, fake, dry)
+    async def run(self, data_update_id=None, fake=False, dry=False):
+        await super().run(data_update_id, fake, dry)
         data_updates_files = self.data_updates_files
         # check if there is something to downgrade
         if not self.last_data_update:
@@ -251,10 +233,10 @@ class Downgrade(DataUpdateCommand):
             print("data update %s running backward..." % (data_update_name))
             module_scope = self.compile_update_in_module(data_update_name)
             # run the data update backward
-            if not self.resource_registered(module_scope):
+            if not self.is_resource_registered(module_scope):
                 print(f"Skipping data update {data_update_name}, resource not registered")
             elif not fake:
-                module_scope.DataUpdate().apply("backwards")
+                await module_scope.DataUpdate().apply("backwards")
             if not dry:
                 # remove the applied data update from the database
                 self.data_updates_service.delete({"name": data_update_name})
@@ -262,35 +244,17 @@ class Downgrade(DataUpdateCommand):
             print("No data update to apply.")
 
 
-class GenerateUpdate(superdesk.Command):
+class GenerateUpdate:
     """Generate a file where to define a new data update.
 
     Example:
     ::
 
-        $ python manage.py data:generate_update --resource=archive
+        $ python manage.py data_generate_update --resource=archive
 
     """
 
-    option_list = [
-        superdesk.Option(
-            "--resource",
-            "-r",
-            dest="resource_name",
-            required=True,
-            help="Resource to update",
-        ),
-        superdesk.Option(
-            "--global",
-            "-g",
-            dest="global_update",
-            required=False,
-            action="store_true",
-            help="This data update belongs to superdesk core",
-        ),
-    ]
-
-    def run(self, resource_name, global_update=False):
+    async def run(self, resource_name, global_update=False):
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         # create a data update file
         try:
@@ -317,20 +281,3 @@ class GenerateUpdate(superdesk.Command):
             }
             f.write(Template(DATA_UPDATE_TEMPLATE).substitute(template_context))
             print("Data update file created %s" % (data_update_filename))
-
-
-superdesk.command("data:generate_update", GenerateUpdate())
-superdesk.command("data:upgrade", Upgrade())
-superdesk.command("data:downgrade", Downgrade())
-
-
-class DataUpdate:
-    resource: str
-
-    def apply(self, direction):
-        assert direction in ["forwards", "backwards"]
-
-        app = get_current_app()
-        collection = app.data.get_mongo_collection(self.resource)
-        db = app.data.driver.db
-        getattr(self, direction)(collection, db)

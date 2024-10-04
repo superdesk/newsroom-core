@@ -3,6 +3,7 @@ from typing import List
 from quart import json
 from pytest import fixture
 from bson import ObjectId
+from tests.core.utils import create_entries_for
 from tests.fixtures import PUBLIC_USER_ID
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
@@ -26,7 +27,7 @@ def get_fixture_path(fixture):
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -40,24 +41,24 @@ async def init(app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "users",
         [
             {
                 "_id": ObjectId("5c53afa45f627d8333220f15"),
                 "email": "foo_user@bar.com",
                 "first_name": "Foo_First_name",
+                "last_name": "Doe",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": "",
             },
             {
                 "_id": ObjectId("5c4684645f627debec1dc3db"),
                 "email": "foo_user2@bar.com",
                 "first_name": "Foo_First_name2",
+                "last_name": "Doe",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": "",
             },
         ],
     )

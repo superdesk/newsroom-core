@@ -34,3 +34,10 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
         if self.clear_item_cache_on_update:
             app = get_current_wsgi_app()
             app.cache.delete(str(doc.id))
+
+    async def find_items_by_ids(self, ids: list[str]) -> list[NewshubResourceModelType]:
+        """
+        Fetches and returns the entries from database for the given list of IDs
+        """
+        cursor = await self.search({"_id": {"$in": ids}})
+        return await cursor.to_list()

@@ -13,11 +13,7 @@ from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.types import AuthProviderConfig
-from newsroom.utils import (
-    get_public_user_data,
-    query_resource,
-    get_json_or_400_async,
-)
+from newsroom.utils import get_public_user_data, query_resource, get_json_or_400_async
 from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs

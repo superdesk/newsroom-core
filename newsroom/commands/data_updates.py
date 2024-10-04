@@ -1,5 +1,4 @@
 import click
-from quart.cli import with_appcontext
 from newsroom.data_updates import (
     GenerateUpdate,
     Upgrade,
@@ -11,11 +10,10 @@ from .cli import newsroom_cli
 
 
 @newsroom_cli.command("data_generate_update")
-@click.option("-r", "--resource", required=True, help="Resource to generate update for")
-@with_appcontext
-def data_generate_update(resource):
+@click.option("-r", "--resource", required=True, help="The resource for which you want to generate the update")
+async def data_generate_update(resource):
     cmd = GenerateUpdate()
-    cmd.run(resource)
+    await cmd.run(resource)
 
 
 @newsroom_cli.command("data_upgrade")
@@ -43,10 +41,9 @@ def data_generate_update(resource):
     required=False,
     help="Does not mark data updates as done. This can be useful for development.",
 )
-@with_appcontext
-def data_upgrade(data_update_id=None, fake=False, dry=False):
+async def data_upgrade(data_update_id=None, fake=False, dry=False):
     cmd = Upgrade()
-    cmd.run(data_update_id, fake, dry)
+    await cmd.run(data_update_id, fake, dry)
 
 
 @newsroom_cli.command("data_downgrade")
@@ -74,7 +71,6 @@ def data_upgrade(data_update_id=None, fake=False, dry=False):
     required=False,
     help="Does not mark data updates as done. This can be useful for development.",
 )
-@with_appcontext
-def data_downgrade(data_update_id=None, fake=False, dry=False):
+async def data_downgrade(data_update_id=None, fake=False, dry=False):
     cmd = Downgrade()
-    cmd.run(data_update_id, fake, dry)
+    await cmd.run(data_update_id, fake, dry)

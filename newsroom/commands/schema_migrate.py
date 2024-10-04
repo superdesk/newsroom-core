@@ -1,5 +1,4 @@
 import click
-from quart.cli import with_appcontext
 
 from superdesk.core import get_current_app, get_app_config
 from superdesk.lock import lock, unlock
@@ -13,7 +12,6 @@ VERSION_ID = "schema_version"
 
 @newsroom_cli.command("schema_migrate")
 @click.argument("resource_name", required=False)
-@with_appcontext
 def schema_migrate(resource_name=None):
     """Migrate elastic schema if needed, should be triggered on every deploy.
 
@@ -26,9 +24,11 @@ def schema_migrate(resource_name=None):
     Example:
     ::
 
-        $ python manage.py schema:migrate
+        $ python manage.py schema_migrate
 
     """
+
+    # TODO-ASYNC: Revisit when "wire" and "agenda" are migrated to async
 
     lock_name = "schema_migrate"
 

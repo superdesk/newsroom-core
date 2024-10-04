@@ -11,7 +11,6 @@
 import base64
 import datetime
 import logging
-from bson import ObjectId
 from urllib.parse import urlparse
 
 from eve.utils import ParsedRequest
@@ -25,7 +24,7 @@ from superdesk.lock import lock, unlock
 from newsroom.celery_app import celery
 from newsroom.email import send_user_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
-from newsroom.utils import parse_date_str, get_items_by_id, get_entity_or_404
+from newsroom.utils import parse_date_str
 
 from .utils import get_monitoring_file, truncate_article_body
 
@@ -36,16 +35,17 @@ logger = logging.getLogger(__name__)
 class MonitoringEmailAlerts(Command):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.log_msg = "Monitoring Scheduled Alerts: {}".format(utcnow())
+        self.log_msg = f"Monitoring Scheduled Alerts: {utcnow()}"
 
     async def run(self, immediate=False):
         try:
+            # TODO-ASYNC: update this below when monitoring is migrated to async
             get_resource_service("monitoring")
         except KeyError:
-            logger.info("{} Monitoring app is not enabled! Not sending email alerts".format(self.log_msg))
+            logger.info(f"{self.log_msg} Monitoring app is not enabled! Not sending email alerts")
             return
 
-        logger.info("{} Starting to send alerts.".format(self.log_msg))
+        logger.info(f"{self.log_msg} Starting to send alerts.")
 
         lock_name = get_lock_id(
             "newsroom",
@@ -240,21 +240,33 @@ class MonitoringEmailAlerts(Command):
             error_recipients = general_settings["values"]["system_alerts_recipients"].split(",")
 
         from newsroom.email import send_template_email
+        from newsroom.users import UsersService
+        from newsroom.companies import CompanyServiceAsync
 
-        for m in monitoring_list:
-            if m.get("users"):
-                users = get_items_by_id([ObjectId(u) for u in m["users"]], "users")
+        users_service = UsersService()
+        companies_service = CompanyServiceAsync()
+
+        for monitoring_data in monitoring_list:
+            if monitoring_data.get("users"):
+                users = await users_service.find_items_by_ids(monitoring_data["users"])
+
                 internal_req = ParsedRequest()
                 internal_req.args = {
-                    "navigation": str(m["_id"]),
+                    "navigation": str(monitoring_data["_id"]),
                     "created_from": created_from,
                     "created_from_time": created_from_time,
                     "skip_user_validation": True,
                 }
+                # TODO-ASYNC: update this below when `monitoring_search` is migrated to async
                 items = list(get_resource_service("monitoring_search").get(req=internal_req, lookup=None))
-                template_kwargs = {"profile": m}
+                template_kwargs = {"profile": monitoring_data}
+
                 if items:
-                    company = get_entity_or_404(m["company"], "companies")
+                    company = await companies_service.find_by_id(monitoring_data["company"])
+                    if company is None:
+                        logger.exception(f"Company {monitoring_data['company']} not found!")
+                        continue
+
                     try:
                         template_kwargs.update(
                             {
@@ -262,10 +274,12 @@ class MonitoringEmailAlerts(Command):
                                 "section": "wire",
                             }
                         )
-                        truncate_article_body(items, m)
-                        _file = await get_monitoring_file(m, items)
+                        truncate_article_body(items, monitoring_data)
+                        _file = await get_monitoring_file(monitoring_data, items)
                         attachment = base64.b64encode(_file.read())
-                        formatter = get_current_app().as_any().download_formatters[m["format_type"]]["formatter"]
+                        formatter = (
+                            get_current_app().as_any().download_formatters[monitoring_data["format_type"]]["formatter"]
+                        )
 
                         for user in users:
                             await send_user_email(
@@ -278,23 +292,21 @@ class MonitoringEmailAlerts(Command):
                                         "file_name": formatter.format_filename(None),
                                         "content_type": "application/{}".format(formatter.FILE_EXTENSION),
                                         "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
-                                            m["name"]
+                                            monitoring_data["name"]
                                         ),
                                     }
                                 ],
                             )
                     except Exception:
                         logger.exception(
-                            "{0} Error processing monitoring profile {1} for company {2}.".format(
-                                self.log_msg, m["name"], company["name"]
-                            )
+                            f"{self.log_msg} Error processing monitoring profile {monitoring_data['name']} for company {company.name}."
                         )
                         if error_recipients:
                             # Send an email to admin
                             template_kwargs = {
-                                "profile": m,
-                                "name": m["name"],
-                                "company": company["name"],
+                                "profile": monitoring_data,
+                                "name": monitoring_data["name"],
+                                "company": company.name,
                                 "run_time": now,
                             }
                             await send_template_email(
@@ -302,7 +314,7 @@ class MonitoringEmailAlerts(Command):
                                 template="monitoring_error",
                                 template_kwargs=template_kwargs,
                             )
-                elif m["schedule"].get("interval") != "immediate" and m.get("always_send"):
+                elif monitoring_data["schedule"].get("interval") != "immediate" and monitoring_data.get("always_send"):
                     for user in users:
                         await send_user_email(
                             user,
@@ -311,7 +323,7 @@ class MonitoringEmailAlerts(Command):
                         )
 
             get_resource_service("monitoring").patch(
-                m["_id"],
+                monitoring_data["_id"],
                 {"last_run_time": local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)},
             )
 
