@@ -234,6 +234,7 @@ class AgendaResource(newsroom.Resource):
     schema["calendars"] = events_schema["calendars"]
     schema["location"] = deepcopy(events_schema["location"])
     schema["location"]["mapping"]["dynamic"] = False
+    schema["location"]["mapping"]["properties"]["address"]["dynamic"] = True  # used for location search
 
     # update location name to allow exact search and term based searching
     schema["location"]["mapping"]["properties"]["name"] = {"type": "text", "fields": {"keyword": {"type": "keyword"}}}
