@@ -2,17 +2,18 @@ import base64
 import email.policy as email_policy
 
 from lxml import etree
-from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
-from pydantic import BaseModel
 from typing_extensions import TypedDict
+from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
 
 from quart_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
+from superdesk.logging import logger
 from superdesk import get_resource_service
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import render_template, url_for
+
 from newsroom.gettext import get_user_timezone
 from newsroom.types import Company, User, Country, CompanyType
 from newsroom.auth import get_company
@@ -26,7 +27,6 @@ from newsroom.utils import (
 )
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
-from superdesk.logging import logger
 
 
 if TYPE_CHECKING:
@@ -240,7 +240,7 @@ async def send_user_email(
     **kwargs: EmailKwargs,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
-    if isinstance(user, BaseModel):
+    if isinstance(user, UserResourceModel):
         user = user.to_dict()
 
     if not user.get("receive_email") and not ignore_preferences:
