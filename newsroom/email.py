@@ -13,6 +13,7 @@ from superdesk.logging import logger
 from superdesk import get_resource_service
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import render_template, url_for
+from superdesk.core.resources import ResourceModel
 
 from newsroom.gettext import get_user_timezone
 from newsroom.types import Company, User, Country, CompanyType
@@ -240,7 +241,7 @@ async def send_user_email(
     **kwargs: EmailKwargs,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
-    if isinstance(user, UserResourceModel):
+    if isinstance(user, ResourceModel):
         user = user.to_dict()
 
     if not user.get("receive_email") and not ignore_preferences:
