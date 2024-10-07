@@ -458,7 +458,7 @@ types-python-dateutil==2.9.0.20240906
     # via
     #   -r mypy-requirements.txt
     #   arrow
-types-pytz==2024.2.0.20240913
+types-pytz==2024.2.0.20241003
     # via
     #   -r mypy-requirements.txt
     #   types-tzlocal
