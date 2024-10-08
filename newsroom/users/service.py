@@ -208,3 +208,12 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
                 return True
 
         return False
+
+    async def find_by_email(self, email: str) -> UserResourceModel | None:
+        """Find a user registry by email
+
+        :param email: Email of user to find
+        :return: ``None`` if user not found, otherwise an instance of ``UserResourceModel``
+        """
+
+        return await self.find_one(email=email)

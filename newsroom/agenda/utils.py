@@ -3,14 +3,14 @@ from datetime import timedelta
 
 from quart_babel import gettext
 
-from newsroom.companies.companies_async.service import CompanyService
 from superdesk.core import get_app_config
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
-from newsroom.template_filters import time_short, parse_date, format_datetime
 from newsroom.gettext import get_session_locale
 from newsroom.notifications import push_notification
+from newsroom.companies.companies_async import CompanyService
+from newsroom.template_filters import time_short, parse_date, format_datetime
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = "_time_to_be_confirmed"
