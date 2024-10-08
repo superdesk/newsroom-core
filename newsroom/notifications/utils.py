@@ -1,9 +1,9 @@
+import superdesk
 import datetime
 
 from bson import ObjectId
-import superdesk
-
 from typing import Any
+
 from superdesk.utc import utcnow
 from superdesk.flask import session
 from superdesk.core import get_app_config

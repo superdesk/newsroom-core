@@ -1,20 +1,20 @@
 import logging
-from typing import Any, Callable, Literal
+from typing import Any, Awaitable, Callable, Literal
 
 from pydantic import BaseModel
 from quart_babel import gettext
 
 from superdesk.lock import lock, unlock
 from superdesk import get_resource_service
-from superdesk.core.web import EndpointGroup, Request, Response
 from superdesk.core import json, get_app_config
+from superdesk.core.web import EndpointGroup, Request, Response
 
 from newsroom import signals
 from newsroom.utils import parse_date_str
 from newsroom.assets import ASSETS_RESOURCE
 from newsroom.core import get_current_wsgi_app
-from newsroom.flask import get_file_from_request
 from newsroom.web.factory import NewsroomWebApp
+from newsroom.flask import get_file_from_request
 from newsroom.wire.views import delete_dashboard_caches
 
 from .publishing import Publisher
@@ -28,16 +28,19 @@ push_endpoints = EndpointGroup("push", __name__)
 notifier = NotificationManager()
 publisher = Publisher()
 
-PublishHandlerFunc = Callable[[NewsroomWebApp, dict[str, Any]], None]
+PublishHandlerFunc = Callable[[NewsroomWebApp, dict[str, Any]], Awaitable[None]]
 
 
-def handle_publish_event(app: NewsroomWebApp, item):
+# TODO-ASYNC: Revisit this module when agenda, items and agenda_featured are async
+
+
+async def handle_publish_event(app: NewsroomWebApp, item):
     orig = app.data.find_one("agenda", req=None, _id=item["guid"])
     event_id = publisher.publish_event(item, orig)
     notify_new_agenda_item.delay(event_id, check_topics=True, is_new=orig is None)
 
 
-def handle_publish_planning(app: NewsroomWebApp, item):
+async def handle_publish_planning(app: NewsroomWebApp, item):
     orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
     item["planning_date"] = parse_date_str(item["planning_date"])
 
@@ -49,9 +52,9 @@ def handle_publish_planning(app: NewsroomWebApp, item):
     notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
 
 
-def handle_publish_text_item(_, item):
+async def handle_publish_text_item(_, item):
     orig = get_resource_service("items").find_one(req=None, _id=item["guid"])
-    item["_id"] = publisher.publish_item(item, orig)
+    item["_id"] = await publisher.publish_item(item, orig)
 
     if not item.get("nextversion"):
         notify_new_wire_item.delay(
@@ -59,7 +62,7 @@ def handle_publish_text_item(_, item):
         )
 
 
-def handle_publish_planning_featured(_, item):
+async def handle_publish_planning_featured(_, item):
     assert item.get("_id"), {"_id": 1}
     service = get_resource_service("agenda_featured")
     orig = service.find_one(req=None, _id=item["_id"])
@@ -110,7 +113,7 @@ async def push(request: Request):
         publish_fn = get_publish_handler(item_type)
 
         if publish_fn:
-            publish_fn(app, item)
+            await publish_fn(app, item)
 
         else:
             await request.abort(400, gettext("Unknown type {}".format(item.get("type"))))

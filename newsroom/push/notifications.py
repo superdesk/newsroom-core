@@ -4,10 +4,10 @@ from typing import Any, Set
 from bson import ObjectId
 
 from newsroom.types import Company, Topic, User
+from newsroom.users.service import UsersService
 from superdesk import get_resource_service
 from superdesk.core import get_app_config
 
-from newsroom.users import users_service
 from newsroom.core import get_current_wsgi_app
 from newsroom.history import get_history_users
 from newsroom.utils import get_company_dict, get_user_dict
@@ -22,6 +22,9 @@ from newsroom.notifications import push_notification, save_user_notifications, N
 
 
 logger = logging.getLogger(__name__)
+
+
+# TODO-ASYNC: revisit when agenda and wire_search are async
 
 
 def is_canceled(item: dict[str, Any]) -> bool:
@@ -43,7 +46,7 @@ class NotificationManager:
             company_ids = [c["_id"] for c in company_dict.values()]
 
             if item_type == "agenda":
-                push_agenda_item_notification("new_item", item=item)
+                await push_agenda_item_notification("new_item", item=item)
             else:
                 push_notification("new_item", _items=[item])
 
@@ -176,7 +179,7 @@ class NotificationManager:
 
         users_processed = []
         users_with_paused_notifications = set(
-            [user["_id"] for user in users_dict.values() if users_service.user_has_paused_notifications(user)]
+            [user["_id"] for user in users_dict.values() if UsersService.user_has_paused_notifications(user)]
         )
 
         def _get_users(section):
@@ -271,5 +274,5 @@ class NotificationManager:
         if not topic_matches:
             return set()
 
-        push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
+        await push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
         return await self.send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
