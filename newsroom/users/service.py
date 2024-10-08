@@ -192,8 +192,8 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         except KeyError:
             pass
 
-    @classmethod
-    def user_has_paused_notifications(cls, user: User) -> bool:
+    @staticmethod
+    def user_has_paused_notifications(user: User) -> bool:
         schedule = user.get("notification_schedule") or {}
         timezone = pytz.timezone(schedule.get("timezone") or get_app_config("DEFAULT_TIMEZONE") or "UTC")
         pause_from = schedule.get("pause_from")
