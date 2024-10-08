@@ -8,6 +8,7 @@ from newsroom.mongo_utils import (
     index_elastic_from_mongo,
     index_elastic_from_mongo_from_timestamp,
 )
+
 from newsroom.wire.search import (
     WireSearchResource,
     get_aggregations as get_wire_aggregations,
@@ -94,7 +95,7 @@ async def test_index_from_mongo_from_timestamp(app, client):
     assert 6 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
 
-async def test_fix_topic_nested_filters(app, runner):
+async def test_fix_topic_nested_filters(app, admin):
     app.config["WIRE_GROUPS"].extend(
         [
             {
@@ -168,8 +169,7 @@ async def test_fix_topic_nested_filters(app, runner):
         ],
     )
 
-    async with app.app_context():
-        fix_topic_nested_filters()
+    await fix_topic_nested_filters()
 
     updated_topic = app.data.find_one("topics", None, topic_id)
 

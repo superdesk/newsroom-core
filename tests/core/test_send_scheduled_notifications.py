@@ -1,16 +1,16 @@
-from typing import Dict, List
 import quart
-
-from datetime import datetime, timedelta
 from bson import ObjectId
+from datetime import datetime, timedelta
 
-from superdesk.utc import utcnow, utc_to_local
-from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule, NotificationQueue
-from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
-
-from newsroom.tests.users import ADMIN_USER_ID
-from tests.core.utils import create_entries_for
 from newsroom.topics.topics_async import TopicService
+from superdesk.utc import utcnow, utc_to_local
+from newsroom.types import NotificationSchedule
+from newsroom.notifications import NotificationQueueService
+from newsroom.notifications.commands import SendScheduledNotificationEmails
+
+from newsroom.notifications.models import NotificationQueue, NotificationTopic
+
+from tests.core.utils import create_entries_for
 
 
 def test_convert_schedule_times():
@@ -33,33 +33,47 @@ def test_convert_schedule_times():
     assert schedule_times[2].minute == 15
 
 
-def test_get_queue_entries_for_section():
+async def test_get_queue_entries_for_section(user):
     command = SendScheduledNotificationEmails()
 
-    topic1_id = ObjectId("54d9a786f87bc2ff88d04021")
-    topic2_id = ObjectId("54d9a786f87bc2ff88d04022")
-    topic3_id = ObjectId("54d9a786f87bc2ff88d04023")
     now_3hr = utcnow() - timedelta(hours=3)
     now_2hr = utcnow() - timedelta(hours=2)
     now_1hr = utcnow() - timedelta(hours=1)
 
-    queue = {
-        "user": ObjectId(),
+    topics_ids = await create_entries_for(
+        "topics",
+        [
+            {"_id": ObjectId(), "label": "test1", "topic_type": "wire"},
+            {
+                "_id": ObjectId(),
+                "label": "test2",
+                "topic_type": "wire",
+            },
+            {
+                "_id": ObjectId(),
+                "label": "test3",
+                "topic_type": "wire",
+            },
+        ],
+    )
+
+    queue_data = {
+        "user": user["_id"],
         "topics": [
             {
-                "topic_id": topic1_id,
+                "topic_id": topics_ids[0],
                 "items": ["topic1_item1"],
                 "section": "wire",
                 "last_item_arrived": now_3hr,
             },
             {
-                "topic_id": topic2_id,
+                "topic_id": topics_ids[1],
                 "items": ["topic2_item1"],
                 "section": "agenda",
                 "last_item_arrived": now_2hr,
             },
             {
-                "topic_id": topic3_id,
+                "topic_id": topics_ids[2],
                 "items": ["topic3_item1", "topic3_item2"],
                 "section": "wire",
                 "last_item_arrived": now_1hr,
@@ -67,52 +81,40 @@ def test_get_queue_entries_for_section():
         ],
     }
 
-    entries = command._get_queue_entries_for_section(queue, "wire")
-    assert entries == [
-        {
-            "topic_id": topic3_id,
-            "items": ["topic3_item1", "topic3_item2"],
-            "section": "wire",
-            "last_item_arrived": now_1hr,
-        },
-        {
-            "topic_id": topic1_id,
-            "items": ["topic1_item1"],
-            "section": "wire",
-            "last_item_arrived": now_3hr,
-        },
-    ]
+    ids = await create_entries_for("notification_queue", [queue_data])
+    queue = await NotificationQueueService().find_by_id(ids[0])
 
-    entries = command._get_queue_entries_for_section(queue, "agenda")
-    assert entries == [
-        {
-            "topic_id": topic2_id,
-            "items": ["topic2_item1"],
-            "section": "agenda",
-            "last_item_arrived": now_2hr,
-        }
-    ]
+    entries = command.get_queue_entries_for_section(queue, "wire")
+
+    assert entries[0].items == ["topic3_item1", "topic3_item2"]
+    assert entries[0].section == "wire"
+    assert entries[0].last_item_arrived == now_1hr
+
+    assert entries[1].items == ["topic1_item1"]
+    assert entries[1].section == "wire"
+    assert entries[1].last_item_arrived == now_3hr
+
+    entries = command.get_queue_entries_for_section(queue, "agenda")
+    assert len(entries) == 1
+    assert entries[0].section == "agenda"
 
 
-async def test_get_latest_item_from_topic_queue(app):
-    user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
-    topic_ids = await create_entries_for(
-        "topics",
-        [
-            {
-                "_id": ObjectId(),
-                "label": "Cheesy Stuff",
-                "query": "cheese",
-                "topic_type": "wire",
-            }
-        ],
-    )
-    topic_id = topic_ids[0]
-    topic = await TopicService().find_by_id(topic_id)
-    if topic:
-        topic_dict = topic.model_dump(by_alias=True)
+async def test_get_latest_item_from_topic_queue(app, user):
+    topic_id = (
+        await create_entries_for(
+            "topics",
+            [
+                {
+                    "label": "Cheesy Stuff",
+                    "query": "cheese",
+                    "topic_type": "wire",
+                }
+            ],
+        )
+    )[0]
+    topic = (await TopicService().find_by_id(topic_id)).to_dict()
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -120,29 +122,28 @@ async def test_get_latest_item_from_topic_queue(app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
             }
         ],
     )
 
-    topic_queue: NotificationQueueTopic = {
-        "topic_id": topic_id,
-        "items": ["topic1_item1"],
-        "section": "wire",
-        "last_item_arrived": utcnow(),
-    }
+    topic_queue = NotificationTopic(
+        topic_id=topic_id,
+        items=["topic1_item1"],
+        section="wire",
+        last_item_arrived=utcnow(),
+    )
 
     command = SendScheduledNotificationEmails()
-    item = command._get_latest_item_from_topic_queue(topic_queue, topic_dict, user, None, set())
+    item = command.get_latest_item_from_topic_queue(topic_queue, topic, user, None, set())
 
     assert item["_id"] == "topic1_item1"
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["body_html"][0]
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["slugline"][0]
 
 
-async def test_get_topic_entries_and_match_table(app):
-    user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
-    topic_ids: List[ObjectId] = await create_entries_for(
+async def test_get_topic_entries_and_match_table(app, user):
+    topics_ids = await create_entries_for(
         "topics",
         [
             {
@@ -159,11 +160,8 @@ async def test_get_topic_entries_and_match_table(app):
             },
         ],
     )
-    topics = await TopicService().search(lookup={})
-    if topics:
-        topics_list = await topics.to_list_raw()
-    user_topics: Dict[ObjectId, Topic] = {topic["_id"]: topic for topic in topics_list}
-    app.data.insert(
+    user_topics = {topic["_id"]: topic for topic in app.data.find_all("topics")}
+    await create_entries_for(
         "items",
         [
             {
@@ -171,24 +169,26 @@ async def test_get_topic_entries_and_match_table(app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
             }
         ],
     )
+
     schedule = NotificationQueue(
+        id=ObjectId(),
         user=user["_id"],
         topics=[
-            NotificationQueueTopic(
-                items=["topic1_item1"], topic_id=topic_ids[0], last_item_arrived=utcnow(), section="wire"
+            NotificationTopic(
+                items=["topic1_item1"], topic_id=topics_ids[0], last_item_arrived=utcnow(), section="wire"
             ),
-            NotificationQueueTopic(
-                items=["topic1_item1"], topic_id=topic_ids[1], last_item_arrived=utcnow(), section="wire"
+            NotificationTopic(
+                items=["topic1_item1"], topic_id=topics_ids[1], last_item_arrived=utcnow(), section="wire"
             ),
         ],
     )
 
     command = SendScheduledNotificationEmails()
-    topic_entries, topic_match_table = command._get_topic_entries_and_match_table(schedule, user, None, user_topics)
+    topic_entries, topic_match_table = command.get_topic_entries_and_match_table(schedule, user, None, user_topics)
 
     assert len(topic_entries["wire"]) == 1
     assert topic_entries["wire"][0]["topic"]["label"] == "Cheesy Stuff"
@@ -204,7 +204,7 @@ async def test_is_scheduled_to_run_for_user():
     timezone = "Australia/Sydney"
 
     # Run schedule if ``last_run_time`` is not defined and ``force=True``
-    assert command._is_scheduled_to_run_for_user({"timezone": timezone}, utcnow(), True) is True
+    assert command.is_scheduled_to_run_for_user({"timezone": timezone}, utcnow(), True) is True
 
     times = ["07:00", "15:00", "20:00"]
     tests = [
@@ -233,7 +233,7 @@ async def test_is_scheduled_to_run_for_user():
 
         now = create_datetime_instance(test["now"][0], test["now"][1])
 
-        assert command._is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
+        assert command.is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
 
 
 async def test_scheduled_notification_topic_matches_template():

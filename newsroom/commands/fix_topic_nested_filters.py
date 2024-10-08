@@ -1,7 +1,6 @@
 from typing import List, Dict, Optional, Any
 from copy import deepcopy
 
-from quart.cli import with_appcontext
 from eve.utils import ParsedRequest
 
 from superdesk.core import json
@@ -9,16 +8,16 @@ from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 
 from newsroom.search.config import nested_agg_groups, SearchGroupNestedConfig
+from newsroom.topics.topics_async import TopicService
 from .cli import newsroom_cli
 
 
 @newsroom_cli.command("fix_topic_nested_filters")
-@with_appcontext
-def _fix_topic_nested_filters():
-    fix_topic_nested_filters()
+async def fix_topic_nested_filters_command():
+    await fix_topic_nested_filters()
 
 
-def fix_topic_nested_filters():
+async def fix_topic_nested_filters():
     """Fix My/Company Topics after adding ``Nested Agg`` to Wire/Agenda group configs
 
     Previously ``subject`` was used to provide a filter for all custom subjects (such as CPs ``distribution``).
@@ -38,12 +37,14 @@ def fix_topic_nested_filters():
 
     try:
         group_configs = _get_nested_search_group_configs()
-        topics_service = get_resource_service("topics")
+        topics_service = TopicService()
 
         search_value_to_nested_group: Dict[str, str] = {}
         skip_search_values = set()
+
         for parent_field, search_fields in group_configs.items():
-            for saved_topic in topics_service.find(where={f"filter.{parent_field}.0": {"$exists": True}}):
+            cursor = await topics_service.search({f"filter.{parent_field}.0": {"$exists": True}})
+            for saved_topic in await cursor.to_list_raw():
                 topic_filters = deepcopy(saved_topic["filter"])
                 update_filters = False
                 for search_field, search_config in search_fields.items():
@@ -76,7 +77,7 @@ def fix_topic_nested_filters():
                 if update_filters:
                     if not len(topic_filters[parent_field]):
                         topic_filters.pop(parent_field, None)
-                    topics_service.patch(id=saved_topic["_id"], updates={"filter": topic_filters})
+                    await topics_service.update(saved_topic["_id"], {"filter": topic_filters})
     finally:
         unlock(lock_name)
 
@@ -126,6 +127,7 @@ def _get_attribute_value_from_name(search_config: SearchGroupNestedConfig, searc
             "source": json.dumps({"query": {"bool": {"filter": [{"term": {f"{parent_field}.name": search_value}}]}}}),
             "size": 1,
         }
+        # TODO-ASYNC: revisit once "wire_search" and "agenda" are migrated
         response = get_resource_service(resource).internal_get(req=req, lookup={})
 
         if not response.count():

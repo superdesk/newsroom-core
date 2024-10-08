@@ -809,10 +809,10 @@ async def notify_new_item(item, check_topics=True):
     item_type = item.get("type")
     users_with_realtime_subscription: Set[ObjectId] = set()
     try:
-        user_dict = get_user_dict()
+        user_dict = await get_user_dict()
         user_ids = [u["_id"] for u in user_dict.values()]
 
-        company_dict = get_company_dict()
+        company_dict = await get_company_dict()
         company_ids = [c["_id"] for c in company_dict.values()]
 
         if item_type == "agenda":

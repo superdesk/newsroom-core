@@ -159,7 +159,7 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.company_admin",
     "newsroom.search",
-    "newsroom.notifications.send_scheduled_notifications",
+    "newsroom.notifications.commands",
 ]
 
 MODULES = [
@@ -463,7 +463,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
     },
     "newsroom:send_scheduled_notifications": {
-        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "task": "newsroom.notifications.commands.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
         "options": {"expires": 5 * 60 - 1},
     },
@@ -477,9 +477,9 @@ NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 # Enables the application of product filtering to image references in the API and ATOM responses
 NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", "false"))
 
-ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
+ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
-    "analyze_wildcard": False
+    "analyze_wildcard": False,
 }
 
 # count above 10k

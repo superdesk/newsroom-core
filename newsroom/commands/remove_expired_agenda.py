@@ -1,5 +1,4 @@
 import click
-from quart.cli import with_appcontext
 import logging
 
 from typing import List, Set, Dict, Any, Generator
@@ -21,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 @newsroom_cli.command("remove_expired_agenda")
 @click.option("-m", "--expiry", "expiry_days", required=False, help="Number of days to determine expiry")
-@with_appcontext
 def remove_expired_agenda(expiry_days=None):
     """Remove expired Agenda items
 
@@ -61,6 +59,7 @@ def _remove_expired_items(now: datetime, expiry_days: int):
     """Remove expired Event and/or Planning items from the Agenda collection"""
 
     logger.info("Starting to remove expired items")
+    # TODO-ASYNC: revisit once `agenda` module has been migrate to async
     agenda_service = get_resource_service("agenda")
     expiry_datetime = now - timedelta(days=expiry_days)
     num_items_removed = 0
