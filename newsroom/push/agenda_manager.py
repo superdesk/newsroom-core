@@ -17,6 +17,9 @@ from .utils import format_qcode_items, get_display_dates, parse_dates, set_dates
 logger = logging.getLogger(__name__)
 
 
+# TODO-ASYNC: revisit when agenda, items and content_api are async
+
+
 class AgendaManager:
     def init_adhoc_agenda(self, planning, agenda):
         """

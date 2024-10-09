@@ -7,10 +7,10 @@ from superdesk.core import get_app_config
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
-from newsroom.template_filters import time_short, parse_date, format_datetime
 from newsroom.gettext import get_session_locale
-from newsroom.utils import query_resource
 from newsroom.notifications import push_notification
+from newsroom.companies.companies_async import CompanyService
+from newsroom.template_filters import time_short, parse_date, format_datetime
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = "_time_to_be_confirmed"
@@ -276,10 +276,9 @@ def remove_restricted_coverage_info(items):
     return items
 
 
-def push_agenda_item_notification(name, item, **kwargs):
-    restricted_companies = [
-        item["_id"] for item in query_resource("companies", lookup={"restrict_coverage_info": True})
-    ]
+async def push_agenda_item_notification(name, item, **kwargs):
+    cursor = await CompanyService().search({"restrict_coverage_info": True})
+    restricted_companies = [item["_id"] for item in await cursor.to_list_raw()]
 
     if not len(restricted_companies):
         push_notification(name, item=item, **kwargs)

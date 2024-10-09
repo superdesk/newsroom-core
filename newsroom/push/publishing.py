@@ -22,12 +22,14 @@ from .utils import fix_hrefs, fix_updates, get_event_dates, set_dates, validate_
 
 
 logger = logging.getLogger(__name__)
-
 agenda_manager = AgendaManager()
 
 
+# TODO-ASYNC: Revisit when agenda and content_api are async
+
+
 class Publisher:
-    def publish_item(self, doc: Item, original: Item):
+    async def publish_item(self, doc: Item, original: Item):
         """Duplicating the logic from content_api.publish service."""
         set_dates(doc)
 
@@ -83,7 +85,7 @@ class Publisher:
 
         try:
             if doc.get("coverage_id"):
-                agenda_items = get_resource_service("agenda").set_delivery(doc)
+                agenda_items = await get_resource_service("agenda").set_delivery(doc)
                 if agenda_items:
                     [notify_new_agenda_item.delay(item["_id"], check_topics=False) for item in agenda_items]
         except Exception as ex:

@@ -1207,7 +1207,7 @@ class AgendaService(BaseSearchService):
 
         return bookmark_users
 
-    def set_delivery(self, wire_item):
+    async def set_delivery(self, wire_item):
         if not wire_item.get("coverage_id"):
             return
 
@@ -1295,7 +1295,7 @@ class AgendaService(BaseSearchService):
             updated_agenda = get_entity_or_404(item.get("_id"), "agenda")
             # Notify agenda to update itself with new details of coverage
             self.enhance_coverage_with_wire_details(parent_coverage, wire_item)
-            push_agenda_item_notification("new_item", item=item)
+            await push_agenda_item_notification("new_item", item=item)
 
             # If published first time, coverage completion will trigger email - not needed now
             if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:

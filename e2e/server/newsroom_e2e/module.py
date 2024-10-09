@@ -36,7 +36,7 @@ async def reset_dbs():
 async def populate_resources(request: Request) -> Response:
     json = await request.get_json()
     ids = []
-    user = create_default_user()
+    user = await create_default_user()
     start_user_session(user, True)
 
     app = get_current_app()
