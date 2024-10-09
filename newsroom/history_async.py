@@ -63,6 +63,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             }
 
         transformed_docs = [transform(doc) for doc in docs]
+        print(transformed_docs)
         try:
             await super().create(transformed_docs)
         except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
@@ -152,7 +153,7 @@ history_resource_config = ResourceConfig(
             ),
             MongoIndexOptions(
                 name="company_user",
-                keys=[("company", 1), ("user", 1)],
+                keys=[("company", 1), ("user", 1), ("item", 1)],
             ),
         ],
     ),
