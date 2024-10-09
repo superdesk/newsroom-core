@@ -1,10 +1,12 @@
+import pytz
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, date
 from typing import Any, Dict
 
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest
 
+from newsroom.types import User
 from superdesk.core import get_app_config
 from superdesk.flask import request, abort, session
 from superdesk.utils import is_hashed, get_hash
@@ -189,3 +191,29 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             await self.elastic.update(item_id, updates)
         except KeyError:
             pass
+
+    @staticmethod
+    def user_has_paused_notifications(user: User) -> bool:
+        schedule = user.get("notification_schedule") or {}
+        timezone = pytz.timezone(schedule.get("timezone") or get_app_config("DEFAULT_TIMEZONE") or "UTC")
+        pause_from = schedule.get("pause_from")
+        pause_to = schedule.get("pause_to")
+
+        if pause_from and pause_to:
+            now = datetime.now(timezone).date()
+            pause_from_date = date.fromisoformat(pause_from)
+            pause_to_date = date.fromisoformat(pause_to)
+
+            if pause_from_date <= now <= pause_to_date:
+                return True
+
+        return False
+
+    async def find_by_email(self, email: str) -> UserResourceModel | None:
+        """Find a user registry by email
+
+        :param email: Email of user to find
+        :return: ``None`` if user not found, otherwise an instance of ``UserResourceModel``
+        """
+
+        return await self.find_one(email=email)

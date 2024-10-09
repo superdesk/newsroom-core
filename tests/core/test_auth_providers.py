@@ -5,10 +5,11 @@ from unittest import mock
 from bson import ObjectId
 from quart import url_for
 
+from newsroom.users.service import UsersService
 from superdesk import get_resource_service
 from newsroom.types import AuthProviderType
 from newsroom.tests import markers
-from tests.utils import logout
+from tests.utils import get_user_by_email, logout
 
 
 companies = {
@@ -155,7 +156,6 @@ def mock_saml_client(req):
 async def test_saml_auth_denies_other_auth_types(app, client):
     await logout(client)
     app.config["SAML_CLIENTS"] = ["samplecomp"]
-    users_service = get_resource_service("users")
     companies_service = get_resource_service("companies")
 
     async def login_user():
@@ -183,7 +183,7 @@ async def test_saml_auth_denies_other_auth_types(app, client):
     response = await login_user()
     assert "Invalid login type" not in await response.get_data(as_text=True)
 
-    user = users_service.find_one(req=None, email="foo@samplecomp")
+    user = await get_user_by_email("foo@samplecomp")
     assert user is not None
     async with client.session_transaction() as session:
         assert session.get("user") == str(user["_id"])
@@ -233,9 +233,7 @@ async def test_google_oauth_denies_other_auth_types(app, client):
         assert "Invalid login type" in await response.get_data(as_text=True)
 
         # Test logging in fails with ``auth_provider`` not defined
-        get_resource_service("users").patch(
-            user_id, updates={"company": companies["google_auth"], "user_type": "public"}
-        )
+        await UsersService().update(user_id, updates={"company": companies["google_auth"], "user_type": "public"})
         companies_service.patch(companies["google_auth"], updates={"auth_provider": None})
         response = await client.get("/login/google_authorized", follow_redirects=True)
         assert "Invalid login type" in await response.get_data(as_text=True)

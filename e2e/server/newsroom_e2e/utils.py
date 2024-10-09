@@ -9,19 +9,19 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from bson import ObjectId
-from flask import current_app as app
 
-from superdesk import get_resource_service
 from newsroom.types import User
+from newsroom.users.service import UsersService
+from tests.core.utils import create_entries_for
 
 USER_ADMIN_ID = ObjectId("445460066f6a58e1c6b11540")
 
 
-def create_default_user() -> User:
-    user_service = get_resource_service("users")
-    user = user_service.find_one(req=None, _id=USER_ADMIN_ID)
+async def create_default_user() -> User:
+    user = await UsersService().find_by_id(USER_ADMIN_ID)
+
     if not user:
-        app.data.insert(
+        await create_entries_for(
             "users",
             [
                 {
@@ -39,6 +39,6 @@ def create_default_user() -> User:
                 }
             ],
         )
-        user = user_service.find_one(req=None, _id=USER_ADMIN_ID)
+        user = await UsersService().find_by_id(USER_ADMIN_ID)
 
-    return user
+    return user.to_dict()

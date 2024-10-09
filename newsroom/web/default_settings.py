@@ -118,7 +118,6 @@ BLUEPRINTS = [
     "newsroom.wire",
     "newsroom.auth.views",
     "newsroom.design",
-    "newsroom.push",
     "newsroom.products",
     "newsroom.reports",
     "newsroom.public",
@@ -175,6 +174,7 @@ MODULES = [
     "newsroom.navigations",
     "newsroom.notifications",
     "newsroom.topics_folders",
+    "newsroom.push",
     "newsroom.history_async",
 ]
 

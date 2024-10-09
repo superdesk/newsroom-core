@@ -57,7 +57,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
                 "versioncreated": now,
                 "user": user["_id"],
                 "company": user.get("company"),
-                "item": item["_id"],
+                "item": str(item["_id"]),
                 "version": str(item.get("version", item.get("_current_version"))),
                 "section": section,
             }

@@ -4,13 +4,13 @@ from unittest import mock
 from datetime import datetime, timedelta
 
 from bson import ObjectId
+from newsroom.push.tasks import notify_new_agenda_item, notify_new_wire_item
 from superdesk.utc import utcnow
 
 from newsroom.tests import markers
 from newsroom.users import UsersService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.notifications import NotificationsService
-from newsroom.push import notify_new_agenda_item, notify_new_wire_item
 from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from newsroom.tests.users import ADMIN_USER_ID
 from tests.core.utils import create_entries_for
@@ -305,15 +305,17 @@ async def test_realtime_notifications_agenda_reccuring_event(app):
         ],
     )
 
-    with mock.patch("newsroom.push.notify_new_item") as notify_new_item:
+    with mock.patch("newsroom.push.tasks.notifier") as notifier:
+        notifier.notify_new_item = mock.AsyncMock()
+
         await notify_new_agenda_item("event_id_1")
-        assert notify_new_item.call_count == 1
+        assert notifier.notify_new_item.call_count == 1
 
         await notify_new_agenda_item("event_id_2", is_new=True)
-        assert notify_new_item.call_count == 1
+        assert notifier.notify_new_item.call_count == 1
 
         await notify_new_agenda_item("event_id_2")
-        assert notify_new_item.call_count == 2
+        assert notifier.notify_new_item.call_count == 2
 
 
 @markers.requires_async_celery

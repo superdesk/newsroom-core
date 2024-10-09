@@ -18,7 +18,7 @@ from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
 from tests.core.utils import create_entries_for
-from tests.utils import mock_send_email, login
+from tests.utils import get_user_by_email, mock_send_email, login
 from newsroom.users import UsersService
 
 
@@ -108,7 +108,7 @@ async def test_new_user_has_correct_flags(client):
     )
 
     assert response.status_code == 201
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await get_user_by_email("newuser@abc.org")
     assert not user["is_approved"]
     assert not user["is_enabled"]
 
@@ -240,15 +240,13 @@ async def test_new_user_can_be_deleted(client):
         },
     )
 
-    # print(response.get_data(as_text=True))
-
     assert response.status_code == 201
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await get_user_by_email("newuser@abc.org")
 
     response = await client.delete("/users/{}".format(user["_id"]))
     assert response.status_code == 200
 
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await UsersService().find_by_email("newuser@abc.org")
     assert user is None
 
 
@@ -663,18 +661,18 @@ async def test_create_user_inherit_sections(users_service):
     assert user.sections is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
-async def test_user_has_paused_notifications(app):
+async def test_user_has_paused_notifications():
     user = User(email="foo", user_type="public")
-    assert not get_resource_service("users").user_has_paused_notifications(user)
+    assert not UsersService.user_has_paused_notifications(user)
 
     user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2024-01-01"}
-    assert not get_resource_service("users").user_has_paused_notifications(user)
+    assert not UsersService.user_has_paused_notifications(user)
 
     user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2050-01-01"}
-    assert get_resource_service("users").user_has_paused_notifications(user)
+    assert UsersService.user_has_paused_notifications(user)
 
 
-async def test_search_all_users(app, client):
+async def test_search_all_users(client):
     response = await client.get("/users/search?q=")
     users = await response.get_json()
     assert len(users) == 3

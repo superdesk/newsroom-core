@@ -367,10 +367,6 @@ async def get_user_dict(use_globals: bool = True) -> dict[str, User]:
     return g.user_dict
 
 
-def get_users_by_email(emails: List[str]):
-    return query_resource("users", lookup={"email": {"$in": emails}})
-
-
 async def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
     """Get all active companies indexed by _id.
 
