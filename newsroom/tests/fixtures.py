@@ -8,6 +8,7 @@ from quart import url_for
 from newsroom.types import Product
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
+from tests.core.utils import create_entries_for
 
 
 PUBLIC_USER_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -193,23 +194,24 @@ async def init_agenda_items(app):
 
 @fixture()
 async def user(app):
-    async with app.app_context():
-        _user = {
-            "_id": ObjectId(ADMIN_USER_ID),
-            "first_name": "admin",
-            "last_name": "admin",
-            "email": ADMIN_USER_EMAIL,
-            "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
-            "user_type": "administrator",
-            "is_validated": True,
-            "is_enabled": True,
-            "is_approved": True,
-            "receive_email": True,
-            "receive_app_notifications": True,
-        }
-        app.data.insert("users", [_user])
-        _user["password"] = "admin"
-        return _user
+    _user = {
+        "_id": ObjectId(ADMIN_USER_ID),
+        "first_name": "admin",
+        "last_name": "admin",
+        "email": ADMIN_USER_EMAIL,
+        "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+        "user_type": "administrator",
+        "is_validated": True,
+        "is_enabled": True,
+        "is_approved": True,
+        "receive_email": True,
+        "receive_app_notifications": True,
+    }
+
+    await create_entries_for("users", [_user])
+
+    _user["password"] = "admin"
+    return _user
 
 
 @fixture()

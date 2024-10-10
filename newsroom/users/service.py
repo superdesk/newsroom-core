@@ -1,9 +1,13 @@
+import pytz
+from copy import deepcopy
+from datetime import datetime, date
 from typing import Any, Dict
 
 import re
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest
 
+from newsroom.types import User
 from superdesk.core import get_app_config
 from superdesk.core.types import HTTP_METHOD, Request
 from superdesk.flask import abort
@@ -151,6 +155,39 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
     async def get_by_email(self, email: str) -> UserResourceModel | None:
         lookup = {"$regex": re.compile("^{}$".format(re.escape(email)), re.IGNORECASE)}
         return await self.find_one(email=lookup)
+
+    async def update_notification_schedule_run_time(self, user: dict[str, Any], run_time: datetime):
+        """
+        Updates the user's notification schedule with the provided run time and clears related cache.
+
+        Args:
+            user: The user object containing the current notification schedule.
+            run_time: The new run time to be updated in the notification schedule.
+        """
+        notification_schedule = deepcopy(user["notification_schedule"])
+        notification_schedule["last_run_time"] = run_time
+        await self.update(user["_id"], {"notification_schedule": notification_schedule})
+
+        app = self.app.wsgi
+        app.cache.delete(str(user["_id"]))
+        app.cache.delete(user["email"])
+
+    @staticmethod
+    def user_has_paused_notifications(user: User) -> bool:
+        schedule = user.get("notification_schedule") or {}
+        timezone = pytz.timezone(schedule.get("timezone") or get_app_config("DEFAULT_TIMEZONE") or "UTC")
+        pause_from = schedule.get("pause_from")
+        pause_to = schedule.get("pause_to")
+
+        if pause_from and pause_to:
+            now = datetime.now(timezone).date()
+            pause_from_date = date.fromisoformat(pause_from)
+            pause_to_date = date.fromisoformat(pause_to)
+
+            if pause_from_date <= now <= pause_to_date:
+                return True
+
+        return False
 
 
 class UsersAuthService(NewshubAsyncResourceService[UserAuthResourceModel]):

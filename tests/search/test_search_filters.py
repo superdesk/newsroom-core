@@ -2,6 +2,7 @@ from pytest import fixture, raises
 from quart import session, json
 from eve.utils import ParsedRequest
 
+from superdesk.core import get_app_config
 from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
@@ -42,7 +43,7 @@ async def init(app):
 
 async def test_apply_section_filter(client, app):
     async with app.test_request_context("/"):
-        query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
+        query_string_settings = get_app_config("ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS")
         session["user"] = ADMIN_USER_ID
         search = SearchQuery()
         service.section = "wire"
@@ -175,7 +176,7 @@ async def test_apply_products_filter(app):
 
 
 async def test_apply_request_filter__query_string(client, app):
-    query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
+    query_string_settings = get_app_config("ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS")
     search = SearchQuery()
     search.args = {"q": "Sport AND Tennis"}
     service.apply_request_filter(search)

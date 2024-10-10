@@ -2,6 +2,7 @@ from typing import Dict, Any
 from os import path
 from quart.testing import QuartClient
 
+from newsroom.users.service import UsersService
 from superdesk.core import get_current_app, get_app_config, json
 from superdesk.flask import url_for
 from superdesk import get_resource_service
@@ -134,3 +135,9 @@ def add_fixture_to_db(resource: str, filename: str):
 
 def get_resource_by_id(resource: str, item_id: str):
     return get_current_app().data.find_one(resource, req=None, _id=item_id)
+
+
+async def get_user_by_email(email: str) -> Dict[str, Any]:
+    new_user = await UsersService().find_by_email(email)
+    assert new_user is not None
+    return new_user.to_dict()

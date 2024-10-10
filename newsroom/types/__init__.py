@@ -104,18 +104,6 @@ class NotificationSchedule(TypedDict, total=False):
     pause_to: str
 
 
-class NotificationQueueTopic(TypedDict, total=False):
-    items: List[str]
-    topic_id: ObjectId
-    last_item_arrived: datetime
-    section: str
-
-
-class NotificationQueue(TypedDict):
-    user: ObjectId
-    topics: List[NotificationQueueTopic]
-
-
 class UserDashboardEntry(TypedDict):
     name: str
     type: str

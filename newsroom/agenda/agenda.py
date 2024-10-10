@@ -1207,7 +1207,7 @@ class AgendaService(BaseSearchService):
 
         return bookmark_users
 
-    def set_delivery(self, wire_item):
+    async def set_delivery(self, wire_item):
         if not wire_item.get("coverage_id"):
             return
 
@@ -1295,7 +1295,7 @@ class AgendaService(BaseSearchService):
             updated_agenda = get_entity_or_404(item.get("_id"), "agenda")
             # Notify agenda to update itself with new details of coverage
             self.enhance_coverage_with_wire_details(parent_coverage, wire_item)
-            push_agenda_item_notification("new_item", item=item)
+            await push_agenda_item_notification("new_item", item=item)
 
             # If published first time, coverage completion will trigger email - not needed now
             if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:
@@ -1350,8 +1350,8 @@ class AgendaService(BaseSearchService):
                 c["watches"] = [ObjectId(u) for u in c["watches"]]
 
     async def notify_new_coverage(self, agenda, wire_item):
-        user_dict = get_user_dict()
-        company_dict = get_company_dict()
+        user_dict = await get_user_dict()
+        company_dict = await get_company_dict()
         notify_user_ids = filter_active_users(agenda.get("watches", []), user_dict, company_dict, events_only=True)
         for user_id in notify_user_ids:
             user = user_dict[str(user_id)]
@@ -1368,8 +1368,8 @@ class AgendaService(BaseSearchService):
     ):
         agenda = deepcopy(update_agenda)
         if agenda and original_agenda.get("state") != WORKFLOW_STATE.KILLED:
-            user_dict = get_user_dict()
-            company_dict = get_company_dict()
+            user_dict = await get_user_dict()
+            company_dict = await get_company_dict()
             coverage_watched = None
             for c in original_agenda.get("coverages") or []:
                 if len(c.get("watches") or []) > 0:

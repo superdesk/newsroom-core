@@ -1,6 +1,7 @@
 import pytz
 import regex
 import superdesk
+from asyncio import gather
 from functools import reduce
 from pydantic import ValidationError
 
@@ -289,13 +290,16 @@ def _is_user_and_company_enabled(user_dict: dict | None, company_dict: Company |
     return is_company_enabled(user, company) and not is_company_expired(user, company)
 
 
-def get_user_dict(use_globals: bool = True) -> Dict[str, User]:
+async def get_user_dict(use_globals: bool = True) -> dict[str, User]:
     """Get all active users indexed by _id."""
 
-    def _get_users() -> Dict[str, User]:
-        all_users = superdesk.get_resource_service("users").find(where={"is_enabled": True})
+    from newsroom.users.service import UsersService
 
-        companies = get_company_dict(use_globals)
+    users_service = UsersService()
+
+    async def _get_users() -> dict[str, User]:
+        users_task = users_service.search({"is_enabled": True})
+        all_users, companies = await gather((await users_task).to_list_raw(), get_company_dict(use_globals))
 
         return {
             str(user["_id"]): user
@@ -304,30 +308,35 @@ def get_user_dict(use_globals: bool = True) -> Dict[str, User]:
         }
 
     if not use_globals:
-        return _get_users()
+        return await _get_users()
     elif "user_dict" not in g or get_current_app().testing:
-        user_dict = _get_users()
+        user_dict = await _get_users()
         g.user_dict = user_dict
     return g.user_dict
 
 
-def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
+async def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
     """Get all active companies indexed by _id.
 
     Must reload when testing because there it's using single context.
     """
 
-    def _get_companies() -> Dict[str, Company]:
-        all_companies = superdesk.get_resource_service("companies").find(where={"is_enabled": True})
+    from newsroom.companies import CompanyServiceAsync
+
+    company_service = CompanyServiceAsync()
+
+    async def _get_companies() -> Dict[str, Company]:
+        companies_cursor = await company_service.search({"is_enabled": True})
+        all_companies = await companies_cursor.to_list_raw()
 
         return {
             str(company["_id"]): company for company in all_companies if _is_user_and_company_enabled(None, company)
         }
 
     if not use_globals:
-        return _get_companies()
+        return await _get_companies()
     elif "company_dict" not in g or get_current_app().testing:
-        g.company_dict = _get_companies()
+        g.company_dict = await _get_companies()
     return g.company_dict
 
 

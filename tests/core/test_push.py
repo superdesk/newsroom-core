@@ -800,9 +800,9 @@ async def test_matching_topics_for_public_user(client, app):
     await client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = get_user_dict(use_globals=False)
+    users = await get_user_dict(use_globals=False)
     assert str(PUBLIC_USER_ID) in users
-    companies = get_company_dict(use_globals=False)
+    companies = await get_company_dict(use_globals=False)
     topics = [
         {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": PUBLIC_USER_ID},
         {
@@ -838,8 +838,8 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
     await client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = get_user_dict(use_globals=False)
-    companies = get_company_dict(use_globals=False)
+    users = await get_user_dict(use_globals=False)
+    companies = await get_company_dict(use_globals=False)
     topics = [
         {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "bar"},
         {
@@ -919,8 +919,8 @@ async def test_matching_topics_with_mallformed_query(client, app):
     await client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = get_user_dict(use_globals=False)
-    companies = get_company_dict(use_globals=False)
+    users = await get_user_dict(use_globals=False)
+    companies = await get_company_dict(use_globals=False)
     topics = [
         {"_id": "good", "query": "*:*", "user": TEST_USER_ID},
         {"_id": "bad", "query": "AND Foo", "user": PUBLIC_USER_ID},
@@ -947,8 +947,8 @@ async def test_matching_topics_when_disabling_section(client, app):
     await client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = get_user_dict(use_globals=False)
-    companies = get_company_dict(use_globals=False)
+    users = await get_user_dict(use_globals=False)
+    companies = await get_company_dict(use_globals=False)
     topics = [
         {"_id": "all wire", "query": "*:*", "user": TEST_USER_ID, "topic_type": "wire"},
         {"_id": "all agenda", "query": "*:*", "user": TEST_USER_ID, "topic_type": "agenda"},

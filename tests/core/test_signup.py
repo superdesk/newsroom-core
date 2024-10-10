@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from unittest import mock
 
 from quart import url_for
@@ -6,9 +5,8 @@ from quart import url_for
 from newsroom.types import CompanyType, Country, ProductType, CompanyProduct
 from newsroom.users import UsersAuthService
 from newsroom.companies.companies_async import CompanyService
-from newsroom.users.service import UsersService
 
-from tests.utils import mock_send_email
+from tests.utils import get_user_by_email, mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -113,11 +111,6 @@ async def test_new_user_signup_fails_if_fields_not_provided(client, app):
     assert "name: This field is required" in txt
     assert "country: This field is required" in txt
     assert "occupation: This field is required" in txt
-
-
-async def get_user_by_email(email: str) -> Dict[str, Any]:
-    new_user = await UsersService().find_one(email=email)
-    return new_user.model_dump(by_alias=True)
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)

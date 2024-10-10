@@ -4,7 +4,7 @@ from bson import ObjectId
 from quart import json
 from quart import url_for
 from eve.utils import str_to_date
-from datetime import datetime, timedelta
+from datetime import timedelta
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
@@ -17,7 +17,14 @@ from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.utils import mock_send_email, login, login_public, logout
+from tests.core.utils import create_entries_for
+from tests.utils import get_user_by_email, mock_send_email, login, login_public, logout
+from newsroom.users import UsersService
+
+
+@pytest.fixture
+def users_service():
+    return UsersService()
 
 
 async def test_user_list_fails_for_anonymous_user(client):
@@ -34,9 +41,9 @@ async def test_user_list_fails_for_public_user(client):
     assert "Forbidden" in await response.get_data(as_text=True)
 
 
-async def test_reset_password_token_sent_for_user_succeeds(app, client):
+async def test_reset_password_token_sent_for_user_succeeds(client, users_service):
     # Insert a new user
-    app.data.insert(
+    await create_entries_for(
         "users",
         [
             {
@@ -56,13 +63,13 @@ async def test_reset_password_token_sent_for_user_succeeds(app, client):
     response = await client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 200
     assert '"success": true' in await response.get_data(as_text=True)
-    user = await UsersAuthService().find_by_id("59b4c5c61d41c8d736852000")
+    user = await users_service.find_by_id("59b4c5c61d41c8d736852000")
     assert user.token is not None
 
 
-async def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
+async def test_reset_password_token_sent_for_user_fails_for_disabled_user(client):
     # Insert a new user
-    app.data.insert(
+    await create_entries_for(
         "users",
         [
             {
@@ -102,7 +109,7 @@ async def test_new_user_has_correct_flags(client):
     )
 
     assert response.status_code == 201
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await get_user_by_email("newuser@abc.org")
     assert not user["is_approved"]
     assert not user["is_enabled"]
 
@@ -141,10 +148,11 @@ async def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_create_new_user_succeeds(app, client):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
+                "_id": ObjectId(),
                 "phone": "2132132134",
                 "sd_subscriber_id": "12345",
                 "name": "Press 2 Co.",
@@ -233,29 +241,27 @@ async def test_new_user_can_be_deleted(client):
         },
     )
 
-    # print(response.get_data(as_text=True))
-
     assert response.status_code == 201
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await get_user_by_email("newuser@abc.org")
 
     response = await client.delete("/users/{}".format(user["_id"]))
     assert response.status_code == 200
 
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await UsersService().get_by_email("newuser@abc.org")
     assert user is None
 
 
-async def test_return_search_for_all_users(client, app):
+async def test_return_search_for_all_users(client):
     for i in range(250):
-        app.data.insert(
+        await create_entries_for(
             "users",
             [
                 {
-                    "email": "foo%s@bar.com" % i,
-                    "first_name": "Foo%s" % i,
+                    "email": f"foo{i}@bar.com",
+                    "first_name": f"Foo {i}",
+                    "last_name": f"Meh {i}",
                     "is_enabled": True,
                     "receive_email": True,
-                    "company": "",
                 }
             ],
         )
@@ -265,21 +271,30 @@ async def test_return_search_for_all_users(client, app):
     assert 250 <= len(data)
 
 
-async def test_active_user(client, app):
+async def test_active_user(client):
     resp = await client.get("/users/search?q=admin")
     data = json.loads(await resp.get_data())
     assert data[0].get("last_active")
 
 
-async def test_active_users_and_active_companies(client, app):
-    user_ids = [ObjectId(), ObjectId(), ObjectId(), ObjectId()]
-    company_ids = [ObjectId(), ObjectId(), ObjectId()]
+async def test_active_users_and_active_companies(app):
+    companies_ids = await create_entries_for(
+        "companies",
+        [
+            {"name": "Company1", "is_enabled": True},
+            {"name": "Company2", "is_enabled": False},
+            {
+                "name": "Company3",
+                "is_enabled": True,
+                "expiry_date": utcnow() - timedelta(days=1),
+            },
+        ],
+    )
 
-    app.data.insert(
+    users_ids = await create_entries_for(
         "users",
         [
             {
-                "_id": user_ids[0],
                 "email": "foo1@bar.com",
                 "last_name": "bar1",
                 "first_name": "foo1",
@@ -287,10 +302,9 @@ async def test_active_users_and_active_companies(client, app):
                 "is_approved": True,
                 "is_enabled": True,
                 "is_validated": True,
-                "company": company_ids[0],
+                "company": companies_ids[0],
             },
             {
-                "_id": user_ids[1],
                 "email": "foo2@bar.com",
                 "last_name": "bar2",
                 "first_name": "foo2",
@@ -298,10 +312,9 @@ async def test_active_users_and_active_companies(client, app):
                 "is_approved": True,
                 "is_enabled": False,
                 "is_validated": True,
-                "company": company_ids[0],
+                "company": companies_ids[0],
             },
             {
-                "_id": user_ids[2],
                 "email": "foo3@bar.com",
                 "last_name": "bar3",
                 "first_name": "foo3",
@@ -309,10 +322,9 @@ async def test_active_users_and_active_companies(client, app):
                 "is_approved": True,
                 "is_enabled": True,
                 "is_validated": True,
-                "company": company_ids[1],
+                "company": companies_ids[1],
             },
             {
-                "_id": user_ids[3],
                 "email": "foo4@bar.com",
                 "last_name": "bar4",
                 "first_name": "foo4",
@@ -320,66 +332,52 @@ async def test_active_users_and_active_companies(client, app):
                 "is_approved": True,
                 "is_enabled": True,
                 "is_validated": True,
-                "company": company_ids[2],
-            },
-        ],
-    )
-
-    app.data.insert(
-        "companies",
-        [
-            {"_id": company_ids[0], "name": "Company1", "is_enabled": True},
-            {"_id": company_ids[1], "name": "Company2", "is_enabled": False},
-            {
-                "_id": company_ids[2],
-                "name": "Company3",
-                "is_enabled": True,
-                "expiry_date": datetime.utcnow() - timedelta(days=1),
             },
         ],
     )
 
     async with app.test_request_context("/"):
-        users = get_user_dict()
-        companies = get_company_dict()
+        users = await get_user_dict()
+        companies = await get_company_dict()
 
-        assert str(user_ids[0]) in users
-        assert str(user_ids[1]) not in users
-        assert str(user_ids[2]) not in users
+        assert str(users_ids[0]) in users  # active user
+        assert str(users_ids[1]) not in users  # not active
+        assert str(users_ids[2]) not in users  # user in expired company
 
-        assert str(company_ids[0]) in companies
-        assert str(company_ids[1]) not in companies
+        assert str(companies_ids[0]) in companies  # active company
+        assert str(companies_ids[1]) not in companies  # not active company
 
 
-async def test_expired_company_does_not_restrict_activity(client, app):
-    company_ids = [ObjectId(), ObjectId(), ObjectId()]
-    app.data.insert(
+async def test_expired_company_does_not_restrict_activity(app):
+    COMP_1, COMP_2, COMP_3 = [str(ObjectId()) for x in range(3)]
+
+    await create_entries_for(
         "companies",
         [
-            {"_id": company_ids[0], "name": "Company1", "is_enabled": True},
-            {"_id": company_ids[1], "name": "Company2", "is_enabled": False},
+            {"_id": COMP_1, "name": "Company1", "is_enabled": True},
+            {"_id": COMP_2, "name": "Company2", "is_enabled": False},
             {
-                "_id": company_ids[2],
+                "_id": COMP_3,
                 "name": "Company3",
                 "is_enabled": True,
-                "expiry_date": datetime.utcnow() - timedelta(days=1),
+                "expiry_date": utcnow() - timedelta(days=1),
             },
         ],
     )
 
     async with app.test_request_context("/"):
-        companies = get_company_dict()
+        companies = await get_company_dict()
 
-        assert str(company_ids[0]) in companies
-        assert str(company_ids[1]) not in companies
-        assert str(company_ids[2]) not in companies
+        assert COMP_1 in companies
+        assert COMP_2 not in companies
+        assert COMP_3 not in companies
 
         app.config["ALLOW_EXPIRED_COMPANY_LOGINS"] = True
-        companies = get_company_dict()
+        companies = await get_company_dict()
 
-        assert str(company_ids[0]) in companies
-        assert str(company_ids[1]) not in companies
-        assert str(company_ids[2]) in companies
+        assert COMP_1 in companies
+        assert COMP_2 not in companies
+        assert COMP_3 in companies
 
 
 async def test_is_valid_user(client, app):
@@ -442,7 +440,7 @@ async def test_is_valid_user(client, app):
 
 
 async def test_account_manager_can_update_user(app, client):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
@@ -468,7 +466,7 @@ async def test_account_manager_can_update_user(app, client):
         "phone": "2132132134",
         "company": company_ids[0],
     }
-    app.data.insert("users", [account_mgr])
+    await create_entries_for("users", [account_mgr])
     response = await login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
 
@@ -493,7 +491,7 @@ async def test_signals(client, app):
     user_updated.connect(updated_listener, weak=False)
     user_deleted.connect(deleted_listener, weak=False)
 
-    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
+    company_ids = await create_entries_for("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
 
     user = {
         "email": "foo1@bar.com",
@@ -582,7 +580,8 @@ async def test_user_can_update_notification_schedule(app, client):
 
     # Update the schedules ``last_run_time``
     now = utcnow()
-    get_resource_service("users").update_notification_schedule_run_time(user, now)
+    await UsersService().update_notification_schedule_run_time(user, now)
+
     user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
     assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
@@ -599,7 +598,7 @@ async def test_user_can_update_notification_schedule(app, client):
 
 
 async def test_check_etag_when_updating_user(app, client):
-    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
+    company_ids = await create_entries_for("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
 
     # Register a new account
     await client.post(
@@ -639,27 +638,42 @@ async def test_check_etag_when_updating_user(app, client):
     assert response.status_code == 200
 
 
-async def test_create_user_inherit_sections(app):
-    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
+async def test_create_user_inherit_sections(users_service):
+    company_ids = await create_entries_for(
+        "companies", [{"_id": ObjectId(), "name": "test", "sections": {"agenda": True, "wire": False}}]
+    )
     assert company_ids
-    user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
+
+    user_ids = await create_entries_for(
+        "users",
+        [
+            {
+                "_id": ObjectId(),
+                "first_name": "Gandalf",
+                "last_name": "The White",
+                "email": "newuser@example.com",
+                "company": company_ids[0],
+            }
+        ],
+    )
     assert user_ids
-    user = app.data.find_one("users", req=None, _id=user_ids[0])
-    assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
+
+    user = await users_service.find_by_id(user_ids[0])
+    assert user.sections is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
-async def test_user_has_paused_notifications(app):
+async def test_user_has_paused_notifications():
     user = User(email="foo", user_type="public")
-    assert not get_resource_service("users").user_has_paused_notifications(user)
+    assert not UsersService.user_has_paused_notifications(user)
 
     user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2024-01-01"}
-    assert not get_resource_service("users").user_has_paused_notifications(user)
+    assert not UsersService.user_has_paused_notifications(user)
 
     user["notification_schedule"] = {"pause_from": "2024-01-01", "pause_to": "2050-01-01"}
-    assert get_resource_service("users").user_has_paused_notifications(user)
+    assert UsersService.user_has_paused_notifications(user)
 
 
-async def test_search_all_users(app, client):
+async def test_search_all_users(client):
     response = await client.get("/users/search?q=")
     users = await response.get_json()
     assert len(users) == 3
@@ -711,7 +725,7 @@ async def test_filter_users_by_product_id(app, client):
 
 
 async def test_create_and_search_new_user(client, app):
-    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
+    company_ids = await create_entries_for("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
 
     # Register a new account
     await client.post(

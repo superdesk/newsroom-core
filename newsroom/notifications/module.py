@@ -7,9 +7,9 @@ from superdesk.core.resources import (
     MongoIndexOptions,
 )
 
+from newsroom.types import Notification, NotificationQueue
 from newsroom.users.module import users_resource_config
 from newsroom import MONGO_PREFIX
-from .models import Notification, NotificationQueue
 from .services import NotificationQueueService, NotificationsService
 
 

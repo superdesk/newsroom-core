@@ -1,13 +1,8 @@
 # TODO-ASYNC: Remove this entire module
 
-import pytz
 import newsroom
 import superdesk
 
-from datetime import datetime, date
-from copy import deepcopy
-
-from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request
 
 from newsroom.types import User, PRODUCT_TYPES, UserRole
@@ -227,31 +222,6 @@ class UsersService(newsroom.Service):
 
     Serves mainly as a proxy to the data layer.
     """
-
-    # TODO-ASYNC: migrate these two pending methods below to `.service.UsersService`
-    # and update the references
-
-    def update_notification_schedule_run_time(self, user: User, run_time: datetime):
-        notification_schedule = deepcopy(user["notification_schedule"])
-        notification_schedule["last_run_time"] = run_time
-        self.update(user["_id"], {"notification_schedule": notification_schedule}, user)
-
-        app = get_current_app().as_any()
-        app.cache.delete(str(user["_id"]))
-        app.cache.delete(user.get("email"))
-
-    def user_has_paused_notifications(self, user: User) -> bool:
-        schedule = user.get("notification_schedule") or {}
-        timezone = pytz.timezone(schedule.get("timezone") or get_app_config("DEFAULT_TIMEZONE") or "UTC")
-        pause_from = schedule.get("pause_from")
-        pause_to = schedule.get("pause_to")
-        if pause_from and pause_to:
-            now = datetime.now(timezone).date()
-            pause_from_date = date.fromisoformat(pause_from)
-            pause_to_date = date.fromisoformat(pause_to)
-            if pause_from_date <= now <= pause_to_date:
-                return True
-        return False
 
 
 class AuthUserService(newsroom.Service):

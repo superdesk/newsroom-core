@@ -5,7 +5,7 @@ from bson import ObjectId
 from superdesk.utc import utcnow
 from superdesk.core.resources import AsyncResourceService
 
-from .models import Notification, NotificationQueue, NotificationTopic
+from newsroom.types import Notification, NotificationQueue, NotificationTopic
 
 
 class NotificationsService(AsyncResourceService[Notification]):

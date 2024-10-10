@@ -3,7 +3,6 @@ from quart import url_for
 from bson import ObjectId
 from pytest import fixture
 
-from superdesk import get_resource_service
 from superdesk.utils import get_hash
 
 from newsroom.types import UserAuthResourceModel
@@ -12,7 +11,7 @@ from newsroom.auth.views import _is_password_valid
 from newsroom.users import UsersService
 from newsroom.tests.users import ADMIN_USER_EMAIL
 from newsroom.companies import CompanyServiceAsync
-from tests.utils import login, logout
+from tests.utils import get_user_by_email, login, logout
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -223,7 +222,7 @@ async def test_account_is_locked_after_5_wrong_passwords(app, client):
             break
 
     # get the user
-    user = get_resource_service("users").find_one(req=None, email="test@sourcefabric.org")
+    user = await get_user_by_email("test@sourcefabric.org")
     assert user["is_enabled"] is False
 
 
@@ -276,7 +275,7 @@ async def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
             assert "Invalid username or password" in await response.get_data(as_text=True)
 
     # get the user
-    user = get_resource_service("users").find_one(req=None, email="test@sourcefabric.org")
+    user = await get_user_by_email("test@sourcefabric.org")
     assert user["is_enabled"] is True
 
 

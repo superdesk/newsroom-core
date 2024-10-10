@@ -1,9 +1,21 @@
 from superdesk.core.module import Module
 
-from .topics_async import topic_resource_config, topic_endpoints, get_user_topics
+from .topics_async import (
+    topic_resource_config,
+    topic_endpoints,
+    get_user_topics,
+    get_agenda_notification_topics_for_query_by_id,
+    get_topics_with_subscribers,
+)
 from . import topics
 
-__all__ = ["get_user_topics", "topic_endpoints", "topic_resource_config"]
+__all__ = [
+    "get_user_topics",
+    "topic_endpoints",
+    "topic_resource_config",
+    "get_agenda_notification_topics_for_query_by_id",
+    "get_topics_with_subscribers",
+]
 
 
 def init_app(app):
