@@ -31,7 +31,7 @@ from superdesk.factory.app import SuperdeskEve
 # from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
-from newsroom.auth import SessionAuth
+from newsroom.auth.eve_auth import SessionAuth
 from newsroom.exceptions import AuthorizationError
 from newsroom.utils import is_json_request, parse_validation_error
 from newsroom.gettext import setup_babel
@@ -211,10 +211,16 @@ class BaseNewsroomApp(SuperdeskEve):
 
         def superdesk_api_error(err):
             error_code = err.status_code or 500
-            return jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
+            return (
+                jsonify({"error": err.message or "", "message": getattr(err, "payload", {}), "code": error_code}),
+                error_code,
+            )
 
         async def authorization_error(err: AuthorizationError):
-            return await render_template("authorization_error.html", message=err.message), err.code
+            if request and is_json_request(request):
+                return jsonify(dict(title=err.title or "Error", message=err.message, code=err.code)), err.code
+
+            return await render_template("authorization_error.html", message=err.message, title=err.title), err.code
 
         def handle_validation_error(error: ValidationError):
             """
