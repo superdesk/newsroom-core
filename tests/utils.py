@@ -138,6 +138,6 @@ def get_resource_by_id(resource: str, item_id: str):
 
 
 async def get_user_by_email(email: str) -> Dict[str, Any]:
-    new_user = await UsersService().find_by_email(email)
+    new_user = await UsersService().get_by_email(email)
     assert new_user is not None
     return new_user.to_dict()

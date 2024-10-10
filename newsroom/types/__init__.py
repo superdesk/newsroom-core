@@ -21,6 +21,7 @@ from .topics import (
     CompanyTopicFoldersResourceModel,
 )
 from .users import DashboardModel, NotificationScheduleModel, UserResourceModel, UserAuthResourceModel
+from .notifications import Notification, NotificationQueue, NotificationTopic
 
 __all__ = [
     "UserRole",
@@ -46,6 +47,9 @@ __all__ = [
     "NotificationScheduleModel",
     "UserResourceModel",
     "UserAuthResourceModel",
+    "Notification",
+    "NotificationQueue",
+    "NotificationTopic",
 ]
 
 
