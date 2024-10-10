@@ -93,8 +93,8 @@ async def get_view_data() -> Dict:
     company_dict = company.to_dict() if company else None
 
     topics = await get_user_topics(user.id)
-    user_folders = await get_user_folders(user_dict, "wire") if user else []
-    company_folders = await get_company_folders(company_dict, "wire") if company_dict else []
+    user_folders = await get_user_folders(user, "wire") if user else []
+    company_folders = await get_company_folders(company, "wire") if company_dict else []
     products = get_products_by_company(company_dict, product_type="wire") if company_dict else []
     ui_config_service = UiConfigResourceService()
 
