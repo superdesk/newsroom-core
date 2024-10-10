@@ -8,9 +8,9 @@ aiofiles==24.1.0
     # via
     #   quart
     #   quart-uploads
-aiohappyeyeballs==2.4.0
+aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.5
+aiohttp==3.10.9
     # via elasticsearch
 aiosignal==1.3.1
     # via aiohttp
@@ -44,7 +44,7 @@ authlib==1.3.2
     # via superdesk-core
 babel==2.16.0
     # via quart-babel
-bcrypt==4.1.3
+bcrypt==4.2.0
     # via superdesk-core
 behave==1.2.6
     # via wooper
@@ -61,9 +61,9 @@ blinker==1.8.2
     #   raven
     #   sentry-sdk
     #   superdesk-core
-boto3==1.35.25
+boto3==1.35.37
     # via superdesk-core
-botocore==1.35.25
+botocore==1.35.37
     # via
     #   boto3
     #   s3transfer
@@ -91,7 +91,7 @@ chardet==5.2.0
     # via
     #   reportlab
     #   superdesk-core
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via requests
 ciso8601==2.3.1
     # via eve-elastic
@@ -111,9 +111,9 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.6.1
+coverage[toml]==7.6.2
     # via pytest-cov
-croniter==2.0.7
+croniter==3.0.3
     # via superdesk-core
 cryptography==43.0.1
     # via
@@ -125,7 +125,7 @@ cssselect2==0.7.0
     # via svglib
 deepdiff==8.0.1
     # via superdesk-planning
-dnspython==2.6.1
+dnspython==2.7.0
     # via
     #   email-validator
     #   pymongo
@@ -190,7 +190,7 @@ hachoir==3.3.0
     # via superdesk-core
 hermescache==1.0.0
     # via superdesk-core
-honcho==1.1.0
+honcho==2.0.0
     # via -r requirements.txt
 hpack==4.0.0
     # via h2
@@ -219,7 +219,7 @@ importlib-metadata==8.5.0
     # via quart-babel
 iniconfig==2.0.0
     # via pytest
-isodate==0.6.1
+isodate==0.7.2
     # via python3-saml
 itsdangerous==2.2.0
     # via
@@ -238,7 +238,7 @@ jwcrypto==1.5.6
     # via
     #   flask-oidc-ex
     #   python-jwt
-kombu==5.3.7
+kombu==5.4.2
     # via
     #   celery
     #   superdesk-core
@@ -252,9 +252,9 @@ lxml==5.2.2
     #   superdesk-core
     #   svglib
     #   xmlsec
-lxml-html-clean==0.1.1
+lxml-html-clean==0.2.2
     # via superdesk-core
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via
     #   jinja2
     #   quart
@@ -292,11 +292,11 @@ parse==1.20.2
     # via
     #   behave
     #   parse-type
-parse-type==0.6.3
+parse-type==0.6.4
     # via behave
 pathspec==0.12.1
     # via black
-pillow==10.3.0
+pillow==10.4.0
     # via
     #   reportlab
     #   superdesk-core
@@ -307,8 +307,10 @@ pluggy==1.5.0
     # via pytest
 priority==2.0.0
     # via hypercorn
-prompt-toolkit==3.0.47
+prompt-toolkit==3.0.48
     # via click-repl
+propcache==0.2.0
+    # via yarl
 pyasn1==0.6.1
     # via
     #   ldap3
@@ -335,7 +337,7 @@ pyhanko-certvalidator==0.26.3
     # via
     #   pyhanko
     #   xhtml2pdf
-pyjwt==2.4.0
+pyjwt==2.8.0
     # via superdesk-core
 pymemcache==4.0.0
     # via superdesk-core
@@ -348,10 +350,8 @@ pyparsing==3.1.4
     # via
     #   httplib2
     #   pyrtf3
-pypdf==5.0.0
+pypdf==5.0.1
     # via xhtml2pdf
-pypng==0.20220715.0
-    # via qrcode
 pyrtf3==0.47.5
     # via -r requirements.txt
 pytest==8.3.3
@@ -398,7 +398,7 @@ pyyaml==6.0.2
     #   pyhanko
     #   responses
     #   superdesk-core
-qrcode==7.4.2
+qrcode==8.0
     # via pyhanko
 quart @ git+https://github.com/MarkLark86/quart@fix-test-client-with-utf8-url
     # via
@@ -416,9 +416,9 @@ quart-flask-patch==0.3.0
     # via superdesk-core
 quart-rate-limiter==0.10.0
     # via -r requirements.txt
-quart-uploads==0.0.3
+quart-uploads==0.0.4
     # via quart-wtforms
-quart-wtforms==1.0.2
+quart-wtforms==1.0.3
     # via -r requirements.txt
 raven[flask]==6.10.0
     # via superdesk-core
@@ -426,9 +426,9 @@ redis==5.0.8
     # via
     #   celery
     #   superdesk-core
-regex==2024.5.15
+regex==2024.7.24
     # via superdesk-core
-reportlab==4.2.2
+reportlab==4.2.5
     # via
     #   superdesk-core
     #   svglib
@@ -451,7 +451,7 @@ rsa==4.9
     # via
     #   google-auth
     #   oauth2client
-s3transfer==0.10.2
+s3transfer==0.10.3
     # via boto3
 sentry-sdk[quart]==2.14.0
     # via -r requirements.txt
@@ -464,14 +464,13 @@ six==1.16.0
     #   behave
     #   flask-oidc-ex
     #   html5lib
-    #   isodate
     #   oauth2client
     #   parse-type
     #   python-bidi
     #   python-dateutil
 sniffio==1.3.1
     # via asgi-tools
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@SDESK-7372
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
@@ -483,7 +482,7 @@ tinycss2==1.3.0
     # via
     #   cssselect2
     #   svglib
-tomli==2.0.1
+tomli==2.0.2
     # via
     #   black
     #   coverage
@@ -504,11 +503,11 @@ types-markupsafe==1.1.10
     # via types-jinja2
 types-protobuf==5.28.0.20240924
     # via -r mypy-requirements.txt
-types-python-dateutil==2.9.0.20240906
+types-python-dateutil==2.9.0.20241003
     # via
     #   -r mypy-requirements.txt
     #   arrow
-types-pytz==2024.2.0.20240913
+types-pytz==2024.2.0.20241003
     # via
     #   -r mypy-requirements.txt
     #   types-tzlocal
@@ -534,10 +533,11 @@ typing-extensions==4.12.2
     #   pydantic
     #   pydantic-core
     #   pypdf
-    #   qrcode
     #   superdesk-core
 tzdata==2024.2
-    # via celery
+    # via
+    #   celery
+    #   kombu
 tzlocal==5.2
     # via
     #   pyhanko
@@ -567,7 +567,7 @@ webencodings==0.5.1
     #   cssselect2
     #   html5lib
     #   tinycss2
-websockets==12.0
+websockets==13.0.1
     # via superdesk-core
 werkzeug==3.0.4
     # via
@@ -590,7 +590,7 @@ xmlsec==1.3.14
     # via
     #   python3-saml
     #   superdesk-core
-yarl==1.12.1
+yarl==1.14.0
     # via
     #   aiohttp
     #   asgi-tools
