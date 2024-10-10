@@ -193,22 +193,23 @@ async def init_agenda_items(app):
 
 @fixture()
 async def user(app):
-    _user = {
-        "_id": ObjectId(ADMIN_USER_ID),
-        "first_name": "admin",
-        "last_name": "admin",
-        "email": ADMIN_USER_EMAIL,
-        "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
-        "user_type": "administrator",
-        "is_validated": True,
-        "is_enabled": True,
-        "is_approved": True,
-        "receive_email": True,
-        "receive_app_notifications": True,
-    }
-    app.data.insert("users", [_user])
-    _user["password"] = "admin"
-    return _user
+    async with app.app_context():
+        _user = {
+            "_id": ObjectId(ADMIN_USER_ID),
+            "first_name": "admin",
+            "last_name": "admin",
+            "email": ADMIN_USER_EMAIL,
+            "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+            "user_type": "administrator",
+            "is_validated": True,
+            "is_enabled": True,
+            "is_approved": True,
+            "receive_email": True,
+            "receive_app_notifications": True,
+        }
+        app.data.insert("users", [_user])
+        _user["password"] = "admin"
+        return _user
 
 
 @fixture()
@@ -236,6 +237,10 @@ async def setup_user_company(app):
                 "name": "Press Co.",
                 "is_enabled": True,
                 "contact_name": "Tom",
+                "sections": {
+                    "wire": True,
+                    "agenda": True,
+                },
                 "products": [
                     {"_id": PRODUCT_1_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_2_ID, "section": "wire", "seats": 0},
