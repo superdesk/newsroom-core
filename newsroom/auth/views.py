@@ -70,7 +70,7 @@ async def login(req: Request):
         company = await user.get_company() if user else None
 
         if user is None:
-            await flash(gettext("6Invalid username or password."), "danger")
+            await flash(gettext("Invalid username or password."), "danger")
         elif await is_valid_user(user, company):
             auth_provider = get_company_auth_provider(company)
             firebase_status = form.firebase_status.data
@@ -84,7 +84,7 @@ async def login(req: Request):
                     "auth/wrong-password",
                 )
             ):
-                await flash(gettext("7Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
             elif auth_provider.type == AuthProviderType.FIREBASE and firebase_status:
                 await log_firebase_unexpected_error(firebase_status)
             elif auth_provider.type != AuthProviderType.PASSWORD and not user.is_admin():
@@ -92,7 +92,7 @@ async def login(req: Request):
                 await flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
                 if not _is_password_valid(form.password.data.encode("UTF-8"), user):
-                    await flash(gettext("8Invalid username or password."), "danger")
+                    await flash(gettext("Invalid username or password."), "danger")
                 else:
                     await auth.start_session(req, user, permanent=form.remember_me.data)
                     return redirect_to_next_url()
@@ -189,7 +189,7 @@ async def get_login_token(req: Request):
         if await is_account_enabled(user):
             return generate_auth_token(user)
     else:
-        return await req.abort(401, gettext("9Invalid username or password."))
+        return await req.abort(401, gettext("Invalid username or password."))
 
 
 class LoginTokenRouteArgs(BaseModel):
@@ -390,7 +390,7 @@ async def set_locale(req: Request):
 async def impersonate_user(req: Request):
     if not req.storage.session.get("auth_user"):
         user = get_user_from_request(req)
-        req.storage.session.set("auth_user", user.id)
+        req.storage.session.set("auth_user", str(user.id))
 
     user_id = (await req.get_form()).get("user")
     assert user_id
@@ -434,9 +434,9 @@ async def change_password(req: Request):
         elif auth_provider.type == AuthProviderType.PASSWORD:
             user_auth = await UsersAuthService().get_by_email(user.email)
             if user_auth is None:
-                await flash(gettext("10Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
             elif not _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
-                await flash(gettext("11Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
             else:
                 updates = {"password": form.new_password.data}
                 await UsersAuthService().update(user.id, updates=updates)
