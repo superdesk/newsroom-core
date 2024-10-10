@@ -8,6 +8,7 @@ from superdesk.utc import utcnow
 
 from newsroom.notifications import get_user_notifications, NotificationsService
 from ..fixtures import PUBLIC_USER_ID, TEST_USER_ID
+from tests.utils import login_public
 
 TEST_ITEM_ID = ObjectId()
 TEST_USER = str(PUBLIC_USER_ID)
@@ -73,11 +74,9 @@ async def test_delete_notification_fails_for_different_user(client, service):
 async def test_delete_notification(client, service):
     await service.create_or_update([TEST_NOTIFICATION])
 
-    async with client.session_transaction() as session:
-        session["user"] = TEST_USER
-        session["name"] = "tester"
-
+    await login_public(client)
     resp = await client.get(USER_NOTIFICATIONS_URL)
+    print(await resp.get_data(as_text=True))
     data = json.loads(await resp.get_data())
     notify_id = data["notifications"][0]["_id"]
 
@@ -103,10 +102,7 @@ async def test_delete_all_notifications(client, service):
         ]
     )
 
-    async with client.session_transaction() as session:
-        session["user"] = TEST_USER
-        session["name"] = "tester"
-
+    await login_public(client)
     resp = await client.get(USER_NOTIFICATIONS_URL)
     data = json.loads(await resp.get_data())
     assert 2 == len(data["notifications"])

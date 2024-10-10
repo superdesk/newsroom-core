@@ -1,36 +1,34 @@
-from quart import session as server_session
+from bson import ObjectId
 
 from newsroom.wire.views import get_home_data
 from newsroom.tests.fixtures import PUBLIC_USER_ID
+
 from tests.core.utils import create_entries_for
-from bson import ObjectId
 
 
 async def test_personal_dashboard_data(client, app, company_products):
-    async with app.test_request_context("/home"):
-        server_session["user"] = str(PUBLIC_USER_ID)
-        server_session["user_type"] = "public"
+    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    assert user
 
-        user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
-        assert user
+    topics = [
+        {"_id": ObjectId(), "label": "fooo", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
+    ]
 
-        topics = [
-            {"_id": ObjectId(), "label": "fooo", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
-        ]
+    await create_entries_for("topics", topics)
 
-        await create_entries_for("topics", topics)
+    app.data.update(
+        "users",
+        PUBLIC_USER_ID,
+        {
+            "dashboards": [
+                {"name": "test d", "type": "4x4", "topic_ids": [topic["_id"] for topic in topics]},
+            ]
+        },
+        user,
+    )
 
-        app.data.update(
-            "users",
-            PUBLIC_USER_ID,
-            {
-                "dashboards": [
-                    {"name": "test d", "type": "4x4", "topic_ids": [topic["_id"] for topic in topics]},
-                ]
-            },
-            user,
-        )
-
+    async with app.test_request_context("/") as request:
+        request.session["user"] = str(PUBLIC_USER_ID)
         data = await get_home_data()
 
     assert "personalizedDashboards" in data

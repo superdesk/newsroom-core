@@ -2,11 +2,14 @@ import datetime
 from quart import url_for
 from bson import ObjectId
 from pytest import fixture
+
 from superdesk import get_resource_service
 from superdesk.utils import get_hash
 
+from newsroom.types import UserAuthResourceModel
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
+from newsroom.users import UsersService
 from newsroom.tests.users import ADMIN_USER_EMAIL
 from newsroom.companies import CompanyServiceAsync
 from tests.utils import login, logout
@@ -170,6 +173,7 @@ async def test_login_fails_for_not_approved_user(app, client):
     assert "Account has not been approved" in await response.get_data(as_text=True)
 
 
+# TODO-ASYNC-AUTH: This one fails
 async def test_login_fails_for_many_times_gets_limited(client, app):
     for i in range(1, 100):
         response = await client.post(
@@ -380,14 +384,16 @@ async def test_login_with_token_succeeds_for_correct_token(client):
 
 
 async def test_is_user_valid_empty_password():
-    password = "foo".encode("utf-8")
-    assert not _is_password_valid(password, {"_id": "foo", "email": "foo@example.com"})
-    assert not _is_password_valid(password, {"_id": "foo", "email": "foo@example.com", "password": None})
-    assert not _is_password_valid(password, {"_id": "foo", "email": "foo@example.com", "password": ""})
-    assert _is_password_valid(
-        password,
-        {"_id": "foo", "email": "foo@example.com", "password": get_hash("foo", 10)},
-    )
+    password_str = "plaintextpassword"
+    password = password_str.encode("utf-8")
+    user_auth = UserAuthResourceModel(id=ObjectId(), email="foo@example.com", first_name="foo", last_name="bar")
+    assert not _is_password_valid(password, user_auth)
+    user_auth.password = None
+    assert not _is_password_valid(password, user_auth)
+    user_auth.password = password_str
+    assert not _is_password_valid(password, user_auth)
+    user_auth.password = get_hash(password_str, 10)
+    assert _is_password_valid(password, user_auth)
 
 
 async def test_login_for_public_user_if_company_not_assigned(client, app):
@@ -459,7 +465,7 @@ async def test_access_for_disabled_user(app, client):
         ],
     )
 
-    user = get_resource_service("users").find_one(req=None, _id=user_id)
+    user = await UsersService().find_by_id(user_id)
 
     await login(client, {"email": "test@sourcefabric.org"})
     resp = await client.get("/bookmarks_wire")
@@ -467,7 +473,7 @@ async def test_access_for_disabled_user(app, client):
 
     await login(client, {"email": ADMIN_USER_EMAIL})
     resp = await client.post(
-        "/users/{}".format(user_id),
+        f"/users/{user_id}",
         form={
             "_id": user_id,
             "first_name": "test test",
@@ -479,17 +485,21 @@ async def test_access_for_disabled_user(app, client):
             "is_enabled": "false",
             "is_approved": "true",
             "company": company,
-            "_etag": user.get("_etag"),
+            "_etag": user.etag,
         },
+        headers={"If-Match": user.etag},
+        follow_redirects=False,
     )
     assert 200 == resp.status_code
 
     resp = await login(client, {"email": "test@sourcefabric.org"}, assert_login=False)
     assert "Account is disabled" in await resp.get_data(as_text=True)
 
+    print("\n\nAttempting to get /users/search")
     resp = await client.get("/users/search")
     assert 302 == resp.status_code
 
+    print("\n\nAttempting to get /wire")
     resp = await client.get("/wire")
     assert 302 == resp.status_code
 
@@ -517,13 +527,10 @@ async def test_access_for_disabled_company(app, client):
         ],
     )
 
-    async with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    await login(client, {"email": "test@sourcefabric.org"}, assert_login=False)
     resp = await client.get("/bookmarks_wire")
     assert 302 == resp.status_code
+    assert resp.headers.get("location") == "/login"
 
 
 async def test_access_for_not_approved_user(client, app):
@@ -533,6 +540,7 @@ async def test_access_for_not_approved_user(client, app):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "is_approved": False,
                 "receive_email": True,
@@ -541,17 +549,15 @@ async def test_access_for_not_approved_user(client, app):
             }
         ],
     )
+    user_id = str(user_ids[0])
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
-        session["user_type"] = "administrator"
-        session["auth_ttl"] = None
+    await login(client, {"email": "foo2@bar.com"}, assert_login=False)
     resp = await client.post(
-        "/users/%s/topics" % user,
+        f"/users/{user_id}/topics",
         json={"label": "bar", "query": "test", "notifications": True, "topic_type": "wire"},
     )
     assert 302 == resp.status_code, await resp.get_data()
+    assert resp.headers.get("location") == "/login"
 
 
 async def test_change_password(client, admin):
@@ -570,7 +576,7 @@ async def test_change_password(client, admin):
     )
 
     assert 200 == resp.status_code
-    assert "Current password invalid" in await resp.get_data(as_text=True)
+    assert "Invalid username or password." in await resp.get_data(as_text=True)
 
     resp = await client.post(
         "/change_password",

@@ -3,6 +3,9 @@ from eve.methods.get import get_internal, getitem_internal
 from superdesk import get_resource_service
 from quart import g
 from bson import ObjectId
+
+from newsroom.companies import CompanyServiceAsync
+
 from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
 
 company_id = "5c3eb6975f627db90c84093c"
@@ -83,7 +86,9 @@ async def test_search_audit_creation(client, app):
             {"body_html": "Once upon a time there was a aardvark that could not swim"},
         ],
     )
+
     async with app.test_request_context("/news", query_string=dict(q="fish", include_fields="body_html")):
+        g.company_instance = await CompanyServiceAsync().find_by_id(company_id)
         g.company_id = company_id
         response = await get_internal("news/search")
         assert len(response[0]["_items"]) == 1

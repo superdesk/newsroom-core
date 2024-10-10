@@ -7,6 +7,8 @@ from superdesk.flask import url_for
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
 
+from tests.fixtures import ADMIN_USER_EMAIL, PUBLIC_USER_EMAIL
+
 
 async def post_json(client: QuartClient, url, data):
     """Post json data to client."""
@@ -96,6 +98,7 @@ async def login(client: QuartClient, user, assert_login=True, follow_redirects=F
         form={
             "email": user["email"],
             "password": user.get("password") or "admin",
+            # "remember_me": True,
         },
         follow_redirects=follow_redirects,
     )
@@ -104,6 +107,14 @@ async def login(client: QuartClient, user, assert_login=True, follow_redirects=F
             resp.status_code == 302 if not follow_redirects else resp.status_code == 200
         ), f"Login failed for user {user['email']}"
     return resp
+
+
+async def login_admin(client: QuartClient):
+    return await login(client, {"email": ADMIN_USER_EMAIL})
+
+
+async def login_public(client: QuartClient):
+    return await login(client, {"email": PUBLIC_USER_EMAIL})
 
 
 def load_fixture(filename: str) -> str:

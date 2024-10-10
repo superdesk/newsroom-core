@@ -84,6 +84,7 @@ async def test_password_auth_denies_other_auth_types(app, client):
     )
 
     async def login_user():
+        # return await login(client, {"email": "test@sourcefabric.org", "password": "admin"})
         return await client.post(
             url_for("auth.login"),
             form={"email": "test@sourcefabric.org", "password": "admin"},

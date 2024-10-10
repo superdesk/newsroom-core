@@ -22,17 +22,18 @@ async def init():
     )
 
 
-async def test_filter_list_fails_for_anonymous_user(app, public_user):
-    async with app.test_client() as client:
-        res = await client.get("/section_filters/search", follow_redirects=False)
-        assert res.status_code == 302
-        assert res.headers.get("location") == "/login"
+async def test_section_filters_when_logged_out(client):
+    await utils.logout(client)
+    response = await client.get("/section_filters/search", follow_redirects=False)
+    assert response.status_code == 302
+    assert response.headers.get("location") == "/login"
 
-    async with app.test_client() as client:
-        await utils.login(client, public_user)
-        response = await client.get("/section_filters/search")
-        assert response.status_code == 403
-        assert b"Forbidden" in await response.get_data()
+
+async def test_section_filters_with_public_user(client):
+    await utils.login(client, {"email": "foo@bar.com"}, follow_redirects=False, auto_logout=True)
+    response = await client.get("/section_filters/search")
+    assert response.status_code == 403
+    assert b"Forbidden" in await response.get_data(), await response.get_data()
 
 
 async def test_return_search_for_filters(client):

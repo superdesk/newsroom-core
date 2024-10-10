@@ -1,10 +1,11 @@
 from quart import json, url_for
 from bson import ObjectId
-from newsroom.companies import CompanyServiceAsync as CompanyService, CompanyResource
+
+from newsroom.types import UserRole, CompanyResource
+from newsroom.companies import CompanyServiceAsync as CompanyService
 from newsroom.tests.users import test_login_succeeds_for_admin
 from newsroom.tests.fixtures import COMPANY_1_ID
 
-from newsroom.user_roles import UserRole
 from newsroom.users.service import UsersService
 from tests.utils import logout
 
