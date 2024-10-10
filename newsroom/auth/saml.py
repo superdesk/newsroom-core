@@ -7,17 +7,19 @@ To enable:
 
 """
 
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import logging
 import pathlib
-import superdesk
 
+from pydantic import BaseModel
 from urllib.parse import urlparse
 from quart_babel import gettext
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 
+import superdesk
 from superdesk.core import get_app_config
+from superdesk.core.types import Request
 from superdesk.flask import (
     request,
     redirect,
@@ -122,7 +124,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
     return userdata
 
 
-@blueprint.route("/login/saml", methods=["GET", "POST"])
+@blueprint.endpoint("/login/saml", methods=["GET", "POST"], auth=False)
 async def saml():
     req = await prepare_flask_request(request)
     auth = init_saml_auth(req)
@@ -170,7 +172,7 @@ async def saml():
     return redirect(auth.login())
 
 
-@blueprint.route("/login/saml_metadata")
+@blueprint.endpoint("/login/saml_metadata", auth=False)
 async def saml_metadata():
     req = await prepare_flask_request(request)
     auth = init_saml_auth(req)
@@ -186,8 +188,13 @@ async def saml_metadata():
     return resp
 
 
-@blueprint.route("/login/<client>", methods=["GET"])
-async def client_login(client):
+class ClientLoginUrlArgs(BaseModel):
+    client: str
+
+
+@blueprint.endpoint("/login/<client>", methods=["GET"], auth=False)
+async def client_login(args: ClientLoginUrlArgs, params: None, req: Request) -> Any:
+    client = args.client
     if not client or client not in get_app_config("SAML_CLIENTS"):
         return abort(404)
     session[SESSION_SAML_CLIENT] = client

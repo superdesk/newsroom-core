@@ -116,7 +116,6 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.wire",
-    "newsroom.auth.views",
     "newsroom.design",
     "newsroom.history",
     "newsroom.push",
@@ -163,7 +162,10 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
+ASYNC_AUTH_CLASS = "newsroom.auth.session_auth:NewshubSessionAuth"
+
 MODULES = [
+    "newsroom.auth.views",
     "newsroom.settings",
     "newsroom.ui_config_async",
     "newsroom.oauth_clients",
