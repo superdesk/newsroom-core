@@ -6,9 +6,10 @@ from pydantic import BaseModel
 
 from superdesk.core import json
 from superdesk.cache import cache
-from superdesk.core.web import EndpointGroup, Response, Request
+from superdesk.core.types import Response, Request
+from superdesk.core.web import EndpointGroup
 
-from newsroom.decorator import admin_only
+from newsroom.auth import auth_rules
 from newsroom.utils import query_resource
 from newsroom.core import get_current_wsgi_app
 from newsroom.flask import get_file_from_request
@@ -67,8 +68,11 @@ async def search(_a, params: SearchParams, _q):
     return Response(navigations)
 
 
-@navigations_endpoints.endpoint("/navigations/new", methods=["POST"])
-@admin_only
+@navigations_endpoints.endpoint(
+    "/navigations/new",
+    methods=["POST"],
+    auth=[auth_rules.admin_only],
+)
 async def create(request: Request):
     nav_data = await get_nav_data_from_request(request)
 
@@ -81,8 +85,11 @@ async def create(request: Request):
     return Response({"success": True, "_id": created_ids[0]}, 201)
 
 
-@navigations_endpoints.endpoint("/navigations/<string:id>", methods=["POST"])
-@admin_only
+@navigations_endpoints.endpoint(
+    "/navigations/<string:id>",
+    methods=["POST"],
+    auth=[auth_rules.admin_only],
+)
 async def edit(args: RouteArguments, _p: None, request: Request):
     service = NavigationsService()
     nav = await service.find_by_id(args.id)
@@ -99,8 +106,11 @@ async def edit(args: RouteArguments, _p: None, request: Request):
     return Response({"success": True})
 
 
-@navigations_endpoints.endpoint("/navigations/<string:id>", methods=["DELETE"])
-@admin_only
+@navigations_endpoints.endpoint(
+    "/navigations/<string:id>",
+    methods=["DELETE"],
+    auth=[auth_rules.admin_only],
+)
 async def delete(args: RouteArguments, _p: None, request: Request):
     service = NavigationsService()
     nav = await service.find_by_id(args.id)

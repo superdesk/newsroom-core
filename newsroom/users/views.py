@@ -9,24 +9,24 @@ from bson import ObjectId
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from superdesk.core.web import Request, Response
+from superdesk.core.types import Request, Response
 from superdesk.core import get_current_app, get_app_config
 from superdesk.core.types import SearchRequest
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
-from newsroom.user_roles import UserRole
-from newsroom.auth import get_user_by_email
+from newsroom.types import CompanyProduct, UserResourceModel, UserAuthResourceModel, UserRole
+from newsroom.auth.providers import AuthProvider
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
-    is_current_user_admin,
     is_current_user,
-    is_current_user_account_mgr,
-    is_current_user_company_admin,
     get_company_auth_provider,
+    get_user_from_request,
+    get_company_from_request,
+    add_token_data,
 )
+from newsroom.auth import auth_rules
 from newsroom.settings import get_setting
-from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
     get_company_sections_monitoring_data,
 )
@@ -46,10 +46,8 @@ from newsroom.utils import (
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
-from .service import UsersService
+from .service import UsersService, UsersAuthService
 from .module import users_endpoints
-from .model import UserResourceModel
-from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user, add_token_data
 
 
 class RouteArguments(BaseModel):
@@ -74,24 +72,17 @@ def get_settings_data():
 
 
 async def get_view_data():
-    user = await get_user_or_abort()
-    user_as_dict = user.to_dict()
-    company = await get_company_from_user_or_session(user)
-
-    company_as_dict = None
-    if company:
-        company_as_dict = company.to_dict()
-
-    auth_provider = get_company_auth_provider(company_as_dict)
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
+    auth_provider = get_company_auth_provider(company)
     ui_config_service = UiConfigResourceService()
-
-    user_company = await get_company_from_user(user)
+    user_as_dict = user.to_dict()
 
     view_data = {
         "user": user_as_dict,
-        "company": getattr(company, "id", ""),
+        "company": company.id if company else "",
         "topics": await get_user_topics(user.id) if user else [],
-        "companyName": getattr(user_company, "name", ""),
+        "companyName": company.name if company else "",
         "locators": get_vocabulary("locators"),
         "ui_configs": await ui_config_service.get_all_config(),
         "groups": get_app_config("WIRE_GROUPS", []),
@@ -134,8 +125,7 @@ class SearchArgs(ObjectIdListModel):
         return value
 
 
-@users_endpoints.endpoint("/users/search", methods=["GET"])
-@account_manager_or_company_admin_only
+@users_endpoints.endpoint("/users/search", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
 async def search(args: None, params: SearchArgs, request: Request) -> Response:
     lookup: Dict[str, Any] = {}
     sort = None
@@ -159,8 +149,9 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
             lookup["products._id"] = where_param.products_id
 
     # Make sure this request only searches for the current users company
-    if is_current_user_company_admin():
-        company = await get_company_from_user_or_session()
+    user = get_user_from_request(request)
+    if user.is_company_admin():
+        company = get_company_from_request(request)
         if company:
             lookup["company"] = company.id
         else:
@@ -172,20 +163,16 @@ async def search(args: None, params: SearchArgs, request: Request) -> Response:
     return Response(users)
 
 
-@users_endpoints.endpoint("/users/new", methods=["POST"])
-@account_manager_or_company_admin_only
-async def create(request: Request):
+@users_endpoints.endpoint("/users/new", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only])
+async def create(request: Request) -> Response:
     form = await UserForm.create_form()
 
     if await form.validate():
-        if not _is_email_address_valid(form.email.data):
-            return Response({"email": [gettext("Email address is already in use")]}, 400)
-
         creation_data = get_updates_from_form(form, on_create=True)
-        new_user = UserResourceModel.from_dict(creation_data)
-
-        if is_current_user_company_admin():
-            company_from_admin = await get_company_from_user_or_session()
+        new_user = UserAuthResourceModel.from_dict(creation_data)
+        current_user = get_user_from_request(request)
+        if current_user.is_company_admin():
+            company_from_admin = get_company_from_request(request)
             if not company_from_admin:
                 return await request.abort(401)
 
@@ -200,39 +187,41 @@ async def create(request: Request):
         new_user.receive_email = True
         new_user.receive_app_notifications = True
 
-        company = await get_company_from_user_or_session(new_user)
+        company = await new_user.get_company()
+        auth_provider: AuthProvider | None = None
         if company:
-            auth_provider = get_company_auth_provider(company.to_dict())
+            auth_provider = get_company_auth_provider(company)
 
             if auth_provider.features["verify_email"]:
                 add_token_data(new_user)
 
-        ids = await UsersService().create([new_user])
+        ids = await UsersAuthService().create([new_user])
 
-        if auth_provider.features["verify_email"]:
-            user_dict = new_user.to_dict()
-            await send_token(user_dict, token_type="new_account", update_token=False)
+        if auth_provider and auth_provider.features["verify_email"]:
+            await send_token(new_user, token_type="new_account", update_token=False)
 
         return Response({"success": True, "_id": ids[0]}, 201)
 
     return Response(form.errors, 400)
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/resend_invite", methods=["POST"])
-@account_manager_or_company_admin_only
-async def resent_invite(args: RouteArguments, params: None, request: Request):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/resend_invite", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def resent_invite(args: RouteArguments, params: None, request: Request) -> Response:
     # TODO: cover with tests all the cases in this view
-    user = await UsersService().find_by_id(args.user_id)
-    company = await get_company_from_user_or_session()
-    user_is_company_admin = is_current_user_company_admin()
+    user = await UsersAuthService().find_by_id(args.user_id)
+    company = get_company_from_request(request)
+    current_user = get_user_from_request(request)
+    user_is_company_admin = current_user.is_company_admin()
 
-    user_company = await get_company_from_user_or_session(user)
+    user_company = await user.get_company()
     if not user_company:
         await request.abort(403)
 
     assert user_company
 
-    auth_provider = get_company_auth_provider(user_company.to_dict())
+    auth_provider = get_company_auth_provider(user_company)
 
     if not user:
         raise NotFound(gettext("User not found"))
@@ -245,30 +234,26 @@ async def resent_invite(args: RouteArguments, params: None, request: Request):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         await request.abort(403)
 
-    await send_token(user.to_dict(), token_type="new_account")
+    await send_token(user, token_type="new_account")
 
     return Response({"success": True})
 
 
-def _is_email_address_valid(email):
-    # TODO-ASYNC: update once `auth` is migrated to async
-    existing_user = get_user_by_email(email)
-    return not existing_user
-
-
 @users_endpoints.endpoint("/users/<string:user_id>", methods=["GET", "POST"])
-@login_required
-async def edit(args: RouteArguments, params: None, request: Request):
-    user_is_company_admin = is_current_user_company_admin()
-    user_is_admin = is_current_user_admin()
-    user_is_account_mgr = is_current_user_account_mgr()
+async def edit(args: RouteArguments, params: None, request: Request) -> Response:
+    current_user = get_user_from_request(request)
+    user_is_company_admin = current_user.is_company_admin()
+    user_is_admin = current_user.is_admin()
+    user_is_account_mgr = current_user.is_account_manager()
     user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
-    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(args.user_id):
+    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(
+        args.user_id, request
+    ):
         await request.abort(401)
 
     user = await UsersService().find_by_id(args.user_id)
-    company = await get_company_from_user_or_session()
+    company = get_company_from_request(request)
 
     if user_is_company_admin and (company is None or user.company != company.id):
         await request.abort(403)
@@ -284,10 +269,7 @@ async def edit(args: RouteArguments, params: None, request: Request):
         form = await UserForm.create_form()
 
         if await form.validate_on_submit():
-            if form.email.data != user.email and not _is_email_address_valid(form.email.data):
-                return Response({"email": [gettext("Email address is already in use")]}, 400)
-
-            elif not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
+            if not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
                 return Response({"company": [gettext("Company is required for non administrators")]}, 400)
 
             updates = get_updates_from_form(form)
@@ -320,8 +302,6 @@ async def edit(args: RouteArguments, params: None, request: Request):
 
 
 def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
-    from newsroom.companies.companies_async import CompanyProduct
-
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
@@ -346,17 +326,17 @@ def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
     return updates
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/profile", methods=["POST"])
-@login_required
-async def edit_user_profile(args: RouteArguments, params: None, request: Request):
-    if not is_current_user(args.user_id):
-        await request.abort(403)
-
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/profile",
+    methods=["POST"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def edit_user_profile(args: RouteArguments, params: None, request: Request) -> Response:
     user = await UsersService().find_by_id(args.user_id)
     if not user:
         raise NotFound(gettext("User not found"))
 
-    form = await UserForm.create_form(user=user)
+    form = await UserForm.create_form(user=user.to_dict())
     if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
         await UsersService().update(args.user_id, updates)
@@ -365,12 +345,12 @@ async def edit_user_profile(args: RouteArguments, params: None, request: Request
     return Response(form.errors, 400)
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/notification_schedules", methods=["POST"])
-@login_required
-async def edit_user_notification_schedules(args: RouteArguments, params: None, request: Request):
-    if not is_current_user(args.user_id):
-        await request.abort(403)
-
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notification_schedules",
+    methods=["POST"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def edit_user_notification_schedules(args: RouteArguments, params: None, request: Request) -> Response:
     user: Optional[UserResourceModel] = await UsersService().find_by_id(args.user_id)
     if not user:
         raise NotFound(gettext("User not found"))
@@ -388,19 +368,19 @@ async def edit_user_notification_schedules(args: RouteArguments, params: None, r
     return Response({"success": True})
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/validate", methods=["POST"])
-@admin_only
-async def validate(args: RouteArguments, params: None, request: None):
+@users_endpoints.endpoint("/users/<string:user_id>/validate", methods=["POST"], auth=[auth_rules.admin_only])
+async def validate(args: RouteArguments, params: None, request: None) -> Response:
     return await _resend_token(args.user_id, token_type="validate")
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/reset_password", methods=["POST"])
-@account_manager_or_company_admin_only
-async def resend_token(args: RouteArguments, params: None, request: None):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/reset_password", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def resend_token(args: RouteArguments, params: None, request: None) -> Response:
     return await _resend_token(args.user_id, token_type="reset_password")
 
 
-async def _resend_token(user_id, token_type):
+async def _resend_token(user_id: str | None, token_type: str) -> Response:
     """
     Sends a new token for a given user_id
     :param user_id: Id of the user to send the token
@@ -408,23 +388,24 @@ async def _resend_token(user_id, token_type):
     :return:
     """
     if not user_id:
-        return BadRequest(gettext("User id not provided"))
+        raise BadRequest(gettext("User id not provided"))
 
-    user = await UsersService().find_by_id(user_id)
+    user = await UsersAuthService().find_by_id(user_id)
     if not user:
         raise NotFound(gettext("User not found"))
 
     assert user
 
-    if await send_token(user.to_dict(), token_type):
+    if await send_token(user, token_type):
         return Response({"success": True})
 
     return Response({"message": "Token could not be sent"}, 400)
 
 
-@users_endpoints.endpoint("/users/<string:user_id>", methods=["DELETE"])
-@account_manager_or_company_admin_only
-async def delete(args: RouteArguments, params: None, request: Request):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>", methods=["DELETE"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def delete(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes the user by given id"""
     service = UsersService()
     user = await service.find_by_id(args.user_id)
@@ -433,33 +414,35 @@ async def delete(args: RouteArguments, params: None, request: Request):
     return Response({"success": True})
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["GET"])
-@login_required
-async def get_notifications(args: RouteArguments, params: None, request: Request):
-    if not is_current_user(args.user_id):
-        await request.abort(403)
-
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications",
+    methods=["GET"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def get_notifications() -> Response:
     return Response(await get_notifications_with_items())
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/notifications", methods=["DELETE"])
-@login_required
-async def delete_all(args: RouteArguments, params: None, request: Request):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications",
+    methods=["DELETE"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def delete_all(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes all notification by given user id"""
-    if not is_current_user(args.user_id):
-        await request.abort(403)
 
     await NotificationsService().delete_many({"user": ObjectId(args.user_id)})
 
     return Response({"success": True})
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/notifications/<string:notification_id>", methods=["DELETE"])
-@login_required
-async def delete_notification(args: NotificationRouteArguments, params: None, request: Request):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications/<string:notification_id>",
+    methods=["DELETE"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def delete_notification(args: NotificationRouteArguments, params: None, request: Request) -> Response:
     """Deletes the notification by given id"""
-    if not is_current_user(args.user_id):
-        await request.abort(403)
 
     service = NotificationsService()
     original = await service.find_by_id(args.notification_id)
@@ -470,10 +453,11 @@ async def delete_notification(args: NotificationRouteArguments, params: None, re
     return Response({"success": True})
 
 
-@users_endpoints.endpoint("/users/<string:user_id>/approve", methods=["POST"])
-@account_manager_or_company_admin_only
-async def approve_user(args: RouteArguments, params: None, request: Request):
-    users_service = UsersService()
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/approve", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def approve_user(args: RouteArguments, params: None, request: Request) -> Response:
+    users_service = UsersAuthService()
     user = await users_service.find_by_id(args.user_id)
     if not user:
         raise NotFound(gettext("User not found"))

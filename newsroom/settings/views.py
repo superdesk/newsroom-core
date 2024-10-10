@@ -4,12 +4,13 @@ import re
 from pydantic import BaseModel
 from quart_babel import gettext
 
-from superdesk.core.web import EndpointGroup, Request, Response
+from superdesk.core.types import Request, Response
+from superdesk.core.web import EndpointGroup
 from superdesk.flask import render_template, g
 from superdesk.utc import utcnow
 
 from newsroom.core import get_current_wsgi_app
-from newsroom.decorator import admin_only, account_manager_only
+from newsroom.auth import auth_rules
 from newsroom.utils import get_json_or_400_async, set_version_creator
 
 from .resource import update_settings_document
@@ -22,8 +23,7 @@ class SettingsAppRouteParams(BaseModel):
     app_id: str
 
 
-@settings_endpoints.endpoint("/settings/<app_id>", methods=["GET"])
-@account_manager_only
+@settings_endpoints.endpoint("/settings/<app_id>", methods=["GET"], auth=[auth_rules.account_manager_only])
 async def settings_app(args: SettingsAppRouteParams, params: None, request: Request):
     from newsroom.users import get_user_profile_data  # noqa
 
@@ -41,8 +41,7 @@ async def settings_app(args: SettingsAppRouteParams, params: None, request: Requ
     await request.abort(404)
 
 
-@settings_endpoints.endpoint("/settings/general_settings", methods=["POST"])
-@admin_only
+@settings_endpoints.endpoint("/settings/general_settings", methods=["POST"], auth=[auth_rules.admin_only])
 async def update_values(request: Request):
     values = await get_json_or_400_async(request)
 

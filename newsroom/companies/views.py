@@ -8,10 +8,10 @@ from werkzeug.exceptions import NotFound, BadRequest
 from pydantic import BaseModel
 
 from superdesk.core import get_app_config, get_current_app
-from superdesk.core.web import Request, Response
+from superdesk.core.types import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
-from newsroom.decorator import admin_only, account_manager_only, login_required
+from newsroom.auth import auth_rules
 from newsroom.types import AuthProviderConfig
 from newsroom.utils import (
     get_public_user_data,
@@ -58,8 +58,11 @@ class CompanySearchArgs(BaseModel):
     q: Optional[str] = None
 
 
-@company_endpoints.endpoint("/companies/search", methods=["GET"])
-@account_manager_only
+@company_endpoints.endpoint(
+    "/companies/search",
+    methods=["GET"],
+    auth=[auth_rules.account_manager_only],
+)
 async def search_companies(args: None, params: CompanySearchArgs, request: Request) -> Response:
     lookup = None
     if params.q is not None:
@@ -70,12 +73,15 @@ async def search_companies(args: None, params: CompanySearchArgs, request: Reque
     return Response(companies)
 
 
-@company_endpoints.endpoint("/companies/new", methods=["POST"])
-@account_manager_only
+@company_endpoints.endpoint(
+    "/companies/new",
+    methods=["POST"],
+    auth=[auth_rules.account_manager_only],
+)
 async def create_company(request: Request) -> Response:
     company = await get_json_or_400_async(request)
     if not isinstance(company, dict):
-        return request.abort(400)
+        return await request.abort(400)
 
     company_data = get_company_updates(company)
 
@@ -135,8 +141,11 @@ class CompanyItemArgs(BaseModel):
     company_id: ObjectIdField
 
 
-@company_endpoints.endpoint("/companies/<string:company_id>", methods=["GET", "POST"])
-@account_manager_only
+@company_endpoints.endpoint(
+    "/companies/<string:company_id>",
+    methods=["GET", "POST"],
+    auth=[auth_rules.account_manager_only],
+)
 async def edit_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
     service = CompanyService()
     original = await service.find_by_id_raw(args.company_id)
@@ -148,7 +157,7 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
 
     request_json = await get_json_or_400_async(request)
     if not isinstance(request_json, dict):
-        return request.abort(400)
+        return await request.abort(400)
 
     updates = get_company_updates(request_json, original)
     await service.update(args.company_id, updates)
@@ -156,8 +165,11 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     return Response({"success": True})
 
 
-@company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])
-@admin_only
+@company_endpoints.endpoint(
+    "/companies/<string:company_id>",
+    methods=["DELETE"],
+    auth=[auth_rules.admin_only],
+)
 async def delete_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
     from newsroom.users.service import UsersService
 
@@ -181,7 +193,6 @@ async def delete_company(args: CompanyItemArgs, params: None, request: Request) 
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>/users", methods=["GET"])
-@login_required
 async def company_users(args: CompanyItemArgs, params: None, request: Request) -> Response:
     users_list = []
     company_users = await get_users_by_company(args.company_id)
@@ -192,11 +203,15 @@ async def company_users(args: CompanyItemArgs, params: None, request: Request) -
     return Response(users_list)
 
 
-@company_endpoints.endpoint("/companies/<string:company_id>/approve", methods=["POST"])
-@account_manager_only
+@company_endpoints.endpoint(
+    "/companies/<string:company_id>/approve",
+    methods=["POST"],
+    auth=[auth_rules.account_manager_only],
+)
 async def approve_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
-    from newsroom.users.service import UsersService
+    from newsroom.users.service import UsersAuthService
 
+    user_auth_service = UsersAuthService()
     service = CompanyService()
     original = await service.find_by_id(args.company_id)
     if not original:
@@ -212,9 +227,9 @@ async def approve_company(args: CompanyItemArgs, params: None, request: Request)
     await service.update(original.id, updates)
 
     # Activate the Users of this Company
-    company_users = await get_users_by_company(original.id)
+    company_user_auths = await user_auth_service.search(lookup={"company": original.id})
 
-    async for user in company_users:
-        await UsersService().approve_user(user)
+    async for user in company_user_auths:
+        await UsersAuthService().approve_user(user)
 
     return Response({"success": True})

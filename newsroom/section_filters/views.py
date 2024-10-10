@@ -1,16 +1,17 @@
 import re
-import json
 from typing import Any, Dict, Optional
 from pydantic import BaseModel, field_validator
 
-from superdesk.core.web import EndpointGroup, Response, Request
+from superdesk.core import json
+from superdesk.core.types import Response, Request
+from superdesk.core.web import EndpointGroup
 
-from newsroom.decorator import admin_only
+from newsroom.types import SectionFilterModel
+from newsroom.auth import auth_rules
 from newsroom.core import get_current_wsgi_app
 from newsroom.utils import get_json_or_400
 
 from .service import SectionFiltersService
-from .model import SectionFilter
 
 section_filters_endpoints = EndpointGroup("section_filters", __name__)
 
@@ -30,7 +31,7 @@ async def get_settings_data():
     return data
 
 
-async def get_section_filter_or_abort(id: str, request: Request) -> SectionFilter:
+async def get_section_filter_or_abort(id: str, request: Request) -> SectionFilterModel:
     section_filter = await SectionFiltersService().find_by_id(id)
     if section_filter is None:
         await request.abort(404)
@@ -48,8 +49,7 @@ class IndexParams(BaseModel):
         return value
 
 
-@section_filters_endpoints.endpoint("/section_filters", methods=["GET"])
-@admin_only
+@section_filters_endpoints.endpoint("/section_filters", methods=["GET"], auth=[auth_rules.admin_only])
 async def index(_a: None, params: IndexParams, _r: None):
     cursor = await SectionFiltersService().search(lookup=params.q)
     section_filters = await cursor.to_list_raw()
@@ -60,8 +60,7 @@ class SearchParams(BaseModel):
     q: str | None = None
 
 
-@section_filters_endpoints.endpoint("/section_filters/search", methods=["GET"])
-@admin_only
+@section_filters_endpoints.endpoint("/section_filters/search", methods=["GET"], auth=[auth_rules.admin_only])
 async def search(_a: None, params: SearchParams, _r: None):
     lookup = None
     if params.q:
@@ -73,8 +72,7 @@ async def search(_a: None, params: SearchParams, _r: None):
     return Response(section_filters)
 
 
-@section_filters_endpoints.endpoint("/section_filters/new", methods=["POST"])
-@admin_only
+@section_filters_endpoints.endpoint("/section_filters/new", methods=["POST"], auth=[auth_rules.admin_only])
 async def create():
     creation_data = await get_json_or_400()
     app_sections = get_current_wsgi_app().sections
@@ -94,8 +92,7 @@ class DetailArgs(BaseModel):
     id: str
 
 
-@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["POST"])
-@admin_only
+@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["POST"], auth=[auth_rules.admin_only])
 async def edit(args: DetailArgs, _p: None, request: Request):
     await get_section_filter_or_abort(args.id, request)
 
@@ -113,8 +110,7 @@ async def edit(args: DetailArgs, _p: None, request: Request):
     return Response({"success": True})
 
 
-@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"])
-@admin_only
+@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"], auth=[auth_rules.admin_only])
 async def delete(args: DetailArgs, _p: None, request: Request):
     """Deletes the section_filters by given id"""
 
