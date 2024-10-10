@@ -12,7 +12,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -52,7 +52,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -96,7 +96,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
