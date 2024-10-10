@@ -130,6 +130,7 @@ export function updateUser(updates: Partial<IUser>) {
     return function (dispatch: any, getState: any) {
 
         const user = cloneDeep(getState().currentUser);
+        // TODO-ASYNC: Stop using /api/_users` endpoint, it should be internal only
         const url = `api/_users/${user._id}`;
 
         const _etag = user._etag;
