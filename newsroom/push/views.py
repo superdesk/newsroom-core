@@ -7,7 +7,8 @@ from quart_babel import gettext
 from superdesk.lock import lock, unlock
 from superdesk import get_resource_service
 from superdesk.core import json, get_app_config
-from superdesk.core.web import EndpointGroup, Request, Response
+from superdesk.core.types import Request, Response
+from superdesk.core.web import EndpointGroup
 
 from newsroom import signals
 from newsroom.utils import parse_date_str

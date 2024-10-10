@@ -42,7 +42,7 @@ async def init(app):
     )
 
     await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "_id": ObjectId("5c53afa45f627d8333220f15"),

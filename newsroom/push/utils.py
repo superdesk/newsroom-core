@@ -7,7 +7,7 @@ from datetime import datetime
 
 from superdesk.utc import utcnow
 from superdesk.types import Item
-from superdesk.core.web import Request
+from superdesk.core.types import Request
 from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.errors import SuperdeskApiError

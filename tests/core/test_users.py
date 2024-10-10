@@ -1,15 +1,16 @@
+import pytest
 import pytz
 from bson import ObjectId
 
 from quart import json
 from quart import url_for
 from eve.utils import str_to_date
-from datetime import timedelta
+from datetime import timedelta, datetime
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from newsroom.types import User, UserResourceModel, CompanyResource, UserRole
-from newsroom.users import UsersAuthService
+from newsroom.users import UsersService, UsersAuthService
 from newsroom.auth.utils import is_valid_user
 from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.tests.fixtures import COMPANY_1_ID
@@ -19,7 +20,6 @@ from unittest import mock
 
 from tests.core.utils import create_entries_for
 from tests.utils import get_user_by_email, mock_send_email, login, login_public, logout
-from newsroom.users import UsersService
 
 
 @pytest.fixture
@@ -41,10 +41,10 @@ async def test_user_list_fails_for_public_user(client):
     assert "Forbidden" in await response.get_data(as_text=True)
 
 
-async def test_reset_password_token_sent_for_user_succeeds(client, users_service):
+async def test_reset_password_token_sent_for_user_succeeds(client):
     # Insert a new user
     await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "_id": ObjectId("59b4c5c61d41c8d736852000"),
@@ -63,14 +63,14 @@ async def test_reset_password_token_sent_for_user_succeeds(client, users_service
     response = await client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 200
     assert '"success": true' in await response.get_data(as_text=True)
-    user = await users_service.find_by_id("59b4c5c61d41c8d736852000")
+    user = await UsersAuthService().find_by_id("59b4c5c61d41c8d736852000")
     assert user.token is not None
 
 
 async def test_reset_password_token_sent_for_user_fails_for_disabled_user(client):
     # Insert a new user
     await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "_id": ObjectId("59b4c5c61d41c8d736852000"),
@@ -254,7 +254,7 @@ async def test_new_user_can_be_deleted(client):
 async def test_return_search_for_all_users(client):
     for i in range(250):
         await create_entries_for(
-            "users",
+            "auth_user",
             [
                 {
                     "email": f"foo{i}@bar.com",
@@ -292,7 +292,7 @@ async def test_active_users_and_active_companies(app):
     )
 
     users_ids = await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "email": "foo1@bar.com",
@@ -466,7 +466,7 @@ async def test_account_manager_can_update_user(app, client):
         "phone": "2132132134",
         "company": company_ids[0],
     }
-    await create_entries_for("users", [account_mgr])
+    await create_entries_for("auth_user", [account_mgr])
     response = await login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
 
@@ -645,7 +645,7 @@ async def test_create_user_inherit_sections(users_service):
     assert company_ids
 
     user_ids = await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "_id": ObjectId(),

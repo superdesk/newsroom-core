@@ -5,7 +5,7 @@ import superdesk
 
 from superdesk.flask import request
 
-from newsroom.types import User, PRODUCT_TYPES, UserRole
+from newsroom.types import PRODUCT_TYPES, UserRole
 from newsroom.auth.eve_auth import SessionAuth
 
 

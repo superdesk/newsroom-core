@@ -3,7 +3,7 @@ import email.policy as email_policy
 
 from lxml import etree
 from typing_extensions import TypedDict
-from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
+from typing import List, Optional, Dict, Any, Union
 
 from quart_babel import gettext
 from flask_mail import Attachment, Message

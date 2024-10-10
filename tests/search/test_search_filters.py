@@ -35,7 +35,7 @@ async def init(app):
     service = BaseSearchService()
 
     await create_entries_for("companies", COMPANIES)
-    await create_entries_for("users", USERS)
+    await create_entries_for("auth_user", USERS)
     await create_entries_for("navigations", NAVIGATIONS)
     await create_entries_for("products", PRODUCTS)
     await create_entries_for("section_filters", SECTION_FILTERS)
@@ -126,7 +126,7 @@ async def test_apply_time_limit_filter(client, app):
 
 async def test_apply_products_filter(app):
     def assert_products_query(args=None, products=None):
-        query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
+        query_string_settings = app.config["ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS"]
         search = SearchQuery()
 
         if args is None:

@@ -4,11 +4,9 @@ from datetime import datetime, timedelta
 
 from newsroom.topics.topics_async import TopicService
 from superdesk.utc import utcnow, utc_to_local
-from newsroom.types import NotificationSchedule
+from newsroom.types import NotificationSchedule, NotificationQueue, NotificationTopic
 from newsroom.notifications import NotificationQueueService
 from newsroom.notifications.commands import SendScheduledNotificationEmails
-
-from newsroom.notifications.models import NotificationQueue, NotificationTopic
 
 from tests.core.utils import create_entries_for
 

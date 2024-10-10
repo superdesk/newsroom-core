@@ -208,7 +208,7 @@ async def user(app):
         "receive_app_notifications": True,
     }
 
-    await create_entries_for("users", [_user])
+    await create_entries_for("auth_user", [_user])
 
     _user["password"] = "admin"
     return _user

@@ -623,11 +623,12 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_checks_service_subscriptions(client, app, mocker):
+    company_id = ObjectId()
     app.data.insert(
         "companies",
         [
             {
-                "_id": 1,
+                "_id": company_id,
                 "name": "Press 2 co.",
                 "is_enabled": True,
             }
@@ -635,14 +636,15 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
     )
 
     user_ids = app.data.insert(
-        "users",
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": 1,
+                "company": company_id,
             }
         ],
     )
@@ -670,7 +672,7 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
         }
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
-        assert 200 == resp.status_code
+        assert 200 == resp.status_code, await resp.get_data(as_text=True)
     assert len(outbox) == 0
 
 
