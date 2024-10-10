@@ -1,6 +1,7 @@
 from superdesk.core import get_current_app
 from superdesk.flask import request
-from newsroom.auth import get_user_id
+
+from newsroom.auth.utils import get_user_id_from_request
 
 
 def get_picture(item):
@@ -29,7 +30,7 @@ def update_action_list(items, action_list, force_insert=False, item_type="items"
     :param item_type: either items or agenda as the collection
     :return:
     """
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     if user_id:
         app = get_current_app()
         db = app.data.get_mongo_collection(item_type)

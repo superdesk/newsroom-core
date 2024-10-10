@@ -1,3 +1,5 @@
+# TODO-ASYNC: Remove this entire module
+
 import pytz
 import newsroom
 import superdesk
@@ -7,35 +9,36 @@ from copy import deepcopy
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request
-from newsroom.products.types import PRODUCT_TYPES
-from newsroom.types import User
-from newsroom.auth import get_user_id, get_user, SessionAuth
-from newsroom.user_roles import UserRole
+
+from newsroom.types import User, PRODUCT_TYPES, UserRole
+from newsroom.auth.eve_auth import SessionAuth
 
 
 class UserAuthentication(SessionAuth):
     def authorized(self, allowed_roles, resource, method):
+        from newsroom.auth.utils import get_user_or_none_from_request
+
         if super().authorized(allowed_roles, resource, method):
             return True
 
-        if not get_user_id():
+        user = get_user_or_none_from_request(None)
+        if not user:
             return False
 
         if not request.view_args or not request.view_args.get("_id"):
             # not a request for a specific user, stop
             return False
 
-        if request.view_args["_id"] == str(get_user_id()):
+        if request.view_args["_id"] == str(user.id):
             # current user editing current user
             return True
 
-        current_user = get_user()
-        if not current_user.get("company") or current_user.get("user_type") != UserRole.COMPANY_ADMIN.value:
+        if not user.company or not user.is_company_admin():
             # current user not a company admin
             return False
 
         request_user = superdesk.get_resource_service("users").find_one(req=None, _id=request.view_args["_id"])
-        if request_user.get("company") and request_user["company"] == current_user["company"]:
+        if request_user.get("company") and request_user["company"] == user.company:
             # if current user is a company admin for request user
             return True
 
@@ -192,6 +195,7 @@ USER_PROFILE_UPDATES = {
     "expiry_alert",
     "_updated",
     "password",
+    "version_creator",
 }
 
 

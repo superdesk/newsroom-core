@@ -3,19 +3,14 @@ from datetime import timedelta
 from quart_babel import gettext
 from authlib.integrations.flask_client import OAuth
 
-import superdesk
+from superdesk.core import get_current_app, get_current_async_app
 from superdesk.flask import Blueprint, url_for, session, redirect
 from superdesk.utc import utcnow
 
 from newsroom.flask import flash
 from newsroom.types import AuthProviderType
-from newsroom.template_filters import is_admin
-from newsroom.utils import (
-    is_company_enabled,
-    is_account_enabled,
-    is_company_expired,
-    get_cached_resource_by_id,
-)
+from newsroom.auth.utils import is_company_enabled, is_account_enabled, is_company_expired
+from newsroom.users import UsersService
 
 from newsroom.limiter import rate_limit
 from newsroom.auth.utils import get_company_auth_provider, redirect_to_next_url
@@ -69,16 +64,16 @@ async def google_authorized():
         return await redirect_with_error(gettext("Email not found"))
 
     # get user by email
-    users_service = superdesk.get_resource_service("users")
-    user = users_service.find_one(req=None, email=email.lower())
+    users_service = UsersService()
+    user = await users_service.get_by_email(email.lower())
     if not user:
         return await redirect_with_error(gettext("User not found"))
 
     # Check user & company validation
-    if not is_admin(user) and not user.get("company"):
+    if not user.is_admin() and not user.company:
         return await redirect_with_error(gettext("No Company assigned"))
 
-    company = get_cached_resource_by_id("companies", user.get("company"))
+    company = await user.get_company()
 
     if not is_company_enabled(user, company):
         return await redirect_with_error(gettext("Company is disabled"))
@@ -94,19 +89,20 @@ async def google_authorized():
         return await redirect_with_error(gettext("Invalid login type, Oauth not enabled for your user"))
 
     # If the user is not yet validated, then validate it now
-    if not user.get("is_validated", False):
-        users_service.system_update(
+    if not user.is_validated:
+        await users_service.system_update(
             user["_id"],
             {
                 "is_validated": True,
                 "last_active": utcnow(),
             },
-            user,
         )
 
     # Set flask session information
-    session["user"] = str(user["_id"])
-    session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    session["user_type"] = user["user_type"]
+    await get_current_async_app().auth.start_session(
+        get_current_app().get_current_request(),
+        user,
+        company=company,
+    )
 
     return redirect_to_next_url()

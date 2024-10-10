@@ -1,15 +1,19 @@
 from typing import Callable, Dict, Union
-from newsroom.auth.utils import is_current_user_account_mgr, is_current_user_admin, is_current_user_company_admin
+
+from newsroom.auth.utils import get_user_or_none_from_request
 from . import admin_reports, company_admin_reports
 
 
 def get_current_user_reports() -> Union[Dict[str, Callable], Dict]:
     """Return reports according to the user type"""
 
-    if is_current_user_admin() or is_current_user_account_mgr():
-        return admin_reports
+    user = get_user_or_none_from_request(None)
 
-    if is_current_user_company_admin():
+    if not user:
+        return {}
+    elif user.is_admin() or user.is_account_manager():
+        return admin_reports
+    elif user.is_company_admin():
         return company_admin_reports
 
     return {}

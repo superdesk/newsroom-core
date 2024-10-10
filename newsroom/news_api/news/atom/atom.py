@@ -12,7 +12,7 @@ from superdesk.flask import Blueprint, request, url_for, Response
 from superdesk.utc import utcnow
 from superdesk.etree import to_string
 
-from newsroom.auth import get_company
+from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products.products import get_products_by_company
 
@@ -69,8 +69,8 @@ async def get_atom():
     #    req.args = {'include_fields': 'abstract'}
     #    response = superdesk.get_resource_service('news/search').get(req=req, lookup=None)
 
-    company = get_company()
-    products = get_products_by_company(company)
+    company = get_company_or_none_from_request(None)
+    products = get_products_by_company(company.to_dict(context={"use_objectid": True}) if company else None)
 
     for item in response[0].get("_items"):
         try:

@@ -12,9 +12,8 @@ from superdesk.flask import jsonify, send_file, request, render_template
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
+from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
 from newsroom.email import send_user_email
-from newsroom.template_filters import is_admin
-from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print
 from newsroom.notifications import push_user_notification
@@ -43,16 +42,17 @@ from newsroom.users import get_user_profile_data
 
 
 async def get_view_data():
-    user = get_user()
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user["_id"]) if user else None,
-        "company": str(user["company"]) if user and user.get("company") else None,
-        "navigations": get_monitoring_for_company(user),
+        "user": str(user.id),
+        "company": str(company.id) if company else None,
+        "navigations": get_monitoring_for_company(user.to_dict()),
         "context": "monitoring",
         "groups": get_app_config("MONITORING_GROUPS") or get_app_config("WIRE_GROUPS", []),
         "ui_config": await ui_config_service.get_section_config("monitoring"),
-        "saved_items": get_bookmarks_count(user["_id"], "monitoring"),
+        "saved_items": get_bookmarks_count(user.id, "monitoring"),
         "formats": [
             {"format": f["format"], "name": f["name"]}
             for f in get_current_app().as_any().download_formatters.values()
@@ -185,12 +185,12 @@ async def edit(_id):
 
             # If the updates have anything other than 'users', only admin or monitoring_admin can update
             if len(request_updates.keys()) == 1 and "users" not in request_updates:
-                user = get_user()
-                if not is_admin(user):
+                user = get_user_from_request(None)
+                if not user.is_admin():
                     return jsonify({"error": "Bad request"}), 400
 
                 company = get_entity_or_404(profile["company"], "companies")
-                if str(user["_id"]) != str(company.get("monitoring_administrator")):
+                if str(user.id) != str(company.get("monitoring_administrator")):
                     return jsonify({"error": "Bad request"}), 400
 
             process_form_request(updates, request_updates, form)
@@ -221,7 +221,7 @@ async def index():
 @blueprint.route("/monitoring/export/<_ids>")
 @login_required
 async def export(_ids):
-    user = get_user(required=True)
+    user = get_user_from_request(None)
     _format = request.args.get("format")
     if not _format:
         return jsonify({"message": "No format specified."}), 400
@@ -242,7 +242,7 @@ async def export(_ids):
 
         if _file:
             update_action_list(_ids.split(","), "export", force_insert=True)
-            get_resource_service("history").create_history_record(items, "export", user, "monitoring")
+            get_resource_service("history").create_history_record(items, "export", user.to_dict(), "monitoring")
 
             return send_file(
                 _file,
@@ -261,7 +261,8 @@ async def share():
     assert data.get("users")
     assert data.get("items")
     assert data.get("monitoring_profile")
-    current_user = get_user(required=True)
+    current_user = get_user_from_request(None)
+    current_user_dict = current_user.to_dict()
     monitoring_profile = get_entity_or_404(data.get("monitoring_profile"), "monitoring")
     items = get_items_for_monitoring_report(data.get("items"), monitoring_profile)
 
@@ -271,7 +272,7 @@ async def share():
             "app_name": get_app_config("SITE_NAME"),
             "profile": monitoring_profile,
             "recipient": user,
-            "sender": current_user,
+            "sender": current_user_dict,
             "message": data.get("message"),
             "item_name": "Monitoring Report",
         }
@@ -295,7 +296,7 @@ async def share():
         )
 
     update_action_list(data.get("items"), "shares")
-    get_resource_service("history").create_history_record(items, "share", current_user, "monitoring")
+    get_resource_service("history").create_history_record(items, "share", current_user_dict, "monitoring")
     return jsonify({"success": True}), 200
 
 
@@ -310,7 +311,7 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "monitoring"))
     return jsonify(), 200
 

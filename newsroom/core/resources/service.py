@@ -1,7 +1,7 @@
 from typing import Generic, Any, ClassVar, TypeVar
 
 from superdesk.core.resources.service import AsyncResourceService
-from newsroom.utils import get_user_id
+
 from newsroom.core import get_current_wsgi_app
 
 from .model import NewshubResourceModel
@@ -14,14 +14,22 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
     clear_item_cache_on_update: ClassVar[bool] = False
 
     async def on_create(self, docs: list[NewshubResourceModelType]) -> None:
+        from newsroom.auth.utils import get_user_or_none_from_request
+
         await super().on_create(docs)
-        for doc in docs:
-            doc.original_creator = get_user_id()
-            doc.version_creator = get_user_id()
+        current_user = get_user_or_none_from_request(None)
+        if current_user:
+            for doc in docs:
+                doc.original_creator = current_user.id
+                doc.version_creator = current_user.id
 
     async def on_update(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
+        from newsroom.auth.utils import get_user_or_none_from_request
+
         await super().on_update(updates, original)
-        updates["version_creator"] = get_user_id()
+        current_user = get_user_or_none_from_request(None)
+        if current_user:
+            updates["version_creator"] = current_user.id
 
     async def on_updated(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         await super().on_updated(updates, original)

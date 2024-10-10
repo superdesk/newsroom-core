@@ -5,15 +5,13 @@ from io import BytesIO
 
 from werkzeug.utils import secure_filename
 
-from superdesk.core import get_app_config, get_current_app
-from superdesk.core.web import Response, Request
+from superdesk.core import get_app_config, get_current_app, get_current_async_app
+from superdesk.core.types import Response, Request
 from superdesk.flask import request as flask_request
 from superdesk.media.media_operations import guess_media_extension
 
 from .module import assets_endpoints
 from .utils import get_media_file, CACHE_MAX_AGE
-
-from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
 
 
 class RouteArguments(BaseModel):
@@ -64,10 +62,12 @@ async def get_upload(media_id: str, filename: str | None = None):
     return response
 
 
-@assets_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
+@assets_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"], auth=False)
 async def download_file(args: RouteArguments, params: UrlParams, request: Request) -> Response:
-    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
-        return clear_session_and_redirect_to_login()
+    if not get_app_config("PUBLIC_DASHBOARD"):
+        response = await get_current_async_app().auth.authenticate(request)
+        if response:
+            return response
 
     response = await get_upload(args.media_id, params.filename)
     return response if response else await request.abort(404)

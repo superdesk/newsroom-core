@@ -1,5 +1,6 @@
 from superdesk.notification import push_notification
-from newsroom.auth import get_user, get_user_id
+
+from newsroom.auth.utils import get_user_id_from_request, get_company_from_request
 
 from .module import module  # noqa
 from .services import NotificationsService, NotificationQueueService
@@ -22,9 +23,11 @@ __all__ = [
 
 
 def push_user_notification(name, **kwargs):
-    push_notification(":".join(map(str, [name, get_user_id()])), **kwargs)
+    user_id = get_user_id_from_request(None)
+    push_notification(":".join(map(str, [name, user_id])), **kwargs)
 
 
 def push_company_notification(name, **kwargs):
-    company_id = get_user().get("company")
-    push_notification(f"{name}:company-{company_id}", **kwargs)
+    company = get_company_from_request(None)
+    if company:
+        push_notification(f"{name}:company-{company.id}", **kwargs)

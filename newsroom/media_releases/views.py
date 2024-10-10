@@ -4,8 +4,9 @@ from eve.methods.get import get_internal
 
 from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
+
+from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
 from newsroom.media_releases import blueprint
-from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, section
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import (
@@ -23,11 +24,12 @@ logger = logging.getLogger(__name__)
 
 async def get_view_data():
     """Get the view data"""
-    user = get_user()
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user["_id"]) if user else None,
-        "company": str(user["company"]) if user and user.get("company") else None,
+        "user": str(user.id),
+        "company": str(company.id) if company else None,
         "navigations": [],
         "formats": [
             {"format": f["format"], "name": f["name"]}
@@ -77,7 +79,7 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "media_releases"))
     return jsonify(), 200
 

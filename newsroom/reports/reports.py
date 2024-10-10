@@ -13,7 +13,7 @@ from superdesk.flask import abort, request, send_file
 import superdesk
 from superdesk.utc import utcnow
 
-from newsroom.auth import get_user
+from newsroom.auth.utils import get_company_from_request
 from newsroom.utils import (
     query_resource,
     get_entity_dict,
@@ -95,8 +95,8 @@ def get_company_and_user_saved_searches():
     """
 
     results = []
-    current_company = get_user().get("company")
-    lookup_company = dict(company=current_company)
+    current_company = get_company_from_request(None)
+    lookup_company = dict(company=current_company.id if current_company else None)
     users = get_entity_dict(query_resource("users", lookup=lookup_company))
     topics = query_resource("topics", lookup=lookup_company)
 
