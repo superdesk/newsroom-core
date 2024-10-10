@@ -193,7 +193,7 @@ async def get_home_data():
         "cards": cards,
         "products": get_products_by_company(company_dict) if company else [],
         "user": str(user.id),
-        "userProducts": user.products or [],
+        "userProducts": user_dict.get("products") or [],
         "userType": user.user_type,
         "company": company.id if company else None,
         "companyProducts": company_dict.get("products") if company else [],
