@@ -1,11 +1,11 @@
 import click
 from bson import ObjectId
 from quart.cli import with_appcontext
+
+from newsroom.types import UserResourceModel
 from newsroom.async_utils import run_async_to_sync
-from newsroom.users.model import UserResourceModel
 from newsroom.users.service import UsersService
 
-from newsroom.auth import get_user_by_email
 from .cli import newsroom_cli
 
 
@@ -16,7 +16,7 @@ from .cli import newsroom_cli
 @click.argument("last_name")
 @click.argument("is_admin", type=bool)
 @with_appcontext
-def create_user(email, password, first_name, last_name, is_admin):
+async def create_user(email, password, first_name, last_name, is_admin):
     """Create a user with given email, password, first_name, last_name and is_admin flag.
 
     If user with given username exists it's noop.
@@ -37,7 +37,7 @@ def create_user(email, password, first_name, last_name, is_admin):
         "id": ObjectId(),
     }
     new_user = UserResourceModel.from_dict(new_user)
-    user = get_user_by_email(email)
+    user = await UsersService().get_by_email(email)
 
     if user:
         print("User already exists %s" % str(new_user))

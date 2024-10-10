@@ -10,11 +10,19 @@ from superdesk.utc import utcnow, utc_to_local
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
-from newsroom.types import User, NotificationSchedule, Company, NotificationQueue, NotificationQueueTopic, Topic
+from newsroom.types import (
+    User,
+    NotificationSchedule,
+    Company,
+    NotificationQueue,
+    NotificationQueueTopic,
+    Topic,
+    NotificationType,
+)
 from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.email import send_user_email
 from newsroom.celery_app import celery
-from newsroom.topics.topics_async import get_user_id_to_topic_for_subscribers, NotificationType
+from newsroom.topics.topics_async import get_user_id_to_topic_for_subscribers
 from newsroom.gettext import get_session_timezone, set_session_timezone
 
 logger = logging.getLogger(__name__)

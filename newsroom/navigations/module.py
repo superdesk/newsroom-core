@@ -4,8 +4,8 @@ from superdesk.core.module import Module
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 
 from newsroom import MONGO_PREFIX
+from newsroom.types import NavigationModel
 
-from .model import Navigation
 from .views import get_settings_data, navigations_endpoints
 from .service import NavigationsService
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 navigations_resource_config = ResourceConfig(
     name="navigations",
-    data_class=Navigation,
+    data_class=NavigationModel,
     service=NavigationsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     default_sort=[("order", 1), ("name", 1)],

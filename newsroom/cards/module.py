@@ -10,7 +10,7 @@ from newsroom.core import get_current_wsgi_app
 from newsroom.utils import query_resource
 from newsroom.navigations import NavigationsService
 
-from .model import CardResourceModel
+from newsroom.types import CardResourceModel
 from .service import CardsResourceService
 from .views import cards_endpoints
 

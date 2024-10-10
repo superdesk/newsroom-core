@@ -14,8 +14,8 @@ from content_api.items_versions.service import ItemsVersionsService
 
 from superdesk.metadata.item import metadata_schema
 
-from newsroom.cards import get_card_size, DashboardCardDict
-from newsroom.types import Article
+from newsroom.types import Article, DashboardCardDict
+from newsroom.cards import get_card_size
 
 
 class ItemsResource(BaseItemsResource):

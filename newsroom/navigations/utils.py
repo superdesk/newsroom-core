@@ -1,6 +1,6 @@
 from bson import ObjectId
-from newsroom.utils import is_admin
-from newsroom.types import Company, Navigation, UserData
+
+from newsroom.types import Company, Navigation, UserData, UserRole
 from newsroom.products.products import get_products_by_company, get_products_by_user
 
 from .service import NavigationsService
@@ -17,7 +17,7 @@ async def get_navigations(user: UserData | None, company: Company | None, produc
     """
     Returns list of navigations for given user and company
     """
-    if user and is_admin(user):
+    if user and user.get("user_type") == UserRole.ADMINISTRATOR:
         cursor = await NavigationsService().search(lookup={"product_type": product_type})
         return await cursor.to_list_raw()
 

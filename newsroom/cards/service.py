@@ -5,7 +5,7 @@ from newsroom.flask import get_file_from_request
 from newsroom.assets import save_file_and_get_url
 
 
-from .model import CardResourceModel, DashboardCardType, DashboardCardConfig
+from newsroom.types import CardResourceModel, DashboardCardConfig, DashboardCardType
 
 
 class CardsResourceService(NewshubAsyncResourceService[CardResourceModel]):

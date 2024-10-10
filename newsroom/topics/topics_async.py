@@ -1,66 +1,24 @@
-from enum import Enum, unique
 from bson import ObjectId
-from pydantic import Field
-from typing import Optional, List, Dict, Any, Annotated, Union
+from typing import Optional, List, Dict, Any, Union
 
 from newsroom import MONGO_PREFIX
-from newsroom.users.utils import get_user_or_abort
+from newsroom.types import TopicResourceModel, UserResourceModel
+from newsroom.exceptions import AuthorizationError
+from newsroom.auth.utils import get_user_from_request
 
 # from newsroom.signals import user_deleted
 
 from newsroom.users.service import UsersService
-from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
 from newsroom.types import User, Topic
 
 from superdesk.core.web import EndpointGroup
-from superdesk.core.resources import dataclass
 
 # from superdesk.core.module import SuperdeskAsyncApp
-from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
-from superdesk.core.resources.validators import validate_data_relation_async
-
-
-@unique
-class NotificationType(str, Enum):
-    NONE = "none"
-    REAL_TIME = "real-time"
-    SCHEDULED = "scheduled"
-
-
-@unique
-class TopicType(str, Enum):
-    WIRE = "wire"
-    AGENDA = "agenda"
-
-
-@dataclass
-class TopicSubscriber:
-    user_id: Annotated[ObjectIdField, validate_data_relation_async("users")]
-    notification_type: NotificationType = NotificationType.REAL_TIME
-
-
-class TopicResourceModel(NewshubResourceModel):
-    label: str
-    query: Optional[str] = None
-    filter: Optional[Dict[str, Any]] = None
-    created_filter: Annotated[Optional[Dict[str, Any]], Field(alias="created")] = None
-    user: Annotated[Optional[ObjectIdField], validate_data_relation_async("users")] = None
-    company: Annotated[Optional[ObjectIdField], validate_data_relation_async("companies")] = None
-    is_global: bool = False
-    subscribers: Optional[List[TopicSubscriber]] = []
-    timezone_offset: Optional[int] = None
-    topic_type: TopicType
-    navigation: Optional[List[Annotated[ObjectIdField, validate_data_relation_async("navigations")]]] = None
-    folder: Annotated[Optional[ObjectIdField], validate_data_relation_async("topic_folders")] = None
-    advanced: Optional[Dict[str, Any]] = None
 
 
 class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
-    async def on_create(self, docs: List[TopicResourceModel]) -> None:
-        return await super().on_create(docs)
-
     async def on_update(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_update(updates, original)
         # If ``is_global`` has been turned off, then remove all subscribers
@@ -84,11 +42,13 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
 
     async def on_updated(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_updated(updates, original)
-        current_user = await get_user_or_abort()
 
-        if current_user:
-            user_dict = current_user.to_dict()
-            await auto_enable_user_emails(updates, original, user_dict)
+        try:
+            current_user = get_user_from_request(None)
+            await auto_enable_user_emails(updates, original, current_user)
+        except AuthorizationError:
+            # No user currently logged in, could this be coming from a celery task?
+            pass
 
     async def on_delete(self, doc: TopicResourceModel):
         await super().on_delete(doc)
@@ -132,7 +92,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             if topic.user == user_object_id:
                 topic.user = None
 
-            self.update(topic.id, updates)
+            await self.update(topic.id, updates)
 
         # remove user as a topic creator for the rest
         user_topics = await self.search(lookup={"user": user["_id"]})
@@ -210,25 +170,22 @@ async def get_agenda_notification_topics_for_query_by_id(item, users):
 
 async def auto_enable_user_emails(
     updates: Topic | dict[str, Any],
-    original: TopicResourceModel | dict[str, Any],
-    user: Optional[User | dict[str, Any]],
+    original: TopicResourceModel | None,
+    user: UserResourceModel,
 ):
     if not updates.get("subscribers"):
         return
 
-    if not user:
-        return
-
     # If current user is already subscribed to this topic,
     # then no need to enable their email notifications
-    data = original.to_dict() if isinstance(original, TopicResourceModel) else original
-    for subscriber in data.get("subscribers", []):
-        if str(subscriber.get("user_id")) == str(user["_id"]):
-            return  # User already subscribed, no need to enable emails
+    if original:
+        for subscriber in original.subscribers or []:
+            if str(subscriber.user_id) == str(user.id):
+                return  # User already subscribed, no need to enable emails
 
     user_newly_subscribed = False
-    for subscriber in updates.get("subscribers", []):
-        if str(subscriber.get("user_id")) == str(user["_id"]):
+    for subscriber_dict in updates.get("subscribers", []):
+        if str(subscriber_dict.get("user_id")) == str(user.id):
             user_newly_subscribed = True
             break
 
@@ -237,7 +194,7 @@ async def auto_enable_user_emails(
 
     # The current user subscribed to this topic in this update
     # Enable their email notifications now
-    await UsersService().update(user["_id"], updates={"receive_email": True})
+    await UsersService().update(user.id, updates={"receive_email": True})
 
 
 # TODO-ASYNC, need to wait for SDESK-7376

@@ -8,11 +8,10 @@ from werkzeug.exceptions import Forbidden
 from superdesk.core import json, get_app_config
 from superdesk import get_resource_service
 
-from newsroom.types import Section
+from newsroom.types import Section, UserRole
 import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
-from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
 from typing import TypedDict, List, Optional
