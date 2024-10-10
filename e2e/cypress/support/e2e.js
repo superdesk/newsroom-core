@@ -77,7 +77,7 @@ export function addDefaultResources() {
             COMPANIES.foobar,
         ],
     }, {
-        resource: 'users', items: [
+        resource: 'auth_user', items: [
             USERS.foobar.admin,
             USERS.foobar.monkey,
         ],

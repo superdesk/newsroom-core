@@ -10,19 +10,19 @@
 
 from bson import ObjectId
 
-from newsroom.types import User
+from newsroom.types import UserResourceModel
 from newsroom.users.service import UsersService
 from tests.core.utils import create_entries_for
 
 USER_ADMIN_ID = ObjectId("445460066f6a58e1c6b11540")
 
 
-async def create_default_user() -> User:
+async def create_default_user() -> UserResourceModel:
     user = await UsersService().find_by_id(USER_ADMIN_ID)
 
     if not user:
         await create_entries_for(
-            "users",
+            "auth_user",
             [
                 {
                     "_id": USER_ADMIN_ID,
@@ -41,4 +41,4 @@ async def create_default_user() -> User:
         )
         user = await UsersService().find_by_id(USER_ADMIN_ID)
 
-    return user.to_dict()
+    return user
