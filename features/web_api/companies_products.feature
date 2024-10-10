@@ -42,7 +42,7 @@ Feature: Company Products
             ]
         }]
         """
-        And newsroom "auth_user"
+        And newsroom "users"
         """
         [{
             "_id": "4e65964bf5db68883df561b0", "user_type": "public",

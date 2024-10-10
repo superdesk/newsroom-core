@@ -25,7 +25,7 @@ from .notifications import NotificationManager
 
 
 logger = logging.getLogger(__name__)
-push_endpoints = EndpointGroup("push", __name__)
+push_endpoints = EndpointGroup("push", __name__, auth=False)
 notifier = NotificationManager()
 publisher = Publisher()
 

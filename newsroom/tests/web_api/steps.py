@@ -73,9 +73,7 @@ async def step_impl_when_post_form_to_url(context, url):
 async def step_impl_when_post_json_to_url(context, url):
     url = apply_placeholders(context, url)
     data = apply_placeholders(context, context.text)
-
-    async with context.app.test_request_context(url):
-        context.response = await context.client.post(url, data=data, headers=context.headers)
+    context.response = await context.client.post(url, data=data, headers=context.headers)
 
     await assert_ok(context.response)
 
@@ -119,7 +117,10 @@ async def when_we_login_as_user(context, email, password):
 @async_run_until_complete
 async def then_we_get_users_with_products(context):
     data = json.loads(apply_placeholders(context, context.text))
-    list_items = await get_json_data(context.response)
+    try:
+        list_items = await get_json_data(context.response)
+    except Exception:
+        assert False, await context.response.get_data(as_text=True)
     if not isinstance(list_items, list):
         list_items = [list_items]
     for user in list_items:
