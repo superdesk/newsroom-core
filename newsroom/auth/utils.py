@@ -270,7 +270,7 @@ async def is_account_enabled(user: UserResourceModel):
 async def is_valid_user(user: UserResourceModel | None, company: CompanyResource | None) -> bool:
     """Validate if user is valid and should be able to login to the system."""
     if not user:
-        await flash(gettext("5Invalid username or password."), "danger")
+        await flash(gettext("Invalid username or password."), "danger")
         return False
 
     current_request = get_current_request()

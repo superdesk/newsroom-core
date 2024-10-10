@@ -27,18 +27,18 @@ class NewshubSessionAuth(UserAuthProtocol):
         if not request.user:
             user_id = request.storage.session.get("user", "")
             if not user_id:
-                await flash(gettext("1Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
                 return await self.clear_session_and_redirect_to_login(request)
 
             try:
                 user_id = ObjectId(user_id)
             except InvalidId:
-                await flash(gettext("2Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
                 return await self.clear_session_and_redirect_to_login(request)
 
             user: UserResourceModel = await UsersService().find_by_id(user_id)
             if not user:
-                await flash(gettext("3Invalid username or password."), "danger")
+                await flash(gettext("Invalid username or password."), "danger")
                 return await self.clear_session_and_redirect_to_login(request)
 
             request.user = user
@@ -60,7 +60,7 @@ class NewshubSessionAuth(UserAuthProtocol):
         # Retrieve auth_ttl and ensure it is also timezone-aware
         auth_ttl = request.storage.session.get("auth_ttl")
         if not auth_ttl or not isinstance(auth_ttl, datetime):
-            await flash(gettext("4Invalid username or password."), "danger")
+            await flash(gettext("Invalid username or password."), "danger")
             return False
 
         if auth_ttl and auth_ttl.tzinfo is None:
