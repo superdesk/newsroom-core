@@ -27,9 +27,9 @@ async def index():
 
 
 def filter_disabled_products(company: Company, products: List[Product]) -> Company:
-    product_ids = set([p["_id"] for p in products])
+    product_ids = set([str(p["_id"]) for p in products])
     if company.get("products"):
-        company["products"] = [ref for ref in company["products"] if ref["_id"] in product_ids]
+        company["products"] = [ref for ref in company["products"] if str(ref["_id"]) in product_ids]
     return company
 
 
