@@ -152,7 +152,8 @@ class AgendaResource(newsroom.Resource):
     schema["urgency"] = {**planning_schema["urgency"], "mapping": {"type": "keyword"}}
     schema["priority"] = {**planning_schema["priority"], "mapping": {"type": "keyword"}}
     schema["place"] = planning_schema["place"]
-    schema["service"] = planning_schema["anpa_category"]
+    schema["service"] = deepcopy(planning_schema["anpa_category"])
+    schema["service"]["mapping"]["dynamic"] = False
     schema["state_reason"] = {"type": "string"}
 
     # Fields supporting Nested Aggregation / Filtering
@@ -185,6 +186,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "dynamic": False,
             "include_in_parent": True,  # Enabled so advanced search works across multiple fields
             "properties": {
                 "planning_id": not_analyzed,
@@ -230,7 +232,9 @@ class AgendaResource(newsroom.Resource):
 
     # other searchable fields needed in UI
     schema["calendars"] = events_schema["calendars"]
-    schema["location"] = events_schema["location"]
+    schema["location"] = deepcopy(events_schema["location"])
+    schema["location"]["mapping"]["dynamic"] = False
+    schema["location"]["mapping"]["properties"]["address"]["dynamic"] = True  # used for location search
 
     # update location name to allow exact search and term based searching
     schema["location"]["mapping"]["properties"]["name"] = {"type": "text", "fields": {"keyword": {"type": "keyword"}}}
@@ -246,6 +250,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "dynamic": False,
             "include_in_parent": True,
             "properties": {
                 "_id": not_analyzed,
