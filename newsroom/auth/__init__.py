@@ -42,6 +42,7 @@ def get_user_required() -> User:
     return user
 
 
+# TODO-ASYNC: get rid of this helper in favour of the async one in newsroom.companies.utils
 def get_company(user=None, required=False) -> Optional[Company]:
     if user is None:
         user = get_user(required=required)
@@ -52,6 +53,7 @@ def get_company(user=None, required=False) -> Optional[Company]:
     return None
 
 
+# TODO-ASYNC: get rid of this helper in favour of the async one in newsroom.users.utils
 def get_company_from_user(user: User) -> Optional[Company]:
     if user.get("company"):
         return superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
