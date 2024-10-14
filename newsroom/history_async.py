@@ -11,7 +11,6 @@ from newsroom.users.utils import get_user_or_abort
 from newsroom.utils import get_json_or_400
 from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
-from newsroom.users.model import UserResourceModel
 
 from superdesk.core.module import Module
 from quart_babel import gettext
@@ -47,7 +46,13 @@ class HistoryResourceModel(NewshubResourceModel):
 
 class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
     async def create_history_record(
-        self, docs: List[Dict[str, Any]], action: str, user: UserResourceModel, section: str = "wire", **kwargs: Any
+        self,
+        docs: List[Dict[str, Any]],
+        action: str,
+        user_id: Optional[ObjectId],
+        company_id: Optional[ObjectId],
+        section: str = "wire",
+        **kwargs: Any,
     ):
         now = utcnow()
 
@@ -55,15 +60,14 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             return {
                 "action": action,
                 "versioncreated": now,
-                "user": user["_id"],
-                "company": user.get("company"),
+                "user": user_id,
+                "company": company_id,
                 "item": str(item["_id"]),
                 "version": str(item.get("version", item.get("_current_version"))),
                 "section": section,
             }
 
         transformed_docs = [transform(doc) for doc in docs]
-        print(transformed_docs)
         try:
             await super().create(transformed_docs)
         except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
@@ -88,7 +92,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
 
         if all:
             # Handle pagination and retrieve additional results
-            while cursor.hits["hits"]["total"]["value"] > len(docs):
+            while cursor.count() > len(docs):
                 query["from"] = len(docs)
                 cursor = await self.query_items(query)
                 async for doc in cursor:
@@ -174,12 +178,17 @@ module = Module(
 async def create(args: None, params: RouteParams, request: Request) -> Response:
     params_dict = await get_json_or_400()
     user = await get_user_or_abort()
+    user_dict = user.to_dict()
 
     if not params_dict.get("item") or not params_dict.get("action") or not params_dict.get("section"):
         return Response({"error": str(gettext("Activity History: Invalid request"))}, 400)
 
     await HistoryService().create_history_record(
-        [params_dict["item"]], params_dict["action"], user.to_dict(), params_dict["section"]
+        [params_dict["item"]],
+        params_dict["action"],
+        user_dict.get("_id"),
+        user_dict.get("company"),
+        params_dict["section"],
     )
 
     return Response({"success": True}, 201)

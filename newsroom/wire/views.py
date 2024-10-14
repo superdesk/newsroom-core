@@ -360,7 +360,9 @@ async def download():
         _file.seek(0)
 
     update_action_list(data["items"], "downloads", force_insert=True)
-    await HistoryService().create_history_record(items, "download", user, request.args.get("type", "wire"))
+    await HistoryService().create_history_record(
+        items, "download", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+    )
     return await send_file(
         _file,
         mimetype=mimetype,
@@ -434,7 +436,9 @@ async def share():
             template_kwargs=template_kwargs,
         )
     update_action_list(data.get("items"), "shares", item_type=item_type)
-    await HistoryService().create_history_record(items, "share", current_user, request.args.get("type", "wire"))
+    await HistoryService().create_history_record(
+        items, "share", current_user.get("_id"), current_user.get("company"), request.args.get("type", "wire")
+    )
     return jsonify(), 201
 
 
@@ -510,7 +514,10 @@ async def copy(_id):
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
-    await HistoryService().create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
+    user = get_user()
+    await HistoryService().create_history_record(
+        [item], "copy", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+    )
     return jsonify({"data": copy_data}), 200
 
 
@@ -554,7 +561,10 @@ async def item(_id):
             template = "wire_item_print.html"
 
         update_action_list([_id], "prints", force_insert=True)
-        await HistoryService().create_history_record([item], "print", get_user(), request.args.get("type", "wire"))
+        user = get_user()
+        await HistoryService().create_history_record(
+            [item], "print", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+        )
 
     return await render_template(
         template,

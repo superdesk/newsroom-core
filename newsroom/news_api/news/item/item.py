@@ -35,7 +35,8 @@ async def get_item(item_id):
     await HistoryService().create_history_record(
         [{"_id": item_id, "version": formatted.get("version")}],
         "api",
-        {"_id": None, "company": ObjectId(g.company_id)},
+        None,
+        ObjectId(g.company_id),
         "news_api",
     )
     return response

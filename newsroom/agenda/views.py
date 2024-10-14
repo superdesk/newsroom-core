@@ -91,7 +91,9 @@ async def item(_id):
         map = request.args.get("map")
         template = "agenda_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
-        await HistoryService().create_history_record([item], "print", get_user(), request.args.get("type", "agenda"))
+        await HistoryService().create_history_record(
+            [item], "print", user.get("_id"), user.get("company"), request.args.get("type", "agenda")
+        )
         return await render_template(
             template,
             item=item,
