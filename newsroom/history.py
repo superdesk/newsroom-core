@@ -15,6 +15,8 @@ from newsroom.auth import get_user
 
 blueprint = Blueprint("history", __name__)
 
+# TODO-ASYNC :- Remove this resource when Reports module is converted to async
+
 
 class HistoryResource(newsroom.Resource):
     item_methods = ["GET"]

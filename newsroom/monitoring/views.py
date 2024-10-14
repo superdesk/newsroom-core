@@ -40,6 +40,7 @@ from newsroom.utils import (
 from .forms import MonitoringForm, alert_types
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
+from newsroom.history_async import HistoryService
 
 
 async def get_view_data():
@@ -242,7 +243,9 @@ async def export(_ids):
 
         if _file:
             update_action_list(_ids.split(","), "export", force_insert=True)
-            get_resource_service("history").create_history_record(items, "export", user, "monitoring")
+            await HistoryService().create_history_record(
+                items, "export", user.get("_id"), user.get("company"), "monitoring"
+            )
 
             return send_file(
                 _file,
@@ -295,7 +298,9 @@ async def share():
         )
 
     update_action_list(data.get("items"), "shares")
-    get_resource_service("history").create_history_record(items, "share", current_user, "monitoring")
+    await HistoryService().create_history_record(
+        items, "share", current_user.get("_id"), current_user.get("company"), "monitoring"
+    )
     return jsonify({"success": True}), 200
 
 
