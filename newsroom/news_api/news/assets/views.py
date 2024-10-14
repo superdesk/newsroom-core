@@ -7,14 +7,14 @@ from superdesk.core.web import EndpointGroup, Request
 from newsroom.assets import get_upload
 from newsroom.news_api.utils import post_api_audit
 
-assets_endpoints = EndpointGroup("news_api_assets", __name__, url_prefix="/api/v1")
+assets_endpoints = EndpointGroup("news_api_assets", __name__)
 
 
 class RouteArguments(BaseModel):
     asset_id: str
 
 
-@assets_endpoints.endpoint("/assets/<string:asset_id>", methods=["GET"])
+@assets_endpoints.endpoint("assets/<string:asset_id>", methods=["GET"])
 async def get_item(args: RouteArguments, _p: None, request: Request):
     app = get_current_wsgi_app()
     auth = app.auth
