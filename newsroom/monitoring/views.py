@@ -243,9 +243,7 @@ async def export(_ids):
 
         if _file:
             update_action_list(_ids.split(","), "export", force_insert=True)
-            await HistoryService().create_history_record(
-                items, "export", user.id, user.company, "monitoring"
-            )
+            await HistoryService().create_history_record(items, "export", user.id, user.company, "monitoring")
 
             return send_file(
                 _file,
@@ -298,9 +296,7 @@ async def share():
         )
 
     update_action_list(data.get("items"), "shares")
-    await HistoryService().create_history_record(
-        items, "share", current_user.id, current_user.company, "monitoring"
-    )
+    await HistoryService().create_history_record(items, "share", current_user.id, current_user.company, "monitoring")
     return jsonify({"success": True}), 200
 
 
