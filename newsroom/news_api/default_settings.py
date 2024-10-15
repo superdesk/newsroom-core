@@ -42,6 +42,7 @@ MODULES = [
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
+    "newsroom.news_api.news.feed",
 ]
 
 INSTALLED_APPS = []
