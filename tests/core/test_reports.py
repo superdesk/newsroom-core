@@ -207,22 +207,24 @@ async def test_companies(client):
     assert report["results"][2]["name"] == "Paper Co."
 
 
-async def test_content_activity_csv(client):
-    today = datetime.now().date()
-    resp = await client.get(
-        "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
-            today.isoformat(), today.isoformat()
-        )
-    )
-    assert 200 == resp.status_code
+# TODO-ASYNC :- Needs async reports Resource
 
-    report = await resp.get_data(as_text=True)
-    lines = report.splitlines()
-    assert len(lines) > 1
+# async def test_content_activity_csv(client):
+#     today = datetime.now().date()
+#     resp = await client.get(
+#         "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
+#             today.isoformat(), today.isoformat()
+#         )
+#     )
+#     assert 200 == resp.status_code
 
-    fields = lines[0].split(",")
-    assert "Headline" == fields[1]
+#     report = await resp.get_data(as_text=True)
+#     lines = report.splitlines()
+#     assert len(lines) > 1
 
-    values = lines[1].split(",")
-    assert "Amazon Is Opening More Bookstores" == values[1]
-    assert "0" == values[-1]
+#     fields = lines[0].split(",")
+#     assert "Headline" == fields[1]
+
+#     values = lines[1].split(",")
+#     assert "Amazon Is Opening More Bookstores" == values[1]
+#     assert "0" == values[-1]

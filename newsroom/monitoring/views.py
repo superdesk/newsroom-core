@@ -39,6 +39,7 @@ from newsroom.utils import (
 from .forms import MonitoringForm, alert_types
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
+from newsroom.history_async import HistoryService
 
 
 async def get_view_data():
@@ -242,7 +243,9 @@ async def export(_ids):
 
         if _file:
             update_action_list(_ids.split(","), "export", force_insert=True)
-            get_resource_service("history").create_history_record(items, "export", user.to_dict(), "monitoring")
+            await HistoryService().create_history_record(
+                items, "export", user.id, user.company, "monitoring"
+            )
 
             return send_file(
                 _file,
@@ -262,7 +265,6 @@ async def share():
     assert data.get("items")
     assert data.get("monitoring_profile")
     current_user = get_user_from_request(None)
-    current_user_dict = current_user.to_dict()
     monitoring_profile = get_entity_or_404(data.get("monitoring_profile"), "monitoring")
     items = get_items_for_monitoring_report(data.get("items"), monitoring_profile)
 
@@ -272,7 +274,7 @@ async def share():
             "app_name": get_app_config("SITE_NAME"),
             "profile": monitoring_profile,
             "recipient": user,
-            "sender": current_user_dict,
+            "sender": current_user.to_dict(),
             "message": data.get("message"),
             "item_name": "Monitoring Report",
         }
@@ -296,7 +298,9 @@ async def share():
         )
 
     update_action_list(data.get("items"), "shares")
-    get_resource_service("history").create_history_record(items, "share", current_user_dict, "monitoring")
+    await HistoryService().create_history_record(
+        items, "share", current_user.id, current_user.company, "monitoring"
+    )
     return jsonify({"success": True}), 200
 
 
