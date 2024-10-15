@@ -3,7 +3,7 @@ import bcrypt
 import logging
 import google.oauth2.id_token
 
-from typing import Literal, Any
+from typing import Literal, Any, cast
 from datetime import timedelta
 
 from pydantic import BaseModel
@@ -20,7 +20,7 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from newsroom.flask import flash
-from newsroom.types import AuthProviderType, UserAuthResourceModel, User, UserRole
+from newsroom.types import AuthProviderType, UserAuthResourceModel, User, UserRole, Company
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.auth.utils import (
     redirect_to_next_url,
@@ -245,9 +245,10 @@ async def signup(req: Request):
         regex = re.compile(f"^{company_name}$", re.IGNORECASE)
         company = await company_service.find_one(name=regex)
         company_dict = company.to_dict() if company else None
-        is_new_company = company_dict is None
+        is_new_company = False
 
-        if is_new_company:
+        if company_dict is None:
+            is_new_company = True
             enabled_products = get_resource_service("products").get(req=None, lookup={"is_enabled": True})
             company_dict = {
                 "name": form.company.data,
@@ -284,8 +285,8 @@ async def signup(req: Request):
             "sections": {section["_id"]: True for section in app.sections},
             "user_type": UserRole.PUBLIC.value,
         }
-        new_user_dict["_id"] = (await user_service.create([new_user_dict]))[0]
-        await send_new_signup_email(company_dict, new_user_dict, is_new_company)
+        new_user_dict["_id"] = ObjectId((await user_service.create([new_user_dict]))[0])
+        await send_new_signup_email(cast(Company, company_dict), cast(User, new_user_dict), is_new_company)
 
         return await render_template("signup_success.html"), 200
     return await render_template(

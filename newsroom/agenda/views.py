@@ -135,9 +135,9 @@ async def search():
 
 async def get_view_data() -> Dict:
     user = get_user_from_request(None)
-    user_dict = {} if not user else user.to_dict()
+    user_dict = None if not user else user.to_dict()
     company = get_company_from_request(None)
-    company_dict = {} if not company else company.to_dict()
+    company_dict = None if not company else company.to_dict()
 
     topics = await get_user_topics(user.id) if user else []
     products = get_products_by_company(company_dict, product_type="agenda") if company else []
@@ -146,7 +146,7 @@ async def get_view_data() -> Dict:
     ui_config_service = UiConfigResourceService()
 
     return {
-        "user": user_dict,
+        "user": user_dict or {},
         "company": company.id if company else None,
         "topics": [t for t in topics if t.get("topic_type") == "agenda"],
         "formats": [

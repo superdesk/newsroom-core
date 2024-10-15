@@ -77,7 +77,7 @@ def parse_date(datetime):
     return datetime
 
 
-def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time: bool) -> ScheduleType:
+def get_schedule_type(start: datetime, end: datetime | None, all_day: bool, no_end_time: bool) -> ScheduleType:
     """
     Determine the schedule type based on event start and end times.
 
