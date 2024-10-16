@@ -36,6 +36,8 @@ CORE_APPS = [
     "newsroom.news_api.news.assets.assets",
     "newsroom.news_api.news.atom.atom",
     "newsroom.history",
+    "newsroom.history",
+    "newsroom.agenda.module",
 ]
 
 MODULES = [
