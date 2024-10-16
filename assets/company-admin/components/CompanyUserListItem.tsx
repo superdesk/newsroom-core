@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {gettext, fullDate} from 'utils';
+import {Label} from 'components/Label';
 
 export function getUserStateLabelDetails(user: any) {
     if (user.is_approved && user.is_enabled && user.is_validated) {
@@ -43,14 +44,12 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
             <td>
                 <div className="name">
                     {user.first_name} {user.last_name}
-                    {user.user_type === 'company_admin' ?
-                        <label className="label label--restricted label--rounded label--fill">
-                            {gettext('Company Admin')}
-                        </label>
-                        : user.user_type === 'administrator' ?
-                            <label className="label label--restricted label--rounded label--fill">
-                                {gettext('Admin')}
-                            </label> : null}
+                    {user.user_type === 'company_admin'
+                        ? <Label text={gettext('Company Admin')} style='fill' />
+                        : user.user_type === 'administrator'
+                            ? <Label text={gettext('Admin')} style='fill' />
+                            : null
+                    }
                 </div>
                 <div className="email">
                     {user.email}

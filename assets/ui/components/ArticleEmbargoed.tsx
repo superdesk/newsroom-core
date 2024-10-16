@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {getEmbargo, gettext, fullDate} from '../../utils';
+import {Label} from 'components/Label';
 
 export default function ArticleEmbargoed({item}: any) {
     const embargo = getEmbargo(item);
@@ -10,9 +11,7 @@ export default function ArticleEmbargoed({item}: any) {
     }
 
     return (
-        <div>
-            <span className="label label--red label--big mb-3">{gettext('Embargo: {{ date }}', {date: fullDate(embargo)})}</span>
-        </div>
+        <Label text={gettext('Embargo: {{ date }}', {date: fullDate(embargo)})} type='alert' style='translucent' className='mb-3' size='big' />
     );
 }
 

@@ -24,6 +24,7 @@ import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
+import {Label} from 'components/Label';
 
 interface IStateProps {
     company: ICompany;
@@ -177,9 +178,7 @@ class EditCompany extends React.Component<IProps, IState> {
                 {this.props.company.is_approved !== false ? null : (
                     <div className="list-item__preview-toolbar">
                         <div className="list-item__preview-toolbar-left">
-                            <label className="label label--orange2 label--big label--rounded">
-                                {gettext('Pending')}
-                            </label>
+                            <Label text={gettext('Pending')} type='warning' size='big' style='translucent' />
                         </div>
                         <div className="list-item__preview-toolbar-right">
                             <button

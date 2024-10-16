@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import {IAgendaItem} from 'interfaces';
 import {bem} from 'ui/utils';
 import {gettext} from 'utils';
+import {Label} from 'components/Label';
 
 interface IProps {
     item: IAgendaItem;
@@ -120,7 +121,7 @@ class AgendaItemTimeUpdater extends React.Component<IProps, IState> {
 
         return(
             <div className={className}>
-                <div className="label label--blue">{this.state.timeText}</div>
+                <Label text={this.state.timeText} type='info' style='translucent' />
             </div>
         );
     }
