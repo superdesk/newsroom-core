@@ -7,21 +7,23 @@ from lxml import etree, html as lxml_html
 from lxml.etree import SubElement
 
 import superdesk
-from superdesk.core.web import EndpointGroup, Request
+from superdesk.core.web import EndpointGroup
+from superdesk.core.types import Request
 from superdesk.core import get_app_config
 from superdesk.flask import url_for, Response
 from superdesk.utc import utcnow
 from superdesk.etree import to_string
 
+from newsroom.core import get_current_wsgi_app
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products.products import get_products_by_company
 
 logger = logging.getLogger(__name__)
-atom_endpoints = EndpointGroup("news_api_atom", __name__)
+atom_endpoints = EndpointGroup("atom", __name__)
 
 
-@atom_endpoints.endpoint("atom", methods=["GET"])
+@atom_endpoints.endpoint("atom", methods=["GET"], auth=False)
 async def get_atom(request: Request):
     def _format_date(date):
         iso8601 = date.isoformat()
@@ -52,11 +54,11 @@ async def get_atom(request: Request):
     SubElement(feed, "title").text = etree.CDATA("{} Atom Feed".format(site_name))
     SubElement(feed, "updated").text = _format_update_date(utcnow())
     SubElement(SubElement(feed, "author"), "name").text = site_name
-    SubElement(feed, "id").text = url_for("news_api_atom.get_atom", _external=True)
+    SubElement(feed, "id").text = url_for("atom.get_atom", _external=True)
     SubElement(
         feed,
         "link",
-        attrib={"href": url_for("news_api_atom.get_atom", _external=True), "rel": "self"},
+        attrib={"href": url_for("atom.get_atom", _external=True), "rel": "self"},
     )
 
     # TODO-ASYNC: replace once the service is ready
