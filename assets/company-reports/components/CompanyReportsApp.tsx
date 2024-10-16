@@ -9,7 +9,6 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import {panels} from '../utils';
-
 import type {IProduct, ICompany} from 'interfaces';
 import type {UserType} from 'company-reports/types';
 

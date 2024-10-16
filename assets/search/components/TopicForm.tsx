@@ -13,6 +13,7 @@ import {FormSection} from 'components/FormSection';
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 import {TopicFolderEditor} from './TopicFolderEditor';
 import {noop} from 'lodash';
+import {Button} from 'components/Buttons';
 
 const TOPIC_NAME_MAXLENGTH = 40;
 
@@ -234,13 +235,12 @@ const TopicForm: React.FC<IProps> = ({
                                         <span className="nh-container__schedule-info mb-3">
                                             {getSubscriptionTimesString(user)}
                                         </span>
-                                        <button
-                                            type="button"
-                                            className="nh-button nh-button--small nh-button--tertiary"
+                                        <Button
+                                            variant="tertiary"
+                                            size="small"
+                                            value={gettext('Edit schedule')}
                                             onClick={openEditTopicNotificationsModal}
-                                        >
-                                            {gettext('Edit schedule')}
-                                        </button>
+                                        />
                                     </div>
                                 )
                             }

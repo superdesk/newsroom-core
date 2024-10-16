@@ -9,6 +9,7 @@ import {save} from '../actions';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
+import {Button} from 'components/Buttons';
 
 function isInput(field: any) {
     return ['text', 'number', 'boolean'].includes(field.type);
@@ -108,8 +109,11 @@ class GeneralSettingsApp extends React.Component<any, any> {
                             <AuditInformation item={audit} noPadding/>
                             <form onSubmit={this.onSubmit}>
                                 {fields}
-
-                                <button type="submit" className="nh-button nh-button--primary">{gettext('Save')}</button>
+                                <Button
+                                    value={gettext('Save')}
+                                    type='submit'
+                                    variant='primary'
+                                />
                             </form>
                         </div>
                     </section>

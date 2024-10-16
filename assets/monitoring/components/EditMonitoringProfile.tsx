@@ -13,6 +13,8 @@ import AuditInformation from 'components/AuditInformation';
 import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
@@ -80,15 +82,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit {{monitoring}} Profile', window.sectionNames) }</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={onClose} />
                 </div>
                 <AuditInformation item={item} />
                 <ul className='nav nav-tabs'>
@@ -201,16 +195,18 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                 </div>
 
                                 <div className='list-item__preview-footer'>
-                                    {item._id && <input
-                                        type='button'
-                                        className='nh-button nh-button--secondary'
-                                        value={gettext('Delete')}
-                                        onClick={onDelete} />}
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--primary'
+                                    {item._id && (
+                                        <Button
+                                            value={gettext('Delete')}
+                                            variant='secondary'
+                                            onClick={onDelete}
+                                        />
+                                    )}
+                                    <Button
                                         value={gettext('Save')}
-                                        onClick={onSave} />
+                                        variant='primary'
+                                        onClick={onSave}
+                                    />
                                 </div>
                             </form>
                         </div>

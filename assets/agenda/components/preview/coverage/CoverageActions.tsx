@@ -58,15 +58,16 @@ function CoverageActionsComponent({
         <ActionButton
             key={action.name}
             item={coverage}
-            className="icon-button icon-button--small icon-button--bordered icon-button--tertiary ms-auto"
             action={{
                 ...action,
                 action: () => {
                     action.action(coverage, agenda);
                 },
             }}
+            variant='tertiary'
+            size='small'
+            border
             plan={agenda}
-            isVisited={parentWatched}
             disabled={parentWatched}
         />
     ));

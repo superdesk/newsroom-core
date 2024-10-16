@@ -25,10 +25,11 @@ class ActionMenu extends React.Component<any, any> {
             <div className='btn-group'>
                 <button
                     ref={(elem: any) => this.referenceElem = elem}
-                    onClick={(event: any) => onActionList(event, item, group, plan)}
                     className="icon-button icon-button--secondary"
-                    aria-label={gettext('More Actions')}>
-                    <i className='icon--more'></i>
+                    aria-label={gettext('More Actions')}
+                    onClick={(event: any) => onActionList(event, item, group, plan)}
+                >
+                    <i className='icon--more' />
                 </button>
                 {this.referenceElem && (
                     <Popover
@@ -44,7 +45,6 @@ class ActionMenu extends React.Component<any, any> {
                                 item={item}
                                 group={group}
                                 plan={plan}
-                                user={user}
                                 actions={actions}
                                 onMouseLeave={this.onMouseLeave}
                                 showShortcutActions={showShortcutActions}

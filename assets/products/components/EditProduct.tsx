@@ -9,6 +9,8 @@ import {gettext, getProductQuery} from 'utils';
 import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
+import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 const getProductCompanies = (product: any, companies: any) => ({
     companies: companies.filter((company: any) => {
@@ -82,15 +84,7 @@ class EditProduct extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Product')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.product.name}</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={this.props.onClose} />
                 </div>
                 <AuditInformation item={this.props.product} />
                 <ul className='nav nav-tabs'>
@@ -181,16 +175,16 @@ class EditProduct extends React.Component<any, any> {
                                 </div>
                                 <div className='list-item__preview-footer'>
                                     {this.getPoductTestButton(this.props.product)}
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--secondary'
+                                    <Button
                                         value={gettext('Delete')}
-                                        onClick={this.props.onDelete}/>
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--primary'
+                                        variant='secondary'
+                                        onClick={this.props.onDelete}
+                                    />
+                                    <Button
                                         value={gettext('Save')}
-                                        onClick={this.props.onSave}/>
+                                        variant='primary'
+                                        onClick={this.props.onSave}
+                                    />
                                 </div>
                             </form>
                         </div>

@@ -18,6 +18,9 @@ import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
+import {IPersonalizedDashboardsWithData} from 'home/reducers';
+import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
 import {IHomeState} from 'home/reducers';
 
 import {DashboardPanels} from './DashboardPanels';
@@ -128,7 +131,6 @@ class HomeApp extends React.Component<IProps, {
                 {this.props.isSearchEnabled && (
                     <SearchBar />
                 )}
-
                 <section
                     className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
@@ -141,16 +143,14 @@ class HomeApp extends React.Component<IProps, {
                                     {
                                         !this.hasPersonalDashboard ? (
                                             <div className="home-tools">
-                                                <button
+                                                <Button
+                                                    value={gettext('Personalize Home')}
+                                                    variant='secondary'
+                                                    size='small'
                                                     onClick={() => {
                                                         this.props.personalizeHome();
                                                     }}
-                                                    type="button"
-                                                    className="nh-button nh-button--secondary nh-button--small"
-                                                    title={gettext('Personalize Home')}
-                                                >
-                                                    {gettext('Personalize Home')}
-                                                </button>
+                                                />
                                             </div>
                                         ) : (
                                             <div className="home-tools">
@@ -175,16 +175,17 @@ class HomeApp extends React.Component<IProps, {
                                                         }
                                                     }}
                                                 />
-                                                <button
+                                                <IconButton
+                                                    icon='settings'
+                                                    variant='tertiary'
+                                                    size='small'
+                                                    border
+                                                    tooltip={gettext('Edit personal Home')}
+                                                    ariaLabel={gettext('Edit personal Home')}
                                                     onClick={() => {
                                                         this.props.personalizeHome();
                                                     }}
-                                                    type="button"
-                                                    className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                                    title={gettext('Edit personal Home')}
-                                                >
-                                                    <i className="icon--settings"></i>
-                                                </button>
+                                                />
                                             </div>
                                         )
                                     }

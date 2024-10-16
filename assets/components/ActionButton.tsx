@@ -1,43 +1,30 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import {Tooltip} from 'bootstrap';
-import {isTouchDevice} from 'utils';
+import {IconButton, IPropsSize, IPropsVariant} from './IconButton';
 
+interface IProps {
+    testId?: string,
+    item: any,
+    action: any,
+    group?: string,
+    plan?: string | any,
+    disabled?: boolean,
+    variant?: IPropsVariant;
+    size?: IPropsSize;
+    border?: boolean;
+}
 
-class ActionButton extends React.Component<any, any> {
-    static propTypes: any;
-    tooltip: any;
-    elem: any;
-    constructor(props: any) {
-        super(props);
-
-        this.tooltip = null;
-    }
-
-    componentDidMount() {
-        if (!isTouchDevice() && this.elem) {
-            this.tooltip = new Tooltip(this.elem, {trigger: 'hover'});
-        }
-    }
-
-    componentWillUnmount() {
-        if (this.elem && this.tooltip) {
-            this.tooltip.dispose();
-        }
-    }
-
+class ActionButton extends React.Component<IProps> {
     render() {
-        const classes = classNames(`icon--${this.props.action.icon}`, {
-            'icon--default': this.props.isVisited || this.props.disabled,
-        });
         const {item, group, plan, action, disabled} = this.props;
+        const tooltip = this.props.action.tooltip ?? this.props.action.name;
 
         return (
-            <button
+            <IconButton
+                icon={this.props.action.icon}
+                variant={this.props.variant}
+                size={this.props.size}
+                border={this.props.border}
                 data-test-id={this.props.testId}
-                type='button'
-                className={this.props.className}
                 disabled={disabled}
                 onClick={
                     () => {
@@ -48,34 +35,11 @@ class ActionButton extends React.Component<any, any> {
                         }
                     }
                 }
-                ref={(elem: any) => this.elem = elem}
-                title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}
-                aria-label={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : this.props.action.name }>
-                <i className={classes}></i>
-                {this.props.displayName && this.props.action.name}</button>
+                tooltip={tooltip}
+                ariaLabel={tooltip}
+            />
         );
     }
 }
-
-ActionButton.propTypes = {
-    testId: PropTypes.string,
-    item: PropTypes.object,
-    group: PropTypes.string,
-    plan: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object
-    ]),
-    className: PropTypes.string,
-    displayName: PropTypes.bool,
-    isVisited: PropTypes.bool,
-    action: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        icon: PropTypes.string.isRequired,
-        action: PropTypes.func.isRequired,
-        multi: PropTypes.bool,
-        tooltip: PropTypes.string,
-    }),
-    disabled: PropTypes.bool,
-};
 
 export default ActionButton;

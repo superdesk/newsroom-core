@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import TextInput from 'components/TextInput';
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 class EditClient extends React.Component<any, any> {
     static propTypes: any;
@@ -19,15 +21,7 @@ class EditClient extends React.Component<any, any> {
                 aria-label={gettext('Edit Client')}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit Client') }</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={this.props.onClose} />
                 </div>
 
                 <div className='tab-content'>
@@ -58,16 +52,18 @@ class EditClient extends React.Component<any, any> {
                                 }
                             </div>
                             <div className='list-item__preview-footer'>
-                                {this.props.client._id && <input
-                                    type='button'
-                                    className='nh-button nh-button--secondary'
-                                    value={gettext('Delete')}
-                                    onClick={this.props.onDelete}/>}
-                                <input
-                                    type='button'
-                                    className='nh-button nh-button--primary'
+                                {this.props.client._id && (
+                                    <Button
+                                        value={gettext('Delete')}
+                                        variant='secondary'
+                                        onClick={this.props.onDelete}
+                                    />
+                                )}
+                                <Button
                                     value={gettext('Save')}
-                                    onClick={this.props.onSave}/>
+                                    variant='primary'
+                                    onClick={this.props.onSave}
+                                />
                             </div>
                         </form>
                     </div>

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import InputWrapper from './InputWrapper';
 
 import {gettext} from 'utils';
+import {IconButton} from './IconButton';
 
 interface IProps {
     type?: string;
@@ -50,16 +51,15 @@ function TextInput({
                 <label htmlFor={name} className={labelClasses}>{label}</label>
             )}
             {copyAction &&
-                <button
-                    className='icon-button'
-                    title={gettext('Copy')}
+                <IconButton
+                    icon='copy'
+                    tooltip={gettext('Copy')}
+                    ariaLabel={gettext('Copy')}
                     onClick={(e) => {
                         e.preventDefault();
                         navigator.clipboard.writeText(value || '');
                     }}
-                >
-                    <i className='icon--copy'></i>
-                </button>
+                />
             }
 
             <div className="field">

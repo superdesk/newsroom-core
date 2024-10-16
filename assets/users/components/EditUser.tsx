@@ -31,6 +31,9 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
 import ActionButton from 'components/ActionButton';
+import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
+import CloseButton from 'components/CloseButton';
 import {IUserSettingsState} from 'users/reducers';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
@@ -128,10 +131,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const userAuthProviderFeatures = authProviderFeatures[authProvider];
 
     const resendInviteButton = {
-        name: gettext('Resend Invite'),
         icon: 'refresh',
         tooltip: gettext('Resend Invite'),
-        multi: false,
         action: () => {
             if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
                 resendUserInvite();
@@ -147,15 +148,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
         >
             <div className='list-item__preview-header'>
                 <h3>{gettext('Add/Edit User')}</h3>
-                <button
-                    id='hide-sidebar'
-                    type='button'
-                    className='icon-button'
-                    data-bs-dismiss='modal'
-                    aria-label={gettext('Close')}
-                    onClick={onClose}>
-                    <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
-                </button>
+                <CloseButton onClick={onClose} />
             </div>
             <AuditInformation item={user} />
             <div className="list-item__preview-content">
@@ -171,39 +164,38 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 </label>
                             )}
                             {!showResendInvite ? null : (
-                                <ActionButton
-                                    key={resendInviteButton.name}
-                                    className="icon-button icon-button--small icon-button--secondary"
-                                    aria-label={gettext('Resend Invite')}
-                                    action={resendInviteButton}
+                                <IconButton
+                                    icon={resendInviteButton.icon}
+                                    size='small'
+                                    tooltip={resendInviteButton.tooltip}
+                                    ariaLabel={resendInviteButton.tooltip}
+                                    onClick={resendInviteButton.action}
                                 />
                             )}
                         </div>
                         {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
                             <div className="list-item__preview-toolbar-right">
                                 {original.is_approved === false ? (
-                                    <button
+                                    <Button
+                                        value={gettext('Approve')}
                                         type="submit"
-                                        className="nh-button nh-button--tertiary nh-button--small"
-                                        aria-label={gettext('Approve User')}
+                                        variant='tertiary'
+                                        size='small'
                                         onClick={(event) => {
                                             event.preventDefault();
                                             approveUser(original._id);
                                         }}
-                                    >
-                                        {gettext('Approve')}
-                                    </button>
+                                    />
                                 ) : (
                                     <form method="POST" action={'/auth/impersonate'}>
                                         <input type="hidden" name="user" value={user._id} />
-                                        <button
-                                            type="submit"
-                                            className="nh-button nh-button--tertiary nh-button--small"
-                                            aria-label={gettext('Impersonate User')}
+                                        <Button
                                             data-test-id="impersonate-user-btn"
-                                        >
-                                            {gettext('Impersonate User')}
-                                        </button>
+                                            value={gettext('Impersonate User')}
+                                            type="submit"
+                                            variant='tertiary'
+                                            size='small'
+                                        />
                                     </form>
                                 )}
                             </div>
@@ -469,27 +461,31 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures.verify_email === false ? null : (
-                            <input
-                                type='button'
-                                className='nh-button nh-button--secondary'
-                                value={gettext('Reset Password')}
-                                id='resetPassword'
-                                onClick={onResetPassword}
-                                data-test-id='reset-password-btn'
+                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures.verify_email === false
+                            ? null
+                            : (
+                                <Button
+                                    value={gettext('Reset Password')}
+                                    variant='secondary'
+                                    id='resetPassword'
+                                    onClick={onResetPassword}
+                                    data-test-id='reset-password-btn'
+                                />
+                            )
+                        }
+                        {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && (
+                            <Button
+                                value={gettext('Delete')}
+                                variant='secondary'
+                                onClick={onDelete}
                             />
                         )}
-                        {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && <input
-                            type='button'
-                            className='nh-button nh-button--secondary'
-                            value={gettext('Delete')}
-                            onClick={onDelete} />}
-                        <input
+                        <Button
                             data-test-id="save-btn"
-                            type='button'
-                            className='nh-button nh-button--primary'
                             value={gettext('Save')}
-                            onClick={onSave} />
+                            variant='primary'
+                            onClick={onSave}
+                        />
                     </div>
                 </form>
             </div>

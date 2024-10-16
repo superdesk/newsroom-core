@@ -147,9 +147,8 @@ class AmNewsListItem extends React.Component<any, any> {
                             action.shortcut &&
                           <ActionButton
                               key={action.name}
-                              className="icon-button icon-button--primary"
+                              variant='primary'
                               action={action}
-                              isVisited={action.visited && action.visited(this.props.user, this.props.item)}
                               item={this.props.item} />
                         )}
                     </div>
