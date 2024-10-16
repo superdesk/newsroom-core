@@ -119,8 +119,12 @@ def get_current_request() -> Request:
 
 def get_user_from_request(request: Request | None) -> UserResourceModel:
     request = request or get_current_request()
-    if request.user is None:
+    if request.user is None or isinstance(request.user, str):
         raise AuthorizationError(401, gettext("Not logged in"))
+    elif isinstance(request.user, str):
+        # TODO-ASYNC: Fix this, the NewsAPI is setting the token on request.user
+        # which is an invalid type
+        raise AuthorizationError(401, gettext("Invalid user instance"))
 
     return cast(UserResourceModel, request.user)
 
