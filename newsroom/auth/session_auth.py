@@ -47,7 +47,6 @@ class NewshubSessionAuth(UserAuthProtocol):
         if not await self.is_valid_session(request, request.user, company):
             return await self.clear_session_and_redirect_to_login(request)
 
-        # await self.start_session(request, user, company=company)
         await self.continue_session(request, request.user, company=company)
         return None
 
