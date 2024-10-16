@@ -6,9 +6,8 @@ from bson import ObjectId
 import newsroom
 import superdesk
 from superdesk.services import CacheableService
-from .types import PRODUCT_TYPES
 
-from newsroom.types import Company, Product, User, NavigationIds
+from newsroom.types import Company, Product, User, NavigationIds, PRODUCT_TYPES
 from newsroom.utils import any_objectid_in_list, parse_objectid
 
 IdsList = NavigationIds

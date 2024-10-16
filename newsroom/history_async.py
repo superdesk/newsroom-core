@@ -1,62 +1,42 @@
+from typing import Any, cast
+
 import pymongo.errors
 from bson import ObjectId
 import werkzeug.exceptions
-
-from datetime import datetime
-from pydantic import BaseModel
-from typing import Optional, Dict, Annotated, List, Any
-
-from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
-from newsroom.users.utils import get_user_or_abort
-from newsroom.utils import get_json_or_400
-from newsroom.core.resources.model import NewshubResourceModel
-from newsroom.core.resources.service import NewshubAsyncResourceService
-
-from superdesk.core.module import Module
 from quart_babel import gettext
-from superdesk.utc import utcnow
-from superdesk.core.web import EndpointGroup, Response, Request
-from superdesk.flask import abort
-from superdesk.core.resources.fields import ObjectId as ObjectIdField, Keyword
-from superdesk.core.resources.validators import validate_data_relation_async
+
+from superdesk.core.types import Request, Response
+from superdesk.core.module import Module
 from superdesk.core.resources import (
     ResourceConfig,
     MongoResourceConfig,
     MongoIndexOptions,
     ElasticResourceConfig,
 )
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
+from superdesk.core.web import EndpointGroup
+from superdesk.utc import utcnow
+from superdesk.flask import abort
 
-
-class RouteParams(BaseModel):
-    item: Optional[Dict[str, Any]] = None
-    action: Optional[str] = None
-    section: Optional[str] = None
-
-
-class HistoryResourceModel(NewshubResourceModel):
-    action: Keyword
-    versioncreated: datetime
-    user: Optional[Annotated[ObjectIdField, validate_data_relation_async("users")]] = None
-    company: Optional[Annotated[ObjectIdField, validate_data_relation_async("companies")]] = None
-    item: Keyword
-    version: str
-    section: Keyword
-    extra_data: Optional[Dict] = None
+from newsroom.types import HistoryResourceModel
+from newsroom.core.resources.service import NewshubAsyncResourceService
+from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
+from newsroom.auth.utils import get_user_from_request
+from newsroom.utils import get_json_or_400
 
 
 class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
     async def create_history_record(
         self,
-        docs: List[Dict[str, Any]],
+        docs: list[dict[str, Any]],
         action: str,
-        user_id: Optional[ObjectId],
-        company_id: Optional[ObjectId],
+        user_id: ObjectId | None,
+        company_id: ObjectId | None,
         section: str = "wire",
-        **kwargs: Any,
     ):
         now = utcnow()
 
-        def transform(item: Dict[str, Any]) -> Dict[str, Any]:
+        def transform(item: dict[str, Any]) -> dict[str, Any]:
             return {
                 "action": action,
                 "versioncreated": now,
@@ -73,30 +53,26 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
         except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
             pass
 
-    async def query_items(self, query: Dict[str, Any]):
+    async def query_items(self, query: dict[str, Any]) -> ElasticsearchResourceCursorAsync[HistoryResourceModel]:
         if query["from"] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             abort(400)
 
         # Use self.find to execute the query and get the cursor
-        cursor = await self.find(query)
-        return cursor
+        return cast(ElasticsearchResourceCursorAsync, await self.find(query))
 
-    async def fetch_history(self, query: Dict[str, Any], all: bool = False):
+    async def fetch_history(self, query: dict[str, Any], all: bool = False):
         cursor = await self.query_items(query)
 
         # Fetch the documents from the cursor
-        docs = []
-        async for doc in cursor:
-            docs.append(doc)
+        docs = await cursor.to_list_raw()
 
         if all:
             # Handle pagination and retrieve additional results
-            while cursor.count() > len(docs):
+            while await cursor.count() > len(docs):
                 query["from"] = len(docs)
                 cursor = await self.query_items(query)
-                async for doc in cursor:
-                    docs.append(doc)
+                docs.extend(await cursor.to_list_raw())
 
         # Return the results
         return {"_items": docs, "hits": cursor.hits}
@@ -108,7 +84,7 @@ async def get_history_users(
     active_company_ids: list[ObjectId | str],
     section: str,
     action: str,
-) -> List[str]:
+) -> list[str]:
     source = {
         "query": {
             "bool": {
@@ -175,19 +151,18 @@ module = Module(
 
 
 @history_endpoint.endpoint("/history/new", methods=["POST"])
-async def create(args: None, params: RouteParams, request: Request) -> Response:
+async def create(request: Request) -> Response:
     params_dict = await get_json_or_400()
-    user = await get_user_or_abort()
-    user_dict = user.to_dict()
+    user = get_user_from_request(request)
 
     if not params_dict.get("item") or not params_dict.get("action") or not params_dict.get("section"):
-        return Response({"error": str(gettext("Activity History: Invalid request"))}, 400)
+        return Response({"error": gettext("Activity History: Invalid request")}, 400)
 
     await HistoryService().create_history_record(
         [params_dict["item"]],
         params_dict["action"],
-        user_dict.get("_id"),
-        user_dict.get("company"),
+        user.id,
+        user.company,
         params_dict["section"],
     )
 

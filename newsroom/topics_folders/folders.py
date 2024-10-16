@@ -1,15 +1,4 @@
-from enum import Enum, unique
-from typing import Optional, Annotated
-
-from newsroom import MONGO_PREFIX
-from newsroom.core.resources.model import NewshubResourceModel
-from newsroom.core.resources.service import NewshubAsyncResourceService
-
-# from newsroom.signals import user_deleted
-
-from newsroom.topics.topics_async import TopicService
-
-from superdesk.core.resources.fields import ObjectId as ObjectIdField
+# from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources import (
     ResourceConfig,
     MongoIndexOptions,
@@ -17,25 +6,17 @@ from superdesk.core.resources import (
     RestEndpointConfig,
     RestParentLink,
 )
-from superdesk.core.resources.validators import validate_data_relation_async
 
-# from superdesk.core.module import SuperdeskAsyncApp
+from newsroom import MONGO_PREFIX
+from newsroom.types import TopicFolderResourceModel, UserTopicFoldersResourceModel, CompanyTopicFoldersResourceModel
+from newsroom.auth import auth_rules
+from newsroom.core.resources import NewshubAsyncResourceService
+from newsroom.topics.topics_async import TopicService
 
-
-@unique
-class SectionType(str, Enum):
-    WIRE = "wire"
-    AGENDA = "agenda"
-    MONITORING = "monitoring"
+# from newsroom.signals import user_deleted
 
 
-class FolderResourceModel(NewshubResourceModel):
-    name: str
-    parent: Annotated[Optional[ObjectIdField], validate_data_relation_async("topic_folders")] = None
-    section: SectionType
-
-
-class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
+class FolderResourceService(NewshubAsyncResourceService[TopicFolderResourceModel]):
     async def on_deleted(self, doc):
         await self.delete_many(lookup={"parent": doc.id})
         await TopicService().delete_many(lookup={"folder": doc.id})
@@ -52,7 +33,7 @@ class FolderResourceService(NewshubAsyncResourceService[FolderResourceModel]):
 
 topic_folders_resource_config = ResourceConfig(
     name="topic_folders",
-    data_class=FolderResourceModel,
+    data_class=TopicFolderResourceModel,
     service=FolderResourceService,
     mongo=MongoResourceConfig(
         prefix=MONGO_PREFIX,
@@ -68,36 +49,22 @@ topic_folders_resource_config = ResourceConfig(
 )
 
 
-class UserFoldersResourceModel(FolderResourceModel):
-    """
-    User Based FolderResource Model
-    """
-
-    user: Annotated[ObjectIdField, validate_data_relation_async("users")]
-
-
 class UserFoldersResourceService(FolderResourceService):
     pass
 
 
 user_topic_folders_resource_config = ResourceConfig(
     name="user_topic_folders",
-    data_class=UserFoldersResourceModel,
+    data_class=UserTopicFoldersResourceModel,
     service=UserFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
     rest_endpoints=RestEndpointConfig(
-        parent_links=[RestParentLink(resource_name="users", model_id_field="user")], url="topic_folders"
+        parent_links=[RestParentLink(resource_name="users", model_id_field="user")],
+        url="topic_folders",
+        auth=[auth_rules.any_user_role],
     ),
 )
-
-
-class CompanyFoldersResourceModel(FolderResourceModel):
-    """
-    Company Based FolderResource Model
-    """
-
-    company: Annotated[ObjectIdField, validate_data_relation_async("companies")]
 
 
 class CompanyFoldersResourceService(FolderResourceService):
@@ -106,11 +73,13 @@ class CompanyFoldersResourceService(FolderResourceService):
 
 company_topic_folder_resource_config = ResourceConfig(
     name="company_topic_folders",
-    data_class=CompanyFoldersResourceModel,
+    data_class=CompanyTopicFoldersResourceModel,
     service=CompanyFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
     rest_endpoints=RestEndpointConfig(
-        parent_links=[RestParentLink(resource_name="companies", model_id_field="company")], url="topic_folders"
+        parent_links=[RestParentLink(resource_name="companies", model_id_field="company")],
+        url="topic_folders",
+        auth=[auth_rules.any_user_role],
     ),
 )

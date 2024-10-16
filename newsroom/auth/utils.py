@@ -1,33 +1,30 @@
-import bson
+from typing import cast, TypedDict
+from datetime import datetime, timedelta
+
+from bson import ObjectId
 import werkzeug
-
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional, TypedDict, Union
 from quart_babel import gettext
+from uuid import uuid4
 
-import superdesk
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_current_app, get_current_async_app, get_app_config, get_current_auth
 from superdesk.flask import session, redirect, url_for
-
-from newsroom.flask import flash
-from newsroom.auth.providers import AuthProvider
-from newsroom.exceptions import AuthorizationError
-from newsroom.user_roles import UserRole
+from superdesk.core.types import Request
 from superdesk.utc import utcnow
-from newsroom.auth import get_user, get_company, get_user_by_email
-from newsroom.types import Section, SectionAllowedMap, User, UserData, Company, AuthProviderType
-from newsroom.utils import (
-    get_random_string,
-    is_valid_user,
-    is_company_enabled,
-    is_company_expired,
-    is_account_enabled,
+
+from newsroom.types import (
+    Product,
+    CompanyResource,
+    UserResourceModel,
+    UserAuthResourceModel,
+    UserRole,
+    UserData,
+    AuthProviderType,
 )
-from newsroom.email import (
-    send_validate_account_email,
-    send_reset_password_email,
-    send_new_account_email,
-)
+from newsroom.flask import flash
+from newsroom.core import get_current_wsgi_app
+from newsroom.exceptions import AuthorizationError
+
+from .providers import AuthProvider
 
 
 # how often we should check in db if session
@@ -41,18 +38,19 @@ async def sign_user_by_email(
     redirect_on_success: str = "wire.index",
     redirect_on_error: str = "auth.login",
     create_missing: bool = False,
-    userdata: Optional[UserData] = None,
+    userdata: UserData | None = None,
     validate_login_attempt: bool = False,
 ) -> werkzeug.Response:
-    users = superdesk.get_resource_service("users")
-    user: Union[User, UserData, None] = get_user_by_email(email)
+    from newsroom.users.service import UsersService
 
+    users_service = UsersService()
+    user = await users_service.get_by_email(email)
     if user is None and create_missing and userdata is not None:
-        user = userdata.copy()
-        user["is_enabled"] = True
-        user["is_approved"] = True
-        users.create([user])
-        assert "_id" in user
+        user_dict = userdata.copy()
+        user_dict["is_enabled"] = True
+        user_dict["is_approved"] = True
+        await users_service.create([user_dict])
+        user = await users_service.get_by_email(email)
 
     async def redirect_with_error(error_str):
         session.pop("_flashes", None)
@@ -63,7 +61,7 @@ async def sign_user_by_email(
         return await redirect_with_error(gettext("User not found"))
 
     if validate_login_attempt:
-        company = get_company(user)
+        company = await user.get_company()
         company_auth_provider = get_company_auth_provider(company)
 
         if company is None:
@@ -79,84 +77,114 @@ async def sign_user_by_email(
                 gettext("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
             )
 
-    users.system_update(
-        user["_id"],
+    await users_service.system_update(
+        user.id,
         {
             "is_validated": True,  # in case user was not validated before set it now
             "last_active": utcnow(),
         },
-        user,
     )
 
-    start_user_session(user)
+    current_request = get_current_app().get_current_request()
+    async_app = get_current_async_app()
+    await async_app.auth.start_session(current_request, user)
 
     return redirect_to_next_url(redirect_on_success)
 
 
-def start_user_session(user: User, permanent=False):
-    session["user"] = str(user["_id"])  # str to avoid serialization issues
-    session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    session["user_type"] = user["user_type"]
-    session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
-    session.permanent = permanent
+def redirect_to_next_url(default_view: str = "wire.index"):
+    next_url = session.pop("next_url", None) or url_for(default_view)
+    return redirect(next_url)
 
 
-def clear_user_session():
-    session["user"] = None
-    session["name"] = None
-    session["user_type"] = None
-    session["auth_ttl"] = None
-    session["auth_user"] = None
-
-
-def is_user_admin(user: User) -> bool:
-    return user.get("user_type") == UserRole.ADMINISTRATOR.value
-
-
-def is_current_user_admin() -> bool:
-    return session.get("user_type") == UserRole.ADMINISTRATOR.value
-
-
-def is_current_user_account_mgr() -> bool:
-    return session.get("user_type") == UserRole.ACCOUNT_MANAGEMENT.value
-
-
-def is_current_user_company_admin() -> bool:
-    return session.get("user_type") == UserRole.COMPANY_ADMIN.value
-
-
-def is_current_user(user_id):
-    """
-    Checks if the current session user is the same as given user id
-    """
-    return session["user"] == str(user_id)
-
-
-async def send_token(user: User, token_type="validate", update_token=True):
-    if user is not None and user.get("is_enabled", False):
-        if token_type == "validate" and user.get("is_validated", False):
-            return False
-
-        token = user.get("token")
-        if update_token:
-            updates = get_token_data()
-            superdesk.get_resource_service("users").system_update(bson.ObjectId(user["_id"]), updates, user)
-            token = updates["token"]
-
-        assert isinstance(token, str)
-
-        if token_type == "validate":
-            await send_validate_account_email(user, token)
-        if token_type == "new_account":
-            await send_new_account_email(user, token)
-        elif token_type == "reset_password":
-            await send_reset_password_email(user, token)
+def is_from_request() -> bool:
+    try:
+        get_current_request()
         return True
-    return False
+    except AuthorizationError:
+        return False
 
 
-# TODO-ASYNC: Remove `TokenData`, `get_token_data` and `add_token_data`
-# once auth app is migrated. These 3 methods have been moved into newsroom.users.utils
+def get_current_request() -> Request:
+    from superdesk.flask import request as flask_request
+
+    wsgi_app = get_current_wsgi_app()
+    request = wsgi_app.get_current_request() or wsgi_app.get_current_request(flask_request)
+
+    if not request:
+        raise AuthorizationError(401, gettext("Not from a request"))
+
+    return request
+
+
+def get_user_from_request(request: Request | None) -> UserResourceModel:
+    request = request or get_current_request()
+    if request.user is None:
+        raise AuthorizationError(401, gettext("Not logged in"))
+    elif isinstance(request.user, str):
+        # TODO-ASYNC: Fix this, the NewsAPI is setting the token on request.user
+        # which is an invalid type
+        raise AuthorizationError(401, gettext("Invalid user instance"))
+
+    return cast(UserResourceModel, request.user)
+
+
+def get_user_or_none_from_request(request: Request | None) -> UserResourceModel | None:
+    try:
+        return get_user_from_request(request)
+    except AuthorizationError:
+        return None
+
+
+def get_user_id_from_request(request: Request | None) -> ObjectId:
+    return get_user_from_request(request).id
+
+
+def get_company_from_request(request: Request | None) -> CompanyResource | None:
+    request = request or get_current_request()
+    return cast(CompanyResource | None, request.storage.request.get("company_instance", None))
+
+
+def get_company_or_none_from_request(request: Request | None) -> CompanyResource | None:
+    try:
+        return get_company_from_request(request)
+    except AuthorizationError:
+        return None
+
+
+def is_current_user(user_id: ObjectId | str, request: Request | None = None) -> bool:
+    return get_user_from_request(request).id == ObjectId(user_id)
+
+
+def get_current_user_sections(request: Request | None) -> dict[str, bool]:
+    return get_user_sections(get_user_from_request(request), get_company_from_request(request))
+
+
+def get_user_sections(user: UserResourceModel | None, company: CompanyResource | None) -> dict[str, bool]:
+    if not user:
+        return {}
+    elif user.user_type == UserRole.ADMINISTRATOR:
+        return {section["_id"]: True for section in get_current_wsgi_app().sections}
+    elif user.sections:
+        return user.sections
+    elif company and company.sections:
+        return company.sections
+    return {}
+
+
+def get_auth_providers() -> dict[str, "AuthProvider"]:
+    return {provider["_id"]: AuthProvider.get_provider(provider) for provider in get_app_config("AUTH_PROVIDERS")}
+
+
+def get_company_auth_provider(company: CompanyResource | None) -> "AuthProvider":
+    providers = get_auth_providers()
+    provider_id = "newshub"
+    if company and company.auth_provider:
+        provider_id = company.auth_provider
+
+    return providers.get(provider_id) or providers["newshub"]
+
+
 class TokenData(TypedDict):
     token: str
     token_expiry_date: datetime
@@ -164,108 +192,142 @@ class TokenData(TypedDict):
 
 def get_token_data() -> TokenData:
     return {
-        "token": get_random_string(),
+        "token": str(uuid4()),
         "token_expiry_date": utcnow() + timedelta(days=get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE")),
     }
 
 
-def add_token_data(user):
-    updates = get_token_data()
-    user.update(updates)
+def add_token_data(user: UserAuthResourceModel):
+    for key, val in get_token_data().items():
+        setattr(user, key, val)
 
 
-async def is_valid_session():
-    """Uses timezone-aware objects to avoid TypeError comparison"""
-    # Get the current UTC time as a timezone-aware datetime
-    now = datetime.now(timezone.utc)
+async def send_token(user: UserAuthResourceModel | None, token_type: str = "validate", update_token=True) -> bool:
+    from newsroom.users import UsersAuthService
 
-    # Retrieve auth_ttl and ensure it is also timezone-aware
-    auth_ttl = session.get("auth_ttl")
-    if auth_ttl and isinstance(auth_ttl, datetime) and auth_ttl.tzinfo is None:
-        auth_ttl = auth_ttl.replace(tzinfo=timezone.utc)  # Make auth_ttl timezone-aware
-
-    # Check session validity
-    return (
-        session.get("user")
-        and session.get("user_type")
-        and (auth_ttl and auth_ttl > now or await revalidate_session_user())
-    )
-
-
-async def revalidate_session_user():
-    user = superdesk.get_resource_service("users").find_one(req=None, _id=session.get("user"))
-    if not user:
-        clear_user_session()
+    if user is None or not user.is_enabled:
         return False
-    company = get_company(user)
-    is_valid = await is_valid_user(user, company)
-    if is_valid:
-        session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
-    return is_valid
+    elif token_type == "validate" and user.is_validated:
+        return False
+
+    token = user.token
+    if update_token:
+        updates = get_token_data()
+        await UsersAuthService().system_update(user.id, updates)
+        token = updates["token"]
+
+    assert isinstance(token, str)
+
+    user_dict = user.to_dict()
+    if token_type == "validate":
+        await send_validate_account_email(user_dict, token)
+    if token_type == "new_account":
+        await send_new_account_email(user_dict, token)
+    elif token_type == "reset_password":
+        await send_reset_password_email(user_dict, token)
+    else:
+        return False
+    return True
 
 
-def get_user_sections(user: User) -> SectionAllowedMap:
-    if not user:
-        return {}
+def is_company_enabled(user: UserResourceModel | None, company: CompanyResource | None) -> bool:
+    """
+    Checks if the company of the user is enabled
+    """
+    if user and not user.company:
+        # there's no company assigned return true for admin user else false
+        return True if user.is_admin() else False
 
-    if is_user_admin(user):
-        # Admin users should see all sections
-        return {section["_id"]: True for section in get_current_app().as_any().sections}
-
-    if user.get("sections"):
-        return user["sections"]
-
-    company = get_company(user)
-    if company and company.get("sections"):
-        return company["sections"]
-
-    return {}
+    return False if not company else company.is_enabled
 
 
-def user_has_section_allowed(user: User, section: Section) -> bool:
-    sections = get_user_sections(user)
-    if sections:
-        return sections.get(section, False)
-    return True  # might be False eventually, atm allow access if sections are not set explicitly
+def is_company_expired(user: UserResourceModel | None, company: CompanyResource | None) -> bool:
+    if get_app_config("ALLOW_EXPIRED_COMPANY_LOGINS"):
+        return False
+    elif user and not user.company:
+        return False if user.is_admin() else True
+    elif company and company.expiry_date:
+        return company.expiry_date.replace(tzinfo=None) < datetime.now()
 
-
-def user_can_manage_company(company_id) -> bool:
-    if is_current_user_admin() or is_current_user_account_mgr():
-        return True
-    if is_current_user_company_admin():
-        user = get_user()
-        if user:
-            return str(user.get("company")) == str(company_id) and company_id
     return False
 
 
-def get_auth_providers() -> Dict[str, AuthProvider]:
-    return {provider["_id"]: AuthProvider.get_provider(provider) for provider in get_app_config("AUTH_PROVIDERS")}
+async def is_account_enabled(user: UserResourceModel):
+    """
+    Checks if user account is active and approved
+    """
+    if not user.is_enabled:
+        await flash(gettext("Account is disabled"), "danger")
+        return False
+
+    if not user.is_approved:
+        account_created = user.created
+
+        approve_expiration = utcnow() + timedelta(days=-get_app_config("NEW_ACCOUNT_ACTIVE_DAYS", 14))
+        if not account_created or account_created < approve_expiration:
+            await flash(gettext("Account has not been approved"), "danger")
+            return False
+
+    return True
 
 
-def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider:
-    providers = get_auth_providers()
+async def is_valid_user(user: UserResourceModel | None, company: CompanyResource | None) -> bool:
+    """Validate if user is valid and should be able to login to the system."""
+    if not user:
+        await flash(gettext("Invalid username or password."), "danger")
+        return False
 
-    provider_id = "newshub"
-    if company and company.get("auth_provider"):
-        provider_id = company.get("auth_provider", "newshub")
+    current_request = get_current_request()
+    current_request.storage.session.pop("_flashes", None)  # remove old messages and just show one message
 
-    return providers.get(provider_id) or providers["newshub"]
+    if not user.is_admin() and not company:
+        await flash(gettext("Insufficient Permissions. Access denied."), "danger")
+        return False
+
+    if not await is_account_enabled(user):
+        await flash(gettext("Account is disabled"), "danger")
+        return False
+
+    if not is_company_enabled(user, company):
+        await flash(gettext("Company account has been disabled."), "danger")
+        return False
+
+    if is_company_expired(user, company):
+        await flash(gettext("Company account has expired."), "danger")
+        return False
+
+    return True
 
 
-def check_user_has_products(user: User, company_products) -> None:
+# TODO-ASYNC: Remove this once everything is async
+async def is_valid_session() -> bool:
+    """Uses timezone-aware objects to avoid TypeError comparison"""
+    # Get the current UTC time as a timezone-aware datetime
+
+    try:
+        request = get_current_request()
+        return await get_current_auth().authenticate(request) is None
+    except AuthorizationError:
+        pass
+
+    await clear_user_session()
+    return False
+
+
+async def clear_user_session(request: Request | None = None):
+    try:
+        await get_current_auth().stop_session(request or get_current_request())
+    except AuthorizationError:
+        pass
+
+
+def check_user_has_products(user: UserResourceModel, company_products: list[Product]) -> None:
     """If user has no products and there are no company products abort page rendering."""
-    unlimited_products = [p for p in (company_products or []) if not p.get("seats")]
-    if (
-        not unlimited_products
-        and not user.get("products")
-        and not (is_current_user_admin() or is_current_user_account_mgr())
-    ):
+    unlimited_products = company_products or []
+    if not unlimited_products and not user.products and not (user.is_admin() or user.is_account_manager()):
         raise AuthorizationError(
             403, gettext("There is no product associated with your user. Please reach out to your Company Admin.")
         )
 
 
-def redirect_to_next_url(default_view: str = "wire.index"):
-    next_url = session.pop("next_url", None) or url_for(default_view)
-    return redirect(next_url)
+from newsroom.email import send_validate_account_email, send_reset_password_email, send_new_account_email  # noqa: E402

@@ -1,11 +1,12 @@
 from typing import List, Dict, Any
 from copy import deepcopy
 
+from newsroom.types import CompanyResource
 from newsroom.core.resources import NewshubAsyncResourceService
 from newsroom.signals import company_create
+from newsroom.auth.utils import is_from_request, get_current_request, get_company_from_request
 
 from ..utils import get_company_section_names, get_company_product_ids, get_users_by_company
-from .types import CompanyResource
 
 
 class CompanyService(NewshubAsyncResourceService[CompanyResource]):
@@ -31,6 +32,17 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
         from newsroom.users.service import UsersService
 
         await super().on_updated(updates, original)
+
+        if is_from_request():
+            # If this is from a request, test to see if we need to update the
+            # current company cached in request storage
+            current_request = get_current_request()
+            current_company = get_company_from_request(current_request)
+            if current_company and current_company.id == original.id:
+                updated = original.to_dict()
+                updated.update(updates)
+                updated_company = CompanyResource.from_dict(updated)
+                current_request.storage.request.set("company_instance", updated_company)
 
         original_dict = original.to_dict()
         updated = deepcopy(original_dict)

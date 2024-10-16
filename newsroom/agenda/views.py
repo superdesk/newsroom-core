@@ -1,6 +1,7 @@
 import json
 from typing import Dict
 
+from bson import ObjectId
 from quart_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
@@ -10,14 +11,17 @@ from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, render_template, abort, jsonify
 from superdesk import get_resource_service
 
+from newsroom.auth.utils import (
+    get_user_from_request,
+    get_user_id_from_request,
+    get_company_from_request,
+    check_user_has_products,
+)
 from newsroom.agenda import blueprint
-from newsroom.auth.utils import check_user_has_products
 from newsroom.products.products import get_products_by_company
-from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.topics_folders import get_company_folders, get_user_folders
 from newsroom.navigations import get_navigations
-from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
 from newsroom.utils import (
     get_entity_or_404,
@@ -35,7 +39,6 @@ from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
-from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
 from newsroom.ui_config_async import UiConfigResourceService
@@ -66,12 +69,12 @@ async def bookmarks():
 async def item(_id):
     item = get_entity_or_404(_id, "agenda")
     user_profile_data = await get_user_profile_data()
-    user = get_user()
-    company = get_company(user)
-    if not is_admin_or_internal(user):
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
+    if not user.is_admin_or_internal():
         remove_fields_for_public_user(item)
 
-    if company and not is_admin(user) and company.get("events_only", False):
+    if company and not user.is_admin() and company.events_only:
         # if the company has permission events only permission then
         # remove planning items and coverages.
         if not item.get("event"):
@@ -81,7 +84,7 @@ async def item(_id):
         item.pop("planning_items", None)
         item.pop("coverages", None)
 
-    if restrict_coverage_info(company):
+    if company and company.restrict_coverage_info:
         remove_restricted_coverage_info([item])
 
     if is_json_request(request):
@@ -92,7 +95,7 @@ async def item(_id):
         template = "agenda_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
         await HistoryService().create_history_record(
-            [item], "print", user.get("_id"), user.get("company"), request.args.get("type", "agenda")
+            [item], "print", user.id, user.company, request.args.get("type", "agenda")
         )
         return await render_template(
             template,
@@ -102,7 +105,7 @@ async def item(_id):
             location=get_location_string(item),
             contacts=get_public_contacts(item),
             links=get_links(item),
-            is_admin=is_admin_or_internal(user),
+            is_admin=user.is_admin_or_internal(),
             user_profile_data=user_profile_data,
         )
 
@@ -122,7 +125,8 @@ async def item(_id):
 async def search():
     response = await get_internal("agenda")
     if len(response):
-        if restrict_coverage_info(get_company()):
+        company = get_company_from_request(None)
+        if company and company.restrict_coverage_info:
             remove_restricted_coverage_info(response[0].get("_items") or [])
         if response[0].get("_aggregations"):
             merge_planning_aggs(response[0]["_aggregations"])
@@ -130,30 +134,33 @@ async def search():
 
 
 async def get_view_data() -> Dict:
-    user = get_user_required()
-    topics = await get_user_topics(user["_id"]) if user else []
-    company = get_company(user)
-    products = get_products_by_company(company, product_type="agenda") if company else []
+    user = get_user_from_request(None)
+    user_dict = None if not user else user.to_dict()
+    company = get_company_from_request(None)
+    company_dict = None if not company else company.to_dict()
+
+    topics = await get_user_topics(user.id) if user else []
+    products = get_products_by_company(company_dict, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
     ui_config_service = UiConfigResourceService()
 
     return {
-        "user": user,
-        "company": str(user.get("company")) if user and user.get("company") else None,
+        "user": user_dict or {},
+        "company": company.id if company else None,
         "topics": [t for t in topics if t.get("topic_type") == "agenda"],
         "formats": [
             {"format": f["format"], "name": f["name"]}
             for f in get_current_app().as_any().download_formatters.values()
             if "agenda" in f["types"]
         ],
-        "navigations": await get_navigations(user, company, "agenda"),
+        "navigations": await get_navigations(user_dict, company_dict, "agenda"),
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
-        "events_only": company.get("events_only", False) if company else False,
-        "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
+        "events_only": company.events_only if company else False,
+        "restrict_coverage_info": company.restrict_coverage_info if company else False,
         "locators": get_vocabulary("locators"),
         "ui_config": await ui_config_service.get_section_config("agenda"),
-        "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company),
+        "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company_dict),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": await get_user_folders(user, "agenda") if user else [],
         "company_folders": await get_company_folders(company, "agenda") if company else [],
@@ -164,7 +171,7 @@ async def get_view_data() -> Dict:
 @blueprint.route("/agenda/request_coverage", methods=["POST"])
 @login_required
 async def request_coverage():
-    user = get_user(required=True)
+    user = get_user_from_request(None)
     data = await get_json_or_400()
     assert data.get("item")
     assert data.get("message")
@@ -188,8 +195,8 @@ async def bookmark():
 async def follow():
     data = await get_json_or_400()
     assert data.get("items")
+    user_id = get_user_id_from_request(None)
     for item_id in data.get("items"):
-        user_id = get_user_id()
         item = get_entity_or_404(item_id, "agenda")
         coverage_updates = {"coverages": item.get("coverages") or []}
         for c in coverage_updates["coverages"]:
@@ -219,7 +226,7 @@ async def follow():
 @blueprint.route("/agenda_coverage_watch", methods=["POST", "DELETE"])
 @login_required
 async def watch_coverage():
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     data = await get_json_or_400()
     assert data.get("item_id")
     assert data.get("coverage_id")
@@ -228,7 +235,7 @@ async def watch_coverage():
     return response
 
 
-def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=False):
+def update_coverage_watch(item_id: str, coverage_id: str, user_id: ObjectId, add: bool, skip_associated: bool = False):
     item = get_entity_or_404(item_id, "agenda")
 
     if user_id in item.get("watches", []):
@@ -295,7 +302,8 @@ async def related_wire_items(wire_id):
             404,
         )
 
-    if restrict_coverage_info(get_company()):
+    company = get_company_from_request(None)
+    if company and company.restrict_coverage_info:
         remove_restricted_coverage_info([agenda_result.docs[0]])
 
     wire_ids = []

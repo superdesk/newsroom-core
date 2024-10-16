@@ -114,7 +114,7 @@ Feature: Agenda Restricted Coverage Details
             "restrict_coverage_info": true
         }]
         """
-        And newsroom "users"
+        And newsroom "auth_user"
         """
         [{
             "_id": "5e65964bf5db68883df561a1",

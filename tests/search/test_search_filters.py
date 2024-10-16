@@ -34,11 +34,11 @@ async def init(app):
     global service
     service = BaseSearchService()
 
-    app.data.insert("users", USERS)
-    app.data.insert("companies", COMPANIES)
+    await create_entries_for("companies", COMPANIES)
+    await create_entries_for("auth_user", USERS)
     await create_entries_for("navigations", NAVIGATIONS)
-    app.data.insert("products", PRODUCTS)
-    app.data.insert("section_filters", SECTION_FILTERS)
+    await create_entries_for("products", PRODUCTS)
+    await create_entries_for("section_filters", SECTION_FILTERS)
 
 
 async def test_apply_section_filter(client, app):
@@ -76,7 +76,7 @@ async def test_apply_section_filter(client, app):
         } in search.query["bool"]["filter"]
 
 
-async def test_apply_company_filter(client, app):
+async def test_apply_company_filter(app):
     app.config["COMPANY_TYPES"] = [
         {"id": "internal", "wire_must": {"term": {"service.code": "a"}}},
         {"id": "public", "wire_must": {"term": {"service.code": "b"}}},
@@ -84,8 +84,8 @@ async def test_apply_company_filter(client, app):
     ]
 
     async def _set_search_query(user_id):
-        async with app.test_request_context("/"):
-            session["user"] = user_id
+        async with app.test_request_context("/") as request:
+            request.session["user"] = str(user_id)
             search = SearchQuery()
             service.prefill_search_user(search)
             service.prefill_search_company(search)
@@ -124,10 +124,9 @@ async def test_apply_time_limit_filter(client, app):
     assert {"range": {"versioncreated": {"gte": "now-25d/d"}}} not in await _set_search_query(PUBLIC_USER_ID)
 
 
-async def test_apply_products_filter(client, app):
-    def assert_products_query(user_id, args=None, products=None):
-        query_string_settings = get_app_config("ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS")
-        session["user"] = user_id
+async def test_apply_products_filter(app):
+    def assert_products_query(args=None, products=None):
+        query_string_settings = app.config["ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS"]
         search = SearchQuery()
 
         if args is None:
@@ -159,18 +158,21 @@ async def test_apply_products_filter(client, app):
         if len(sd_product_ids):
             assert {"terms": {"products.code": sd_product_ids}} in search.query["bool"]["should"]
 
-    async with app.test_request_context("/"):
-        # Admin has access to everything by default
-        assert_products_query(ADMIN_USER_ID, None, [])
+    # Admin has access to everything by default
+    async with app.test_request_context("/") as client:
+        client.session["user"] = str(ADMIN_USER_ID)
+        assert_products_query(None, [])
         # Filter results by navigation
-        assert_products_query(ADMIN_USER_ID, {"navigation": str(NAV_3)}, [PRODUCTS[1]])
+        assert_products_query({"navigation": str(NAV_3)}, [PRODUCTS[1]])
 
+    async with app.test_request_context("/") as client:
+        client.session["user"] = str(PUBLIC_USER_ID)
         # Public user has access only to their allowed products
-        assert_products_query(PUBLIC_USER_ID, None, [PRODUCTS[0], PRODUCTS[1]])
+        assert_products_query(None, [PRODUCTS[0], PRODUCTS[1]])
         # Filter results by navigation
-        assert_products_query(PUBLIC_USER_ID, {"navigation": str(NAV_1)}, [PRODUCTS[0]])
+        assert_products_query({"navigation": str(NAV_1)}, [PRODUCTS[0]])
         # Filter results by navigation, ignoring non wire navigations
-        assert_products_query(PUBLIC_USER_ID, {"navigation": "{},{}".format(NAV_1, NAV_5)}, [PRODUCTS[0]])
+        assert_products_query({"navigation": "{},{}".format(NAV_1, NAV_5)}, [PRODUCTS[0]])
 
 
 async def test_apply_request_filter__query_string(client, app):

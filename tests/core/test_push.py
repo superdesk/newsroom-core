@@ -5,13 +5,17 @@ import bson
 from unittest import mock
 from datetime import datetime, timedelta
 
+from bson import ObjectId
 from quart import json
 from quart.datastructures import FileStorage
 
 from superdesk import get_resource_service
+
+from newsroom.types import UserResourceModel, CompanyResource, UserRole
+from newsroom.utils import get_company_dict, get_entity_or_404, get_user_dict
+
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
-from newsroom.utils import get_company_dict, get_entity_or_404, get_user_dict
 from tests.core.utils import add_company_products, create_entries_for
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email
@@ -619,11 +623,12 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_checks_service_subscriptions(client, app, mocker):
+    company_id = ObjectId()
     app.data.insert(
         "companies",
         [
             {
-                "_id": 1,
+                "_id": company_id,
                 "name": "Press 2 co.",
                 "is_enabled": True,
             }
@@ -631,14 +636,15 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
     )
 
     user_ids = app.data.insert(
-        "users",
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": 1,
+                "company": company_id,
             }
         ],
     )
@@ -666,7 +672,7 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
         }
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
-        assert 200 == resp.status_code
+        assert 200 == resp.status_code, await resp.get_data(as_text=True)
     assert len(outbox) == 0
 
 
@@ -737,21 +743,43 @@ async def test_matching_topics(client, app):
     await client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = {"foo": {"company": "1", "user_type": "administrator", "_id": "foo"}}
-    companies = {"1": {"_id": 1, "name": "test-comp"}}
+    user_id = ObjectId()
+    company_id = ObjectId()
+    users: dict[str, dict] = {
+        str(user_id): UserResourceModel(
+            id=user_id,
+            email="foo@bar.org",
+            first_name="foo",
+            last_name="bar",
+            user_type=UserRole.ADMINISTRATOR,
+            company=company_id,
+        ).to_dict(),
+    }
+    companies: dict[str, dict] = {
+        str(company_id): CompanyResource(
+            id=company_id,
+            name="test-comp",
+        ).to_dict(),
+    }
+    topic_ids = dict(
+        created_to_old=ObjectId(),
+        created_from_future=ObjectId(),
+        filter=ObjectId(),
+        query=ObjectId(),
+    )
     topics = [
-        {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "foo"},
+        {"_id": topic_ids["created_to_old"], "created": {"to": "2017-01-01"}, "user": user_id},
         {
-            "_id": "created_from_future",
+            "_id": topic_ids["created_from_future"],
             "created": {"from": "now/d"},
-            "user": "foo",
+            "user": user_id,
             "timezone_offset": 60 * 28,
         },
-        {"_id": "filter", "filter": {"genre": ["other"]}, "user": "foo"},
-        {"_id": "query", "query": "Foo", "user": "foo"},
+        {"_id": topic_ids["filter"], "filter": {"genre": ["other"]}, "user": user_id},
+        {"_id": topic_ids["query"], "query": "Foo", "user": user_id},
     ]
     matching = search.get_matching_topics(item["guid"], topics, users, companies)
-    assert ["created_from_future", "query"] == matching
+    assert [topic_ids["created_from_future"], topic_ids["query"]] == matching
 
 
 async def test_matching_topics_for_public_user(client, app):

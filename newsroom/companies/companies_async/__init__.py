@@ -2,12 +2,10 @@ from superdesk.core.resources import ResourceConfig, MongoResourceConfig, MongoI
 
 from content_api import MONGO_PREFIX
 
-from .types import CompanyResource, CompanyProduct
+from newsroom.types import CompanyResource
 from .service import CompanyService
 
 __all__ = [
-    "CompanyResource",
-    "CompanyProduct",
     "CompanyService",
     "company_resource_config",
 ]

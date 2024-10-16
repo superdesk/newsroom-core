@@ -10,7 +10,7 @@ import superdesk
 from superdesk import register_resource  # noqa
 from typing import Dict, List, Tuple
 
-from newsroom.user_roles import UserRole
+from newsroom.types import UserRole
 
 __version__ = "2.8.0rc1"
 

@@ -1,87 +1,89 @@
 from functools import wraps
 
 from superdesk.flask import request, redirect, url_for, abort, session
-from newsroom.auth import get_user_required
-from newsroom.auth.utils import (
-    clear_user_session,
-    is_current_user_account_mgr,
-    is_current_user_admin,
-    is_current_user_company_admin,
-    is_valid_session,
-    user_has_section_allowed,
-)
+from newsroom.auth.utils import get_user_from_request, get_current_user_sections, is_valid_session
 
 
-def clear_session_and_redirect_to_login():
-    clear_user_session()
+# TODO-ASYNC: Remove this once everything is async
+def redirect_to_login():
     session["next_url"] = request.url
     return redirect(url_for("auth.login"))
 
 
+# TODO-ASYNC: Remove this once everything is async
 def login_required(f):
     @wraps(f)
     async def async_decorated_function(*args, **kwargs):
         if not await is_valid_session():
-            return clear_session_and_redirect_to_login()
+            return redirect_to_login()
         return await f(*args, **kwargs)
 
     return async_decorated_function
 
 
+# TODO-ASYNC: Remove this once everything is async
 def admin_only(f):
     @wraps(f)
     async def async_decorated_function(*args, **kwargs):
         if not await is_valid_session():
-            return clear_session_and_redirect_to_login()
-        elif not is_current_user_admin():
+            return redirect_to_login()
+        user = get_user_from_request(None)
+        if not user.is_admin():
             return abort(403)
         return await f(*args, **kwargs)
 
     return async_decorated_function
 
 
+# TODO-ASYNC: Remove this once everything is async
 def account_manager_only(f):
     @wraps(f)
     async def async_decorated_function(*args, **kwargs):
         if not await is_valid_session():
-            return clear_session_and_redirect_to_login()
-        elif not is_current_user_admin() and not is_current_user_account_mgr():
+            return redirect_to_login()
+        user = get_user_from_request(None)
+        if not user.is_admin() and not user.is_account_manager():
             return abort(403)
         return await f(*args, **kwargs)
 
     return async_decorated_function
 
 
+# TODO-ASYNC: Remove this once everything is async
 def company_admin_only(f):
     @wraps(f)
     async def async_decorated_function(*args, **kwargs):
         if not await is_valid_session():
-            return clear_session_and_redirect_to_login()
-        elif not is_current_user_company_admin():
+            return redirect_to_login()
+        user = get_user_from_request(None)
+        if not user.is_company_admin():
             return abort(403)
         return await f(*args, **kwargs)
 
     return async_decorated_function
 
 
+# TODO-ASYNC: Remove this once everything is async
 def account_manager_or_company_admin_only(f):
     @wraps(f)
     async def async_decorated_function(*args, **kwargs):
         if not await is_valid_session():
-            return clear_session_and_redirect_to_login()
-        elif not is_current_user_admin() and not is_current_user_account_mgr() and not is_current_user_company_admin():
+            return redirect_to_login()
+        user = get_user_from_request(None)
+        if not user.is_admin() and not user.is_account_manager() and not user.is_company_admin():
             return abort(403)
+
         return await f(*args, **kwargs)
 
     return async_decorated_function
 
 
+# TODO-ASYNC: Remove this once everything is async
 def section(section):
     def _section_required(f):
         @wraps(f)
         async def async_wrapper(*args, **kwargs):
-            user = get_user_required()
-            if not is_current_user_admin() and not user_has_section_allowed(user, section):
+            if not get_current_user_sections(None).get(section):
                 return abort(403)
             return await f(*args, **kwargs)
 

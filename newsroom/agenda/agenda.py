@@ -29,7 +29,7 @@ from newsroom.agenda.email import (
     send_coverage_notification_email,
     send_agenda_notification_email,
 )
-from newsroom.auth import get_company, get_user
+from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.notifications import save_user_notifications
 from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
@@ -1095,9 +1095,9 @@ class AgendaService(BaseSearchService):
         :param dict lookup: The parsed in lookup dictionary from the endpoint
         :param dict featured: list featured items
         """
-        user = get_user()
-        company = get_company(user)
-        if is_events_only_access(user, company):
+        user = get_user_from_request(None)
+        company = get_company_from_request(None)
+        if is_events_only_access(user.to_dict(), company.to_dict()):
             abort(403)
 
         if not featured or not featured.get("items"):
@@ -1123,7 +1123,7 @@ class AgendaService(BaseSearchService):
         if not source["from"]:
             source["aggs"] = aggregations
 
-        if company and not is_admin(user) and company.get("events_only", False):
+        if company and not user.is_admin() and company.events_only:
             # no adhoc planning items and remove planning items and coverages fields
             query["bool"]["filter"].append({"exists": {"field": "event"}})
             _remove_fields(source, PLANNING_ITEMS_FIELDS)

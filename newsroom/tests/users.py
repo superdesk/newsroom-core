@@ -10,4 +10,4 @@ async def test_login_succeeds_for_admin(client):
         url_for("auth.login"),
         form={"email": ADMIN_USER_EMAIL, "password": "admin"},
     )
-    assert response.status_code == 302
+    assert response.status_code == 302, await response.get_data(as_text=True)

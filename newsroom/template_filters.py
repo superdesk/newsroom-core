@@ -4,6 +4,7 @@ import arrow
 from bson.objectid import ObjectId
 import hashlib
 import logging
+from enum import Enum
 
 from eve.utils import str_to_date
 
@@ -17,12 +18,10 @@ from superdesk.flask import session, url_for
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
-from newsroom.auth import get_company
-from newsroom.gettext import get_session_timezone
-from enum import Enum
 
-from newsroom.types import User
-from newsroom.user_roles import UserRole
+from newsroom.types import UserRole
+from newsroom.gettext import get_session_timezone
+
 from .template_loaders import template_locale
 
 
@@ -78,7 +77,7 @@ def parse_date(datetime):
     return datetime
 
 
-def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time: bool) -> ScheduleType:
+def get_schedule_type(start: datetime, end: datetime | None, all_day: bool, no_end_time: bool) -> ScheduleType:
     """
     Determine the schedule type based on event start and end times.
 
@@ -278,10 +277,11 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
-    from newsroom.auth.utils import get_user_sections, get_user
+    from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request, get_user_sections
 
-    user = get_user()
-    sections = get_user_sections(user)
+    user = get_user_or_none_from_request(None)
+    company = get_company_or_none_from_request(None)
+    sections = get_user_sections(user, company)
     navs = sidenavs(blueprint)
     if sections:
         return [nav for nav in navs if section_allowed(nav, sections)]
@@ -400,12 +400,15 @@ def get_item_category_names(item: Dict[str, Any]) -> str:
     return ", ".join([category["name"] for category in item["service"]])
 
 
-def get_ga_user_properties(user: User) -> Dict[str, str]:
+def get_ga_user_properties() -> Dict[str, str]:
+    from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request
+
+    user = get_user_or_none_from_request(None)
     if not user:
         return {}
-    company = get_company(user)
+    company = get_company_or_none_from_request(None)
     return {
-        "company": (company.get("name") if company else "") or "none",
-        "user": f"{user['first_name']} {user['last_name'][:1]}".strip(),
-        "user_internal_id": str(user.get("_id") or ""),  # user_id is reserved name
+        "company": (company.name if company else "") or "none",
+        "user": f"{user.first_name} {user.last_name[:1]}".strip(),
+        "user_internal_id": str(user.id),
     }

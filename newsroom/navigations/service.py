@@ -1,12 +1,13 @@
 from superdesk import get_resource_service
+
+from newsroom.types import NavigationModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
-from .model import Navigation
 
 
-class NavigationsService(NewshubAsyncResourceService[Navigation]):
+class NavigationsService(NewshubAsyncResourceService[NavigationModel]):
     resource_name = "navigations"
 
-    async def on_delete(self, doc: Navigation):
+    async def on_delete(self, doc: NavigationModel):
         """Remove references in products to this navigation entry once it is deleted"""
 
         await super().on_delete(doc)

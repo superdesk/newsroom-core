@@ -20,7 +20,8 @@ from tests.utils import (
     get_admin_user_id,
     mock_send_email,
 )
-from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
+from tests.utils import login
+from tests.fixtures import ADMIN_USER_ID, PUBLIC_USER_ID, PUBLIC_USER_EMAIL, COMPANY_1_ID
 from .utils import add_company_products, create_entries_for
 
 from copy import deepcopy
@@ -92,10 +93,7 @@ async def agenda_user(client, app):
         ],
     )
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-
+    await login(client, {"email": PUBLIC_USER_EMAIL})
     return PUBLIC_USER_ID
 
 
@@ -122,11 +120,7 @@ async def test_item_json(client):
 
 
 async def test_item_json_does_not_return_files(client, app):
-    # public user
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-
+    await login(client, {"email": PUBLIC_USER_EMAIL})
     data = await get_json(client, "/agenda/urn:conference?format=json")
     assert "headline" in data
     assert "files" not in data["event"]
@@ -144,7 +138,7 @@ async def get_bookmarks_count(client, user):
 
 async def test_basic_search(client, agenda_user):
     resp = await client.get("/agenda/search?q=headline")
-    assert resp.status_code == 200
+    assert resp.status_code == 200, await resp.get_data(as_text=True)
     data = json.loads(await resp.get_data())
     assert data["_meta"]["total"]
 
@@ -272,10 +266,7 @@ async def test_agenda_search_filtered_by_query_product(client, app, public_compa
         ],
     )
 
-    async with client.session_transaction() as session:
-        session["user"] = "59b4c5c61d41c8d736852fbf"
-        session["user_type"] = "public"
-
+    await login(client, {"email": PUBLIC_USER_EMAIL})
     resp = await client.get("/agenda/search")
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
@@ -403,33 +394,31 @@ async def test_remove_watch_coverages_on_watch_item(client, app):
 
 
 async def test_fail_watch_coverages(client, app):
-    user_id = get_admin_user_id(app)
-
     await post_json(client, "/agenda_watch", {"items": ["urn:conference"]})
     after_watch_item = get_entity_or_404("urn:conference", "agenda")
-    assert after_watch_item["watches"] == [user_id]
+    print(after_watch_item["watches"])
+    assert after_watch_item["watches"] == [ObjectId(ADMIN_USER_ID)]
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-        request = {
-            "coverage_id": "urn:coverage",
-            "item_id": "urn:conference",
-        }
+    request = {
+        "coverage_id": "urn:coverage",
+        "item_id": "urn:conference",
+    }
 
-        # Add a coverage watch
-        resp = await client.post(
-            "/agenda_coverage_watch",
-            json=request,
-        )
-        assert resp.status_code == 403
+    # Add a coverage watch
+    # Cannot edit coverage watch when watching parent item
+    resp = await client.post(
+        "/agenda_coverage_watch",
+        json=request,
+    )
+    assert resp.status_code == 403
 
-        # Remove a coverage watch
-        resp = await client.delete(
-            "/agenda_coverage_watch",
-            json=request,
-        )
-        assert resp.status_code == 403
+    # Remove a coverage watch
+    # Cannot edit coverage watch when watching parent item
+    resp = await client.delete(
+        "/agenda_coverage_watch",
+        json=request,
+    )
+    assert resp.status_code == 403
 
 
 @mock.patch("newsroom.utils.get_utcnow", mock_utcnow)

@@ -150,44 +150,50 @@ async def test_prefill_search_page(client, app):
     }
 
 
-async def test_prefill_search_user(client, app):
-    async with app.test_request_context("/"):
-        session["user"] = None
+async def test_prefill_search_user(app):
+    async with app.test_request_context("/") as client:
+        client.session["user"] = None
         search = get_search_instance()
         assert search.user is None
 
-        session["user"] = ADMIN_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = ADMIN_USER_ID
         search = get_search_instance()
         assert search.user.get("_id") == ADMIN_USER_ID
         assert search.is_admin is True
 
-        session["user"] = PUBLIC_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = PUBLIC_USER_ID
         search = get_search_instance()
         assert search.user.get("_id") == PUBLIC_USER_ID
         assert search.is_admin is False
 
-        session["user"] = ADMIN_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = ADMIN_USER_ID
         search = get_search_instance(args={"user": TEST_USER_ID})
         assert search.user.get("_id") == TEST_USER_ID
         assert search.is_admin is False
 
 
-async def test_prefill_search_company(client, app):
-    async with app.test_request_context("/"):
-        session["user"] = None
+async def test_prefill_search_company(app):
+    async with app.test_request_context("/") as client:
+        client.session["user"] = None
         search = get_search_instance()
         assert search.user is None
         assert search.company is None
 
-        session["user"] = ADMIN_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = ADMIN_USER_ID
         search = get_search_instance()
         assert search.company.get("_id") == COMPANY_1
 
-        session["user"] = PUBLIC_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = PUBLIC_USER_ID
         search = get_search_instance()
         assert search.company.get("_id") == COMPANY_2
 
-        session["user"] = ADMIN_USER_ID
+    async with app.test_request_context("/") as client:
+        client.session["user"] = ADMIN_USER_ID
         search = get_search_instance(args={"user": TEST_USER_ID})
         assert search.company.get("_id") == COMPANY_3
 

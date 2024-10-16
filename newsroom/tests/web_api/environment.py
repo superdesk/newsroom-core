@@ -123,10 +123,9 @@ async def login_user(context, scenario):
     if data:
         url = "/login"
 
-        async with context.app.test_request_context("/login"):
-            response = await context.client.post(
-                get_prefixed_url(context.app, url),
-                form=data,
-                headers=context.headers,
-            )
-            assert response.status_code == 302, response.status_code
+        response = await context.client.post(
+            get_prefixed_url(context.app, url),
+            form=data,
+            headers=context.headers,
+        )
+        assert response.status_code == 302, response.status_code

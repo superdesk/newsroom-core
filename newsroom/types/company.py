@@ -6,7 +6,8 @@ from superdesk.core.resources.validators import validate_data_relation_async, va
 from superdesk.core.resources.fields import ObjectId
 
 from newsroom.core.resources import NewshubResourceModel, validate_ip_address, validate_auth_provider
-from newsroom.products.types import ProductType
+
+from .products import ProductType
 
 
 @dataclass

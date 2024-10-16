@@ -7,13 +7,13 @@ from pydantic import BaseModel, ValidationError
 from werkzeug.exceptions import NotFound
 
 from superdesk.utils import gen_password
-from superdesk.core.web import Request, Response
+from superdesk.core.types import Request, Response
 from superdesk.core.resources.fields import ObjectId
-
-from newsroom.utils import get_json_or_400_async
-from newsroom.decorator import admin_only, account_manager_only
-from .clients_async import clients_endpoints, ClientService, ClientResource
 from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
+
+from newsroom.auth import auth_rules
+from newsroom.utils import get_json_or_400_async
+from .clients_async import clients_endpoints, ClientService
 
 
 async def get_settings_data():
@@ -31,8 +31,11 @@ class ClientArgs(BaseModel):
     client_id: ObjectId
 
 
-@clients_endpoints.endpoint("/oauth_clients/search", methods=["GET"])
-@account_manager_only
+@clients_endpoints.endpoint(
+    "/oauth_clients/search",
+    methods=["GET"],
+    auth=[auth_rules.account_manager_only],
+)
 async def search(args: None, params: ClientSearchArgs, request: Request) -> Response:
     lookup = None
     if params.q:
@@ -43,15 +46,18 @@ async def search(args: None, params: ClientSearchArgs, request: Request) -> Resp
     return Response(data)
 
 
-@clients_endpoints.endpoint("/oauth_clients/new", methods=["POST"])
-@account_manager_only
+@clients_endpoints.endpoint(
+    "/oauth_clients/new",
+    methods=["POST"],
+    auth=[auth_rules.account_manager_only],
+)
 async def create(request: Request) -> Response:
     """
     Creates the client with given client id
     """
     client = await get_json_or_400_async(request)
     if not isinstance(client, dict):
-        return request.abort(400)
+        return await request.abort(400)
 
     password = gen_password()
     doc = {
@@ -60,8 +66,7 @@ async def create(request: Request) -> Response:
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
     try:
-        new_client = ClientResource.from_dict(doc)
-        ids = await ClientService().create([new_client])
+        ids = await ClientService().create([doc])
     except ValidationError as error:
         return Response(
             {
@@ -75,8 +80,11 @@ async def create(request: Request) -> Response:
     return Response({"success": True, "_id": ids[0], "password": password}, 201)
 
 
-@clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["GET", "POST"])
-@account_manager_only
+@clients_endpoints.endpoint(
+    "/oauth_clients/<string:client_id>",
+    methods=["GET", "POST"],
+    auth=[auth_rules.account_manager_only],
+)
 async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Edits the client with given client id
@@ -84,13 +92,13 @@ async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     service = ClientService()
     original = await service.find_by_id(args.client_id)
     if not original:
-        return NotFound(gettext("Client not found"))
+        raise NotFound(gettext("Client not found"))
     elif request.method == "GET":
         return Response(original)
 
     request_json = await get_json_or_400_async(request)
     if not isinstance(request_json, dict):
-        return request.abort(400)
+        return await request.abort(400)
 
     updates = {}
     updates["name"] = request_json.get("name")
@@ -98,8 +106,11 @@ async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     return Response({"success": True})
 
 
-@clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["DELETE"])
-@admin_only
+@clients_endpoints.endpoint(
+    "/oauth_clients/<string:client_id>",
+    methods=["DELETE"],
+    auth=[auth_rules.admin_only],
+)
 async def delete(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Deletes the client with given client id

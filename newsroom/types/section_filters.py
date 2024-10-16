@@ -2,7 +2,7 @@ from typing import Optional
 from newsroom.core.resources.model import NewshubResourceModel
 
 
-class SectionFilter(NewshubResourceModel):
+class SectionFilterModel(NewshubResourceModel):
     name: str
     description: str = ""
     sd_product_id: Optional[str] = None

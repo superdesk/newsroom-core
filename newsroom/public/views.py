@@ -6,12 +6,12 @@ from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import render_template
 
 from newsroom.auth.utils import is_valid_session
-from newsroom.types import Article
+from newsroom.types import Article, DashboardCardDict
 from newsroom.public import blueprint
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
-from newsroom.cards import CardsResourceService, DashboardCardDict
+from newsroom.cards import CardsResourceService
 
 PUBLIC_DASHBOARD_CONFIG_CACHE_KEY = "public-dashboard-config"
 PUBLIC_DASHBOARD_CARDS_CACHE_KEY = "public-dashboard-cards"

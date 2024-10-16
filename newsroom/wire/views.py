@@ -1,6 +1,7 @@
 import io
 import zipfile
 from inspect import iscoroutinefunction
+from bson import ObjectId
 from newsroom.users.service import UsersService
 import superdesk
 
@@ -17,15 +18,21 @@ from superdesk.flask import request, jsonify, render_template, abort, send_file
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
-from newsroom.auth.utils import check_user_has_products, is_valid_session
+
+from newsroom.auth.utils import (
+    get_user_from_request,
+    get_company_from_request,
+    get_user_id_from_request,
+    is_valid_session,
+    check_user_has_products,
+)
 
 from newsroom.cards import get_card_size, get_card_type, CardsResourceService
 from newsroom.navigations import get_navigations
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
-from newsroom.auth import get_company, get_user, get_user_id, get_user_required
-from newsroom.decorator import login_required, admin_only, section, clear_session_and_redirect_to_login
+from newsroom.decorator import login_required, admin_only, section, redirect_to_login
 from newsroom.topics import get_user_topics
 from newsroom.topics_folders import get_user_folders, get_company_folders
 from newsroom.email import get_language_template_name, send_user_email
@@ -63,17 +70,6 @@ HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
-def get_services(user):
-    services = get_app_config("SERVICES")
-    for service in services:
-        service.setdefault("is_active", True)
-    company = get_company(user)
-    if company and company.get("services"):
-        for service in services:
-            service["is_active"] = bool(company["services"].get(service["code"]))
-    return services
-
-
 def set_permissions(item, section="wire", ignore_latest=False):
     permitted = superdesk.get_resource_service("{}_search".format(section)).has_permissions(item, ignore_latest)
     set_item_permission(item, permitted)
@@ -92,29 +88,31 @@ def set_item_permission(item, permitted=True):
 
 
 async def get_view_data() -> Dict:
-    user = get_user_required()
-    company = get_company(user)
-    topics = await get_user_topics(user["_id"]) if user else []
-    company_id = str(user["company"]) if user and user.get("company") else None
+    user = get_user_from_request(None)
+    user_dict = user.to_dict()
+    company = get_company_from_request(None)
+    company_dict = company.to_dict() if company else None
+
+    topics = await get_user_topics(user.id)
     user_folders = await get_user_folders(user, "wire") if user else []
     company_folders = await get_company_folders(company, "wire") if company else []
-    products = get_products_by_company(company, product_type="wire") if company else []
+    products = get_products_by_company(company_dict, product_type="wire") if company_dict else []
     ui_config_service = UiConfigResourceService()
 
     check_user_has_products(user, products)
 
     return {
-        "user": user,
-        "company": company_id,
+        "user": user_dict,
+        "company": str(company.id) if company else None,
         "topics": [t for t in topics if t.get("topic_type") == "wire"],
         "formats": [
             {"format": f["format"], "name": f["name"], "assets": f["assets"]}
             for f in get_current_app().as_any().download_formatters.values()
             if "wire" in f["types"]
         ],
-        "navigations": await get_navigations(user, company, "wire"),
+        "navigations": await get_navigations(user_dict, company_dict, "wire"),
         "products": products,
-        "saved_items": get_bookmarks_count(user["_id"], "wire"),
+        "saved_items": get_bookmarks_count(user.id, "wire"),
         "context": "wire",
         "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": get_app_config("WIRE_GROUPS", []),
@@ -158,7 +156,7 @@ def get_personal_dashboards_data(user, company, topics):
 
     def _get_topic_data(topic_id):
         for topic in topics:
-            if topic["_id"] == topic_id:
+            if topic["_id"] == ObjectId(topic_id):
                 items = get_topic_items(topic)
                 if items:
                     return {
@@ -183,21 +181,23 @@ def get_personal_dashboards_data(user, company, topics):
 
 
 async def get_home_data():
-    user = get_user()
-    company = get_company(user)
+    user = get_user_from_request(None)
+    user_dict = user.to_dict()
+    company = get_company_from_request(None)
+    company_dict = company.to_dict() if company else None
+
     cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
-    company_id = str(user["company"]) if user and user.get("company") else None
-    topics = await get_user_topics(user["_id"]) if user else []
+    topics = await get_user_topics(user.id)
     ui_config_service = UiConfigResourceService()
 
     return {
         "cards": cards,
-        "products": get_products_by_company(company) if company else [],
-        "user": str(user["_id"]) if user else None,
-        "userProducts": user.get("products") or [],
-        "userType": user.get("user_type"),
-        "company": company_id,
-        "companyProducts": company.get("products") if company else [],
+        "products": get_products_by_company(company_dict) if company else [],
+        "user": str(user.id),
+        "userProducts": user_dict.get("products") or [],
+        "userType": user.user_type,
+        "company": company.id if company else None,
+        "companyProducts": company_dict.get("products") if company else [],
         "formats": [
             {
                 "format": f["format"],
@@ -211,7 +211,7 @@ async def get_home_data():
         "topics": topics,
         "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": get_app_config("WIRE_GROUPS", []),
-        "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
+        "personalizedDashboards": get_personal_dashboards_data(user_dict, company_dict, topics),
     }
 
 
@@ -225,11 +225,7 @@ def get_previous_versions(item):
 @blueprint.route("/")
 async def index():
     if not await is_valid_session():
-        data = (
-            await render_public_dashboard()
-            if get_app_config("PUBLIC_DASHBOARD")
-            else clear_session_and_redirect_to_login()
-        )
+        data = await render_public_dashboard() if get_app_config("PUBLIC_DASHBOARD") else redirect_to_login()
         return data
     data = await get_home_data()
     user_profile_data = await get_user_profile_data()
@@ -257,10 +253,9 @@ async def get_media_card_external(card_id):
 @blueprint.route("/card_items")
 @login_required
 async def get_card_items():
-    user = get_user()
+    company = get_company_from_request(None)
     cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
-    company_id = str(user["company"]) if user and user.get("company") else None
-    items_by_card = get_items_by_card(cards, company_id)
+    items_by_card = get_items_by_card(cards, company.id if company else None)
     return jsonify({"_items": items_by_card})
 
 
@@ -299,7 +294,7 @@ async def search():
 @blueprint.route("/download", methods=["POST"])
 @login_required
 async def download():
-    user = get_user(required=True)
+    user = get_user_from_request(None)
     data = await request.get_json()
     _format = data.get("format", "text")
     item_type = get_type(data.get("type"))
@@ -361,7 +356,7 @@ async def download():
 
     update_action_list(data["items"], "downloads", force_insert=True)
     await HistoryService().create_history_record(
-        items, "download", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+        items, "download", user.id, user.company, request.args.get("type", "wire")
     )
     return await send_file(
         _file,
@@ -374,7 +369,8 @@ async def download():
 @blueprint.route("/wire_share", methods=["POST"])
 @login_required
 async def share():
-    current_user = get_user(required=True)
+    current_user = get_user_from_request(None)
+    current_user_dict = current_user.to_dict()
     item_type = get_type()
     data = await get_json_or_400()
 
@@ -396,7 +392,7 @@ async def share():
         template_kwargs = {
             "app_name": get_app_config("SITE_NAME"),
             "recipient": user,
-            "sender": current_user,
+            "sender": current_user_dict,
             "items": items,
             "message": data.get("message"),
             "section": request.args.get("type", "wire"),
@@ -420,9 +416,9 @@ async def share():
                     item=items[0]["_id"],
                     data=dict(
                         shared_by=dict(
-                            _id=current_user["_id"],
-                            first_name=current_user["first_name"],
-                            last_name=current_user["last_name"],
+                            _id=current_user.id,
+                            first_name=current_user.first_name,
+                            last_name=current_user.last_name,
                         ),
                         items=[i["_id"] for i in items],
                     ),
@@ -437,7 +433,7 @@ async def share():
         )
     update_action_list(data.get("items"), "shares", item_type=item_type)
     await HistoryService().create_history_record(
-        items, "share", current_user.get("_id"), current_user.get("company"), request.args.get("type", "wire")
+        items, "share", current_user.id, current_user.company, request.args.get("type", "wire")
     )
     return jsonify(), 201
 
@@ -486,7 +482,7 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "wire"))
     return jsonify(), 200
 
@@ -514,9 +510,9 @@ async def copy(_id):
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
-    user = get_user()
+    user = get_user_from_request(None)
     await HistoryService().create_history_record(
-        [item], "copy", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+        [item], "copy", user.id, user.company, request.args.get("type", "wire")
     )
     return jsonify({"data": copy_data}), 200
 
@@ -561,9 +557,9 @@ async def item(_id):
             template = "wire_item_print.html"
 
         update_action_list([_id], "prints", force_insert=True)
-        user = get_user()
+        user = get_user_from_request(None)
         await HistoryService().create_history_record(
-            [item], "print", user.get("_id"), user.get("company"), request.args.get("type", "wire")
+            [item], "print", user.id, user.company, request.args.get("type", "wire")
         )
 
     return await render_template(

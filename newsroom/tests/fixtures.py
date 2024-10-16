@@ -208,7 +208,7 @@ async def user(app):
         "receive_app_notifications": True,
     }
 
-    await create_entries_for("users", [_user])
+    await create_entries_for("auth_user", [_user])
 
     _user["password"] = "admin"
     return _user
@@ -239,6 +239,10 @@ async def setup_user_company(app):
                 "name": "Press Co.",
                 "is_enabled": True,
                 "contact_name": "Tom",
+                "sections": {
+                    "wire": True,
+                    "agenda": True,
+                },
                 "products": [
                     {"_id": PRODUCT_1_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_2_ID, "section": "wire", "seats": 0},

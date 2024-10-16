@@ -13,9 +13,10 @@ from tests.fixtures import (  # noqa: F401
     init_agenda_items,
     init_auth,
     PUBLIC_USER_ID,
+    PUBLIC_USER_NAME,
     COMPANY_1_ID,
 )
-from tests.utils import post_json, mock_send_email
+from tests.utils import post_json, mock_send_email, login_public
 from .test_push_events import test_event, test_planning
 from unittest import mock
 
@@ -83,11 +84,7 @@ async def agenda_products(app):
 
 
 async def test_item_json(client):
-    # public user
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-
+    await login_public(client)
     resp = await client.get("/agenda/urn:conference?format=json")
     data = json.loads(await resp.get_data())
     assert "headline" in data
@@ -96,11 +93,7 @@ async def test_item_json(client):
 
 
 async def test_search(client, app, agenda_products):
-    # public user
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-
+    await login_public(client)
     resp = await client.get("/agenda/search")
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
@@ -139,7 +132,7 @@ async def set_watch_products(app):
         "products",
         [
             {
-                "_id": "12",
+                "_id": ObjectId(),
                 "name": "product test",
                 "query": "press",
                 "companies": [COMPANY_1_ID],
@@ -158,9 +151,7 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
     await post_json(client, "/push", event)
     await set_watch_products(app)
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
+    await login_public(client)
 
     await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
@@ -199,9 +190,7 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
     await set_watch_products(app)
     await post_json(client, "/push", event)
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
+    await login_public(client)
 
     await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
@@ -235,10 +224,7 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
     await post_json(client, "/push", event)
     await set_watch_products(app)
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
-
+    await login_public(client)
     await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
     # planning comes in
@@ -262,9 +248,7 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
     await post_json(client, "/push", event)
     await post_json(client, "/push", planning)
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
+    await login_public(client)
 
     await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
@@ -290,9 +274,7 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
     await post_json(client, "/push", event)
     await post_json(client, "/push", planning)
 
-    async with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
+    await login_public(client)
 
     await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 

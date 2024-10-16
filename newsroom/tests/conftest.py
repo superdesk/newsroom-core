@@ -54,6 +54,14 @@ class Task311(asyncio.tasks.Task):
         asyncio.tasks._register_task(self)
 
 
+class CustomEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
+    def set_event_loop(self, loop):
+        if loop is not None:
+            context = contextvars.copy_context()
+            loop.set_task_factory(functools.partial(task_factory, context=context))
+        super().set_event_loop(loop)
+
+
 def task_factory(loop, coro, context=None):
     stack = traceback.extract_stack()
     for frame in stack[-2::-1]:
@@ -70,17 +78,8 @@ def task_factory(loop, coro, context=None):
 
 
 @fixture(scope="session")
-def event_loop():
-    """
-    This fixture is used by pytest-asyncio to run test's setup/run/teardown.
-    It's needed to share contextvars between these stages.
-    This breaks context isolation for tasks, so we need to check calling context there
-    """
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    context = contextvars.copy_context()
-    loop.set_task_factory(functools.partial(task_factory, context=context))
-    asyncio.set_event_loop(loop)
-    return loop
+def event_loop_policy(request):
+    return CustomEventLoopPolicy()
 
 
 def update_config(conf):

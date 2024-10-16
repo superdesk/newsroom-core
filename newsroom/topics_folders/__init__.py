@@ -1,5 +1,5 @@
 from superdesk.core.module import Module
-from newsroom.types import Company, User
+from newsroom.types import CompanyResource, UserResourceModel
 from typing import List, Dict, Any
 
 from .folders import (
@@ -17,20 +17,20 @@ module = Module(
 )
 
 
-async def get_user_folders(user: User, section: str) -> List[Dict[str, Any]]:
+async def get_user_folders(user: UserResourceModel, section: str) -> List[Dict[str, Any]]:
     mongo_cursor = await UserFoldersResourceService().search(
         lookup={
-            "user": user["_id"],
+            "user": user.id,
             "section": section,
         },
     )
     return await mongo_cursor.to_list_raw()
 
 
-async def get_company_folders(company: Company, section: str) -> List[Dict[str, Any]]:
+async def get_company_folders(company: CompanyResource, section: str) -> List[Dict[str, Any]]:
     mongo_cursor = await CompanyFoldersResourceService().search(
         lookup={
-            "company": company["_id"],
+            "company": company.id,
             "section": section,
         },
     )

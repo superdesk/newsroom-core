@@ -2,22 +2,22 @@ import multiprocessing
 
 from superdesk.core import get_current_app
 from superdesk.core.module import Module
-from superdesk.core.web import endpoint, Request, Response
+from superdesk.core.types import Request, Response
+from superdesk.core.web import endpoint
 from superdesk.cache import cache
 from superdesk.timer import timer
 
-from newsroom.auth.utils import start_user_session
 from newsroom.tests.db import drop_mongo, reset_elastic
 from tests.core.utils import create_entries_for
 
 from .utils import create_default_user
 
 
-@endpoint("e2e/init", methods=["POST"])
+@endpoint("e2e/init", methods=["POST"], auth=False)
 async def init_e2e_app(_request: Request) -> Response:
     with multiprocessing.Lock(), timer("app_init"):
         await reset_dbs()
-        create_default_user()
+        await create_default_user()
 
     return Response("OK")
 
@@ -32,14 +32,12 @@ async def reset_dbs():
         app.init_indexes()
 
 
-@endpoint("e2e/populate_resources", methods=["POST"])
+@endpoint("e2e/populate_resources", methods=["POST"], auth=False)
 async def populate_resources(request: Request) -> Response:
     json = await request.get_json()
     ids = []
-    user = await create_default_user()
-    start_user_session(user, True)
-
-    app = get_current_app()
+    await create_default_user()
+    app = get_current_app().as_any()
     async with app.app_context():
         for entry in json.get("resources") or []:
             resource = entry.get("resource")

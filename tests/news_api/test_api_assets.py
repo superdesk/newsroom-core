@@ -1,4 +1,5 @@
 import os
+from bson import ObjectId
 from tests.news_api.test_api_audit import audit_check
 
 
@@ -16,12 +17,13 @@ async def setup_image(app):
 
 
 async def test_get_asset(client, app):
+    company_id = ObjectId()
     app.data.insert(
         "companies",
-        [{"_id": "company_123", "name": "Test Company", "is_enabled": True}],
+        [{"_id": company_id, "name": "Test Company", "is_enabled": True}],
     )
-    app.data.insert("news_api_tokens", [{"company": "company_123", "enabled": True}])
-    token = app.data.find_one("news_api_tokens", req=None, company="company_123")
+    app.data.insert("news_api_tokens", [{"company": company_id, "enabled": True}])
+    token = app.data.find_one("news_api_tokens", req=None, company=company_id)
 
     image_id = await setup_image(app)
     response = await client.get("api/v1/assets/{}".format(image_id), headers={"Authorization": token.get("token")})

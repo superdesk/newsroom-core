@@ -10,6 +10,8 @@ import superdesk
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 
+from newsroom.types import CompanyResource
+from newsroom.companies import CompanyServiceAsync
 from .resource import NewsApiTokensResource
 from .service import NewsApiTokensService
 
@@ -83,7 +85,15 @@ class CompanyTokenAuth(TokenAuth):
             if updates.get("rate_limit_expiry"):
                 g.rate_limit_expiry = updates["rate_limit_expiry"]
 
-        g.company_id = str(token.get("company"))
+        company_id = token.get("company")
+        g.company_id = str(company_id)
+
+        # TODO-ASYNC: Improve auth for NewsAPI, when there is no User associated with a request
+        # Store CompanyResource instance on request cache (to be used with get_company_from_request)
+        company_dict = CompanyServiceAsync().mongo.find_one({"_id": company_id})
+        if company_dict:
+            g.company_instance = CompanyResource.from_dict(company_dict)
+
         return g.company_id
 
 

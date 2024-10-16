@@ -2,10 +2,9 @@ from unittest import mock
 
 from quart import url_for
 
-from newsroom.types import CompanyType, Country
-from newsroom.auth import get_auth_user_by_email
-from newsroom.companies.companies_async import CompanyService, CompanyProduct
-from newsroom.products.types import ProductType
+from newsroom.types import CompanyType, Country, ProductType, CompanyProduct
+from newsroom.users import UsersAuthService
+from newsroom.companies.companies_async import CompanyService
 
 from tests.utils import get_user_by_email, mock_send_email
 
@@ -164,11 +163,11 @@ async def test_approve_company_and_users(app, client):
         assert new_user["is_validated"] is False
 
         # Test that the account activation email was sent
-        auth_user = get_auth_user_by_email("john@doe.org")
+        auth_user = await UsersAuthService().get_by_email("john@doe.org")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["john@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user["token"] in outbox[0].body
+        assert auth_user.token in outbox[0].body
 
     # Sign up another user for the same company
     response = await client.post(
@@ -208,11 +207,11 @@ async def test_approve_company_and_users(app, client):
         assert new_user["is_validated"] is False
 
         # Test that the account activation email was sent
-        auth_user = get_auth_user_by_email("jane@doe.org")
+        auth_user = await UsersAuthService().get_by_email("jane@doe.org")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["jane@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user["token"] in outbox[0].body
+        assert auth_user.token in outbox[0].body
 
 
 async def test_signup_not_enabled_without_config(client, app):

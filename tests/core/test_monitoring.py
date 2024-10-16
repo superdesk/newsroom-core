@@ -3,11 +3,11 @@ from typing import List
 from quart import json
 from pytest import fixture
 from bson import ObjectId
+
 from tests.core.utils import create_entries_for
-from tests.fixtures import PUBLIC_USER_ID
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
-from tests.utils import mock_send_email, post_json
+from tests.utils import mock_send_email, post_json, login_public
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
 from superdesk import get_resource_service
@@ -42,7 +42,7 @@ async def init(app):
     )
 
     await create_entries_for(
-        "users",
+        "auth_user",
         [
             {
                 "_id": ObjectId("5c53afa45f627d8333220f15"),
@@ -88,11 +88,7 @@ async def init(app):
 
 
 async def test_non_admin_actions_fail(client, app):
-    user_id = str(PUBLIC_USER_ID)
-    async with client.session_transaction() as session:
-        session["user"] = user_id
-        session["name"] = "public"
-        session["user_type"] = "public"
+    await login_public(client)
 
     response = await client.post(
         "/monitoring/new",

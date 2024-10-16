@@ -5,8 +5,9 @@ from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 from superdesk import get_resource_service
 
+from newsroom.types import Navigation, CompanyResource, UserResourceModel
+from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
-from newsroom.auth import get_user, get_user_id, get_company_from_user
 from newsroom.decorator import login_required, section
 from newsroom.topics import get_user_topics
 from newsroom.navigations import get_navigations_by_company
@@ -27,24 +28,25 @@ from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
 from newsroom.cards import CardsResourceService
 
-
 search_endpoint_name = "{}_search".format(SECTION_ID)
 
 
 async def get_view_data():
     """Get the view data"""
-    user = get_user()
-    topics = await get_user_topics(user["_id"]) if user else []
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
+
+    topics = await get_user_topics(user.id)
     navigations = await get_navigations_by_company(
-        str(user["company"]) if user and user.get("company") else None,
+        company.to_dict() if company else None,
         product_type=SECTION_ID,
     )
-    get_story_count(navigations, user)
+    await get_story_count(navigations, user, company)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user["_id"]) if user else None,
-        "user_type": (user or {}).get("user_type") or "public",
-        "company": str(user["company"]) if user and user.get("company") else None,
+        "user": str(user.id),
+        "user_type": user.user_type,
+        "company": str(company.id) if company else None,
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],
         "navigations": navigations,
         "formats": [
@@ -52,7 +54,7 @@ async def get_view_data():
             for f in get_current_app().as_any().download_formatters.values()
             if "wire" in f["types"]
         ],
-        "saved_items": get_bookmarks_count(user["_id"], SECTION_ID),
+        "saved_items": get_bookmarks_count(user.id, SECTION_ID),
         "context": SECTION_ID,
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
@@ -60,25 +62,26 @@ async def get_view_data():
     }
 
 
-def get_story_count(navigations, user):
-    company = get_company_from_user(user) if user else None
+async def get_story_count(navigations: list[Navigation], user: UserResourceModel, company: CompanyResource):
     get_resource_service(search_endpoint_name).get_navigation_story_count(navigations, SECTION_ID, company, user)
 
 
 async def get_home_page_data():
     """Get home page data for market place"""
-    user = get_user()
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
+
     navigations = await get_navigations_by_company(
-        str(user["company"]) if user and user.get("company") else None,
+        company.to_dict() if company else None,
         product_type=SECTION_ID,
     )
-    get_story_count(navigations, user)
+    await get_story_count(navigations, user, company)
     return {
-        "user": str(user["_id"]) if user else None,
-        "company": str(user["company"]) if user and user.get("company") else None,
+        "user": str(user.id),
+        "company": str(company.id) if company else None,
         "navigations": navigations,
         "cards": await (await CardsResourceService().find({"dashboard": SECTION_ID})).to_list_raw(),
-        "saved_items": get_bookmarks_count(user["_id"], SECTION_ID),
+        "saved_items": get_bookmarks_count(user.id, SECTION_ID),
         "context": SECTION_ID,
         "home_page": True,
         "title": SECTION_NAME,
@@ -132,7 +135,7 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id()
+    user_id = get_user_id_from_request(None)
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, SECTION_ID))
     return jsonify(), 200
 

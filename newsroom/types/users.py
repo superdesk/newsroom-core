@@ -3,10 +3,7 @@ from datetime import datetime
 from pydantic import Field
 from typing import Annotated, List, Optional
 from dataclasses import asdict
-
-from newsroom.user_roles import UserRole
-from newsroom.companies.companies_async import CompanyProduct
-from newsroom.core.resources.model import NewshubResourceModel
+from quart_babel import lazy_gettext
 
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import dataclass
@@ -17,9 +14,14 @@ from superdesk.core.resources.validators import (
     validate_data_relation_async,
 )
 
+from newsroom.core.resources.model import NewshubResourceModel
+
+from .company import CompanyProduct, CompanyResource
+from .user_roles import UserRole
+
 
 @dataclass
-class Dashboard:
+class DashboardModel:
     name: str
     type: str
     topic_ids: Annotated[list[ObjectIdField], validate_data_relation_async("topics")]
@@ -28,8 +30,11 @@ class Dashboard:
         return asdict(self)
 
 
+b = lazy_gettext("123")
+
+
 @dataclass
-class NotificationSchedule:
+class NotificationScheduleModel:
     timezone: str
     times: List[str]
     last_run_time: Optional[datetime] = None
@@ -40,8 +45,11 @@ class NotificationSchedule:
 class UserResourceModel(NewshubResourceModel):
     first_name: str
     last_name: str
-    password: Optional[Annotated[str, validate_minlength(8)]] = None
-    email: Annotated[str, validate_email(), validate_iunique_value_async("users", "email")]
+    email: Annotated[
+        str,
+        validate_email(),
+        validate_iunique_value_async("users", "email", lazy_gettext("Email address is already in use")),
+    ]
     phone: Optional[str] = None
     mobile: Optional[str] = None
     role: Optional[str] = None
@@ -58,9 +66,6 @@ class UserResourceModel(NewshubResourceModel):
     is_approved: bool = False
     expiry_alert: bool = False
 
-    token: Optional[str] = None
-    token_expiry_date: Optional[datetime] = None
-
     receive_email: bool = True
     receive_app_notifications: bool = True
 
@@ -70,5 +75,37 @@ class UserResourceModel(NewshubResourceModel):
 
     products: Optional[List[CompanyProduct]] = None
     sections: Optional[dict[str, bool]] = None
-    dashboards: Optional[List[Dashboard]] = None
-    notification_schedule: Optional[NotificationSchedule] = None
+    dashboards: Optional[List[DashboardModel]] = None
+    notification_schedule: Optional[NotificationScheduleModel] = None
+
+    def is_admin(self) -> bool:
+        return self.user_type == UserRole.ADMINISTRATOR
+
+    def is_internal(self) -> bool:
+        return self.user_type == UserRole.INTERNAL
+
+    def is_admin_or_internal(self) -> bool:
+        return self.user_type in [
+            UserRole.ADMINISTRATOR,
+            UserRole.ACCOUNT_MANAGEMENT,
+            UserRole.INTERNAL,
+        ]
+
+    def is_account_manager(self) -> bool:
+        return self.user_type == UserRole.ACCOUNT_MANAGEMENT
+
+    def is_company_admin(self) -> bool:
+        return self.user_type == UserRole.COMPANY_ADMIN
+
+    async def get_company(self) -> CompanyResource | None:
+        from newsroom.companies.companies_async import CompanyService
+
+        if self.company:
+            return await CompanyService().find_by_id(self.company)
+        return None
+
+
+class UserAuthResourceModel(UserResourceModel):
+    password: Optional[Annotated[str, validate_minlength(8)]] = None
+    token: Optional[str] = None
+    token_expiry_date: Optional[datetime] = None

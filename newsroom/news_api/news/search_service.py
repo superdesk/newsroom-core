@@ -12,10 +12,10 @@ from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
-from newsroom.wire.items import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
-from newsroom.auth import get_company
 
+from newsroom.auth.utils import get_company_or_none_from_request
+from newsroom.wire.items import ItemsResource
 from newsroom.news_api.utils import (
     post_api_audit,
     remove_internal_renditions,
@@ -118,8 +118,10 @@ class NewsAPINewsService(BaseSearchService):
             else self.mandatory_exclude_fields
         )
 
-        company = get_company()
-        products = get_products_by_company(company, product_type="news_api")
+        company = get_company_or_none_from_request(None)
+        products = get_products_by_company(
+            company.to_dict(context={"use_objectid": True}) if company else None, product_type="news_api"
+        )
 
         for doc in resp.docs:
             for field in exclude_fields:
@@ -167,7 +169,8 @@ class NewsAPINewsService(BaseSearchService):
             search.query["bool"]["minimum_should_match"] = 1
 
     def prefill_search_company(self, search):
-        search.company = get_company()
+        company = get_company_or_none_from_request(None)
+        search.company = company.to_dict(context={"use_objectid": True}) if company else None
 
     def prefill_search_products(self, search):
         """Prefill the search products

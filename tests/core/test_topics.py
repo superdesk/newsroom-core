@@ -1,13 +1,13 @@
+from pytest import fixture
+
 from quart import json
 from unittest import mock
 from copy import deepcopy
 from bson import ObjectId
-from tests.core.utils import create_entries_for
 import pymongo
 
+from newsroom.types import UserResourceModel, TopicResourceModel, TopicType
 from newsroom.topics.views import get_topic_url
-
-from newsroom.users.model import UserResourceModel
 from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
@@ -19,15 +19,19 @@ from ..fixtures import (  # noqa: F401
 )
 from ..utils import mock_send_email, get_resource_by_id  # noqa
 from tests import utils
+from tests.core.utils import create_entries_for
 from newsroom.topics.topics_async import TopicService
 from newsroom.topics_folders.folders import UserFoldersResourceService
+
+WIRE_NAV_ID = ObjectId("5cc94454bc43165c045ffec9")
+AGENDA_NAV_ID = ObjectId("5cc94454bc43165c045ffec0")
 
 base_topic = {
     "_id": ObjectId(),
     "label": "Foo",
     "query": "foo",
     "topic_type": "wire",
-    "navigation": [ObjectId("5cc94454bc43165c045ffec9")],
+    "navigation": [WIRE_NAV_ID],
 }
 
 agenda_topic = {
@@ -35,7 +39,7 @@ agenda_topic = {
     "label": "Foo",
     "query": "foo",
     "topic_type": "agenda",
-    "navigation": [ObjectId("5cc94454bc43165c045ffec3")],
+    "navigation": [AGENDA_NAV_ID],
 }
 
 user_id = str(PUBLIC_USER_ID)
@@ -46,6 +50,27 @@ user_topic_folders_url = "/api/users/{}/topic_folders".format(TEST_USER_ID)
 company_topic_folders_url = "/api/companies/{}/topic_folders".format(COMPANY_1_ID)
 
 
+@fixture
+async def navigation_items():
+    await create_entries_for(
+        "navigations",
+        [
+            {
+                "_id": WIRE_NAV_ID,
+                "name": "Foo",
+                "product_type": "wire",
+                "is_enabled": True,
+            },
+            {
+                "_id": AGENDA_NAV_ID,
+                "name": "Foo",
+                "product_type": "agenda",
+                "is_enabled": True,
+            },
+        ],
+    )
+
+
 async def test_topics_no_session(app):
     async with app.test_client() as client:
         resp = await client.get(topics_url)
@@ -54,8 +79,8 @@ async def test_topics_no_session(app):
         assert 302 == resp.status_code
 
 
-async def test_post_topic_user(client):
-    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+async def test_post_topic_user(client, navigation_items):
+    await utils.login_public(client)
     resp = await client.post(topics_url, json=deepcopy(base_topic))
     assert 201 == resp.status_code
     resp = await client.get(topics_url)
@@ -64,24 +89,17 @@ async def test_post_topic_user(client):
     assert 1 == len(data["_items"])
 
 
-async def test_update_topic_fails_for_different_user(app):
-    async with app.test_client() as client:
-        await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-        resp = await client.post(topics_url, json=deepcopy(base_topic))
-        assert 201 == resp.status_code
+async def test_update_topic_fails_for_different_user(app, client, navigation_items):
+    topic = deepcopy(base_topic)
+    topic_id = (await create_entries_for("topics", [topic]))[0]
 
-        resp = await client.get(topics_url)
-        data = json.loads(await resp.get_data())
-        _id = data["_items"][0]["_id"]
-
-    async with app.test_client() as client:
-        await utils.login(client, {"email": "test@bar.com"})
-        resp = await client.post("topics/{}".format(_id), json={"label": "test123"})
-        assert 403 == resp.status_code
+    await utils.login(client, {"email": "test@bar.com"})
+    resp = await client.post(f"topics/{topic_id}", json={"label": "test123"})
+    assert 403 == resp.status_code
 
 
-async def test_update_topic(client):
-    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+async def test_update_topic(client, navigation_items):
+    await utils.login_public(client)
     resp = await client.post(topics_url, json=deepcopy(base_topic))
     assert 201 == resp.status_code
 
@@ -93,14 +111,14 @@ async def test_update_topic(client):
         "topics/{}".format(_id),
         json={"label": "test123"},
     )
-    assert 200 == resp.status_code
+    assert 200 == resp.status_code  # , await resp.get_data(as_text=True)
 
     resp = await client.get(topics_url)
     data = json.loads(await resp.get_data())
     assert "test123" == data["_items"][0]["label"]
 
 
-async def test_delete_topic(client):
+async def test_delete_topic(client, navigation_items):
     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
     resp = await client.post(topics_url, json=deepcopy(base_topic))
     assert 201 == resp.status_code
@@ -118,7 +136,7 @@ async def test_delete_topic(client):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_share_wire_topics(client, app):
+async def test_share_wire_topics(client, app, navigation_items):
     topic = deepcopy(base_topic)
     topic_ids = await create_entries_for("topics", [topic])
     topic["_id"] = topic_ids[0]
@@ -147,7 +165,7 @@ async def test_share_wire_topics(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_share_agenda_topics(client, app):
+async def test_share_agenda_topics(client, app, navigation_items):
     topic_ids = await create_entries_for("topics", [agenda_topic])
     agenda_topic["_id"] = topic_ids[0]
     await utils.login(client, {"email": PUBLIC_USER_EMAIL})
@@ -175,42 +193,48 @@ async def test_share_agenda_topics(client, app):
 
 
 async def test_get_topic_share_url(app):
-    topic = {"topic_type": "wire", "query": "art exhibition"}
-    assert await get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
+    topic = TopicResourceModel(id=ObjectId(), label="Test Topic", topic_type=TopicType.WIRE, query="art exhibition")
+    assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
-    topic = {"topic_type": "wire", "filter": {"location": [["Sydney"]]}}
-    assert (
-        await get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
-    )
+    topic.query = None
+    topic.filter = {"location": [["Sydney"]]}
+    assert get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
 
-    topic = {"topic_type": "wire", "navigation": ["123"]}
-    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
+    topic.filter = None
+    NAV1_ID = ObjectId()
+    NAV2_ID = ObjectId()
+    topic.navigation = [NAV1_ID]
+    assert get_topic_url(topic) == f"http://localhost:5050/wire?navigation=%5B%22{NAV1_ID}%22%5D"
 
-    topic = {"topic_type": "wire", "navigation": ["123", "456"]}
-    assert await get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
+    topic.navigation = [NAV1_ID, NAV2_ID]
+    assert get_topic_url(topic) == f"http://localhost:5050/wire?navigation=%5B%22{NAV1_ID}%22,+%22{NAV2_ID}%22%5D"
 
-    topic = {"topic_type": "wire", "created": {"from": "2018-06-01"}}
-    assert await get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
+    topic.navigation = None
+    topic.created_filter = {"from": "2018-06-01"}
+    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
 
-    topic = {"topic_type": "wire", "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]}}
-    assert await get_topic_url(topic) == (
+    topic.created_filter = None
+    topic.advanced = {"all": "Weather Sydney", "fields": ["headline", "body_html"]}
+    assert get_topic_url(topic) == (
         "http://localhost:5050/wire?advanced="
         "%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
 
-    topic = {
-        "topic_type": "wire",
-        "query": "art exhibition",
-        "filter": {"urgency": [3]},
-        "navigation": ["123"],
-        "created": {"from": "2018-06-01"},
-        "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]},
-    }
+    topic = TopicResourceModel(
+        id=ObjectId(),
+        label="Test Topic",
+        topic_type=TopicType.WIRE,
+        query="art exhibition",
+        filter={"urgency": [3]},
+        navigation=[NAV1_ID],
+        created_filter={"from": "2018-06-01"},
+        advanced={"all": "Weather Sydney", "fields": ["headline", "body_html"]},
+    )
     assert (
-        await get_topic_url(topic) == "http://localhost:5050/wire?"
+        get_topic_url(topic) == "http://localhost:5050/wire?"
         "q=art+exhibition"
         "&filter=%7B%22urgency%22:+%5B3%5D%7D"
-        "&navigation=%5B%22123%22%5D"
+        f"&navigation=%5B%22{NAV1_ID}%22%5D"
         "&created=%7B%22from%22:+%222018-06-01%22%7D"
         "&advanced=%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
@@ -300,6 +324,8 @@ async def test_topic_folders_unique_validation(client):
         assert False, "Expected DuplicateKeyError for user topic folder, but got success"
 
     # create company topic with same name
+    print("URL=")
+    print(company_topic_folders_url)
     resp = await client.post(company_topic_folders_url, json=folder)
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
@@ -331,27 +357,21 @@ async def test_topic_folders_unique_validation(client):
         assert False, "Expected DuplicateKeyError for case-insensitive company topic folder, but got success"
 
 
-async def test_topic_subscriber_auto_enable_user_emails(app, client):
-    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
-    user: UserResourceModel = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
+async def test_topic_subscriber_auto_enable_user_emails(app, client, navigation_items):
+    await utils.login_public(client)
+    users_service = UsersService()
+    user: UserResourceModel = await users_service.find_by_id(PUBLIC_USER_ID)
     topic = deepcopy(base_topic)
 
-    async def disable_user_emails():
-        user["receive_email"] = False
-        resp = await client.post(f"/users/{PUBLIC_USER_ID}", form=user)
-        assert resp.status_code == 200, await resp.get_data(as_text=True)
-
     # Make sure we start with user emails disabled
-    await disable_user_emails()
-    user = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
-    assert user["receive_email"] is False
+    await users_service.update(user.id, {"receive_email": False})
+    user = await users_service.find_by_id(PUBLIC_USER_ID)
+    assert user.receive_email is False
 
     # Create a new topic, with the current user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["id"],
+            "user_id": user.id,
             "notification_type": "real-time",
         }
     ]
@@ -362,15 +382,13 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
     topic = json.loads(topic.model_dump_json())
 
     # Make sure user emails are enabled after creating the topic
-    user = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
-    assert user["receive_email"] is True
+    user = await users_service.find_by_id(PUBLIC_USER_ID)
+    assert user.receive_email is True
 
     # Disable the user emails again
-    await disable_user_emails()
-    user = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
-    assert user["receive_email"] is False
+    await users_service.update(user.id, {"receive_email": False})
+    user = await users_service.find_by_id(PUBLIC_USER_ID)
+    assert user.receive_email is False
 
     # Update the topic, this time removing the user as a subscriber
     topic["subscribers"] = []
@@ -379,14 +397,13 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # Make sure user emails are still disabled
-    user = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
-    assert user["receive_email"] is False
+    user = await users_service.find_by_id(PUBLIC_USER_ID)
+    assert user.receive_email is False
 
     # Update the topic, this time adding the user as a subscriber
     topic["subscribers"] = [
         {
-            "user_id": user["id"],
+            "user_id": user.id,
             "notification_type": "real-time",
         }
     ]
@@ -394,9 +411,8 @@ async def test_topic_subscriber_auto_enable_user_emails(app, client):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     # And make sure user emails are re-enabled again
-    user = await UsersService().find_by_id(PUBLIC_USER_ID)
-    user = json.loads(user.model_dump_json())
-    assert user["receive_email"] is True
+    user = await users_service.find_by_id(PUBLIC_USER_ID)
+    assert user.receive_email is True
 
 
 async def test_remove_user_topics_on_user_delete(client, app):
@@ -492,12 +508,10 @@ async def test_created_field_in_topic_url(client):
     assert 200 == resp.status_code
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
-    assert "Foo" == data["_items"][0]["label"]
+    topic = TopicResourceModel.from_dict(data["_items"][0])
+    assert topic.label == "Foo"
 
-    assert (
-        await get_topic_url(data["_items"][0])
-        == "http://localhost:5050/wire?q=foo&created=%7B%22date_filter%22:+%22last_week%22%7D"
-    )
+    assert get_topic_url(topic) == "http://localhost:5050/wire?q=foo&created=%7B%22date_filter%22:+%22last_week%22%7D"
 
     resp = await client.post(
         "topics/{}".format(data["_items"][0]["_id"]),
@@ -507,9 +521,8 @@ async def test_created_field_in_topic_url(client):
 
     resp = await client.get(topics_url)
     data = json.loads(await resp.get_data())
+    assert 1 == len(data["_items"])
+    topic = TopicResourceModel.from_dict(data["_items"][0])
 
-    assert "test123" == data["_items"][0]["label"]
-    assert (
-        await get_topic_url(data["_items"][0])
-        == "http://localhost:5050/wire?created=%7B%22date_filter%22:+%22today%22%7D"
-    )
+    assert topic.label == "test123"
+    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22date_filter%22:+%22today%22%7D"

@@ -8,8 +8,9 @@ from superdesk.core import get_current_app
 from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
 
+from newsroom.types import NavigationModel
 from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
-from newsroom.navigations import NavigationsService, Navigation
+from newsroom.navigations import NavigationsService
 from newsroom.navigations import get_navigations_as_list
 from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
@@ -69,7 +70,7 @@ def validate_product(product):
         return jsonify({"name": gettext("Name not found")}), 400
 
 
-async def find_nav_or_404(nav_id: str) -> Navigation:
+async def find_nav_or_404(nav_id: str) -> NavigationModel:
     nav = await NavigationsService().find_by_id(nav_id)
     if nav is None:
         abort(404)

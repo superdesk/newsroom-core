@@ -1,16 +1,9 @@
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from bson import ObjectId
 from superdesk.core.resources.cursor import ResourceCursorAsync
 
-from newsroom.types import Company
-from newsroom.utils import query_resource
-
-from .companies_async.types import CompanyProduct, CompanyResource
-
-# avoid circular reference as it's used for type hints only
-if TYPE_CHECKING:
-    from newsroom.users.model import UserResourceModel
+from newsroom.types import Company, CompanyProduct, CompanyResource, UserResourceModel
 
 
 def restrict_coverage_info(company: Optional[Company]) -> bool:
@@ -80,6 +73,8 @@ def get_companies_id_by_product(product_id: str) -> List[str]:
     Returns:
         List[str]: A list of company IDs associated with the specified product.
     """
+    from newsroom.utils import query_resource
+
     companies = list(query_resource("companies"))
     return [
         str(company["_id"])

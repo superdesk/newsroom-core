@@ -36,17 +36,18 @@ async def companies(app):
     return _companies
 
 
-async def test_product_list_fails_for_anonymous_user(client, anonymous_user, public_user, app):
-    async with app.test_request_context("/products/search"):
-        await utils.logout(client)
-        response = await client.get("/products/search")
-        assert response.status_code == 302
-        assert response.headers.get("location") == "/login"
+async def test_product_list_fails_for_anonymous_user(client):
+    await utils.logout(client)
+    response = await client.get("/products/search")
+    assert response.status_code == 302
+    assert response.headers.get("location") == "/login"
 
-        await utils.login(client, public_user)
-        response = await client.get("/products/search", follow_redirects=True)
-        assert response.status_code == 403, await response.get_data(as_text=True)
-        assert b"Forbidden" in await response.get_data()
+
+async def test_product_list_fails_for_public_user(client):
+    await utils.login_public(client)
+    response = await client.get("/products/search", follow_redirects=True)
+    assert response.status_code == 403, await response.get_data(as_text=True)
+    assert b"Forbidden" in await response.get_data()
 
 
 async def test_return_search_for_products(client):

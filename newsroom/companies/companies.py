@@ -6,9 +6,11 @@ from superdesk.flask import abort
 from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 import newsroom
-from newsroom.companies.utils import get_company_section_names, get_company_product_ids
-from newsroom.products.types import PRODUCT_TYPES
+
+from newsroom.types import PRODUCT_TYPES
 from newsroom.signals import company_create
+
+from .utils import get_company_section_names, get_company_product_ids
 
 
 class CompaniesResource(newsroom.Resource):

@@ -3,7 +3,8 @@ from quart import json
 from pytest import fixture
 
 
-from newsroom.cards import CardResourceModel, DashboardCardType, CardsResourceService
+from newsroom.types import CardResourceModel, DashboardCardType
+from newsroom.cards import CardsResourceService
 from tests.utils import logout
 
 

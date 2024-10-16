@@ -33,7 +33,7 @@ async def assert_ok(response):
 @then("we get the following order")
 @async_run_until_complete
 async def step_impl_ordered_list(context):
-    assert_200(context.response)
+    await assert_200(context.response)
     response_data = ((await get_json_data(context.response)) or {}).get("_items")
     ids = [item["_id"] for item in response_data]
     expected_order = json.loads(context.text)
@@ -59,12 +59,11 @@ async def step_impl_get_json_array_from_url(context, url):
 async def step_impl_when_post_form_to_url(context, url):
     url = apply_placeholders(context, url)
     data = json.loads(apply_placeholders(context, context.text))
-    async with context.app.test_request_context(url):
-        context.response = await context.client.post(
-            get_prefixed_url(context.app, url),
-            form={key: json.dumps(val) for key, val in data.items()},
-            headers=[header for header in context.headers if header[0] != "Content-Type"],
-        )
+    context.response = await context.client.post(
+        get_prefixed_url(context.app, url),
+        form={key: json.dumps(val) for key, val in data.items()},
+        headers=[header for header in context.headers if header[0] != "Content-Type"],
+    )
 
     await assert_ok(context.response)
 
@@ -74,9 +73,7 @@ async def step_impl_when_post_form_to_url(context, url):
 async def step_impl_when_post_json_to_url(context, url):
     url = apply_placeholders(context, url)
     data = apply_placeholders(context, context.text)
-
-    async with context.app.test_request_context(url):
-        context.response = await context.client.post(url, data=data, headers=context.headers)
+    context.response = await context.client.post(url, data=data, headers=context.headers)
 
     await assert_ok(context.response)
 
@@ -91,7 +88,7 @@ async def step_impl_store_response_item_id(context, tag):
 @then("we get aggregations")
 @async_run_until_complete
 async def step_impl_get_aggregations(context):
-    assert_200(context.response)
+    await assert_200(context.response)
     response_aggs = ((await get_json_data(context.response)) or {}).get("_aggregations")
     expected_aggs = json.loads(context.text)
 
@@ -120,7 +117,10 @@ async def when_we_login_as_user(context, email, password):
 @async_run_until_complete
 async def then_we_get_users_with_products(context):
     data = json.loads(apply_placeholders(context, context.text))
-    list_items = await get_json_data(context.response)
+    try:
+        list_items = await get_json_data(context.response)
+    except Exception:
+        assert False, await context.response.get_data(as_text=True)
     if not isinstance(list_items, list):
         list_items = [list_items]
     for user in list_items:

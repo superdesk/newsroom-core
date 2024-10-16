@@ -1,21 +1,18 @@
 import superdesk
 from quart_babel import lazy_gettext
 
-from newsroom.users.model import UserResourceModel
-
 from superdesk.core import json, get_current_app
 from apps.prepopulate.app_initialize import get_filepath
 
-from newsroom.user_roles import UserRole
+from newsroom.types import CompanyResource, UserResourceModel, UserRole
 
 from .companies import CompaniesResource, CompaniesService
-from .companies_async import CompanyService as CompanyServiceAsync, CompanyResource
+from .companies_async import CompanyService as CompanyServiceAsync
 
 from .module import module  # noqa
 
 __all__ = [
     "CompanyServiceAsync",
-    "CompanyResource",
 ]
 
 

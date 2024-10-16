@@ -5,7 +5,6 @@ from asyncio import gather
 from functools import reduce
 from pydantic import ValidationError
 
-from uuid import uuid4
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from typing import List, Dict, Any, Optional, Union
@@ -17,34 +16,25 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
-from superdesk.core.web import Request
+from superdesk.core.types import Request
 from superdesk.core import json, get_current_app, get_app_config
-from superdesk.flask import abort, request, g, session, url_for
-from superdesk.utc import utcnow
+from superdesk.flask import abort, request, g, url_for
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
 from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
-from newsroom.flask import flash
-from newsroom.types import PublicUserData, User, Company, Group, Permissions
+from newsroom.types import PublicUserData, User, Company, Group, Permissions, CompanyResource, UserResourceModel
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
     format_datetime,
-    is_admin,
     get_client_format,
 )
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
 MAX_TERMS_SIZE = 1000
-
-
-def get_user_id():
-    from newsroom.auth import get_user_id as _get_user_id
-
-    return _get_user_id()
 
 
 def query_resource(
@@ -60,10 +50,6 @@ def query_resource(
 
 def find_one(resource, **lookup):
     return get_current_app().data.find_one(resource, req=None, **lookup)
-
-
-def get_random_string():
-    return str(uuid4())
 
 
 def json_serialize_datetime_objectId(obj):
@@ -295,48 +281,13 @@ def get_links(agenda):
     return agenda.get("event", {}).get("links", [])
 
 
-def is_company_enabled(user, company=None):
-    """
-    Checks if the company of the user is enabled
-    """
-    if not user.get("company"):
-        # there's no company assigned return true for admin user else false
-        return True if is_admin(user) else False
+# TODO-ASYNC: Once push/content resources are upgraded, use is_company_x functions directly
+def _is_user_and_company_enabled(user_dict: dict | None, company_dict: Company | None) -> bool:
+    from newsroom.auth.utils import is_company_enabled, is_company_expired
 
-    if not company:
-        return False
-
-    return company.get("is_enabled", False)
-
-
-def is_company_expired(user=None, company=None):
-    if get_app_config("ALLOW_EXPIRED_COMPANY_LOGINS"):
-        return False
-    elif user and not user.get("company"):
-        return False if is_admin(user) else True
-    expiry_date = (company or {}).get("expiry_date")
-    if not expiry_date:
-        return False
-    return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
-
-
-async def is_account_enabled(user):
-    """
-    Checks if user account is active and approved
-    """
-    if not user.get("is_enabled"):
-        await flash(gettext("Account is disabled"), "danger")
-        return False
-
-    if user.get("is_approved") is False:
-        account_created = user.get("_created")
-
-        approve_expiration = utcnow() + timedelta(days=-get_app_config("NEW_ACCOUNT_ACTIVE_DAYS", 14))
-        if not account_created or account_created < approve_expiration:
-            await flash(gettext("Account has not been approved"), "danger")
-            return False
-
-    return True
+    user = UserResourceModel.from_dict(user_dict) if user_dict else None
+    company = CompanyResource.from_dict(company_dict) if company_dict else None
+    return is_company_enabled(user, company) and not is_company_expired(user, company)
 
 
 async def get_user_dict(use_globals: bool = True) -> dict[str, User]:
@@ -353,10 +304,7 @@ async def get_user_dict(use_globals: bool = True) -> dict[str, User]:
         return {
             str(user["_id"]): user
             for user in all_users
-            if (
-                is_company_enabled(user, companies.get(str(user.get("company"))))
-                and not is_company_expired(user, companies.get(str(user.get("company"))))
-            )
+            if _is_user_and_company_enabled(user, companies.get(str(user.get("company"))))
         }
 
     if not use_globals:
@@ -382,9 +330,7 @@ async def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
         all_companies = await companies_cursor.to_list_raw()
 
         return {
-            str(company["_id"]): company
-            for company in all_companies
-            if is_company_enabled({"company": company["_id"]}, company) and not is_company_expired(company=company)
+            str(company["_id"]): company for company in all_companies if _is_user_and_company_enabled(None, company)
         }
 
     if not use_globals:
@@ -428,49 +374,6 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     return None
 
 
-async def is_valid_user(user, company) -> bool:
-    """Validate if user is valid and should be able to login to the system."""
-    if not user:
-        await flash(gettext("Invalid username or password."), "danger")
-        return False
-
-    session.pop("_flashes", None)  # remove old messages and just show one message
-
-    if not is_admin(user) and not company:
-        await flash(gettext("Insufficient Permissions. Access denied."), "danger")
-        return False
-
-    if not await is_account_enabled(user):
-        await flash(gettext("Account is disabled"), "danger")
-        return False
-
-    if not is_company_enabled(user, company):
-        await flash(gettext("Company account has been disabled."), "danger")
-        return False
-
-    if is_company_expired(user, company):
-        await flash(gettext("Company account has expired."), "danger")
-        return False
-
-    return True
-
-
-def update_user_last_active(user):
-    # Updated the active time for the user if required
-    if not user.get("last_active") or user.get("last_active") < utcnow() + timedelta(minutes=-10):
-        current_time = utcnow()
-        # Set the cached version of the user
-        user["last_active"] = current_time
-        user["is_validated"] = True
-        get_current_app().as_any().cache.set(
-            str(user["_id"]), json.dumps(user, default=json_serialize_datetime_objectId)
-        )
-        # Set the db version of the user
-        superdesk.get_resource_service("users").system_update(
-            ObjectId(user["_id"]), {"last_active": current_time, "is_validated": True}, user
-        )
-
-
 def get_items_by_id(ids, resource):
     try:
         return list(superdesk.get_resource_service(resource).find(where={"_id": {"$in": ids}}))
@@ -492,11 +395,15 @@ def url_for_agenda(item, _external=True):
 
 
 def set_original_creator(doc):
-    doc["original_creator"] = get_user_id()
+    from newsroom.auth.utils import get_user_id_from_request
+
+    doc["original_creator"] = get_user_id_from_request(None)
 
 
 def set_version_creator(doc):
-    doc["version_creator"] = get_user_id()
+    from newsroom.auth.utils import get_user_id_from_request
+
+    doc["version_creator"] = get_user_id_from_request(None)
 
 
 def get_items_for_user_action(_ids, item_type):
@@ -512,11 +419,11 @@ def get_items_for_user_action(_ids, item_type):
                 item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
     elif items[0].get("type") == "agenda":
         # Import here to prevent circular imports
-        from newsroom.auth import get_company
-        from newsroom.companies.utils import restrict_coverage_info
+        from newsroom.auth.utils import get_company_from_request
         from newsroom.agenda.utils import remove_restricted_coverage_info
 
-        if restrict_coverage_info(get_company()):
+        company = get_company_from_request(None)
+        if company and company.restrict_coverage_info:
             remove_restricted_coverage_info(items)
 
     return items

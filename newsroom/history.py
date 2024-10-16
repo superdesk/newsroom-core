@@ -11,7 +11,7 @@ from superdesk.core import json
 from superdesk.flask import abort, Blueprint, jsonify
 import newsroom
 from newsroom.utils import get_json_or_400
-from newsroom.auth import get_user
+from newsroom.auth.utils import get_user_from_request
 
 blueprint = Blueprint("history", __name__)
 
@@ -126,7 +126,7 @@ async def create():
         return "", gettext("Activity History: Inavlid request")
 
     get_resource_service("history").create_history_record(
-        [params["item"]], params["action"], get_user(), params["section"]
+        [params["item"]], params["action"], get_user_from_request(None).to_dict(), params["section"]
     )
     return jsonify({"success": True}), 201
 

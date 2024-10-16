@@ -1,6 +1,6 @@
 from typing_extensions import assert_never
 
-from .model import DashboardCardType
+from newsroom.types import DashboardCardType
 
 
 def get_card_size(cardType: DashboardCardType) -> int:

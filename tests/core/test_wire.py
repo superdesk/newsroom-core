@@ -5,9 +5,11 @@ from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
-from tests.core.utils import add_company_products, create_entries_for
+
+from newsroom.companies import CompanyServiceAsync
 from newsroom.wire.search import WireSearchService, SearchQuery
 
+from tests.core.utils import add_company_products, create_entries_for
 from ..fixtures import (  # noqa: F401
     items,
     init_items,
@@ -644,10 +646,9 @@ async def test_company_type_filter(client, app, public_user):
     assert "WEATHER" != data["_items"][0]["slugline"]
 
 
-async def test_search_by_products_and_filtered_by_embargoe(client, app):
-    async with app.test_request_context("/"):
-        server_session["user"] = str(PUBLIC_USER_ID)
-        server_session["user_type"] = "public"
+async def test_search_by_products_and_filtered_by_embargoe(app):
+    async with app.test_request_context("/") as client:
+        client.session["user"] = PUBLIC_USER_ID
         product_id = ObjectId()
         add_company_products(
             app,
@@ -683,9 +684,7 @@ async def test_search_by_products_and_filtered_by_embargoe(client, app):
             dict(id="test", wire_must_not={"range": {"embargoed": {"gte": "now"}}}),
         ]
 
-        company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
-        app.data.update("companies", COMPANY_1_ID, {"company_type": "test"}, company)
-
+        await CompanyServiceAsync().update(COMPANY_1_ID, {"company_type": "test"})
         items = get_resource_service("wire_search").get_product_items(product_id, 20)
         assert 0 == len(items)
 

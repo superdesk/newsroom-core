@@ -4,6 +4,7 @@ import time
 from authlib.jose import jwt, JoseError
 
 from superdesk.core import get_app_config
+from newsroom.types import UserResourceModel
 
 
 class AuthToken(TypedDict):
@@ -13,7 +14,7 @@ class AuthToken(TypedDict):
     last_name: str
 
 
-def generate_auth_token(user, expiration=3600) -> bytes:
+def generate_auth_token(user: UserResourceModel, expiration: int = 3600) -> bytes:
     """
     Generates a secure token for the user
     :param user: user
@@ -22,10 +23,10 @@ def generate_auth_token(user, expiration=3600) -> bytes:
     """
     header = {"alg": "HS256"}
     payload = {
-        "id": str(user["_id"]),
-        "first_name": user.get("first_name"),
-        "last_name": user.get("last_name"),
-        "user_type": user["user_type"],
+        "id": str(user.id),
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "user_type": user.user_type,
         "exp": int(time.time()) + expiration,
     }
 

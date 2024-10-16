@@ -3,6 +3,7 @@
 {% block content %}
 <section class="content">
     <div class="wire-articles__item-wrap col-12">
+        {% if title %}<h1>{{ title }}</h1>{% endif %}
         <div class="alert alert-secondary">{{ message }}</div>
     </div>
 </section>

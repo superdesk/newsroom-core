@@ -4,7 +4,6 @@ from quart_babel.typing import ASGIRequest
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, session
-from newsroom.auth import get_user
 from newsroom.template_loaders import get_template_locale
 from newsroom.types import User
 
@@ -29,12 +28,14 @@ def get_client_locales():
 
 
 async def get_session_locale(_req: ASGIRequest | None = None):
+    from newsroom.auth.utils import get_user_or_none_from_request
+
     try:
         if session.get("locale"):
             return session["locale"]
-        user = get_user()
-        if user and user.get("locale"):
-            return user["locale"]
+        user = get_user_or_none_from_request(None)
+        if user and user.locale:
+            return user.locale
     except (RuntimeError, AttributeError, KeyError):
         pass
 
@@ -61,12 +62,14 @@ def get_user_timezone(user: User) -> str:
 
 
 async def get_session_timezone(_req: ASGIRequest | None = None):
+    from newsroom.auth.utils import get_user_or_none_from_request
+
     try:
         if session.get("timezone"):
             return session["timezone"]
-        user = get_user()
-        if user and user["notification_schedule"]["timezone"]:
-            return user["notification_schedule"]["timezone"]
+        user = get_user_or_none_from_request(None)
+        if user and user.notification_schedule and user.notification_schedule.timezone:
+            return user.notification_schedule.timezone
     except (RuntimeError, AttributeError, KeyError):
         pass
 

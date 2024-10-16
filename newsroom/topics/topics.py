@@ -7,9 +7,9 @@ import newsroom
 import superdesk
 
 from bson import ObjectId
-from newsroom.auth import get_user
-from newsroom.types import Topic, User
-from newsroom.user_roles import UserRole
+
+from newsroom.auth.utils import get_user_or_none_from_request
+from newsroom.types import Topic, User, UserRole
 from newsroom.utils import set_original_creator, set_version_creator
 from newsroom.signals import user_deleted
 
@@ -85,7 +85,9 @@ class TopicsService(newsroom.Service):
 
     def on_update(self, updates, original):
         super().on_update(updates, original)
-        set_version_creator(updates)
+        current_user = get_user_or_none_from_request(None)
+        if current_user:
+            set_version_creator(updates)
 
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
@@ -107,9 +109,9 @@ class TopicsService(newsroom.Service):
             updates["folder"] = ObjectId(updates["folder"])
 
     def on_updated(self, updates, original):
-        current_user = get_user()
+        current_user = get_user_or_none_from_request(None)
         if current_user:
-            auto_enable_user_emails(updates, original, current_user)
+            auto_enable_user_emails(updates, original, current_user.to_dict())
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})

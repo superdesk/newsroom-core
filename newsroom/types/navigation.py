@@ -4,7 +4,7 @@ from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.validators import validate_multi_field_iunique_value_async
 
 
-class Navigation(NewshubResourceModel):
+class NavigationModel(NewshubResourceModel):
     name: Annotated[str, validate_multi_field_iunique_value_async("navigations", ["name", "product_type"])]
     description: str = ""
     is_enabled: bool = True

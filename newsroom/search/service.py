@@ -13,8 +13,10 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
+from newsroom.types import CompanyResource, UserResourceModel
 from newsroom import Service
-from newsroom.auth.utils import user_has_section_allowed
+from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request, get_user_sections
+from newsroom.companies import CompanyServiceAsync
 from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
 from newsroom.search.config import (
     SearchGroupNestedConfig,
@@ -28,7 +30,6 @@ from newsroom.products.products import (
     get_product_by_id,
     get_products_by_user,
 )
-from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
@@ -443,15 +444,15 @@ class BaseSearchService(Service):
             search.is_admin = is_admin(search.user)
             return
 
-        current_user = get_user(required=False)
+        current_user = get_user_or_none_from_request(None)
         if current_user:
-            search.is_admin = is_admin(current_user)
+            search.is_admin = current_user.is_admin()
 
         if search.is_admin and search.args.get("user"):
             search.user = get_resource_service("users").find_one(req=None, _id=search.args["user"])
             search.is_admin = is_admin(search.user)
         else:
-            search.user = current_user
+            search.user = current_user.to_dict(context={"use_objectid": True}) if current_user else None
 
     def prefill_search_company(self, search):
         """Prefill the search company
@@ -459,7 +460,13 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
-        search.company = get_company(search.user) if search.company is None else search.company
+        if search.company is None:
+            current_user = get_user_or_none_from_request(None)
+            if current_user and current_user.id == search.user["_id"]:
+                company = get_company_or_none_from_request(None)
+                search.company = company.to_dict(context={"use_objectid": True}) if company else None
+            elif search.user and search.user.get("company"):
+                search.company = CompanyServiceAsync().mongo.find_one({"_id": ObjectId(search.user.get("company"))})
 
     def prefill_search_page(self, search):
         """Prefill the search page parameters
@@ -882,23 +889,29 @@ class BaseSearchService(Service):
         topic_matches = []
         topics_checked = set()
 
-        for user in users.values():
-            if not user_has_section_allowed(user, self.section):
+        for user_dict in users.values():
+            # TODO-ASYNC: pass in UserResourceModel and CompanyResource instances instead
+            user = UserResourceModel.from_dict(user_dict)
+            company_dict = companies.get(str(user.company)) if user.company else None
+            company = CompanyResource.from_dict(company_dict) if company_dict else None
+
+            user_sections = get_user_sections(user, company)
+            if not user_sections.get(self.section):
                 continue
 
             # if users_service.user_has_paused_notifications(user):
             #     continue
 
             aggs = {"topics": {"filters": {"filters": {}}}}
-            company = companies.get(str(user.get("company", "")))
+
             # there will be one base search for a user with aggs for user topics
-            search = self.get_topic_query(None, user, company, query=query)
+            search = self.get_topic_query(None, user_dict, company_dict, query=query)
             if not search:
                 continue
             queried_topics = []
             for topic in topics:
                 user_id = str(topic["user"])
-                if not user_id or str(user["_id"]) != user_id:
+                if not user_id or str(user.id) != user_id:
                     continue
                 if topic["_id"] in topics_checked:
                     continue
@@ -931,7 +944,7 @@ class BaseSearchService(Service):
                     "Error in get_matching_topics",
                     extra=dict(
                         query=source,
-                        user=user_id,
+                        user=user_dict["_id"],
                     ),
                 )
                 continue

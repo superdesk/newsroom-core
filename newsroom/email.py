@@ -3,7 +3,7 @@ import email.policy as email_policy
 
 from lxml import etree
 from typing_extensions import TypedDict
-from typing import List, Optional, Dict, Any, Union, TYPE_CHECKING
+from typing import List, Optional, Dict, Any, Union
 
 from quart_babel import gettext
 from flask_mail import Attachment, Message
@@ -12,12 +12,11 @@ from jinja2 import TemplateNotFound
 from superdesk.logging import logger
 from superdesk import get_resource_service
 from superdesk.core import get_app_config, get_current_app
-from superdesk.flask import render_template, url_for
 from superdesk.core.resources import ResourceModel
+from superdesk.flask import render_template, url_for
 
 from newsroom.gettext import get_user_timezone
-from newsroom.types import Company, User, Country, CompanyType
-from newsroom.auth import get_company
+from newsroom.types import Company, User, Country, CompanyType, UserResourceModel
 from newsroom.celery_app import celery
 from newsroom.template_loaders import template_locale
 from newsroom.utils import (
@@ -25,13 +24,9 @@ from newsroom.utils import (
     get_location_string,
     get_links,
     get_public_contacts,
+    url_for_agenda,
 )
 from newsroom.template_filters import is_admin_or_internal
-from newsroom.utils import url_for_agenda
-
-
-if TYPE_CHECKING:
-    from newsroom.users.model import UserResourceModel
 
 
 class NewsroomMessage(Message):
@@ -405,17 +400,18 @@ async def _send_new_wire_notification_email(user, topic_name, item, section):
     )
 
 
-def _remove_restricted_coverage_info(user, item):
+def _remove_restricted_coverage_info(item):
     # Import here to prevent circular imports
-    from newsroom.companies.utils import restrict_coverage_info
+    from newsroom.auth.utils import get_company_or_none_from_request
     from newsroom.agenda.utils import remove_restricted_coverage_info
 
-    if restrict_coverage_info(get_company()):
+    company = get_company_or_none_from_request(None)
+    if company and company.restrict_coverage_info:
         remove_restricted_coverage_info([item])
 
 
 async def _send_new_agenda_notification_email(user, topic_name, item):
-    _remove_restricted_coverage_info(user, item)
+    _remove_restricted_coverage_info(item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
         app_name=get_app_config("SITE_NAME"),
@@ -466,7 +462,7 @@ async def _send_history_match_wire_notification_email(user, item, section):
 
 
 async def _send_history_match_agenda_notification_email(user, item):
-    _remove_restricted_coverage_info(user, item)
+    _remove_restricted_coverage_info(item)
     app_name = get_app_config("SITE_NAME")
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(

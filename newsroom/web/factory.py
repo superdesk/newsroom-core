@@ -2,7 +2,6 @@ import os
 
 from newsroom.flask import send_from_directory
 
-from newsroom.auth import get_user
 from newsroom.commands.cli import commands_blueprint
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
@@ -154,7 +153,13 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(format_event_datetime)
         self.add_template_global(get_ga_user_properties)
 
-        self.context_processor(lambda: {"auth_user": get_user()})
+        def get_user_for_template():
+            from newsroom.auth.utils import get_user_or_none_from_request
+
+            user = get_user_or_none_from_request(None)
+            return {"auth_user": user.to_dict() if user else None}
+
+        self.context_processor(get_user_for_template)
 
         self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 

@@ -1,14 +1,13 @@
 from superdesk.flask import g
 from superdesk.core.resources import AsyncCacheableService
 
+from newsroom.types import SectionFilterModel
 from newsroom.search import BoolQuery
 from newsroom.search.service import query_string
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
-from .model import SectionFilter
 
-
-class SectionFiltersService(NewshubAsyncResourceService[SectionFilter], AsyncCacheableService):
+class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], AsyncCacheableService):
     resource_name = "section_filters"
     cache_lookup = {"is_enabled": True}
 
