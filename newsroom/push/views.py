@@ -11,6 +11,7 @@ from superdesk.core.types import Request, Response
 from superdesk.core.web import EndpointGroup
 
 from newsroom import signals
+from newsroom.agenda.service import FeaturedService
 from newsroom.utils import parse_date_str
 from newsroom.assets import ASSETS_RESOURCE
 from newsroom.core import get_current_wsgi_app
@@ -65,7 +66,7 @@ async def handle_publish_text_item(_, item):
 
 async def handle_publish_planning_featured(_, item):
     assert item.get("_id"), {"_id": 1}
-    service = get_resource_service("agenda_featured")
+    service = FeaturedService()
     orig = service.find_one(req=None, _id=item["_id"])
 
     if orig:
