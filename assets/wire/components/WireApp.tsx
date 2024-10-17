@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
+import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE, getConfig} from 'utils';
 import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 
 import {
@@ -224,6 +224,7 @@ class WireApp extends SearchBase<any> {
                                             refresh={this.props.fetchItems}
                                             setSortQuery={this.props.setSortQuery}
                                             setQuery={this.props.setQuery}
+                                            showDefaultTimeframeLabel={getConfig('show_default_time_frame_label') ?? true}
                                         />
                                     )
                                 }

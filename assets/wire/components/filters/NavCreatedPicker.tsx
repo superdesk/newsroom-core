@@ -3,14 +3,14 @@ import {gettext} from 'utils';
 
 import NavGroup from './NavGroup';
 
-import {IDateFilter} from 'interfaces/common';
+import {IDateFilter, IDateFilters} from 'interfaces/common';
 import {ICreatedFilter} from 'interfaces/search';
 
 interface IProps {
     context: 'wire' | 'agenda';
     createdFilter: ICreatedFilter;
     setCreatedFilter: (createdFilter: ICreatedFilter) => void;
-    dateFilters: IDateFilter[];
+    dateFilters: IDateFilters;
 }
 
 function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters}: IProps) {
