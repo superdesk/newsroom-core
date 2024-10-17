@@ -75,6 +75,7 @@ interface IOwnProps {
     showTotalLabel?: boolean;
     showSaveTopic?: boolean;
     showSortDropdown?: boolean;
+    showDefaultTimeframeLabel?: boolean;
     totalItems?: number;
     activeTopic: ITopic;
     topicType: ITopic['topic_type'];
@@ -210,14 +211,15 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                             })
                                         }
                                     </div>
-                                    {(() => {
+                                    {this.props.showDefaultTimeframeLabel && (() => {
                                         if (!(this.props.activeDateFilter?.date_filter == null && defaultDateFilter?.name != null)) {
                                             return null;
                                         }
                                         const dateFilterName = defaultDateFilter.name;
+
                                         return (
                                             <span className='d-flex align-items-center'>
-                                                <span className='popup-text--label'>{gettext('{{dateFilterName}}', {dateFilterName: dateFilterName})}</span>
+                                                <span className='popup-text--label'>{dateFilterName}</span>
     
                                                 <Popup
                                                     placement='right'

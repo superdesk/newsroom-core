@@ -13,8 +13,8 @@ interface IState {
 }
 
 export class Popup extends React.PureComponent<IProps, IState> {
-    elem: any;
-    referenceElem: any;
+    elem: HTMLElement | undefined;
+    referenceElem: HTMLElement | undefined;
     constructor(props: any) {
         super(props);
 
