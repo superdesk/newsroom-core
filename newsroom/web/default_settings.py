@@ -178,6 +178,7 @@ MODULES = [
     "newsroom.topics_folders",
     "newsroom.push",
     "newsroom.history_async",
+    "newsroom.agenda",
 ]
 
 SITE_NAME = "Newshub"
