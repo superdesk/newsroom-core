@@ -124,7 +124,6 @@ BLUEPRINTS = [
     "newsroom.news_api.api_tokens",
     "newsroom.monitoring",
     "newsroom.auth_server.oauth2",
-    "newsroom.company_admin",
 ]
 
 CORE_APPS = [
@@ -155,7 +154,6 @@ CORE_APPS = [
     "newsroom.oauth_clients",
     "newsroom.auth_server.client",
     "newsroom.email_templates",
-    "newsroom.company_admin",
     "newsroom.search",
     "newsroom.notifications.commands",
 ]
@@ -178,6 +176,7 @@ MODULES = [
     "newsroom.topics_folders",
     "newsroom.push",
     "newsroom.history_async",
+    "newsroom.company_admin",
 ]
 
 SITE_NAME = "Newshub"
