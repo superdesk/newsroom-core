@@ -13,7 +13,6 @@ from newsroom.agenda.agenda import (
 )
 from newsroom.agenda.model import FeaturedResourceModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
-from newsroom.section_filters.service import SectionFiltersService
 from newsroom.utils import get_local_date
 from newsroom.template_filters import is_admin
 
@@ -61,6 +60,8 @@ class FeaturedService(NewshubAsyncResourceService[FeaturedResourceModel]):
         :param dict lookup: The parsed in lookup dictionary from the endpoint
         :param dict featured: list featured items
         """
+        from newsroom.section_filters.service import SectionFiltersService
+
         user = get_user_from_request(None)
         company = get_company_from_request(None)
         if is_events_only_access(user.to_dict(), company.to_dict()):
