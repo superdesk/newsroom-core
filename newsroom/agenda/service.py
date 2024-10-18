@@ -95,9 +95,7 @@ class FeaturedService(NewshubAsyncResourceService[FeaturedResourceModel]):
             query["bool"]["filter"].append({"exists": {"field": "event"}})
             remove_fields(source, PLANNING_ITEMS_FIELDS)
 
-        internal_req = ParsedRequest()
-        internal_req.args = {"source": json.dumps(source)}
-        cursor = self.internal_get(internal_req, lookup)
+        cursor = await self.search(source)
 
         docs_by_id = {}
         for doc in cursor.docs:
