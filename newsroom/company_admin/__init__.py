@@ -1,10 +1,5 @@
-from superdesk.flask import Blueprint
-from newsroom.web.factory import NewsroomWebApp
+from superdesk.core.module import Module
 
-blueprint = Blueprint("company_admin", __name__)
+from .views import blueprint
 
-from . import views  # noqa
-
-
-def init_app(app: NewsroomWebApp):
-    pass
+module = Module(name="newsroom.company_admin", endpoints=[blueprint])
