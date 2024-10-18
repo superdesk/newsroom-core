@@ -1,5 +1,4 @@
 from datetime import datetime
-from eve.utils import ParsedRequest
 
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.agenda.agenda import (
@@ -16,7 +15,6 @@ from newsroom.core.resources.service import NewshubAsyncResourceService
 from newsroom.utils import get_local_date
 from newsroom.template_filters import is_admin
 
-from superdesk.core import json
 from superdesk.flask import abort
 from superdesk.utc import local_to_utc
 from superdesk.utils import ListCursor
