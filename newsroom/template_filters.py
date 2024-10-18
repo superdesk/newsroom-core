@@ -1,5 +1,5 @@
 import os
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import arrow
 from bson.objectid import ObjectId
 import flask
@@ -62,17 +62,20 @@ def to_json(value):
     return htmlsafe_json_dumps(obj=value, dumper=app.json_encoder().dumps)
 
 
-def parse_date(datetime):
+def parse_date(datetime: Union[str, datetime]) -> datetime:
     """Return datetime instance for datetime."""
     if isinstance(datetime, str):
         try:
-            return str_to_date(datetime)
+            parsed = str_to_date(datetime)
+            if not parsed:
+                raise ValueError()
+            return parsed
         except ValueError:
             return arrow.get(datetime).datetime
     return datetime
 
 
-def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time: bool) -> ScheduleType:
+def get_schedule_type(start: datetime, end: Optional[datetime], all_day: bool, no_end_time: bool) -> ScheduleType:
     """
     Determine the schedule type based on event start and end times.
 
