@@ -62,6 +62,8 @@ async def send_product_seat_request_email(request: Request):
     user = get_user_from_request(None)
     company = get_company_from_request(None)
 
+    assert company is not None
+
     if not company:
         await request.abort(404, gettext("Company not found"))
 
