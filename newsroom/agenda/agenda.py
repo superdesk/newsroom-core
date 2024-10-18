@@ -303,7 +303,7 @@ class AgendaResource(newsroom.Resource):
     item_methods = ["GET"]
 
 
-def _agenda_query():
+def build_agenda_query():
     return {
         "bool": {
             "filter": [],
@@ -640,7 +640,7 @@ def _filter_terms(filters, item_type, highlights=False):
     }
 
 
-def _remove_fields(source, fields):
+def remove_fields(source, fields):
     """Add fields to remove the elastic search
 
     :param dict source: elasticsearch query object
@@ -892,7 +892,7 @@ class AgendaService(BaseSearchService):
             search.query["bool"]["minimum_should_match"] = 1
 
         # Append the product query to the agenda query
-        agenda_query = _agenda_query()
+        agenda_query = build_agenda_query()
         agenda_query["bool"]["filter"].append(search.query)
         search.query = agenda_query
 
@@ -901,7 +901,7 @@ class AgendaService(BaseSearchService):
         self.apply_request_filter(search)
 
         if not is_admin_or_internal(search.user):
-            _remove_fields(search.source, PRIVATE_FIELDS)
+            remove_fields(search.source, PRIVATE_FIELDS)
 
         if search.item_type == "events":
             # no adhoc planning items and remove planning items and coverages fields
@@ -922,7 +922,7 @@ class AgendaService(BaseSearchService):
                     },
                 }
             )
-            _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
+            remove_fields(search.source, PLANNING_ITEMS_FIELDS)
         elif search.item_type == "planning":
             search.query["bool"]["filter"].append(
                 {
@@ -961,7 +961,7 @@ class AgendaService(BaseSearchService):
                     },
                 }
             )
-            _remove_fields(search.source, ["planning_items", "display_dates"])
+            remove_fields(search.source, ["planning_items", "display_dates"])
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["filter"].append(
@@ -1526,7 +1526,7 @@ class AgendaService(BaseSearchService):
 
     def get_saved_items_count(self):
         search = SearchQuery()
-        search.query = _agenda_query()
+        search.query = build_agenda_query()
 
         self.prefill_search_query(search)
         self.apply_filters(search)

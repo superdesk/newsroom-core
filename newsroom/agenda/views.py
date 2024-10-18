@@ -165,7 +165,7 @@ async def get_view_data() -> Dict:
         "locators": get_vocabulary("locators"),
         "ui_config": await ui_config_service.get_section_config("agenda"),
         "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company_dict),
-        "has_agenda_featured_items": await FeaturedService().find_one(req=None) is not None,
+        "has_agenda_featured_items": await FeaturedService().get_all() is not None,
         "user_folders": await get_user_folders(user, "agenda") if user else [],
         "company_folders": await get_company_folders(company, "agenda") if company else [],
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
