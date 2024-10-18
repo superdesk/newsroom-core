@@ -87,3 +87,5 @@ export interface IDateFilter {
     filter?: string;
     query?: string;
 }
+
+export type IDateFilters = Array<IDateFilter>
