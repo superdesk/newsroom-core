@@ -1,12 +1,4 @@
-from superdesk.core.module import SuperdeskAsyncApp, Module
+from superdesk.core.module import Module
 from .views import atom_endpoints
 
-
-def init_module(app: SuperdeskAsyncApp):
-    app.wsgi.register_endpoint(atom_endpoints)
-
-
-module = Module(
-    name="newsroom.news_api.atom",
-    init=init_module,
-)
+module = Module(name="newsroom.news_api.atom", endpoints=[atom_endpoints])
