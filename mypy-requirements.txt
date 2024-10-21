@@ -1,4 +1,4 @@
-mypy
+mypy==1.12.1
 types-Flask
 types-Jinja2
 types-itsdangerous
@@ -8,4 +8,4 @@ types-requests
 types-tzlocal
 types-Werkzeug
 types-protobuf
-typing-extensions
+typing-extensions==4.12.2
