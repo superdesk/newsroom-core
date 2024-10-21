@@ -128,12 +128,9 @@ history_resource_config = ResourceConfig(
         prefix=MONGO_PREFIX,
         indexes=[
             MongoIndexOptions(
-                name="item",
-                keys=[("item", 1)],
-            ),
-            MongoIndexOptions(
                 name="company_user",
-                keys=[("company", 1), ("user", 1), ("item", 1)],
+                keys=[("item", 1), ("company", 1), ("user", 1)],
+                unique=False,
             ),
         ],
     ),
