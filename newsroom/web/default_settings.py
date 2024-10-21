@@ -174,7 +174,6 @@ MODULES = [
     "newsroom.topics_folders",
     "newsroom.push",
     "newsroom.history_async",
-    "newsroom.agenda",
     "newsroom.company_admin",
     "newsroom.public",
 ]
