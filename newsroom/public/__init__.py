@@ -1,14 +1,17 @@
-from superdesk.flask import Blueprint, render_template
+from superdesk.core.app import SuperdeskAsyncApp
+from superdesk.core.module import Module
+from superdesk.flask import render_template
 from newsroom.gettext import get_session_locale
 from newsroom.email import get_language_template_name
 
-blueprint = Blueprint("public", __name__)
-
-from . import views  # noqa
+from .views import public_endpoints
 
 
-def init_app(app):
-    app.add_template_global(render_restricted_action_modal_body)
+def init_module(app: SuperdeskAsyncApp):
+    app.wsgi.add_template_global(render_restricted_action_modal_body)
+
+
+module = Module(name="newsroom.public", init=init_module, endpoints=[public_endpoints])
 
 
 async def render_restricted_action_modal_body():
