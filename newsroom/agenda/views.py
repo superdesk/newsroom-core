@@ -38,7 +38,6 @@ from newsroom.utils import (
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
-from newsroom.agenda.service import FeaturedService
 from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
@@ -124,9 +123,6 @@ async def item(_id):
 @login_required
 @section("agenda")
 async def search():
-    if request.args.get("featured"):
-        return await FeaturedService().get_featured_stories(request, lookup=None)
-
     response = await get_internal("agenda")
     if len(response):
         company = get_company_from_request(None)
@@ -149,11 +145,6 @@ async def get_view_data() -> Dict:
     check_user_has_products(user, products)
     ui_config_service = UiConfigResourceService()
 
-    async def has_agenda_featured_items():
-        async for _ in FeaturedService().get_all():
-            return True
-        return False
-
     return {
         "user": user_dict or {},
         "company": company.id if company else None,
@@ -170,7 +161,7 @@ async def get_view_data() -> Dict:
         "locators": get_vocabulary("locators"),
         "ui_config": await ui_config_service.get_section_config("agenda"),
         "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company_dict),
-        "has_agenda_featured_items": await has_agenda_featured_items(),
+        "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": await get_user_folders(user, "agenda") if user else [],
         "company_folders": await get_company_folders(company, "agenda") if company else [],
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
