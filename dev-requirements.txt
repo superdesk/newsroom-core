@@ -247,7 +247,7 @@ mccabe==0.7.0
     # via flake8
 mongolock @ git+https://github.com/superdesk/mongolock.git@v1
     # via superdesk-core
-mypy==1.11.2
+mypy==1.12.1
     # via -r mypy-requirements.txt
 mypy-extensions==1.0.0
     # via
