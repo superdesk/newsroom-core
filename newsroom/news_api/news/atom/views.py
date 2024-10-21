@@ -7,27 +7,24 @@ from lxml import etree, html as lxml_html
 from lxml.etree import SubElement
 
 import superdesk
-from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import Blueprint, request, url_for, Response
+from superdesk.core.web import EndpointGroup
+from superdesk.core.types import Request
+from superdesk.core import get_app_config
+from superdesk.flask import url_for, Response
 from superdesk.utc import utcnow
 from superdesk.etree import to_string
 
+from newsroom.core import get_current_wsgi_app
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products.products import get_products_by_company
 
-blueprint = Blueprint("atom", __name__)
-
-
 logger = logging.getLogger(__name__)
+atom_endpoints = EndpointGroup("atom", __name__)
 
 
-def init_app(app):
-    superdesk.blueprint(blueprint, app)
-
-
-@blueprint.route("/atom", methods=["GET"])
-async def get_atom():
+@atom_endpoints.endpoint("atom", methods=["GET"], auth=False)
+async def get_atom(request: Request):
     def _format_date(date):
         iso8601 = date.isoformat()
         if date.tzinfo:
@@ -38,7 +35,7 @@ async def get_atom():
         DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
         return date.strftime(DATETIME_FORMAT) + "Z"
 
-    auth = get_current_app().auth
+    auth = get_current_wsgi_app().auth
     if not auth.authorized([], None, request.method):
         return auth.authenticate()
 
@@ -64,17 +61,17 @@ async def get_atom():
         attrib={"href": url_for("atom.get_atom", _external=True), "rel": "self"},
     )
 
+    # TODO-ASYNC: replace once the service is ready
     response = await get_internal("news/search")
-    #    req = ParsedRequest()
-    #    req.args = {'include_fields': 'abstract'}
-    #    response = superdesk.get_resource_service('news/search').get(req=req, lookup=None)
-
     company = get_company_or_none_from_request(None)
     products = get_products_by_company(company.to_dict(context={"use_objectid": True}) if company else None)
 
     for item in response[0].get("_items"):
         try:
+            # TODO-ASYNC: revisit when items are made async
             complete_item = superdesk.get_resource_service("items").find_one(req=None, _id=item.get("_id"))
+            if not complete_item:
+                continue
 
             # If featuremedia is not allowed for the company don't add the item
             if ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions"):
@@ -134,8 +131,9 @@ async def get_atom():
             # If there are any image embeds then reset the source to a Newshub asset
             html_updated = False
             regex = r" EMBED START Image {id: \"editor_([0-9]+)"
-            root_elem = lxml_html.fromstring(complete_item.get("body_html", ""))
+            root_elem = lxml_html.fromstring(complete_item.get("body_html", "<html></html>"))
             comments = root_elem.xpath("//comment()")
+
             for comment in comments:
                 if "EMBED START Image" in comment.text:
                     m = re.search(regex, comment.text)
@@ -161,7 +159,7 @@ async def get_atom():
 
             if ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions"):
                 image = (
-                    ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions").get("16-9")
+                    ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions").get("16-9")  # type: ignore
                 )
                 if not image or not complete_item:
                     continue

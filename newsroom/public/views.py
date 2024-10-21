@@ -1,13 +1,14 @@
 from typing import List, Dict
 
+from pydantic import BaseModel
 from werkzeug.utils import secure_filename
 
-from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import render_template
+from superdesk.core.web import EndpointGroup
+from superdesk.core import get_current_app, get_app_config
 
 from newsroom.auth.utils import is_valid_session
 from newsroom.types import Article, DashboardCardDict
-from newsroom.public import blueprint
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
@@ -16,6 +17,8 @@ from newsroom.cards import CardsResourceService
 PUBLIC_DASHBOARD_CONFIG_CACHE_KEY = "public-dashboard-config"
 PUBLIC_DASHBOARD_CARDS_CACHE_KEY = "public-dashboard-cards"
 PUBLIC_DASHBOARD_ITEMS_CACHE_KEY = "public-dashboard-items"
+
+public_endpoints = EndpointGroup("public", __name__)
 
 
 async def get_public_dashboard_config():
@@ -54,9 +57,14 @@ async def get_public_cards() -> List[DashboardCardDict]:
     return cards
 
 
-@blueprint.route("/page/<path:template>")
-async def page(template):
-    return await render_template("page-{template}.html".format(template=secure_filename(template)))
+class PageArgs(BaseModel):
+    template: str
+
+
+@public_endpoints.endpoint("/page/<path:template>")
+async def page(args: PageArgs, _p: None, _r: None):
+    template = secure_filename(args.template)
+    return await render_template(f"page-{template}.html")
 
 
 async def render_public_dashboard():
@@ -73,7 +81,7 @@ async def render_public_dashboard():
     )
 
 
-@blueprint.route("/public/card_items")
+@public_endpoints.endpoint("/public/card_items")
 async def public_card_items():
     if not await is_valid_session() and not get_app_config("PUBLIC_DASHBOARD"):
         return {"_items": []}
