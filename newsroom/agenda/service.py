@@ -1,14 +1,13 @@
 from datetime import datetime
-from eve.utils import ParsedRequest
 
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.agenda.agenda import (
     is_events_only_access,
-    _agenda_query,
+    build_agenda_query,
     nested_query,
     planning_items_query_string,
     aggregations,
-    _remove_fields,
+    remove_fields,
     PLANNING_ITEMS_FIELDS,
 )
 from newsroom.agenda.model import FeaturedResourceModel
@@ -16,8 +15,6 @@ from newsroom.core.resources.service import NewshubAsyncResourceService
 from newsroom.utils import get_local_date
 from newsroom.template_filters import is_admin
 
-from superdesk import get_resource_service
-from superdesk.core import json
 from superdesk.flask import abort
 from superdesk.utc import local_to_utc
 from superdesk.utils import ListCursor
@@ -61,6 +58,8 @@ class FeaturedService(NewshubAsyncResourceService[FeaturedResourceModel]):
         :param dict lookup: The parsed in lookup dictionary from the endpoint
         :param dict featured: list featured items
         """
+        from newsroom.section_filters.service import SectionFiltersService
+
         user = get_user_from_request(None)
         company = get_company_from_request(None)
         if is_events_only_access(user.to_dict(), company.to_dict()):
@@ -69,8 +68,8 @@ class FeaturedService(NewshubAsyncResourceService[FeaturedResourceModel]):
         if not featured or not featured.get("items"):
             return ListCursor([])
 
-        query = _agenda_query()
-        get_resource_service("section_filters").apply_section_filter(query, self.section)
+        query = build_agenda_query()
+        await SectionFiltersService().apply_section_filter(query, self.section)
         planning_items_query = nested_query(
             "planning_items",
             {"bool": {"filter": [{"terms": {"planning_items.guid": featured["items"]}}]}},
@@ -92,11 +91,9 @@ class FeaturedService(NewshubAsyncResourceService[FeaturedResourceModel]):
         if company and not is_admin(user) and company.get("events_only", False):
             # no adhoc planning items and remove planning items and coverages fields
             query["bool"]["filter"].append({"exists": {"field": "event"}})
-            _remove_fields(source, PLANNING_ITEMS_FIELDS)
+            remove_fields(source, PLANNING_ITEMS_FIELDS)
 
-        internal_req = ParsedRequest()
-        internal_req.args = {"source": json.dumps(source)}
-        cursor = self.internal_get(internal_req, lookup)
+        cursor = await self.search(source)
 
         docs_by_id = {}
         for doc in cursor.docs:

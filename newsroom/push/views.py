@@ -67,7 +67,7 @@ async def handle_publish_text_item(_, item):
 async def handle_publish_planning_featured(_, item):
     assert item.get("_id"), {"_id": 1}
     service = FeaturedService()
-    orig = service.find_one(req=None, _id=item["_id"])
+    orig = await service.find_by_id(item["_id"])
 
     if orig:
         service.update(orig["_id"], {"items": item.get("items") or []}, orig)
