@@ -138,7 +138,6 @@ CORE_APPS = [
     "newsroom.wire",
     "newsroom.topics",
     "newsroom.history",
-    "newsroom.products",
     "newsroom.section_filters",
     "newsroom.reports",
     "newsroom.agenda",
@@ -176,6 +175,7 @@ MODULES = [
     "newsroom.history_async",
     "newsroom.company_admin",
     "newsroom.public",
+    "newsroom.products",
 ]
 
 SITE_NAME = "Newshub"

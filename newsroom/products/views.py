@@ -2,14 +2,20 @@ import re
 from typing import List
 
 from bson import ObjectId
+from pydantic import BaseModel
 from quart_babel import gettext
 
-from superdesk.core import get_current_app
+from newsroom.auth import auth_rules
+from newsroom.companies.companies_async.service import CompanyService
+from newsroom.core import get_current_wsgi_app
+from newsroom.products.service import ProductsService
+from superdesk.core.types import Response
+from superdesk.core.web import EndpointGroup
 from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
 
 from newsroom.types import NavigationModel
-from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
+from newsroom.decorator import admin_only, account_manager_only
 from newsroom.navigations import NavigationsService
 from newsroom.navigations import get_navigations_as_list
 from newsroom.products import blueprint
@@ -20,18 +26,19 @@ from newsroom.utils import (
     get_entity_or_404,
     set_original_creator,
     set_version_creator,
-    query_resource,
 )
+
+products_endpoints = EndpointGroup("products_views", __name__)
 
 
 async def get_settings_data():
+    app = get_current_wsgi_app()
+
     return {
-        "products": list(query_resource("products")),
+        "products": await ProductsService().get_all_raw_as_list(),
         "navigations": await get_navigations_as_list(),
-        "companies": list(query_resource("companies")),
-        "sections": [
-            s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
-        ],  # monitoring has no products
+        "companies": await CompanyService().get_all_raw_as_list(),
+        "sections": [s for s in app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
     }
 
 
@@ -44,25 +51,29 @@ def get_product_ref(product: Product, seats=0) -> ProductRef:
     }
 
 
-@blueprint.route("/products", methods=["GET"])
-@admin_only
+@products_endpoints.endpoint("/products", methods=["GET"], auth=[auth_rules.admin_only])
 async def index():
-    lookup = None
-    if request.args.get("q"):
-        lookup = request.args.get("q")
-    products = list(query_resource("products", lookup=lookup))
-    return jsonify(products), 200
+    products = await ProductsService().get_all_raw_as_list()
+    return Response(products)
 
 
-@blueprint.route("/products/search", methods=["GET"])
-@account_manager_or_company_admin_only
-async def search():
-    lookup = None
-    if request.args.get("q"):
-        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
+class SearchArgs(BaseModel):
+    q: str | None = None
+
+
+@products_endpoints.endpoint(
+    "/products/search", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def search(_a: None, params: SearchArgs, _r: None):
+    lookup = {}
+    if params.q:
+        regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
         lookup = {"name": regex}
-    products = list(query_resource("products", lookup=lookup))
-    return jsonify(products), 200
+
+    search_cursor = await ProductsService().search(lookup)
+    products = await search_cursor.to_list_raw()
+
+    return Response(products)
 
 
 def validate_product(product):
