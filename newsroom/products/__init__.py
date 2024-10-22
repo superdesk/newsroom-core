@@ -1,7 +1,6 @@
 from quart_babel import lazy_gettext
 
 import superdesk
-from superdesk.flask import Blueprint
 from superdesk.core.module import Module
 from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.core.mongo import MongoResourceConfig
@@ -12,9 +11,7 @@ from newsroom.types import ProductResourceModel
 
 from . import products
 from .service import ProductsService
-from .views import get_settings_data, products_endpoints
-
-blueprint = Blueprint("products", __name__)
+from .views import get_settings_data, products_endpoints, blueprint  # noqa
 
 
 def init_module(app: SuperdeskAsyncApp):

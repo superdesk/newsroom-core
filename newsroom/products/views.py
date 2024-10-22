@@ -9,26 +9,24 @@ from newsroom.auth import auth_rules
 from newsroom.companies.companies_async.service import CompanyService
 from newsroom.core import get_current_wsgi_app
 from newsroom.products.service import ProductsService
-from superdesk.core.types import Response
+from superdesk.core.types import Request, Response
 from superdesk.core.web import EndpointGroup
-from superdesk.flask import jsonify, request, abort
+from superdesk.flask import jsonify, request, abort, Blueprint
 from superdesk import get_resource_service
 
 from newsroom.types import NavigationModel
 from newsroom.decorator import admin_only, account_manager_only
 from newsroom.navigations import NavigationsService
 from newsroom.navigations import get_navigations_as_list
-from newsroom.products import blueprint
 from newsroom.products.products import get_products_by_company
 from newsroom.types import Product, ProductRef
 from newsroom.utils import (
-    get_json_or_400,
     get_entity_or_404,
-    set_original_creator,
-    set_version_creator,
+    get_json_or_400_async,
 )
 
 products_endpoints = EndpointGroup("products_views", __name__)
+blueprint = Blueprint("products", __name__)
 
 
 async def get_settings_data():
@@ -57,14 +55,14 @@ async def index():
     return Response(products)
 
 
-class SearchArgs(BaseModel):
+class SearchParams(BaseModel):
     q: str | None = None
 
 
 @products_endpoints.endpoint(
     "/products/search", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
 )
-async def search(_a: None, params: SearchArgs, _r: None):
+async def search(_a: None, params: SearchParams, _r: None):
     lookup = {}
     if params.q:
         regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
@@ -88,28 +86,24 @@ async def find_nav_or_404(nav_id: str) -> NavigationModel:
     return nav
 
 
-@blueprint.route("/products/new", methods=["POST"])
-@admin_only
-async def create():
-    product = await get_json_or_400()
-
-    validation = validate_product(product)
-    if validation:
-        return validation
-
-    if product.get("navigations"):
-        # TODO-ASYNC: when products are migrated, we won't need `find_nav_or_404` as it could be replaced with a model validation
-        product["navigations"] = [(await find_nav_or_404(_id)).id for _id in product.get("navigations")]
-    set_original_creator(product)
-    ids = get_resource_service("products").post([product])
-    return jsonify({"success": True, "_id": ids[0]}), 201
+@products_endpoints.endpoint("/products/new", methods=["POST"], auth=[auth_rules.admin_only])
+async def create(request: Request):
+    creation_data = await get_json_or_400_async(request)
+    products = await ProductsService().create([creation_data])
+    return Response({"success": True, "_id": products[0]}, 201)
 
 
-@blueprint.route("/products/<id>", methods=["POST"])
-@admin_only
-async def edit(id):
-    get_entity_or_404(ObjectId(id), "products")
-    data = await get_json_or_400()
+class ProductsArgs(BaseModel):
+    product_id: str
+
+
+@products_endpoints.endpoint("/products/<string:product_id>", methods=["POST"], auth=[auth_rules.admin_only])
+async def edit(args: ProductsArgs, _p: None, request: Request):
+    product = await ProductsService().find_by_id(args.product_id)
+    if not product:
+        await request.abort(404, gettext("Product not found"))
+
+    data = await get_json_or_400_async(request)
     updates = {
         "name": data.get("name"),
         "description": data.get("description"),
@@ -120,13 +114,9 @@ async def edit(id):
         "product_type": data.get("product_type", "wire"),
     }
 
-    validation = validate_product(updates)
-    if validation:
-        return validation
+    await ProductsService().update(args.product_id, updates)
 
-    set_version_creator(updates)
-    get_resource_service("products").patch(id=ObjectId(id), updates=updates)
-    return jsonify({"success": True}), 200
+    return Response({"success": True})
 
 
 @blueprint.route("/products/<id>/companies", methods=["POST"])
