@@ -176,6 +176,7 @@ MODULES = [
     "newsroom.history_async",
     "newsroom.company_admin",
     "newsroom.public",
+    "newsroom.agenda",
 ]
 
 SITE_NAME = "Newshub"
