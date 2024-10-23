@@ -9,12 +9,13 @@ class NavigationsService(NewshubAsyncResourceService[NavigationModel]):
 
     async def on_delete(self, doc: NavigationModel):
         """Remove references in products to this navigation entry once it is deleted"""
+        from newsroom.products import ProductsService
 
         await super().on_delete(doc)
 
         navigation = doc.id
-        products = get_resource_service("products").find(where={"navigations": str(navigation)})
+        products_cursor = await ProductsService().search({"navigations": str(navigation)})
 
-        for product in products:
+        for product in await products_cursor.to_list_raw():
             product["navigations"].remove(navigation)
-            get_resource_service("products").patch(product["_id"], product)
+            await ProductsService().update(product["_id"], product)

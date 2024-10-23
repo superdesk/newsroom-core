@@ -119,6 +119,7 @@ class NewsAPINewsService(BaseSearchService):
         )
 
         company = get_company_or_none_from_request(None)
+        # TODO-ASYNC: replace when NewsAPI is async
         products = get_products_by_company(
             company.to_dict(context={"use_objectid": True}) if company else None, product_type="news_api"
         )
@@ -190,6 +191,7 @@ class NewsAPINewsService(BaseSearchService):
                 )
             )
         else:
+            # TODO-ASYNC: replace when NewsAPI is async
             search.products = get_products_by_company(search.company, product_type=search.section)
 
     def prefill_search_args(self, search, req=None):

@@ -11,7 +11,10 @@ from newsroom.types import ProductResourceModel
 
 from . import products
 from .service import ProductsService
-from .views import get_settings_data, products_endpoints, blueprint  # noqa
+from .views import get_settings_data, products_endpoints
+from .utils import get_products_by_company
+
+__all__ = ["get_products_by_company", "ProducsService"]
 
 
 def init_module(app: SuperdeskAsyncApp):
