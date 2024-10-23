@@ -124,7 +124,11 @@ async def item(_id):
 @login_required
 @section("agenda")
 async def search():
-    response = await get_internal("agenda")
+    if request.args.get("featured"):
+        response = await FeaturedService().get_featured_stories(request, lookup=None)
+    else:
+        response = await get_internal("agenda")
+
     if len(response):
         company = get_company_from_request(None)
         if company and company.restrict_coverage_info:
