@@ -125,7 +125,8 @@ async def item(_id):
 @section("agenda")
 async def search():
     if request.args.get("featured"):
-        response = await FeaturedService().get_featured_stories(request, lookup=None)
+        cursor = await FeaturedService().get_featured_stories(request, lookup=None)
+        response = [{"_items": cursor.docs}]
         return await send_response("agenda", response)
 
     response = await get_internal("agenda")
