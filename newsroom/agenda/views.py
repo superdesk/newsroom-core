@@ -126,9 +126,9 @@ async def item(_id):
 async def search():
     if request.args.get("featured"):
         response = await FeaturedService().get_featured_stories(request, lookup=None)
-    else:
-        response = await get_internal("agenda")
+        return await send_response("agenda", response)
 
+    response = await get_internal("agenda")
     if len(response):
         company = get_company_from_request(None)
         if company and company.restrict_coverage_info:
