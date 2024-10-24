@@ -53,7 +53,7 @@ __all__ = [
     "NotificationQueue",
     "NotificationTopic",
     "HistoryResourceModel",
-    "FeaturedResourceModel"
+    "FeaturedResourceModel",
 ]
 
 

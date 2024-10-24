@@ -39,7 +39,9 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
     async def find_one_for_date(self, for_date: datetime) -> FeaturedResourceModel | None:
         return await self.find_one(display_from={"$lte": for_date}, display_to={"$gte": for_date})
 
-    async def get_featured_stories(self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0) -> Any:
+    async def get_featured_stories(
+        self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0
+    ) -> Any:
         for_date = datetime.strptime(date_from, "%d/%m/%Y %H:%M")
         local_date = get_local_date(
             for_date.strftime("%Y-%m-%d"),
@@ -49,9 +51,11 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         featured_doc = await self.find_one_for_date(local_date)
         return await self.featured(featured_doc, query_string, from_offset)
 
-    async def featured(self, featured_doc: Optional[dict], query_string: Optional[str] = None, from_offset: int = 0) -> Any:
+    async def featured(
+        self, featured_doc: Optional[dict], query_string: Optional[str] = None, from_offset: int = 0
+    ) -> Any:
         """Return featured items.
-        
+
         :param Optional[dict] featured_doc: The featured document for the given date
         :param Optional[str] query_string: Optional search query to filter the results
         :param int from_offset: Pagination offset for the results
@@ -61,7 +65,7 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
 
         user = get_user_from_request(None)
         company = get_company_from_request(None)
-        if is_events_only_access(user.to_dict(), company.to_dict()):
+        if is_events_only_access(user.to_dict(), company.to_dict()):  # type: ignore
             abort(403)
 
         if not featured_doc or not featured_doc.get("items"):
@@ -109,8 +113,8 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         docs = []
         agenda_ids = set()
         for _id in featured_doc["items"]:
-            if docs_by_id.get(_id) and docs_by_id.get(_id).get("_id") not in agenda_ids:
+            if docs_by_id.get(_id) and docs_by_id.get(_id).get("_id") not in agenda_ids: # type: ignore
                 docs.append(docs_by_id.get(_id))
-                agenda_ids.add(docs_by_id.get(_id).get("_id"))
+                agenda_ids.add(docs_by_id.get(_id).get("_id")) # type: ignore
 
         return docs
