@@ -23,6 +23,7 @@ from .topics import (
 from .users import DashboardModel, NotificationScheduleModel, UserResourceModel, UserAuthResourceModel
 from .notifications import Notification, NotificationQueue, NotificationTopic
 from .history import HistoryResourceModel
+from .featured import FeaturedResourceModel
 
 __all__ = [
     "UserRole",
@@ -52,6 +53,7 @@ __all__ = [
     "NotificationQueue",
     "NotificationTopic",
     "HistoryResourceModel",
+    "FeaturedResourceModel",
 ]
 
 
