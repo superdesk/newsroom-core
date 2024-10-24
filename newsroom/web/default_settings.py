@@ -552,7 +552,7 @@ AGENDA_GROUPS = None
 #:
 #: .. versionadded:: 2.1.0
 #:
-ALLOW_EXPIRED_COMPANY_LOGINS = False
+ALLOW_EXPIRED_COMPANY_LOGINS = True
 
 #: The timeout used on the cache for the dashboard items
 #:
