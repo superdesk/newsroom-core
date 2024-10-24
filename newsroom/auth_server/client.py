@@ -1,5 +1,5 @@
 from . import oauth2
+from superdesk.core.module import Module
 
 
-def init_app(app):
-    oauth2.config_oauth(app)
+module = Module(name="newsroom.auth_server.client", endpoints=[oauth2.blueprint], init=oauth2.config_oauth)
