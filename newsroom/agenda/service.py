@@ -11,7 +11,7 @@ from newsroom.agenda.agenda import (
     remove_fields,
     PLANNING_ITEMS_FIELDS,
 )
-from newsroom.agenda.model import FeaturedResourceModel
+from newsroom.types import FeaturedResourceModel
 from newsroom.utils import get_local_date
 from newsroom.template_filters import is_admin
 

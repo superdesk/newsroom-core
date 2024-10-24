@@ -1,7 +1,7 @@
 from newsroom import MONGO_PREFIX
 from newsroom.agenda.service import FeaturedService
-from newsroom.agenda.model import FeaturedResourceModel
 
+from newsroom.types import FeaturedResourceModel
 from superdesk.core.module import Module
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig
 
