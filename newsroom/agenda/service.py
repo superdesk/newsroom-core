@@ -113,8 +113,8 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         docs = []
         agenda_ids = set()
         for _id in featured_doc["items"]:
-            if docs_by_id.get(_id) and docs_by_id.get(_id).get("_id") not in agenda_ids: # type: ignore
+            if docs_by_id.get(_id) and docs_by_id.get(_id).get("_id") not in agenda_ids:  # type: ignore
                 docs.append(docs_by_id.get(_id))
-                agenda_ids.add(docs_by_id.get(_id).get("_id")) # type: ignore
+                agenda_ids.add(docs_by_id.get(_id).get("_id"))  # type: ignore
 
         return docs
