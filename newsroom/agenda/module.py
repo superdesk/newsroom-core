@@ -13,4 +13,4 @@ featured_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
 )
 
-module = Module(name="newsroom.agenda_featured", resources=[featured_resource_config])
+module = Module(name="newsroom.agenda", resources=[featured_resource_config])
