@@ -32,7 +32,7 @@ shared_secret = None
 expiration_delay = 0
 
 
-@blueprint.endpoint(TOKEN_ENDPOINT, methods=["POST"])
+@blueprint.endpoint(TOKEN_ENDPOINT, methods=["POST"], auth=False)
 async def issue_token(request: Request):
     current_time = utcnow()
     try:
@@ -45,8 +45,8 @@ async def issue_token(request: Request):
         raise
     else:
         if client_id:
-            client = ClientService().find_by_id(client_id)
-            ClientService().system_update(ObjectId(client_id), {"last_active": current_time}, client)
+            client = await ClientService().find_by_id(client_id)
+            await ClientService().system_update(ObjectId(client_id), {"last_active": current_time}, client)
         return token_response
 
 
