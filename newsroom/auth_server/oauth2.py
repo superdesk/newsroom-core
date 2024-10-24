@@ -18,6 +18,8 @@ from superdesk.utc import utcnow
 
 from superdesk.core.web import EndpointGroup
 from superdesk.core.types import Request
+from superdesk.core.app import SuperdeskAsyncApp
+
 from newsroom.oauth_clients.clients_async import ClientService
 
 logger = logging.getLogger(__name__)
@@ -45,8 +47,7 @@ async def issue_token(request: Request):
         raise
     else:
         if client_id:
-            client = await ClientService().find_by_id(client_id)
-            await ClientService().system_update(ObjectId(client_id), {"last_active": current_time}, client)
+            await ClientService().system_update(ObjectId(client_id), {"last_active": current_time})
         return token_response
 
 
@@ -61,7 +62,7 @@ def generate_jwt_token(client, grant_type, user, scope):
     return jwt.encode(header, payload, shared_secret)
 
 
-def config_oauth(app):
+def config_oauth(app: SuperdeskAsyncApp):
     global expiration_delay
     expiration_delay = app.wsgi.config["AUTH_SERVER_EXPIRATION_DELAY"]
     global shared_secret

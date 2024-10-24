@@ -40,7 +40,7 @@ class OAuth2Client(ClientMixin):
         return ""
 
 
-def query_client(client_id):
+def query_client(client_id: str):
     try:
         client_data = run_async_to_sync(ClientService().find_by_id(ObjectId(client_id)))
     except InvalidId as e:

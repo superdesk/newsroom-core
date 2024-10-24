@@ -149,7 +149,6 @@ CORE_APPS = [
     "newsroom.monitoring",
     "newsroom.company_expiry_alerts",
     "newsroom.oauth_clients",
-    "newsroom.auth_server.client",
     "newsroom.email_templates",
     "newsroom.search",
     "newsroom.notifications.commands",
