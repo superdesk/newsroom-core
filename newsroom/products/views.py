@@ -1,10 +1,10 @@
 import re
+from typing import Any, Tuple, cast
 
-from bson import ObjectId
+from bson import ObjectId, errors
 from pydantic import BaseModel
 from quart_babel import gettext
 
-from superdesk import get_resource_service
 from superdesk.core.web import EndpointGroup
 from superdesk.core.types import Request, Response
 
@@ -15,8 +15,7 @@ from newsroom.utils import get_json_or_400_async
 from newsroom.products.service import ProductsService
 from newsroom.navigations import get_navigations_as_list
 from newsroom.companies.companies_async import CompanyService
-
-from .utils import get_products_by_company
+from newsroom.types.company import CompanyProduct, CompanyResource
 
 products_endpoints = EndpointGroup("products_views", __name__)
 
@@ -69,9 +68,22 @@ async def search(_a: None, params: SearchParams, _r: None):
     return Response(products)
 
 
+async def convert_ids_or_abort(request: Request, data: dict[str, Any], key: str):
+    try:
+        if key in data:
+            data[key] = [ObjectId(str_id) for str_id in data[key]]
+    except errors.InvalidId:
+        await request.abort(400, f"Please provide valid {key} ids")
+
+
 @products_endpoints.endpoint("/products/new", methods=["POST"], auth=[auth_rules.admin_only])
 async def create(request: Request):
     creation_data = await get_json_or_400_async(request)
+
+    # convert navigations and companies ids from string to ObjectId
+    for key in ["companies", "navigations"]:
+        await convert_ids_or_abort(request, creation_data, key)
+
     products = await ProductsService().create([creation_data])
     return Response({"success": True, "_id": products[0]}, 201)
 
@@ -97,6 +109,69 @@ async def edit(args: ProductsArgs, _p: None, request: Request):
     return Response({"success": True})
 
 
+async def update_company_products(
+    company: CompanyResource, product_id: ObjectId, selected_companies: list[ObjectId], product_ref: ProductRef
+) -> Tuple[list[ProductRef], bool]:
+    """
+    Updates the company's product list by either adding or removing a product reference.
+
+    Returns:
+        Tuple[List[ProductRef], bool]: A tuple where the first element is the of company products,
+        and the second element is a boolean indicating whether an update is required.
+    """
+
+    if company.id in selected_companies:
+        return add_product_to_company(company, product_id, product_ref)
+    else:
+        return remove_product_from_company(company, product_id)
+
+
+def add_product_to_company(
+    company: CompanyResource, product_id: ObjectId, product_ref: ProductRef
+) -> Tuple[list[ProductRef], bool]:
+    """
+    Adds a product to the company's product list if it doesn't already exist.
+    """
+    if not product_in_company(company, product_id):
+        company_products: list[ProductRef] = (cast(list[ProductRef], company.products)).copy()
+        company_products.append(product_ref)
+        return company_products, True
+    return cast(list[ProductRef], company.products), False
+
+
+def product_in_company(company: CompanyResource, product_id: ObjectId) -> bool:
+    """
+    Checks if a product is already in a given Company products list.
+    """
+    for product in company.products:
+        if str(product._id) == str(product_id):
+            return True
+    return False
+
+
+def remove_product_from_company(company: CompanyResource, product_id: ObjectId) -> Tuple[list[ProductRef], bool]:
+    """
+    Removes a product from the company's product list if it exists.
+
+    Returns:
+        A tuple with the list of products of the company and a boolean to indicate if an update is
+        required or not.
+    """
+    company_products = [p for p in company.products if str(p._id) != str(product_id)]
+    is_update_required = len(company_products) != len(company.products)
+
+    return cast(list[ProductRef], company_products), is_update_required
+
+
+def update_company_sections(company: CompanyResource, company_products: list[ProductRef]):
+    sections = company.sections
+    for product in company_products:
+        if isinstance(product, CompanyProduct):
+            product = product.to_dict()
+        sections.setdefault(product["section"], True)
+    return sections
+
+
 @products_endpoints.endpoint(
     "/products/<string:product_id>/companies", methods=["POST"], auth=[auth_rules.account_manager_only]
 )
@@ -106,34 +181,18 @@ async def update_companies(args: ProductsArgs, _p: None, request: Request):
         await request.abort(404, gettext("Product not found"))
 
     updates = await request.get_json()
-    selected_companies = updates.get("companies") or []
+    await convert_ids_or_abort(request, updates, "companies")
+    selected_companies: list[ObjectId] = updates.get("companies") or []
+    product_ref = get_product_ref(product.to_dict())
 
-    async for company in CompanyService().get_all_raw():
-        update_company = False
-        if "products" in company:
-            company_products: list[ProductRef] = company["products"].copy()
-        else:
-            company_products = [get_product_ref(p) for p in await get_products_by_company(company)]
-            update_company = True
-        if str(company["_id"]) in selected_companies:
-            for ref in company_products:
-                if str(ref["_id"]) == args.product_id:
-                    break
-            else:
-                company_products.append(get_product_ref(product))
-                update_company = True
-        else:
-            for ref in company_products:
-                if str(ref["_id"]) == args.product_id:
-                    company_products = [p for p in company_products if str(p["_id"]) != args.product_id]
-                    update_company = True
-        if update_company:
-            sections = company.get("sections") or {}
-            for product in company_products:
-                sections.setdefault(product["section"], True)
-            get_resource_service("companies").patch(
-                company["_id"], updates={"products": company_products, "sections": sections}
-            )
+    async for company in CompanyService().get_all():
+        company_products, update_required = await update_company_products(
+            company, ObjectId(args.product_id), selected_companies, product_ref
+        )
+
+        if update_required:
+            company_sections = update_company_sections(company, company_products)
+            await CompanyService().update(company.id, {"products": company_products, "sections": company_sections})
 
     return Response({"success": True})
 

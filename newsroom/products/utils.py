@@ -33,7 +33,7 @@ async def get_products_by_company(
     if company_product_ids:
         lookup = get_products_lookup(company_product_ids, navigation_ids)
         cursor = await ProductsService().search(lookup)
-        return cursor.to_list_raw()
+        return await cursor.to_list_raw()
 
     return []
 

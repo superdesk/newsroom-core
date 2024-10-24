@@ -5,6 +5,7 @@ from typing import Annotated
 from superdesk.core.resources import validators
 from superdesk.core.resources.fields import Field
 from newsroom.core.resources.model import NewshubResourceModel
+from newsroom.core.resources.validators import validate_multi_field_iunique_value_async
 
 PRODUCT_TYPES = ["wire", "agenda", "news_api"]
 
@@ -18,7 +19,7 @@ class ProductType(str, Enum):
 class ProductResourceModel(NewshubResourceModel):
     name: Annotated[
         str,
-        validators.validate_iunique_value_async(resource_name="products", field_name="name"),
+        validate_multi_field_iunique_value_async("products", ["name", "product_type"]),
     ]
     description: str | None = None
     sd_product_id: str | None = None

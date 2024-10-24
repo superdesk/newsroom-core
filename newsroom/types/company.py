@@ -1,9 +1,10 @@
 from typing import Annotated, Optional
 from datetime import datetime
+from dataclasses import asdict
 
 from superdesk.core.resources import dataclass
 from superdesk.core.resources.validators import validate_data_relation_async, validate_iunique_value_async
-from superdesk.core.resources.fields import ObjectId
+from superdesk.core.resources.fields import ObjectId, Field
 
 from newsroom.core.resources import NewshubResourceModel, validate_ip_address, validate_auth_provider
 
@@ -15,6 +16,9 @@ class CompanyProduct:
     _id: Annotated[ObjectId, validate_data_relation_async("products")]
     section: ProductType
     seats: int = 0
+
+    def to_dict(self):
+        return asdict(self)
 
 
 class CompanyResource(NewshubResourceModel):
@@ -28,7 +32,7 @@ class CompanyResource(NewshubResourceModel):
     phone: Optional[str] = None
     country: Optional[str] = None
     expiry_date: Optional[datetime] = None
-    sections: Optional[dict[str, bool]] = None
+    sections: dict[str, bool] = Field(default_factory=dict)
     archive_access: bool = False
     events_only: bool = False
     restrict_coverage_info: bool = False
@@ -40,7 +44,7 @@ class CompanyResource(NewshubResourceModel):
         validate_ip_address(),
     ] = None
 
-    products: Optional[list[CompanyProduct]] = None
+    products: list[CompanyProduct] = Field(default_factory=list)
 
     auth_domain: Optional[str] = None  # Deprecated
     auth_domains: Annotated[Optional[list[str]], validate_iunique_value_async("companies", "auth_domains")] = None

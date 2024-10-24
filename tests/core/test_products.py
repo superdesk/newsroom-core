@@ -4,8 +4,13 @@ from bson import ObjectId
 from quart import json
 from pytest import fixture
 
+from newsroom.companies.companies_async.service import CompanyService
+from newsroom.products.service import ProductsService
 from newsroom.tests.users import test_login_succeeds_for_admin
 from datetime import datetime
+
+from newsroom.users.service import UsersService
+from tests.core.utils import create_entries_for
 
 from .. import utils
 
@@ -20,7 +25,7 @@ async def product(app):
         "query": "sports",
         "product_type": "wire",
     }
-    app.data.insert("products", [_product])
+    await create_entries_for("products", [_product])
     return _product
 
 
@@ -146,9 +151,11 @@ async def test_assign_products_to_companies(client, app, product, companies):
     await test_login_succeeds_for_admin(client)
     await assign_product_to_companies(client, product, companies)
 
-    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
-    assert "products" in company
-    assert company["products"] == [{"section": "wire", "_id": product["_id"], "seats": 0}]
+    company = await CompanyService().find_by_id(companies[0]["_id"])
+    assert company is not None
+    assert company.products is not None
+    assert company.products[0]._id == product["_id"]
+    assert company.products[0].section == "wire"
 
     resp = await client.post(
         "/products/{}/companies".format(product["_id"]),
@@ -161,8 +168,9 @@ async def test_assign_products_to_companies(client, app, product, companies):
 
     assert 200 == resp.status_code
 
-    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
-    assert company["products"] == []
+    company = await CompanyService().find_by_id(companies[0]["_id"])
+    assert company is not None
+    assert company.products == []
 
 
 async def test_delete_assigned_product(client, app, product, companies, user):
@@ -171,7 +179,11 @@ async def test_delete_assigned_product(client, app, product, companies, user):
         "is_enabled": True,
     }
 
-    app.data.insert("products", [product2])
+    created_id = (await create_entries_for("products", [product2]))[0]
+    product2 = await ProductsService().find_by_id(created_id)
+
+    assert product2 is not None
+    product2 = product2.to_dict()
 
     await utils.login(client, user)
 
@@ -179,20 +191,20 @@ async def test_delete_assigned_product(client, app, product, companies, user):
     await assign_product_to_companies(client, product2, companies)
     await assign_product_to_user(client, product2, user)
 
-    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
-    assert 2 == len(company["products"])
+    company = await CompanyService().find_by_id(companies[0]["_id"])
+    assert 2 == len(company.products)
 
-    updated_user = app.data.find_one("users", req=None, _id=user["_id"])
-    assert 1 == len(updated_user["products"])
+    updated_user = await UsersService().find_by_id(user["_id"])
+    assert 1 == len(updated_user.products)
 
     await utils.delete_json(client, f"/products/{product2['_id']}")
 
-    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
-    assert 1 == len(company["products"])
-    assert product2["_id"] not in [p["_id"] for p in company["products"]]
+    company = await CompanyService().find_by_id(companies[0]["_id"])
+    assert 1 == len(company.products)
+    assert product2["_id"] not in [p._id for p in company.products]
 
-    updated_user = app.data.find_one("users", req=None, _id=user["_id"])
-    assert 0 == len(updated_user["products"])
+    updated_user = await UsersService().find_by_id(user["_id"])
+    assert 0 == len(updated_user.products)
 
 
 @pytest.mark.skip(reason="Figure out why `/wire/search` is not filtering items for public users")

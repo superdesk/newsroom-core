@@ -1,5 +1,3 @@
-from superdesk import get_resource_service
-
 from newsroom.types import NavigationModel
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
@@ -14,8 +12,7 @@ class NavigationsService(NewshubAsyncResourceService[NavigationModel]):
         await super().on_delete(doc)
 
         navigation = doc.id
-        products_cursor = await ProductsService().search({"navigations": str(navigation)})
-
+        products_cursor = await ProductsService().search({"navigations": navigation})
         for product in await products_cursor.to_list_raw():
             product["navigations"].remove(navigation)
             await ProductsService().update(product["_id"], product)

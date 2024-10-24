@@ -53,5 +53,5 @@ class ProductsService(NewshubAsyncResourceService[ProductResourceModel], AsyncCa
         for service in [UsersService(), CompanyService()]:
             search_cursor = await service.search(lookup)
             for item in await search_cursor.to_list_raw():
-                updates = {"products": [p for p in item["products"] if p["_id"] != doc.id]}
-                service.system_update(item["_id"], updates)
+                updates = {"products": [p for p in item["products"] if str(p["_id"]) != str(doc.id)]}
+                await service.system_update(item["_id"], updates)
