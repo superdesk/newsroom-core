@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Any, List
 
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.agenda.agenda import (
@@ -17,7 +18,6 @@ from newsroom.template_filters import is_admin
 from superdesk.flask import abort
 from superdesk.core.resources import AsyncResourceService
 from superdesk.utc import local_to_utc
-from superdesk.utils import ListCursor
 
 
 class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
@@ -39,22 +39,23 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
     async def find_one_for_date(self, for_date: datetime) -> FeaturedResourceModel | None:
         return await self.find_one(req=None, display_from={"$lte": for_date}, display_to={"$gte": for_date})
 
-    async def get_featured_stories(self, req, lookup):
-        for_date = datetime.strptime(req.args.get("date_from"), "%d/%m/%Y %H:%M")
-        offset = int(req.args.get("timezone_offset", "0"))
+    async def get_featured_stories(self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0) -> List[Any]:
+        for_date = datetime.strptime(date_from, "%d/%m/%Y %H:%M")
         local_date = get_local_date(
             for_date.strftime("%Y-%m-%d"),
-            datetime.strftime(for_date, "%H:%M:%S"),
-            offset,
+            for_date.strftime("%H:%M:%S"),
+            timezone_offset,
         )
         featured_doc = await self.find_one_for_date(local_date)
-        return await self.featured(req, lookup, featured_doc)
+        return await self.featured(featured_doc, query_string, from_offset)
 
-    async def featured(self, req, lookup, featured):
+    async def featured(self, featured_doc: dict, query_string: Optional[str] = None, from_offset: int = 0) -> List[Any]:
         """Return featured items.
-        :param ParsedRequest req: The parsed in request instance from the endpoint
-        :param dict lookup: The parsed in lookup dictionary from the endpoint
-        :param dict featured: list featured items
+        
+        :param dict featured_doc: The featured document for the given date
+        :param Optional[str] query_string: Optional search query to filter the results
+        :param int from_offset: Pagination offset for the results
+        :return: A list of filtered featured items
         """
         from newsroom.section_filters.service import SectionFiltersService
 
@@ -63,31 +64,29 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         if is_events_only_access(user.to_dict(), company.to_dict()):
             abort(403)
 
-        if not featured or not featured.get("items"):
-            return ListCursor([])
+        if not featured_doc or not featured_doc.get("items"):
+            return []
 
         query = build_agenda_query()
         await SectionFiltersService().apply_section_filter(query, self.section)
+
         planning_items_query = nested_query(
             "planning_items",
-            {"bool": {"filter": [{"terms": {"planning_items.guid": featured["items"]}}]}},
+            {"bool": {"filter": [{"terms": {"planning_items.guid": featured_doc["items"]}}]}},
             name="featured",
         )
-        if req.args.get("q"):
-            query["bool"]["filter"].append(self.query_string(req.args["q"]))
-            planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(req.args["q"]))
+
+        if query_string:
+            query["bool"]["filter"].append(self.query_string(query_string))
+            planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(query_string))
 
         query["bool"]["filter"].append(planning_items_query)
 
-        source = {"query": query}
-        self.set_post_filter(source, req)
-        source["size"] = len(featured["items"])
-        source["from"] = req.args.get("from", 0, type=int)
-        if not source["from"]:
+        source = {"query": query, "size": len(featured_doc["items"]), "from": from_offset}
+        if not from_offset:
             source["aggs"] = aggregations
 
         if company and not is_admin(user) and company.get("events_only", False):
-            # no adhoc planning items and remove planning items and coverages fields
             query["bool"]["filter"].append({"exists": {"field": "event"}})
             remove_fields(source, PLANNING_ITEMS_FIELDS)
 
@@ -98,21 +97,19 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
             for p in doc.get("planning_items") or []:
                 docs_by_id[p.get("guid")] = doc
 
-            # make the items display on the featured day,
-            # it's used in ui instead of dates.start and dates.end
+            # Update display dates based on the featured document
             doc.update(
                 {
-                    "_display_from": featured["display_from"],
-                    "_display_to": featured["display_to"],
+                    "_display_from": featured_doc["display_from"],
+                    "_display_to": featured_doc["display_to"],
                 }
             )
 
         docs = []
         agenda_ids = set()
-        for _id in featured["items"]:
+        for _id in featured_doc["items"]:
             if docs_by_id.get(_id) and docs_by_id.get(_id).get("_id") not in agenda_ids:
                 docs.append(docs_by_id.get(_id))
                 agenda_ids.add(docs_by_id.get(_id).get("_id"))
 
-        cursor.docs = docs
-        return cursor
+        return docs
