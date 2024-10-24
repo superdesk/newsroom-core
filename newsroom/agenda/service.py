@@ -23,7 +23,7 @@ from superdesk.utc import local_to_utc
 class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
     resource_name = "agenda_featured"
 
-    async def on_create(self, docs):
+    async def on_create(self, docs: List[FeaturedResourceModel]) -> None:
         """
         Add UTC from/to datetimes on save.
         Problem is 31.8. in Sydney is from 30.8. 14:00 UTC to 31.8. 13:59 UTC.
@@ -31,15 +31,15 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         display_from and display_to.
         """
         for item in docs:
-            date = datetime.strptime(item._id, "%Y%m%d")
+            date = datetime.strptime(item.id, "%Y%m%d")
             item.display_from = local_to_utc(item.tz, date.replace(hour=0, minute=0, second=0))
             item.display_to = local_to_utc(item.tz, date.replace(hour=23, minute=59, second=59))
         await super().on_create(docs)
 
     async def find_one_for_date(self, for_date: datetime) -> FeaturedResourceModel | None:
-        return await self.find_one(req=None, display_from={"$lte": for_date}, display_to={"$gte": for_date})
+        return await self.find_one(display_from={"$lte": for_date}, display_to={"$gte": for_date})
 
-    async def get_featured_stories(self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0) -> List[Any]:
+    async def get_featured_stories(self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0) -> Any:
         for_date = datetime.strptime(date_from, "%d/%m/%Y %H:%M")
         local_date = get_local_date(
             for_date.strftime("%Y-%m-%d"),
@@ -49,10 +49,10 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         featured_doc = await self.find_one_for_date(local_date)
         return await self.featured(featured_doc, query_string, from_offset)
 
-    async def featured(self, featured_doc: dict, query_string: Optional[str] = None, from_offset: int = 0) -> List[Any]:
+    async def featured(self, featured_doc: Optional[dict], query_string: Optional[str] = None, from_offset: int = 0) -> Any:
         """Return featured items.
         
-        :param dict featured_doc: The featured document for the given date
+        :param Optional[dict] featured_doc: The featured document for the given date
         :param Optional[str] query_string: Optional search query to filter the results
         :param int from_offset: Pagination offset for the results
         :return: A list of filtered featured items
@@ -83,6 +83,7 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         query["bool"]["filter"].append(planning_items_query)
 
         source = {"query": query, "size": len(featured_doc["items"]), "from": from_offset}
+        # self.set_post_filter(source, req)  # TODO: Confirm usage of function with previous ParsedReq
         if not from_offset:
             source["aggs"] = aggregations
 
