@@ -39,10 +39,10 @@ async def issue_token(request: Request):
     current_time = utcnow()
     try:
         token_response = authorization.create_token_response()
-        if request.authorization:
+        if request.request.authorization:
             client_id = request.authorization.get("username")
         else:
-            client_id = (await request.form).get("client_id")
+            client_id = (await request.get_form()).get("client_id")
     except Exception:
         raise
     else:
