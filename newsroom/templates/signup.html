@@ -1,24 +1,16 @@
 {% extends "layout_wire.html" %}
 
 {% block contentMain %}
-
-<div class="container-fluid py-5 overflow-auto nh-login-page__content">
-    <div class="row">
-        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
-            <div class="card border-0 bg-white box-shadow--z1 rounded--m">
-                <div class="card-header pt-4 border-0 bg-white rounded--m">
-                    <div class="login-logo">
-                        <img src="{{ theme_url('login-logo.svg') }}" width="220"/>
-                    </div>
-                    <h5 class="mb-0">{{ gettext("Sign up") }}</h5>
-                </div>
-                <div class="card-body pt-1">
-                    {% include "signup_form.html" %}
-                </div>
-            </div>
+<div class="nh-login-page__content {% block custom_container_style %}{% endblock %}">
+    <div class="login-box mt-5 mb-5">
+        <div class="login-box__header">
+            <h3 class="login-box__title">{{ gettext("Sign up") }}</h3>
+        </div>
+        <div>
+            {% include "login_messages.html" %}
+            {% include "signup_form.html" %}
         </div>
     </div>
-    {% include "login_messages.html" %}
 </div>
 
 {% endblock %}
