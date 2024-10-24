@@ -1,7 +1,7 @@
 from bson import ObjectId
 
 from newsroom.types import Company, Navigation, UserData, UserRole
-from newsroom.products.products import get_products_by_company, get_products_by_user
+from newsroom.products.products import get_products_by_user
 
 from .service import NavigationsService
 
@@ -17,13 +17,15 @@ async def get_navigations(user: UserData | None, company: Company | None, produc
     """
     Returns list of navigations for given user and company
     """
+    from newsroom.products import get_products_by_company
+
     if user and user.get("user_type") == UserRole.ADMINISTRATOR:
         cursor = await NavigationsService().search(lookup={"product_type": product_type})
         return await cursor.to_list_raw()
 
     products = []
     if company:
-        products += get_products_by_company(company, None, product_type, True)
+        products += await get_products_by_company(company, None, product_type, True)
     if user:
         products += get_products_by_user(user, product_type, None)
 

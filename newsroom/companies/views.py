@@ -13,8 +13,9 @@ from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.auth import auth_rules
 from newsroom.types import AuthProviderConfig
-from newsroom.utils import get_public_user_data, query_resource, get_json_or_400_async
+from newsroom.utils import get_public_user_data, get_json_or_400_async
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.products.service import ProductsService
 
 from .module import company_endpoints, company_configs
 from .utils import get_users_by_company
@@ -38,9 +39,9 @@ async def get_settings_data():
 
     ui_config_service = UiConfigResourceService()
     return {
-        "companies": [company async for company in CompanyService().get_all_raw()],
+        "companies": await CompanyService().get_all_raw_as_list(),
         "services": get_app_config("SERVICES"),
-        "products": list(query_resource("products")),
+        "products": await ProductsService().get_all_raw_as_list(),
         "sections": get_current_app().as_any().sections,
         "company_types": get_company_types_options(),
         "api_enabled": get_app_config("NEWS_API_ENABLED", False),

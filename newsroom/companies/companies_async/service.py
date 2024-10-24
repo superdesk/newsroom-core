@@ -5,6 +5,7 @@ from newsroom.types import CompanyResource
 from newsroom.core.resources import NewshubAsyncResourceService
 from newsroom.signals import company_create
 from newsroom.auth.utils import is_from_request, get_current_request, get_company_from_request
+from newsroom.types.company import CompanyProduct
 
 from ..utils import get_company_section_names, get_company_product_ids, get_users_by_company
 
@@ -18,13 +19,24 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
         for company in docs:
             company_create.send(self, company=company.to_dict())
 
+    def _get_products(self, updates: Dict[str, Any], original: CompanyResource):
+        """
+        Loop over products and checks if any of them is instance of CompanyProduct to
+        convert them into dict
+        """
+        for product in updates.get("products", original.products) or []:
+            if isinstance(product, CompanyProduct):
+                yield product.to_dict()
+            else:
+                yield product
+
     async def on_update(self, updates: Dict[str, Any], original: CompanyResource) -> None:
         await super().on_update(updates, original)
         if "sections" in updates or "products" in updates:
             sections = updates.get("sections", original.sections) or {}
             updates["products"] = [
                 product
-                for product in updates.get("products", original.products) or []
+                for product in self._get_products(updates, original)
                 if product.get("section") and sections.get(product["section"]) is True
             ]
 

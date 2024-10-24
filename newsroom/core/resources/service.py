@@ -49,3 +49,9 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
         """
         cursor = await self.search({"_id": {"$in": ids}})
         return await cursor.to_list()
+
+    async def get_all_raw_as_list(self):
+        """
+        Returns the list of all the entries raw as list
+        """
+        return [entry async for entry in self.get_all_raw()]

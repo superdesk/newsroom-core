@@ -31,7 +31,6 @@ CORE_APPS = [
     "newsroom.news_api.news.item.item",
     "newsroom.news_api.news.search",
     "newsroom.news_api.news.feed",
-    "newsroom.products",
     "newsroom.news_api.api_audit",
     "newsroom.history",
 ]
@@ -44,6 +43,7 @@ MODULES = [
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
+    "newsroom.products",
 ]
 
 INSTALLED_APPS = []
