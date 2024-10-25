@@ -1,6 +1,6 @@
 from datetime import datetime
 from eve.utils import ParsedRequest
-from typing import Optional, Any, List
+from typing import Any
 
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.agenda.agenda import (
@@ -25,7 +25,7 @@ from superdesk.utc import local_to_utc
 class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
     resource_name = "agenda_featured"
 
-    async def on_create(self, docs: List[FeaturedResourceModel]) -> None:
+    async def on_create(self, docs: list[FeaturedResourceModel]) -> None:
         """
         Add UTC from/to datetimes on save.
         Problem is 31.8. in Sydney is from 30.8. 14:00 UTC to 31.8. 13:59 UTC.
@@ -45,8 +45,8 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         self,
         date_from: str,
         timezone_offset: int = 0,
-        query_string: Optional[str] = None,
-        filter_string: Optional[str] = None,
+        query_string: str | None = None,
+        filter_string: str | None = None,
         from_offset: int = 0,
     ) -> Any:
         for_date = datetime.strptime(date_from, "%d/%m/%Y %H:%M")
@@ -60,15 +60,16 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
 
     async def featured(
         self,
-        featured_doc: Optional[dict],
-        query_string: Optional[str] = None,
-        filter_string: Optional[str] = None,
+        featured_doc: dict | None = None,
+        query_string: str | None = None,
+        filter_string: str | None = None,
         from_offset: int = 0,
     ) -> Any:
         """Return featured items.
 
         :param Optional[dict] featured_doc: The featured document for the given date
         :param Optional[str] query_string: Optional search query to filter the results
+        :param Optional[str] filter_string: Optional filter query to filter the results
         :param int from_offset: Pagination offset for the results
         :return: A list of filtered featured items
         """
