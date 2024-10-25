@@ -130,10 +130,9 @@ async def search():
         query_string = request.args.get("q")
         filter_string = request.args.get("filter")
         from_offset = int(request.args.get("from", 0))
-        featured_docs = await FeaturedService().get_featured_stories(
+        response = await FeaturedService().get_featured_stories(
             date_from, timezone_offset, query_string, filter_string, from_offset
         )
-        response = [{"_items": featured_docs}]
         return await send_response("agenda", response)
 
     response = await get_internal("agenda")
