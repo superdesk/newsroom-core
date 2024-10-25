@@ -1,5 +1,5 @@
 import re
-from typing import Any, Tuple, cast
+from typing import Tuple, cast
 
 from bson import ObjectId, errors
 from pydantic import BaseModel
