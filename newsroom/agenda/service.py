@@ -80,7 +80,7 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
             abort(403)
 
         if not featured_doc or not featured_doc.get("items"):
-            return ({"_items": [], "_meta": { "total" : 0}},)
+            return ({"_items": [], "_meta": {"total": 0}},)
 
         query = build_agenda_query()
         await SectionFiltersService().apply_section_filter(query, self.section)
@@ -130,4 +130,6 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
                 docs.append(docs_by_id.get(_id))
                 agenda_ids.add(docs_by_id.get(_id).get("_id"))  # type: ignore
 
-        return ({"_items": docs, "_meta": { "total" : len(docs)}},)
+        # TODO-ASYNC: Temporary implementation to ensure the response includes _meta details
+        # for total count as the front end relies on data._meta.total
+        return ({"_items": docs, "_meta": {"total": len(docs)}},)
