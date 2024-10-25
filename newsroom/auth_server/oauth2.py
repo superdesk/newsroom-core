@@ -40,7 +40,7 @@ async def issue_token(request: Request):
     try:
         token_response = authorization.create_token_response()
         if request.request.authorization:
-            client_id = request.authorization.get("username")
+            client_id = request.request.authorization.get("username")
         else:
             client_id = (await request.get_form()).get("client_id")
     except Exception:
