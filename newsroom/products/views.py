@@ -72,7 +72,7 @@ async def parse_objectid_or_abort(request: Request, value: str | ObjectId) -> Ob
     try:
         return ObjectId(value)
     except errors.InvalidId:
-        await request.abort(400, f"The provided value '{value}' is not a valid ID.")
+        return await request.abort(400, f"The provided value '{value}' is not a valid ID.")
 
 
 @products_endpoints.endpoint("/products/new", methods=["POST"], auth=[auth_rules.admin_only])
