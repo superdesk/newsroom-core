@@ -47,6 +47,7 @@ class MonitoringSearchService(WireSearchService):
         """
 
         if search.company:
+            # TODO-ASYNC: Replace once MonitoringSearch is async
             search.products = get_products_by_company(
                 search.company,
                 search.navigation_ids,

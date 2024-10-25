@@ -30,6 +30,7 @@ from newsroom.email import send_new_signup_email
 from newsroom.limiter import rate_limit
 from newsroom.users import UsersService, UsersAuthService
 from newsroom.companies.companies_async import CompanyService
+from newsroom.products import ProductsService
 
 from .utils import (
     get_user_from_request,
@@ -249,7 +250,8 @@ async def signup(req: Request):
 
         if company_dict is None:
             is_new_company = True
-            enabled_products = get_resource_service("products").get(req=None, lookup={"is_enabled": True})
+            enabled_products = await ProductsService().search({"is_enabled": True})
+
             company_dict = {
                 "name": form.company.data,
                 "contact_name": form.first_name.data + " " + form.last_name.data,
@@ -265,7 +267,7 @@ async def signup(req: Request):
                 "sections": {section["_id"]: True for section in app.sections},
                 "products": [
                     {"_id": product.get("_id"), "seats": 0, "section": product.get("product_type")}
-                    for product in enabled_products
+                    for product in await enabled_products.to_list_raw()
                 ],
             }
             company_dict["_id"] = (await company_service.create([company_dict]))[0]

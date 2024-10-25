@@ -551,6 +551,7 @@ class BaseSearchService(Service):
                         search.products += user_products
 
                 # add unlimited (seats=0) company products
+                # TODO-ASYNC: replace once Search is async
                 company_products = get_products_by_company(
                     search.company,
                     search.navigation_ids,

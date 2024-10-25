@@ -18,7 +18,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.agenda import blueprint
-from newsroom.products.products import get_products_by_company
+from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics
 from newsroom.topics_folders import get_company_folders, get_user_folders
 from newsroom.navigations import get_navigations
@@ -140,7 +140,7 @@ async def get_view_data() -> Dict:
     company_dict = None if not company else company.to_dict()
 
     topics = await get_user_topics(user.id) if user else []
-    products = get_products_by_company(company_dict, product_type="agenda") if company else []
+    products = await get_products_by_company(company_dict, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
     ui_config_service = UiConfigResourceService()
