@@ -1,7 +1,8 @@
 import re
 import ipaddress
 from typing import Any, Optional
-from bson import ObjectId, errors
+from bson import ObjectId
+from bson.errors import InvalidId
 from pydantic import AfterValidator, BeforeValidator
 from pydantic_core import PydanticCustomError
 from quart_babel import gettext
@@ -140,7 +141,7 @@ def validate_valid_objectid(field_name: str) -> BeforeValidator:
         if isinstance(value, str):
             try:
                 value = ObjectId(value)
-            except errors.InvalidId:
+            except InvalidId:
                 raise PydanticCustomError(
                     field_name, f"Provided ID '{value}' is not a valid ObjectId for field '{field_name}'."
                 )

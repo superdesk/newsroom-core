@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import Iterable, List, Dict, Any
 from copy import deepcopy
 
 from newsroom.types import CompanyResource
@@ -19,7 +19,7 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
         for company in docs:
             company_create.send(self, company=company.to_dict())
 
-    def _get_products(self, updates: Dict[str, Any], original: CompanyResource):
+    def _get_products(self, updates: Dict[str, Any], original: CompanyResource) -> Iterable[dict[str, Any]]:
         """
         Loop over products and checks if any of them is instance of CompanyProduct to
         convert them into dict

@@ -157,7 +157,7 @@ def remove_product_from_company(company: CompanyResource, product_id: ObjectId) 
     return cast(list[ProductRef], company_products), is_update_required
 
 
-def update_company_sections(company: CompanyResource, company_products: list[ProductRef]):
+def update_company_sections(company: CompanyResource, company_products: list[ProductRef]) -> dict[str, bool]:
     sections = company.sections
     for product in company_products:
         if isinstance(product, CompanyProduct):
