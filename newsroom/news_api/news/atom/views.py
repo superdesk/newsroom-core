@@ -17,7 +17,7 @@ from superdesk.etree import to_string
 from newsroom.core import get_current_wsgi_app
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
-from newsroom.products.products import get_products_by_company
+from newsroom.products import get_products_by_company
 
 logger = logging.getLogger(__name__)
 atom_endpoints = EndpointGroup("atom", __name__)
@@ -64,7 +64,7 @@ async def get_atom(request: Request):
     # TODO-ASYNC: replace once the service is ready
     response = await get_internal("news/search")
     company = get_company_or_none_from_request(None)
-    products = get_products_by_company(company.to_dict(context={"use_objectid": True}) if company else None)
+    products = await get_products_by_company(company.to_dict(context={"use_objectid": True}) if company else None)
 
     for item in response[0].get("_items"):
         try:
