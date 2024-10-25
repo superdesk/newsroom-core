@@ -1,4 +1,5 @@
 from datetime import datetime
+from eve.utils import ParsedRequest
 from typing import Optional, Any, List
 
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
@@ -15,6 +16,7 @@ from newsroom.types import FeaturedResourceModel
 from newsroom.utils import get_local_date
 from newsroom.template_filters import is_admin
 
+from superdesk import get_resource_service
 from superdesk.flask import abort
 from superdesk.core.resources import AsyncResourceService
 from superdesk.utc import local_to_utc
@@ -40,7 +42,12 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         return await self.find_one(display_from={"$lte": for_date}, display_to={"$gte": for_date})
 
     async def get_featured_stories(
-        self, date_from: str, timezone_offset: int = 0, query_string: Optional[str] = None, from_offset: int = 0
+        self,
+        date_from: str,
+        timezone_offset: int = 0,
+        query_string: Optional[str] = None,
+        filter_string: Optional[str] = None,
+        from_offset: int = 0,
     ) -> Any:
         for_date = datetime.strptime(date_from, "%d/%m/%Y %H:%M")
         local_date = get_local_date(
@@ -49,10 +56,14 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
             timezone_offset,
         )
         featured_doc = await self.find_one_for_date(local_date)
-        return await self.featured(featured_doc, query_string, from_offset)
+        return await self.featured(featured_doc, query_string, filter_string, from_offset)
 
     async def featured(
-        self, featured_doc: Optional[dict], query_string: Optional[str] = None, from_offset: int = 0
+        self,
+        featured_doc: Optional[dict],
+        query_string: Optional[str] = None,
+        filter_string: Optional[str] = None,
+        from_offset: int = 0,
     ) -> Any:
         """Return featured items.
 
@@ -87,11 +98,13 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
         query["bool"]["filter"].append(planning_items_query)
 
         source = {"query": query, "size": len(featured_doc["items"]), "from": from_offset}
-        # self.set_post_filter(source, req)  # TODO: Confirm usage of function with previous ParsedReq
+        req = ParsedRequest()
+        req.args = {"filter": filter_string}
+        get_resource_service("agenda").set_post_filter(source, req)
         if not from_offset:
             source["aggs"] = aggregations
 
-        if company and not is_admin(user) and company.get("events_only", False):
+        if company and not is_admin(user) and company.events_only:
             query["bool"]["filter"].append({"exists": {"field": "event"}})
             remove_fields(source, PLANNING_ITEMS_FIELDS)
 
