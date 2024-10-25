@@ -1,7 +1,8 @@
 import re
 import ipaddress
 from typing import Any, Optional
-from pydantic import AfterValidator
+from bson import ObjectId, errors
+from pydantic import AfterValidator, BeforeValidator
 from pydantic_core import PydanticCustomError
 from quart_babel import gettext
 
@@ -116,3 +117,39 @@ def validate_multi_field_iunique_value_async(
             )
 
     return AsyncValidator(_validate_iunique_value)
+
+
+def validate_valid_objectid(field_name: str) -> BeforeValidator:
+    """
+    Creates a validator that processes a single value (str or ObjectId) for a specified field.
+    It attempts to parse a string into `bson.ObjectId` if necessary and raises a validation error
+    if the value is invalid or incompatible with `bson.ObjectId`.
+
+    Args:
+        field_name (str): The name of the field being validated, used in error messages.
+
+    Returns:
+        BeforeValidator: A validator that parses valid ObjectId strings and raises errors for invalid ones.
+
+    Usage:
+        This validator should be used with `typing.Annotated`, preferably placed to the most right side
+        within the `Annotated` parameters list, to ensure it processes after other validators.
+    """
+
+    def _validate_objectid(value: str | ObjectId) -> ObjectId:
+        if isinstance(value, str):
+            try:
+                value = ObjectId(value)
+            except errors.InvalidId:
+                raise PydanticCustomError(
+                    field_name, f"Provided ID '{value}' is not a valid ObjectId for field '{field_name}'."
+                )
+        elif not isinstance(value, ObjectId):
+            raise PydanticCustomError(
+                field_name,
+                f"Wrong value type for ID '{value}' in field '{field_name}': expected 'str' or 'ObjectId'.",
+            )
+
+        return value
+
+    return BeforeValidator(_validate_objectid)

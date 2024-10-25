@@ -5,7 +5,7 @@ from typing import Annotated
 from superdesk.core.resources import validators
 from superdesk.core.resources.fields import Field
 from newsroom.core.resources.model import NewshubResourceModel
-from newsroom.core.resources.validators import validate_multi_field_iunique_value_async
+from newsroom.core.resources.validators import validate_multi_field_iunique_value_async, validate_valid_objectid
 
 PRODUCT_TYPES = ["wire", "agenda", "news_api"]
 
@@ -27,12 +27,20 @@ class ProductResourceModel(NewshubResourceModel):
     planning_item_query: str | None = None
     is_enabled: bool = True
     product_type: ProductType = ProductType.WIRE
-    navigations: list[Annotated[ObjectId, validators.validate_data_relation_async("navigations")]] = Field(
-        default_factory=list
-    )
+    navigations: list[
+        Annotated[
+            ObjectId,
+            validators.validate_data_relation_async("navigations"),
+            validate_valid_objectid("navigations"),
+        ]
+    ] = Field(default_factory=list)
 
     # obsolete
     # TODO: check with the team why it is obsolete
-    companies: list[Annotated[ObjectId, validators.validate_data_relation_async("companies")]] = Field(
-        default_factory=list
-    )
+    companies: list[
+        Annotated[
+            ObjectId,
+            validators.validate_data_relation_async("companies"),
+            validate_valid_objectid("companies"),
+        ]
+    ] = Field(default_factory=list)

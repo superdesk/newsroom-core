@@ -68,22 +68,16 @@ async def search(_a: None, params: SearchParams, _r: None):
     return Response(products)
 
 
-async def convert_ids_or_abort(request: Request, data: dict[str, Any], key: str):
+async def parse_objectid_or_abort(request: Request, value: str | ObjectId) -> ObjectId:
     try:
-        if key in data:
-            data[key] = [ObjectId(str_id) for str_id in data[key]]
+        return ObjectId(value)
     except errors.InvalidId:
-        await request.abort(400, f"Please provide valid {key} ids")
+        await request.abort(400, f"The provided value '{value}' is not a valid ID.")
 
 
 @products_endpoints.endpoint("/products/new", methods=["POST"], auth=[auth_rules.admin_only])
 async def create(request: Request):
     creation_data = await get_json_or_400_async(request)
-
-    # convert navigations and companies ids from string to ObjectId
-    for key in ["companies", "navigations"]:
-        await convert_ids_or_abort(request, creation_data, key)
-
     products = await ProductsService().create([creation_data])
     return Response({"success": True, "_id": products[0]}, 201)
 
@@ -181,8 +175,7 @@ async def update_companies(args: ProductsArgs, _p: None, request: Request):
         await request.abort(404, gettext("Product not found"))
 
     updates = await request.get_json()
-    await convert_ids_or_abort(request, updates, "companies")
-    selected_companies: list[ObjectId] = updates.get("companies") or []
+    selected_companies = [await parse_objectid_or_abort(request, x) for x in updates.get("companies", [])]
     product_ref = get_product_ref(product.to_dict())
 
     async for company in CompanyService().get_all():

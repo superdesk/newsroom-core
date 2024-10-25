@@ -147,7 +147,7 @@ async def test_gets_all_products(client, app):
     assert 251 == len(data)
 
 
-async def test_assign_products_to_companies(client, app, product, companies):
+async def test_assign_products_to_companies(client, product, companies):
     await test_login_succeeds_for_admin(client)
     await assign_product_to_companies(client, product, companies)
 
