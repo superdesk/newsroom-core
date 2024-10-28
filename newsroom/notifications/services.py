@@ -2,10 +2,12 @@ from copy import deepcopy
 from typing import Any
 
 from bson import ObjectId
+
 from superdesk.utc import utcnow
 from superdesk.core.resources import AsyncResourceService
 
 from newsroom.types import Notification, NotificationQueue, NotificationTopic
+from newsroom.utils import get_user_dict_async
 
 
 class NotificationsService(AsyncResourceService[Notification]):
@@ -14,36 +16,38 @@ class NotificationsService(AsyncResourceService[Notification]):
         Save the given notifications entries into the database. If the notification entry already
         exists in the database then it proceed to execute an update instead
         """
-        from newsroom.users import UsersService
 
         now = utcnow()
         ids = []
+        users = await get_user_dict_async()
 
         for doc in entries:
-            user_id = doc["user"]
-            user = await UsersService().find_by_id(user_id)
-
+            user = users.get(ObjectId(doc["user"]))
             if user is None or not user.receive_app_notifications:
                 continue
 
-            notification_id = f"{user_id}_{doc['item']}"
+            notification_id = f"{user.id}_{doc['item']}"
             original = await self.find_by_id(notification_id)
 
             if original:
+                updates = {
+                    "_created": now,
+                    "action": doc.get("action") or original.action,
+                }
+                if "data" in doc:
+                    updates["data"] = doc["data"] or {}
                 await self.update(
                     notification_id,
-                    updates={
-                        "_created": now,
-                        "action": doc.get("action") or original.action,
-                        "data": doc.get("data") or original.data,
-                    },
+                    updates=updates,
                 )
             else:
                 creation_data = {
                     "_id": notification_id,
-                    "user": ObjectId(doc["user"]),
+                    "user": user.id,
                 }
                 doc.update(creation_data)
+                if not doc.get("data"):
+                    doc.pop("data", None)
                 await self.create([doc])
 
             ids.append(notification_id)
@@ -77,7 +81,6 @@ class NotificationQueueService(AsyncResourceService[NotificationQueue]):
             await self.create(
                 [
                     {
-                        "_id": ObjectId(),
                         "user": user_id,
                         "topics": [
                             {
@@ -94,10 +97,13 @@ class NotificationQueueService(AsyncResourceService[NotificationQueue]):
             # Update an existing schedule
             updates = {"topics": deepcopy(original.topics or [])}
 
-            topic_queue = next((topic for topic in updates["topics"] if topic.topic_id == topic_id), None)
+            topic_queue: NotificationTopic | None = next(
+                (topic for topic in updates["topics"] if topic.topic_id == topic_id), None
+            )
 
             if topic_queue is None:
-                topic_queue = NotificationTopic(
+                # MyPy fails here with call-arg error, not sure why. Ignore it for now
+                topic_queue = NotificationTopic(  # type: ignore[call-arg]
                     topic_id=topic_id, section=section, last_item_arrived=item["versioncreated"]
                 )
                 updates["topics"].append(topic_queue)

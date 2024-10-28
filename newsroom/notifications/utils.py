@@ -1,4 +1,5 @@
 import datetime
+from asyncio import gather
 
 from bson import ObjectId
 from typing import Any
@@ -9,6 +10,8 @@ from superdesk.flask import session
 from superdesk.core import get_app_config
 from superdesk.notification import push_notification
 
+from newsroom.wire import WireSearchServiceAsync
+from newsroom.topics.topics_async import TopicService
 from .services import NotificationsService
 
 
@@ -62,17 +65,18 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     item_ids = [n["item"] for n in saved_notifications]
     items = []
 
-    try:
-        items.extend(superdesk.get_resource_service("wire_search").get_items(item_ids))
-    except (KeyError, TypeError):  # wire disabled
-        pass
+    wire_cursor, topics_cursor = await gather(
+        WireSearchServiceAsync().get_items_by_id(item_ids),
+        TopicService().search({"_id": {"$in": item_ids}}),
+    )
+    wire_items, topic_items = await gather(wire_cursor.to_list_raw(), topics_cursor.to_list_raw())
+
+    items.extend(wire_items)
+    items.extend(topic_items)
+
     try:
         items.extend(superdesk.get_resource_service("agenda").get_items(item_ids))
     except (KeyError, TypeError):  # agenda disabled
-        pass
-    try:
-        items.extend(superdesk.get_resource_service("topics").get_items(item_ids))
-    except (KeyError, TypeError):  # topics disabled
         pass
 
     return {

@@ -25,6 +25,7 @@ notifications_resource_config = ResourceConfig(
                 name="user_created",
                 keys=[("user", 1), ("_created", -1)],
                 collation={"locale": "en", "strength": 2},
+                unique=False,
             )
         ],
     ),
