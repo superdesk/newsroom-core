@@ -56,7 +56,7 @@ async def index():
 
 @blueprint.endpoint("/design/<string:page>", auth=False)
 async def page(args: RouteArguments, params: None, req: Request):
-    return await render_template("design_%s.html" % args.page)
+    return await render_template(f"design_{args.page}.html")
 
 
 module = Module(name="newsroom.design", endpoints=[blueprint])
