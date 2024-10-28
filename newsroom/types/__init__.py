@@ -26,6 +26,7 @@ from .users import DashboardModel, NotificationScheduleModel, UserResourceModel,
 from .notifications import Notification, NotificationQueue, NotificationTopic
 from .history import HistoryResourceModel
 from .wire import WireItem
+from .featured import FeaturedResourceModel
 
 __all__ = [
     "SectionEnum",
@@ -58,6 +59,7 @@ __all__ = [
     "NotificationTopic",
     "HistoryResourceModel",
     "WireItem",
+    "FeaturedResourceModel",
     "ProductResourceModel",
 ]
 

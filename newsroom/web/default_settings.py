@@ -174,6 +174,7 @@ MODULES = [
     "newsroom.wire.module",
     "newsroom.company_admin",
     "newsroom.public",
+    "newsroom.agenda",
     "newsroom.products",
 ]
 
