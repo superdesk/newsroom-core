@@ -1,43 +1,51 @@
+from typing import Any, TypedDict
 import io
 import zipfile
 from inspect import iscoroutinefunction
-from bson import ObjectId
-from newsroom.users.service import UsersService
-import superdesk
 
-from typing import Dict
+from bson import ObjectId
+from pydantic import BaseModel, field_validator
 from operator import itemgetter
-from eve.render import send_response
-from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
-from werkzeug.datastructures import ImmutableMultiDict
 from quart_babel import gettext
 
+from superdesk.core.types import Request, Response
 from superdesk.core import get_app_config, get_current_app
-from superdesk.flask import request, jsonify, render_template, abort, send_file
-from superdesk.utc import utcnow
 from superdesk import get_resource_service
-from superdesk.default_settings import strtobool
+from superdesk.flask import render_template, send_file
+from superdesk.utc import utcnow
 
+from newsroom.types import (
+    UserResourceModel,
+    TopicResourceModel,
+    CompanyResource,
+    DashboardModel,
+    SectionEnum,
+    CardResourceModel,
+    WireItem,
+    DashboardCardType,
+)
+from newsroom.exceptions import AuthorizationError
+from newsroom.search.types import NewshubSearchRequest
 from newsroom.auth.utils import (
     get_user_from_request,
     get_company_from_request,
-    get_user_id_from_request,
     is_valid_session,
     check_user_has_products,
 )
-
+from newsroom.auth import auth_rules
+from newsroom.users.service import UsersService
 from newsroom.cards import get_card_size, get_card_type, CardsResourceService
 from newsroom.navigations import get_navigations
 from newsroom.products.products import get_products_by_company
-from newsroom.wire import blueprint
+from .filters import WireSearchRequestArgs
+from .module import wire_endpoints
 from newsroom.wire.utils import update_action_list
-from newsroom.decorator import login_required, admin_only, section, redirect_to_login
-from newsroom.topics import get_user_topics
+from newsroom.decorator import redirect_to_login
 from newsroom.topics_folders import get_user_folders, get_company_folders
+from newsroom.topics.topics_async import get_user_topics_async
 from newsroom.email import get_language_template_name, send_user_email
 from newsroom.utils import (
-    get_entity_or_404,
     get_json_or_400,
     parse_dates,
     get_type,
@@ -59,41 +67,54 @@ from newsroom.public.views import (
     PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
 )
 
-from .search import get_bookmarks_count
-from .items import get_items_for_dashboard
 from newsroom.assets import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
 from newsroom.history_async import HistoryService
 
+from .items import get_items_for_dashboard
+from .service import WireSearchServiceAsync
+
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
-def set_permissions(item, section="wire", ignore_latest=False):
-    permitted = superdesk.get_resource_service("{}_search".format(section)).has_permissions(item, ignore_latest)
-    set_item_permission(item, permitted)
+async def set_permissions(wire_item: WireItem, ignore_latest=False):
+    try:
+        cursor = await WireSearchServiceAsync().get_items_by_id(
+            [wire_item.id],
+            WireSearchRequestArgs(
+                ignoreLatest=ignore_latest,
+                page_size=0,
+            ),
+            apply_permissions=True,
+        )
+        permitted = (await cursor.count()) > 0
+    except Exception:
+        permitted = False
+
+    set_item_permission(wire_item, permitted)
 
 
-def set_item_permission(item, permitted=True):
-    if not item:
+def set_item_permission(wire_item: WireItem, permitted=True):
+    if not wire_item:
         return
 
-    item["_access"] = permitted
-    if not item["_access"]:
-        item.pop("body_text", None)
-        item.pop("body_html", None)
-        item.pop("renditions", None)
-        item.pop("associations", None)
+    wire_item.user_has_access = permitted
+    if not wire_item.user_has_access:
+        wire_item.body_text = ""
+        wire_item.body_html = ""
+        wire_item.renditions = None
+        wire_item.associations = None
 
 
-async def get_view_data() -> Dict:
+async def get_view_data() -> dict:
     user = get_user_from_request(None)
     user_dict = user.to_dict()
     company = get_company_from_request(None)
     company_dict = company.to_dict() if company else None
 
-    topics = await get_user_topics(user.id)
+    topics = await get_user_topics_async(user)
     user_folders = await get_user_folders(user, "wire") if user else []
     company_folders = await get_company_folders(company, "wire") if company else []
     products = get_products_by_company(company_dict, product_type="wire") if company_dict else []
@@ -104,7 +125,7 @@ async def get_view_data() -> Dict:
     return {
         "user": user_dict,
         "company": str(company.id) if company else None,
-        "topics": [t for t in topics if t.get("topic_type") == "wire"],
+        "topics": [topic.to_dict() for topic in topics if topic.topic_type == "wire"],
         "formats": [
             {"format": f["format"], "name": f["name"], "assets": f["assets"]}
             for f in get_current_app().as_any().download_formatters.values()
@@ -112,7 +133,7 @@ async def get_view_data() -> Dict:
         ],
         "navigations": await get_navigations(user_dict, company_dict, "wire"),
         "products": products,
-        "saved_items": get_bookmarks_count(user.id, "wire"),
+        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "wire",
         "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": get_app_config("WIRE_GROUPS", []),
@@ -122,13 +143,13 @@ async def get_view_data() -> Dict:
     }
 
 
-def get_items_by_card(cards, company_id):
+async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId | None):
     cache_key = "{}{}".format(HOME_ITEMS_CACHE_KEY, company_id or "")
     app = get_current_app().as_any()
     if app.cache.get(cache_key):
         return app.cache.get(cache_key)
 
-    items_by_card = get_items_for_dashboard(cards)
+    items_by_card = await get_items_for_dashboard(cards)
     app.cache.set(cache_key, items_by_card, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
 
@@ -143,58 +164,80 @@ def delete_dashboard_caches():
         app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
-def get_personal_dashboards_data(user, company, topics):
+class DashboardTopicData(TypedDict):
+    _id: str
+    items: list[dict[str, Any]]
+
+
+class DashboardData(TypedDict):
+    dashboard_id: str
+    dashboard_name: str
+    dashboard_card_type: DashboardCardType
+    topic_items: list[DashboardTopicData]
+
+
+async def get_personal_dashboards_data(
+    user: UserResourceModel, company: CompanyResource, topics: list[TopicResourceModel]
+) -> list[DashboardData]:
     card_type = get_card_type(get_app_config("PERSONAL_DASHBOARD_CARD_TYPE") or "4-picture-text")
 
-    def get_topic_items(topic):
-        query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
-        if not query:
-            return list()
-        return list(
-            superdesk.get_resource_service("wire_search").get_items_by_query(query, size=get_card_size(card_type))
-        )
+    async def get_topic_items(topic: TopicResourceModel):
+        try:
+            cursor = await WireSearchServiceAsync().search(
+                NewshubSearchRequest(
+                    args=WireSearchRequestArgs(page_size=get_card_size(card_type)),
+                    section=WireSearchServiceAsync.section,
+                    current_user=user,
+                    user=user,
+                    company=company,
+                    is_admin=user.is_admin(),
+                    topic=topic,
+                )
+            )
+            return await cursor.to_list_raw()
+        except AuthorizationError:
+            return []
 
-    def _get_topic_data(topic_id):
+    async def _get_topic_data(topic_id: ObjectId):
         for topic in topics:
-            if topic["_id"] == ObjectId(topic_id):
-                items = get_topic_items(topic)
-                if items:
+            if topic.id == topic_id:
+                topic_items = await get_topic_items(topic)
+                if topic_items:
                     return {
-                        "_id": topic["_id"],
-                        "items": items,
+                        "_id": topic.id,
+                        "items": topic_items,
                     }
                 break
         return None
 
-    def _get_dashboard_data(dashboard, index):
+    async def _get_dashboard_data(dashboard: DashboardModel, dashboard_index: int):
         return {
-            "dashboard_id": f"d{index}",
-            "dashboard_name": dashboard.get("name", ""),
+            "dashboard_id": f"d{dashboard_index}",
+            "dashboard_name": dashboard.name,
             "dashboard_card_type": card_type,
             "topic_items": list(
-                filter(None, [_get_topic_data(topic_id) for topic_id in dashboard.get("topic_ids") or []])
+                filter(None, [await _get_topic_data(topic_id) for topic_id in dashboard.topic_ids or []])
             ),
         }
 
-    dashboards = user.get("dashboards") or []
-    return [_get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
+    dashboards = user.dashboards or []
+    return [await _get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
 
 
 async def get_home_data():
     user = get_user_from_request(None)
-    user_dict = user.to_dict()
     company = get_company_from_request(None)
     company_dict = company.to_dict() if company else None
 
     cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
-    topics = await get_user_topics(user.id)
+    topics = await get_user_topics_async(user)
     ui_config_service = UiConfigResourceService()
 
     return {
         "cards": cards,
         "products": get_products_by_company(company_dict) if company else [],
         "user": str(user.id),
-        "userProducts": user_dict.get("products") or [],
+        "userProducts": user.products or [],
         "userType": user.user_type,
         "company": company.id if company else None,
         "companyProducts": company_dict.get("products") if company else [],
@@ -208,21 +251,25 @@ async def get_home_data():
             for f in get_current_app().as_any().download_formatters.values()
         ],
         "context": "wire",
-        "topics": topics,
+        "topics": [topic.to_dict() for topic in topics],
         "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": get_app_config("WIRE_GROUPS", []),
-        "personalizedDashboards": get_personal_dashboards_data(user_dict, company_dict, topics),
+        "personalizedDashboards": await get_personal_dashboards_data(user, company, topics),
     }
 
 
-def get_previous_versions(item):
-    if item.get("ancestors"):
-        ancestors = superdesk.get_resource_service("wire_search").get_items(item["ancestors"])
+async def get_previous_versions(wire_item: WireItem) -> list[dict]:
+    if len(wire_item.ancestors):
+        cursor = await WireSearchServiceAsync().get_items_by_id(
+            wire_item.ancestors, args=WireSearchRequestArgs(ignoreLatest=True)
+        )
+        ancestors = await cursor.to_list_raw()
+        # ancestors = await (await WireSearchServiceAsync().get_items_by_id(wire_item.ancestors)).to_list_raw()
         return sorted(ancestors, key=itemgetter("versioncreated"), reverse=True)
     return []
 
 
-@blueprint.route("/")
+@wire_endpoints.endpoint("/", auth=False)
 async def index():
     if not await is_valid_session():
         data = await render_public_dashboard() if get_app_config("PUBLIC_DASHBOARD") else redirect_to_login()
@@ -232,73 +279,77 @@ async def index():
     return await render_template("home.html", data=data, user_profile_data=user_profile_data)
 
 
-@blueprint.route("/media_card_external/<card_id>")
-@login_required
-async def get_media_card_external(card_id):
-    cache_id = "{}_{}".format(HOME_EXTERNAL_ITEMS_CACHE_KEY, card_id)
+class MediaCardRouteArguments(BaseModel):
+    card_id: str
+
+
+@wire_endpoints.endpoint("/media_card_external/<card_id>")
+async def get_media_card_external(args: MediaCardRouteArguments, params: None, request: Request) -> Response:
+    cache_id = "{}_{}".format(HOME_EXTERNAL_ITEMS_CACHE_KEY, args.card_id)
     app = get_current_app().as_any()
 
     if app.cache.get(cache_id):
         card_items = app.cache.get(cache_id)
     else:
-        card = await CardsResourceService().find_by_id_raw(card_id)
+        card = await CardsResourceService().find_by_id_raw(args.card_id)
         if not card:
-            abort(404)
+            await request.abort(404)
         card_items = app.get_media_cards_external(card)
         app.cache.set(cache_id, card_items, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
 
-    return jsonify({"_items": card_items})
+    return Response({"_items": card_items})
 
 
-@blueprint.route("/card_items")
-@login_required
-async def get_card_items():
+@wire_endpoints.endpoint("/card_items")
+async def get_card_items() -> Response:
     company = get_company_from_request(None)
-    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
-    items_by_card = get_items_by_card(cards, company.id if company else None)
-    return jsonify({"_items": items_by_card})
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
+    items_by_card = await get_items_by_card(cards, company.id if company else None)
+    return Response({"_items": items_by_card})
 
 
-@blueprint.route("/wire")
-@login_required
-@section("wire")
-async def wire():
+@wire_endpoints.endpoint("/wire", auth=[auth_rules.section_required("wire")])
+async def wire() -> str:
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
     return await render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
 
 
-@blueprint.route("/bookmarks_wire")
-@login_required
-async def bookmarks():
+@wire_endpoints.endpoint("/bookmarks_wire")
+async def bookmarks() -> str:
     data = await get_view_data()
     data["bookmarks"] = True
     user_profile_data = await get_user_profile_data()
     return await render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
-@blueprint.route("/wire/search")
-@login_required
-@section("wire")
-async def search():
-    if "prepend_embargoed" in request.args or get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH"):
-        args = request.args.to_dict()
-        args["prepend_embargoed"] = strtobool(
-            str(request.args.get("prepend_embargoed", get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH")))
-        )
-        request.args = ImmutableMultiDict(args)
-    response = await get_internal("wire_search")
-    return await send_response("wire_search", response)
+@wire_endpoints.endpoint("/wire/search", auth=[auth_rules.section_required("wire")])
+async def search(request: Request) -> Response:
+    return await WireSearchServiceAsync().process_web_request(request)
 
 
-@blueprint.route("/download", methods=["POST"])
-@login_required
-async def download():
+class ItemActionUrlParams(BaseModel):
+    type: SectionEnum = SectionEnum.WIRE
+
+
+@wire_endpoints.endpoint("/download", methods=["POST"])
+async def download(args: None, params: ItemActionUrlParams, request: Request):
+    """Endpoint to download Wire OR Agenda item(s)"""
+
     user = get_user_from_request(None)
     data = await request.get_json()
     _format = data.get("format", "text")
     item_type = get_type(data.get("type"))
-    items = get_items_for_user_action(data["items"], item_type)
+
+    if item_type == "agenda":
+        # Getting Event and/or Planning items
+        # TODO-ASYNC: Update when Agenda is migrated to async
+        items = get_items_for_user_action(data["items"], item_type)
+    else:
+        # Getting Wire items
+        cursor = await WireSearchServiceAsync().get_items_for_action(data["items"])
+        items = await cursor.to_list_raw()
+
     _file = io.BytesIO()
     formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
     mimetype = None
@@ -309,9 +360,9 @@ async def download():
                 picture = formatter.format_item(items[0], item_type=item_type)
                 return (
                     await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
-                ) or abort(404)
+                ) or await request.abort(404)
             except ValueError:
-                return abort(404)
+                return await request.abort(404)
         else:
             with zipfile.ZipFile(_file, mode="w") as zf:
                 for item in items:
@@ -355,9 +406,7 @@ async def download():
         _file.seek(0)
 
     update_action_list(data["items"], "downloads", force_insert=True)
-    await HistoryService().create_history_record(
-        items, "download", user.id, user.company, request.args.get("type", "wire")
-    )
+    await HistoryService().create_history_record(items, "download", user.id, user.company, params.type.value)
     return await send_file(
         _file,
         mimetype=mimetype,
@@ -366,9 +415,10 @@ async def download():
     )
 
 
-@blueprint.route("/wire_share", methods=["POST"])
-@login_required
-async def share():
+@wire_endpoints.endpoint("/wire_share", methods=["POST"])
+async def share(args: None, params: ItemActionUrlParams, request: Request) -> Response:
+    """Endpoint to share Wire OR Agenda item(s)"""
+
     current_user = get_user_from_request(None)
     current_user_dict = current_user.to_dict()
     item_type = get_type()
@@ -378,7 +428,14 @@ async def share():
     assert data.get("items")
 
     users_service = UsersService()
-    items = get_items_for_user_action(data.get("items"), item_type)
+    if item_type == "agenda":
+        # Getting Event and/or Planning items
+        # TODO-ASYNC: Update when Agenda is migrated to async
+        items = get_items_for_user_action(data.get("items"), item_type)
+    else:
+        # Getting Wire items
+        cursor = await WireSearchServiceAsync().get_items_for_action(data.get("items"))
+        items = await cursor.to_list_raw()
 
     for user_id in data["users"]:
         user = await users_service.find_by_id(user_id)
@@ -395,7 +452,7 @@ async def share():
             "sender": current_user_dict,
             "items": items,
             "message": data.get("message"),
-            "section": request.args.get("type", "wire"),
+            "section": params.type,
             "subject_name": items[0].get("headline") or items[0].get("name"),
         }
 
@@ -433,47 +490,36 @@ async def share():
         )
     update_action_list(data.get("items"), "shares", item_type=item_type)
     await HistoryService().create_history_record(
-        items, "share", current_user.id, current_user.company, request.args.get("type", "wire")
+        items, "share", current_user.id, current_user.company, params.type.value
     )
-    return jsonify(), 201
+    return Response("", 201)
 
 
-@blueprint.route("/wire", methods=["DELETE"])
-@admin_only
-async def remove_wire_items():
+@wire_endpoints.endpoint("/wire", methods=["DELETE"], auth=[auth_rules.admin_only])
+async def remove_wire_items(request: Request) -> Response:
     data = await get_json_or_400()
     assert data.get("items")
 
-    items_service = get_resource_service("items")
-    versions_service = get_resource_service("items_versions")
+    wire_service = WireSearchServiceAsync().service
 
-    ids = []
-    for doc in items_service.get_from_mongo(req=None, lookup={"_id": {"$in": data["items"]}}):
-        ids.append(doc["_id"])
-        ids.extend(doc.get("ancestors") or [])
+    item_ids = []
+    async for item in await wire_service.search({"_id": {"$in": data["items"]}}, use_mongo=True):
+        item_ids.append(item.id)
+        item_ids.extend(item.ancestors or [])
 
-    if not ids:
-        abort(404, gettext("Not found"))
+    if not item_ids:
+        await request.abort(404, gettext("Not found"))
 
-    docs = list(doc for doc in items_service.get_from_mongo(req=None, lookup={"_id": {"$in": ids}}))
+    cursor = await wire_service.search({"_id": {"$in": item_ids}}, use_mongo=True)
+    async for wire_item in cursor:
+        await wire_service.delete(wire_item)
 
-    for doc in docs:
-        items_service.on_delete(doc)
-
-    items_service.delete({"_id": {"$in": ids}})
-
-    for doc in docs:
-        items_service.on_deleted(doc)
-        versions_service.on_item_deleted(doc)
-
-    push_notification("items_deleted", ids=ids)
-
-    return jsonify(), 200
+    push_notification("items_deleted", ids=item_ids)
+    return Response("")
 
 
-@blueprint.route("/wire_bookmark", methods=["POST", "DELETE"])
-@login_required
-async def bookmark():
+@wire_endpoints.endpoint("/wire_bookmark", methods=["POST", "DELETE"])
+async def bookmark() -> Response:
     """Bookmark an item.
 
     Stores user id into item.bookmarks array.
@@ -482,16 +528,26 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id_from_request(None)
-    push_user_notification("saved_items", count=get_bookmarks_count(user_id, "wire"))
-    return jsonify(), 200
+    push_user_notification("saved_items", count=await WireSearchServiceAsync().get_current_user_bookmarks_count())
+    return Response("")
 
 
-@blueprint.route("/wire/<_id>/copy", methods=["POST"])
-@login_required
-async def copy(_id):
+class WireItemRouteArgs(BaseModel):
+    item_id: str
+
+
+@wire_endpoints.endpoint("/wire/<item_id>/copy", methods=["POST"])
+async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Request) -> Response:
+    """Endpoint to copy Wire OR Agenda item(s)"""
+
     item_type = get_type()
-    item = get_entity_or_404(_id, item_type)
+    if item_type == "agenda":
+        item = get_resource_service("agenda").find_one(req=None, _id=args.item_id)
+    else:
+        item = (await WireSearchServiceAsync().service.find_by_id(args.item_id)).to_dict()
+
+    if not item:
+        await request.abort(404)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
     locale = (await get_session_locale() or "en").lower()
@@ -509,57 +565,64 @@ async def copy(_id):
         )
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
-    update_action_list([_id], "copies", item_type=item_type)
-    user = get_user_from_request(None)
-    await HistoryService().create_history_record(
-        [item], "copy", user.id, user.company, request.args.get("type", "wire")
-    )
-    return jsonify({"data": copy_data}), 200
+    update_action_list([args.item_id], "copies", item_type=item_type)
+    user = get_user_from_request(request)
+    await HistoryService().create_history_record([item], "copy", user.id, user.company, params.type.value)
+
+    return Response({"data": copy_data})
 
 
-@blueprint.route("/wire/<_id>/versions")
-@login_required
-async def versions(_id):
-    item = get_entity_or_404(_id, "items")
-    items = get_previous_versions(item)
-    return jsonify({"_items": items})
+@wire_endpoints.endpoint("/wire/<item_id>/versions")
+async def versions(args: WireItemRouteArgs, params: None, request: Request) -> Response:
+    wire_item = await WireSearchServiceAsync().service.find_by_id(args.item_id)
+    if wire_item is None:
+        await request.abort(404)
+    return Response({"_items": await get_previous_versions(wire_item)})
 
 
-@blueprint.route("/wire/<_id>")
-@login_required
-async def item(_id):
-    items = get_items_for_user_action([_id], "items")
-    if not items:
-        return
+class WireItemUrlParams(BaseModel):
+    ignoreLatest: bool = False
+    print: bool = False
+    monitoring_profile: str | None = None
+    type: SectionEnum = SectionEnum.WIRE
 
-    item = items[0]
-    set_permissions(
-        item,
-        "wire",
-        False if request.args.get("ignoreLatest") == "false" else True,
-    )
+
+@wire_endpoints.endpoint("/wire/<item_id>")
+async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Request) -> Response | str:
+    wire_service = WireSearchServiceAsync()
+
+    wire_item = await wire_service.service.find_by_id(args.item_id)
+    if not wire_item:
+        return await request.abort(404)
+
+    await set_permissions(wire_item, params.ignoreLatest)
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("wire")
     display_char_count = config.get("char_count", False)
     user_profile_data = await get_user_profile_data()
     if is_json_request(request):
-        return jsonify(item)
-    if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
-    previous_versions = get_previous_versions(item)
+        return Response(wire_item)
+
+    if not wire_item.user_has_access:
+        return await render_template(
+            "wire_item_access_restricted.html", item=wire_item, user_profile_data=user_profile_data
+        )
+
+    previous_versions = await get_previous_versions(wire_item)
     template = "wire_item.html"
-    data = {"item": item}
-    if "print" in request.args:
-        if request.args.get("monitoring_profile"):
-            data.update(request.view_args)
+    data = {"item": wire_item.to_dict()}
+    if params.print:
+        if params.monitoring_profile:
+            # TODO-ASYNC: Figure out what these args are actually, and where are they used (in the template?)
+            # data.update(request.view_args)
             template = "monitoring_export.html"
         else:
             template = "wire_item_print.html"
 
-        update_action_list([_id], "prints", force_insert=True)
-        user = get_user_from_request(None)
+        update_action_list([wire_item.id], "prints", force_insert=True)
+        user = get_user_from_request(request)
         await HistoryService().create_history_record(
-            [item], "print", user.id, user.company, request.args.get("type", "wire")
+            [wire_item.to_dict()], "print", user.id, user.company, params.type.value
         )
 
     return await render_template(
@@ -571,16 +634,31 @@ async def item(_id):
     )
 
 
-@blueprint.route("/wire/items/<_ids>")
-@login_required
-async def items(_ids):
-    item_ids = _ids.split(",")
-    items = superdesk.get_resource_service("wire_search").get_items(item_ids)
-    for item in items:
-        set_permissions(
-            item,
-            "wire",
-            False if request.args.get("ignoreLatest") == "false" else True,
-        )
+class WireItemsRouteArgs(BaseModel):
+    item_ids: list[str]
 
-    return jsonify(items.docs), 200
+    @field_validator("item_ids", mode="before")
+    def parse_item_ids(cls, value: list[str] | str) -> list[str]:
+        return [item_id.strip() for item_id in value.split(",")] if isinstance(value, str) else value
+
+
+@wire_endpoints.endpoint("/wire/items/<item_ids>")
+async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Request) -> Response:
+    wire_search = WireSearchServiceAsync()
+
+    # First get the items directly from the resource service
+    items_cursor = await wire_search.service.search({"bool": {"query": {"must": [{"terms": {"_id": args.item_ids}}]}}})
+    if not await items_cursor.count():
+        return Response([])
+
+    # Now get the list of items this user has permissions for
+    allowed_items_cursor = await wire_search.get_items_by_id(
+        args.item_ids, WireSearchRequestArgs(ignoreLatest=params.ignoreLatest)
+    )
+    allowed_ids = {item.id async for item in allowed_items_cursor}
+
+    # And set the item permissions for each item
+    async for item in items_cursor:
+        set_item_permission(item, item.id in allowed_ids)
+
+    return Response(await items_cursor.to_list_raw())
