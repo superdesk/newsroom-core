@@ -6,11 +6,12 @@ from eve.methods.get import get_internal
 from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 
-from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
+from newsroom.types import SectionEnum
+from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.am_news import blueprint
 from newsroom.decorator import login_required, section
 from newsroom.navigations import get_navigations_by_company
-from newsroom.wire.search import get_bookmarks_count
+from newsroom.wire import WireSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -42,7 +43,7 @@ async def get_view_data():
             for f in get_current_app().as_any().download_formatters.values()
             if "wire" in f["types"]
         ],
-        "saved_items": get_bookmarks_count(user.id, "am_news"),
+        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.AM_NEWS),
         "context": "am_news",
         "ui_config": await ui_config_service.get_section_config("am_news"),
     }
@@ -84,8 +85,10 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id_from_request(None)
-    push_user_notification("saved_items", count=get_bookmarks_count(user_id, "am_news"))
+    push_user_notification(
+        "saved_items",
+        count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.AM_NEWS),
+    )
     return jsonify(), 200
 
 

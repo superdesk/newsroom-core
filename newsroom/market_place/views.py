@@ -5,13 +5,13 @@ from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 from superdesk import get_resource_service
 
-from newsroom.types import Navigation, CompanyResource, UserResourceModel
-from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
+from newsroom.types import Navigation, CompanyResource, UserResourceModel, SectionEnum
+from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.decorator import login_required, section
 from newsroom.topics import get_user_topics
 from newsroom.navigations import get_navigations_by_company
-from newsroom.wire.search import get_bookmarks_count
+from newsroom.wire import WireSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -54,7 +54,7 @@ async def get_view_data():
             for f in get_current_app().as_any().download_formatters.values()
             if "wire" in f["types"]
         ],
-        "saved_items": get_bookmarks_count(user.id, SECTION_ID),
+        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
         "context": SECTION_ID,
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
@@ -81,7 +81,7 @@ async def get_home_page_data():
         "company": str(company.id) if company else None,
         "navigations": navigations,
         "cards": await (await CardsResourceService().find({"dashboard": SECTION_ID})).to_list_raw(),
-        "saved_items": get_bookmarks_count(user.id, SECTION_ID),
+        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
         "context": SECTION_ID,
         "home_page": True,
         "title": SECTION_NAME,
@@ -135,8 +135,10 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id_from_request(None)
-    push_user_notification("saved_items", count=get_bookmarks_count(user_id, SECTION_ID))
+    push_user_notification(
+        "saved_items",
+        count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
+    )
     return jsonify(), 200
 
 

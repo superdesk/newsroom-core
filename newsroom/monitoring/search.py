@@ -5,7 +5,7 @@ from quart_babel import gettext
 from superdesk.flask import abort
 from superdesk import get_resource_service
 
-from newsroom.search.service import query_string
+from newsroom.search.utils import query_string
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.utils import query_resource
 from newsroom.products.products import get_products_by_company
