@@ -226,6 +226,7 @@ async def get_personal_dashboards_data(
 
 async def get_home_data():
     user = get_user_from_request(None)
+    user_dict = user.to_dict()
     company = get_company_from_request(None)
     company_dict = company.to_dict() if company else None
 
@@ -237,7 +238,7 @@ async def get_home_data():
         "cards": cards,
         "products": await get_products_by_company(company_dict) if company else [],
         "user": str(user.id),
-        "userProducts": user.products or [],
+        "userProducts": user_dict.get("products") or [],
         "userType": user.user_type,
         "company": company.id if company else None,
         "companyProducts": company_dict.get("products") if company else [],
