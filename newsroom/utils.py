@@ -18,7 +18,7 @@ from quart_babel import gettext, format_date as _format_date
 
 from superdesk.core.types import Request
 from superdesk.core import json, get_current_app, get_app_config
-from superdesk.flask import abort, request, g, url_for
+from superdesk.flask import abort, request, g, url_for, Request as FlaskRequest
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
@@ -105,6 +105,7 @@ def get_entity_or_404(_id, resource):
     return item
 
 
+# TODO-ASYNC: Remove this once Agenda is migrated to async
 def get_entities_elastic_or_mongo_or_404(_ids, resource):
     """Finds item in elastic search as fist preference. If not configured, finds from mongo"""
     elastic = get_current_app().data._search_backend(resource)
@@ -177,12 +178,16 @@ def get_entity_dict(items, str_id=False):
     return {item["_id"]: item for item in items}
 
 
-def is_json_request(request):
+def is_json_request(req: Request | FlaskRequest) -> bool:
     """Test if request is for json content."""
-    return (
-        request.args.get("format") == "json"
-        or request.accept_mimetypes.best_match(["application/json", "text/html"]) == "application/json"
-    )
+
+    if isinstance(req, FlaskRequest):
+        return (
+            req.args.get("format") == "json"
+            or req.accept_mimetypes.best_match(["application/json", "text/html"]) == "application/json"
+        )
+    else:
+        return req.get_url_arg("format") == "json" or req.is_json_request()
 
 
 def unique_codes(key, *groups):
@@ -282,11 +287,13 @@ def get_links(agenda):
 
 
 # TODO-ASYNC: Once push/content resources are upgraded, use is_company_x functions directly
-def _is_user_and_company_enabled(user_dict: dict | None, company_dict: Company | None) -> bool:
+def _is_user_and_company_enabled(
+    user_dict: dict | UserResourceModel | None, company_dict: Company | CompanyResource | None
+) -> bool:
     from newsroom.auth.utils import is_company_enabled, is_company_expired
 
-    user = UserResourceModel.from_dict(user_dict) if user_dict else None
-    company = CompanyResource.from_dict(company_dict) if company_dict else None
+    user = UserResourceModel.from_dict(user_dict) if isinstance(user_dict, dict) else user_dict
+    company = CompanyResource.from_dict(company_dict) if isinstance(company_dict, dict) else company_dict
     return is_company_enabled(user, company) and not is_company_expired(user, company)
 
 
@@ -315,6 +322,35 @@ async def get_user_dict(use_globals: bool = True) -> dict[str, User]:
     return g.user_dict
 
 
+# TODO-ASYNC: Replace usage of above function with this one, and remove `_async` suffix
+async def get_user_dict_async(use_globals: bool = True) -> dict[ObjectId, UserResourceModel]:
+    from newsroom.auth.utils import get_current_request, is_from_request
+    from newsroom.users.service import UsersService
+
+    async def _get_users() -> dict[ObjectId, UserResourceModel]:
+        users_task = UsersService().search({"is_enabled": True})
+        users_cursor, companies = await gather(users_task, get_company_dict_async(use_globals))
+
+        return {
+            user.id: user
+            async for user in users_cursor
+            if _is_user_and_company_enabled(user, companies.get(user.company))
+        }
+
+    if not use_globals or not is_from_request():
+        return await _get_users()
+
+    app = get_current_app()
+    current_request = get_current_request()
+
+    users_dict = current_request.storage.request.get("user_dict_async")
+    if app.testing or not users_dict:
+        users_dict = await _get_users()
+        current_request.storage.request.set("user_dict_async", users_dict)
+
+    return users_dict
+
+
 async def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
     """Get all active companies indexed by _id.
 
@@ -338,6 +374,35 @@ async def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
     elif "company_dict" not in g or get_current_app().testing:
         g.company_dict = await _get_companies()
     return g.company_dict
+
+
+# TODO-ASYNC: Replace usage of above function with this one, and remove `_async` suffix
+async def get_company_dict_async(use_globals: bool = True) -> Dict[ObjectId, CompanyResource]:
+    """Get all active companies indexed by _id.
+
+    Must reload when testing because there it's using single context.
+    """
+
+    from newsroom.auth.utils import get_current_request, is_from_request
+    from newsroom.companies import CompanyServiceAsync
+
+    async def _get_companies() -> Dict[ObjectId, CompanyResource]:
+        cursor = await CompanyServiceAsync().search({"is_enabled": True})
+
+        return {company.id: company async for company in cursor if _is_user_and_company_enabled(None, company)}
+
+    if not use_globals or not is_from_request():
+        return await _get_companies()
+
+    app = get_current_app()
+    current_request = get_current_request()
+
+    companies_dict = current_request.storage.request.get("company_dict_async")
+    if app.testing or not companies_dict:
+        companies_dict = await _get_companies()
+        current_request.storage.request.set("company_dict_async", companies_dict)
+
+    return companies_dict
 
 
 def get_cached_resource_by_id(resource, _id, black_list_keys=None):
@@ -406,6 +471,7 @@ def set_version_creator(doc):
     doc["version_creator"] = get_user_id_from_request(None)
 
 
+# TODO-ASYNC: Remove this once Agenda is upgraded to async
 def get_items_for_user_action(_ids, item_type):
     # Getting entities from elastic first so that we get all fields
     # even those which are not a part of ItemsResource(content_api) schema.
@@ -629,3 +695,44 @@ def get_groups(groups: List[Group], company: Optional[Company]):
 
 def get_company_permissions(company: Optional[Company]) -> Dict[Permissions, bool]:
     return {"coverage_info": not company or company.get("restrict_coverage_info") is not True}
+
+
+async def get_user_and_company_dicts(
+    use_globals: bool = True,
+) -> tuple[dict[ObjectId, UserResourceModel], dict[ObjectId, CompanyResource]]:
+    from newsroom.users import UsersService
+    from newsroom.companies import CompanyServiceAsync
+    from newsroom.auth.utils import is_company_enabled, is_company_expired, get_current_request, is_from_request
+
+    async def _get_items() -> tuple[dict[ObjectId, UserResourceModel], dict[ObjectId, CompanyResource]]:
+        user_cursor, company_cursor = await gather(
+            UsersService().search({"is_enabled": True}),
+            CompanyServiceAsync().search({"is_enabled": True}),
+        )
+        all_users, all_companies = await gather(
+            user_cursor.to_list(),
+            company_cursor.to_list(),
+        )
+
+        companies = {
+            company.id: company
+            for company in all_companies
+            if is_company_enabled(None, company) and not is_company_expired(None, company)
+        }
+        users = {
+            user.id: user
+            for user in all_users
+            if is_company_enabled(user, companies.get(user.company, None))
+            and not is_company_expired(user, companies.get(user.company, None))
+        }
+        return users, companies
+
+    if not is_from_request() or not use_globals:
+        return await _get_items()
+
+    current_request = get_current_request()
+    if current_request.storage.request.get("user_company_dicts") or get_current_app().testing:
+        users, companies = await _get_items()
+        current_request.storage.request.set("user_company_dicts", (users, companies))
+
+    return current_request.storage.request.get("user_company_dicts")
