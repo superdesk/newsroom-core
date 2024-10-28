@@ -16,6 +16,7 @@ from newsroom.assets import ASSETS_RESOURCE
 from newsroom.core import get_current_wsgi_app
 from newsroom.web.factory import NewsroomWebApp
 from newsroom.flask import get_file_from_request
+from newsroom.wire import WireSearchServiceAsync
 from newsroom.wire.views import delete_dashboard_caches
 
 from .publishing import Publisher
@@ -37,7 +38,7 @@ PublishHandlerFunc = Callable[[NewsroomWebApp, dict[str, Any]], Awaitable[None]]
 
 async def handle_publish_event(app: NewsroomWebApp, item):
     orig = app.data.find_one("agenda", req=None, _id=item["guid"])
-    event_id = publisher.publish_event(item, orig)
+    event_id = await publisher.publish_event(item, orig)
     notify_new_agenda_item.delay(event_id, check_topics=True, is_new=orig is None)
 
 
@@ -45,8 +46,8 @@ async def handle_publish_planning(app: NewsroomWebApp, item):
     orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
     item["planning_date"] = parse_date_str(item["planning_date"])
 
-    plan_id = publisher.publish_planning_item(item, orig)
-    event_id = publisher.publish_planning_into_event(item)
+    plan_id = await publisher.publish_planning_item(item, orig)
+    event_id = await publisher.publish_planning_into_event(item)
 
     # Prefer parent Event when sending notificaitons
     _id = event_id or plan_id
@@ -54,8 +55,8 @@ async def handle_publish_planning(app: NewsroomWebApp, item):
 
 
 async def handle_publish_text_item(_, item):
-    orig = get_resource_service("items").find_one(req=None, _id=item["guid"])
-    item["_id"] = await publisher.publish_item(item, orig)
+    orig = await WireSearchServiceAsync().service.find_by_id(item["guid"])
+    item["_id"] = await publisher.publish_item(item, orig.to_dict() if orig else None)
 
     if not item.get("nextversion"):
         notify_new_wire_item.delay(

@@ -1,25 +1,30 @@
 import logging
 
-from typing import Any, Set
+from typing import Any
 from bson import ObjectId
 
-from newsroom.types import Company, Topic, User
-from newsroom.users.service import UsersService
+from superdesk.core.types import SearchRequest
+
 from superdesk import get_resource_service
 from superdesk.core import get_app_config
 
 from newsroom.core import get_current_wsgi_app
-from newsroom.history import get_history_users
-from newsroom.utils import get_company_dict, get_user_dict
+from newsroom.types import Company, Topic, User, UserResourceModel, CompanyResource, TopicResourceModel, SectionEnum
+from newsroom.wire.filters import WireSearchRequestArgs
+from newsroom.history_async import get_history_users
+from newsroom.utils import get_user_dict_async, get_company_dict_async
 from newsroom.agenda.utils import push_agenda_item_notification
 from newsroom.email import (
     send_new_item_notification_email,
     send_history_match_notification_email,
     send_item_killed_notification_email,
 )
-from newsroom.topics import get_agenda_notification_topics_for_query_by_id, get_topics_with_subscribers
+from newsroom.topics import (
+    get_agenda_notification_topics_for_query_by_id,
+    get_topics_with_subscribers_async,
+)
 from newsroom.notifications import push_notification, save_user_notifications, NotificationQueueService
-
+from newsroom.wire import WireSearchServiceAsync
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +42,13 @@ class NotificationManager:
             return
 
         item_type = item.get("type")
-        users_with_realtime_subscription: Set[ObjectId] = set()
+        users_with_realtime_subscription: set[ObjectId] = set()
         try:
-            user_dict = await get_user_dict()
-            user_ids = [u["_id"] for u in user_dict.values()]
+            users = await get_user_dict_async()
+            user_ids = list(users.keys())
 
-            company_dict = await get_company_dict()
-            company_ids = [c["_id"] for c in company_dict.values()]
+            companies = await get_company_dict_async()
+            company_ids = list(companies.keys())
 
             if item_type == "agenda":
                 await push_agenda_item_notification("new_item", item=item)
@@ -52,24 +57,19 @@ class NotificationManager:
 
             if check_topics:
                 if item_type == "text":
-                    users_with_realtime_subscription = await self.notify_wire_topic_matches(
-                        item, user_dict, company_dict
-                    )
+                    users_with_realtime_subscription = await self.notify_wire_topic_matches(item, users, companies)
                 else:
-                    users_with_realtime_subscription = await self.notify_agenda_topic_matches(
-                        item, user_dict, company_dict
-                    )
+                    users_with_realtime_subscription = await self.notify_agenda_topic_matches(item, users, companies)
 
             if get_app_config("NOTIFY_MATCHING_USERS") == "never":
                 return
-
-            if get_app_config("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
+            elif get_app_config("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
                 return
 
             await self.notify_user_matches(
                 item,
-                user_dict,
-                company_dict,
+                users,
+                companies,
                 user_ids,
                 company_ids,
                 users_with_realtime_subscription if not is_canceled(item) else set(),
@@ -79,75 +79,90 @@ class NotificationManager:
             logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
     async def notify_wire_topic_matches(
-        self, item: dict[str, Any], users_dict: dict[str, User], companies_dict: dict[str, Company]
-    ) -> Set[ObjectId]:
-        topics = await get_topics_with_subscribers("wire")
-        topic_matches = get_resource_service("wire_search").get_matching_topics(
-            item["_id"], topics, users_dict, companies_dict
+        self, item: dict[str, Any], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
+    ) -> set[ObjectId]:
+        topics = await get_topics_with_subscribers_async("wire")
+        topic_matches = await WireSearchServiceAsync().get_mathing_topics_for_item(
+            item["_id"], topics, list(users.values()), companies
         )
 
         if not topic_matches:
             return set()
 
         push_notification("topic_matches", item=item, topics=topic_matches)
-        return await self.send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return await self.send_topic_notification_emails(item, topics, topic_matches, users, companies)
 
     async def send_topic_notification_emails(
         self,
         item: dict[str, Any],
-        topics: list[Topic],
-        topic_matches: list,
-        users: dict[str, User],
-        companies: dict[str, Company],
-    ) -> Set[ObjectId]:
-        users_processed: Set[ObjectId] = set()
-        users_with_realtime_subscription: Set[ObjectId] = set()
+        topics: list[TopicResourceModel],
+        topic_matches: set[ObjectId],
+        users: dict[ObjectId, UserResourceModel],
+        companies: dict[ObjectId, CompanyResource],
+    ) -> set[ObjectId]:
+        users_processed: set[ObjectId] = set()
+        users_with_realtime_subscription: set[ObjectId] = set()
         notification_queue_service = NotificationQueueService()
 
         for topic in topics:
-            if topic["_id"] not in topic_matches:
+            if topic.id not in topic_matches:
                 continue
 
-            for subscriber in topic.get("subscribers") or []:
-                user = users.get(str(subscriber["user_id"]))
+            for subscriber in topic.subscribers or []:
+                user = users.get(subscriber.user_id)
 
                 if not user:
                     continue
 
-                company = companies.get(str(user.get("company")))
+                company = companies.get(user.company) if user.company else None
 
-                section = topic.get("topic_type") or "wire"
-                if user["_id"] not in users_processed:
+                section: SectionEnum = topic.topic_type or SectionEnum.WIRE
+                if user.id not in users_processed:
                     # Only send websocket notification once for each item
                     await save_user_notifications(
                         [
                             dict(
-                                user=user["_id"],
+                                user=user.id,
                                 item=item["_id"],
-                                resource=section,
+                                resource=section.value,
                                 action="topic_matches",
                                 data=None,
                             )
                         ]
                     )
-                    users_processed.add(user["_id"])
+                    users_processed.add(user.id)
 
-                if not user.get("receive_email"):
+                if not user.receive_email:
                     continue
-                elif subscriber.get("notification_type") == "scheduled":
-                    await notification_queue_service.add_item_to_queue(user["_id"], section, topic["_id"], item)
-                elif user["_id"] in users_with_realtime_subscription:
+                elif subscriber.notification_type == "scheduled":
+                    await notification_queue_service.add_item_to_queue(user.id, section.value, topic.id, item)
+                elif user.id in users_with_realtime_subscription:
                     # This user has already received a realtime notification email about this item
                     # No need to send another
                     continue
                 else:
-                    users_with_realtime_subscription.add(user["_id"])
-                    search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
-                    query = search_service.get_topic_query(
-                        topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
-                    )
+                    users_with_realtime_subscription.add(user.id)
+                    if topic.topic_type == SectionEnum.WIRE:
+                        wire_service = WireSearchServiceAsync()
+                        query = await wire_service.get_topic_items_query(
+                            topic,
+                            user,
+                            company,
+                            args=WireSearchRequestArgs(
+                                page_size=1,
+                                ids=[item["_id"]],
+                                es_highlight=True,
+                            ),
+                        )
+                        cursor = await wire_service.service.find(SearchRequest(elastic=query))
+                        items = await cursor.to_list_raw()
+                    else:
+                        search_service = get_resource_service("agenda")
+                        query = search_service.get_topic_query(
+                            topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
+                        )
 
-                    items = list(search_service.get_items_by_query(query, size=1))
+                        items = list(search_service.get_items_by_query(query, size=1))
                     highlighted_item = item
 
                     if len(items) > 0:
@@ -155,9 +170,9 @@ class NotificationManager:
 
                     await send_new_item_notification_email(
                         user,
-                        topic["label"],
+                        topic.label,
                         item=highlighted_item,
-                        section=section,
+                        section=section.value,
                     )
 
         return users_with_realtime_subscription
@@ -165,73 +180,75 @@ class NotificationManager:
     async def notify_user_matches(
         self,
         item: dict[str, Any],
-        users_dict: dict[str, Any],
-        companies_dict: dict[str, Company],
+        users: dict[ObjectId, UserResourceModel],
+        companies: dict[ObjectId, CompanyResource],
         user_ids: list[ObjectId],
         company_ids: list[ObjectId],
         users_with_realtime_subscription: set[ObjectId],
     ):
         """Send notification to users who have downloaded or bookmarked the provided item"""
 
-        related_items = item.get("ancestors", [])
+        related_items: list[str] = item.get("ancestors", [])
         related_items.append(item["_id"])
         is_text = item.get("type") == "text"
 
-        users_processed = []
-        users_with_paused_notifications = set(
-            [user["_id"] for user in users_dict.values() if UsersService.user_has_paused_notifications(user)]
+        users_processed: set[ObjectId] = set()
+        users_with_paused_notifications: set[ObjectId] = set(
+            [user.id for user in users.values() if user.has_paused_notifications()]
         )
 
-        def _get_users(section):
+        async def _get_users(section: str) -> set[ObjectId]:
             """Get the list of users who have downloaded or bookmarked the items"""
             # Get users who have downloaded any of the items
-            user_list = get_history_users(related_items, user_ids, company_ids, section, "download")
+            user_list = await get_history_users(related_items, user_ids, company_ids, section, "download")
 
             if is_text and section != "agenda":
                 # Add users who have bookmarked any of the items
-                service = get_resource_service("{}_search".format(section))
-                bookmarked_users = service.get_matching_bookmarks(related_items, users_dict, companies_dict)
+                bookmarked_users = await WireSearchServiceAsync().get_matching_item_bookmarks(
+                    related_items,
+                    users,
+                    companies,
+                )
 
-                user_list.extend(bookmarked_users)
+                user_list.update(bookmarked_users)
 
             # Add users if this section is wire
             # Or if the user is not already in the list of users for wire
-            user_list = [
+            # Removing duplicates, if any
+            user_list = set(
                 user_id
                 for user_id in user_list
                 if user_id not in users_processed
-                and ObjectId(user_id) not in users_with_realtime_subscription
-                and ObjectId(user_id) not in users_with_paused_notifications
-            ]
+                and user_id not in users_with_realtime_subscription
+                and user_id not in users_with_paused_notifications
+            )
 
-            users_processed.extend(user_list)
+            users_processed.update(user_list)
+            return user_list
 
-            # Remove duplicates and return the list
-            return list(set(user_list))
-
-        async def _send_notification(section, users_ids):
+        async def _send_notification(section: str, users_ids: set[ObjectId]):
             if not users_ids:
                 return
 
             await save_user_notifications(
                 [
                     dict(
-                        user=user,
+                        user=user_id,
                         item=item["_id"],
                         resource=item.get("type"),
                         action="history_match",
                         data=None,
                     )
-                    for user in users_ids
+                    for user_id in users_ids
                 ]
             )
 
-            await self.send_user_notification_emails(item, users_ids, users_dict, section)
+            await self.send_user_notification_emails(item, users_ids, users, section)
 
         # First add users for the 'wire' section and send the notification
         # As this takes precedence over all other sections
         # (in case items appear in multiple sections)
-        await _send_notification("wire", _get_users("wire"))
+        await _send_notification("wire", await _get_users("wire"))
 
         # Next iterate over the registered sections (excluding wire and api)
         app = get_current_wsgi_app()
@@ -241,25 +258,32 @@ class NotificationManager:
             if section["_id"] != "wire" and section["group"] not in ["api", "monitoring"]
         ]:
             # Add the users for those sections and send the notification
-            await _send_notification(section_id, _get_users(section_id))
+            await _send_notification(section_id, await _get_users(section_id))
 
     async def send_user_notification_emails(
-        self, item: dict[str, Any], user_matches: list[ObjectId], users: dict[str, User], section: Any
+        self, item: dict[str, Any], user_matches: set[ObjectId], users: dict[ObjectId, UserResourceModel], section: str
     ):
         for user_id in user_matches:
-            user = users.get(str(user_id))
-            if is_canceled(item):
+            user = users.get(user_id)
+            if not user:
+                continue
+            elif is_canceled(item):
                 await send_item_killed_notification_email(user, item=item)
             else:
-                if user and user.get("receive_email"):
+                if user.receive_email:
                     await send_history_match_notification_email(user, item=item, section=section)
 
     async def notify_agenda_topic_matches(
-        self, item: dict[str, Any], users_dict: dict[str, User], companies_dict: dict[str, Company]
-    ) -> Set[ObjectId]:
-        topics = await get_topics_with_subscribers("agenda")
+        self, item: dict[str, Any], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
+    ) -> set[ObjectId]:
+        topics = await get_topics_with_subscribers_async("agenda")
+
+        # TODO-ASYNC: Remove these conversions once Agenda is updated to async
+        users_dict: dict[str, User] = {str(user.id): user.to_dict() for user in users.values()}
+        companies_dict: dict[str, Company] = {str(company.id): company.to_dict() for company in companies.values()}
+        topics_list: list[Topic] = [topic.to_dict() for topic in topics]
         topic_matches = get_resource_service("agenda").get_matching_topics(
-            item["_id"], topics, users_dict, companies_dict
+            item["_id"], topics_list, users_dict, companies_dict
         )
 
         # Include topics where the ``query`` is ``item["_id"]``
@@ -275,4 +299,4 @@ class NotificationManager:
             return set()
 
         await push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
-        return await self.send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return await self.send_topic_notification_emails(item, topics, topic_matches, users, companies)
