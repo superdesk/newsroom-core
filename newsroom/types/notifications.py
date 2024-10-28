@@ -1,8 +1,9 @@
 from datetime import datetime
-from dataclasses import dataclass
-from typing import Annotated, Optional
-from superdesk.core.resources import ResourceModel
-from superdesk.core.resources.fields import ObjectId, Field
+from typing import Annotated
+from pydantic import Field
+
+from superdesk.core.resources import ResourceModel, dataclass
+from superdesk.core.resources.fields import ObjectId
 from superdesk.core.resources.validators import validate_data_relation_async
 
 
@@ -17,7 +18,7 @@ class Notification(ResourceModel):
 
     user: user_validated_type
     action: str
-    data: Optional[dict] = {}
+    data: dict = Field(default_factory=dict)
 
 
 @dataclass
