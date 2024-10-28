@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from quart_babel import gettext
 
 from superdesk.lock import lock, unlock
-from superdesk import get_resource_service
 from superdesk.core import json, get_app_config
 from superdesk.core.types import Request, Response
 from superdesk.core.web import EndpointGroup
