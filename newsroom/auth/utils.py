@@ -101,7 +101,7 @@ def is_from_request() -> bool:
     try:
         get_current_request()
         return True
-    except AuthorizationError:
+    except (AuthorizationError, RuntimeError):
         return False
 
 
