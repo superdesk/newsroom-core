@@ -75,7 +75,7 @@ class CompanyExpiryAlerts:
                     }
                     logger.info(f"{self.log_msg} Sending to following users of company {company['name']}: {recipients}")
 
-                    async for user in users_cursor.to_list():
+                    for user in await users_cursor.to_list():
                         await send_user_email(
                             user,
                             template="company_expiry_alert_user",

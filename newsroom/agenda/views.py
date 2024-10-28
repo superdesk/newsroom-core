@@ -18,7 +18,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.agenda import blueprint
-from newsroom.products.products import get_products_by_company
+from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics
 from newsroom.topics_folders import get_company_folders, get_user_folders
 from newsroom.navigations import get_navigations
@@ -38,6 +38,7 @@ from newsroom.utils import (
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
+from newsroom.agenda.service import FeaturedService
 from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
@@ -123,6 +124,17 @@ async def item(_id):
 @login_required
 @section("agenda")
 async def search():
+    if request.args.get("featured"):
+        date_from = request.args.get("date_from")
+        timezone_offset = int(request.args.get("timezone_offset", 0))
+        query_string = request.args.get("q")
+        filter_string = request.args.get("filter")
+        from_offset = int(request.args.get("from", 0))
+        response = await FeaturedService().get_featured_stories(
+            date_from, timezone_offset, query_string, filter_string, from_offset
+        )
+        return await send_response("agenda", response)
+
     response = await get_internal("agenda")
     if len(response):
         company = get_company_from_request(None)
@@ -140,7 +152,7 @@ async def get_view_data() -> Dict:
     company_dict = None if not company else company.to_dict()
 
     topics = await get_user_topics(user.id) if user else []
-    products = get_products_by_company(company_dict, product_type="agenda") if company else []
+    products = await get_products_by_company(company_dict, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
     ui_config_service = UiConfigResourceService()
@@ -161,7 +173,7 @@ async def get_view_data() -> Dict:
         "locators": get_vocabulary("locators"),
         "ui_config": await ui_config_service.get_section_config("agenda"),
         "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company_dict),
-        "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
+        "has_agenda_featured_items": await FeaturedService().count() > 0,
         "user_folders": await get_user_folders(user, "agenda") if user else [],
         "company_folders": await get_company_folders(company, "agenda") if company else [],
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
