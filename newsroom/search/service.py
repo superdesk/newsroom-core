@@ -1,5 +1,5 @@
 import logging
-from typing import List, Literal, Optional, Union, Dict, Any, TypedDict
+from typing import List, Optional, Union, Dict, Any
 from copy import deepcopy
 
 from quart_babel import gettext
@@ -13,17 +13,11 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
-from newsroom.types import CompanyResource, UserResourceModel
+from newsroom.types import CompanyResource, UserResourceModel, AdvancedSearchParams
 from newsroom import Service
 from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request, get_user_sections
 from newsroom.companies import CompanyServiceAsync
-from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
-from newsroom.search.config import (
-    SearchGroupNestedConfig,
-    get_nested_config,
-    is_search_field_nested,
-    get_advanced_search_fields,
-)
+
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
@@ -34,6 +28,21 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
+
+from .types import (
+    BoolQuery,
+    BoolQueryParams,
+    QueryStringQuery,
+    SearchArgs,
+    ElasticDefaultOperator,
+    ElasticQueryStringType,
+)
+from .config import (
+    get_nested_config,
+    is_search_field_nested,
+    get_advanced_search_fields,
+)
+from .utils import query_string, get_filter_query
 
 # from newsroom.users import users_service
 
@@ -46,51 +55,6 @@ def strtobool(val):
     elif isinstance(val, int):
         return val != 0
     return _strtobool(val)
-
-
-def query_string(
-    query: str,
-    default_operator: Literal["AND", "OR"] = "AND",
-    fields: list[str] | None = None,
-    multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
-    analyze_wildcard=False,
-) -> QueryStringQuery:
-    query_string_params = get_app_config("ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS", {}).copy()
-
-    query_string_params.update(
-        dict(
-            query=query,
-            default_operator=default_operator,
-            lenient=True,
-            fields=fields if fields is not None else ["*"],
-            type=multimatch_type,
-            # We only set ``analyze_wildcard`` if the default is turned off
-            # otherwise if default is turned on, then we always set it to True
-            analyze_wildcard=query_string_params.get("analyze_wildcard") or analyze_wildcard,
-        )
-    )
-
-    return dict(query_string=query_string_params)
-
-
-def get_filter_query(
-    key: str, val: List[str], aggregation_field: str, nested_config: Optional[SearchGroupNestedConfig]
-):
-    if nested_config:
-        return {
-            "nested": {
-                "path": nested_config["parent"],
-                "query": {
-                    "bool": {
-                        "filter": [
-                            {"term": {f"{nested_config['parent']}.{nested_config['field']}": nested_config["value"]}},
-                            {"terms": {f"{nested_config['parent']}.{nested_config['searchfield']}": val}},
-                        ],
-                    },
-                },
-            },
-        }
-    return {"terms": {aggregation_field: val}}
 
 
 def parse_sort(value):
@@ -108,23 +72,6 @@ def parse_sort(value):
             return field_spec
 
     return list(filter(None, [parse_field(field) for field in value.split(",")]))
-
-
-class AdvancedSearchParams(TypedDict):
-    all: str
-    any: str
-    exclude: str
-    fields: List[str]
-
-
-class SearchArgs(TypedDict, total=False):
-    q: str
-    id: str
-    ids: List[str]
-    size: int
-    bookmarks: str
-    ignore_latest: bool
-    filter: Union[Dict[str, str], str]
 
 
 class SearchQuery(object):
@@ -834,14 +781,22 @@ class BaseSearchService(Service):
         if search.advanced.get("all"):
             search.query["bool"].setdefault("must", []).append(
                 query_string(
-                    search.advanced["all"], "AND", fields=fields, multimatch_type="cross_fields", analyze_wildcard=True
+                    search.advanced["all"],
+                    ElasticDefaultOperator.AND,
+                    fields=fields,
+                    multimatch_type=ElasticQueryStringType.CROSS_FIELDS,
+                    analyze_wildcard=True,
                 )
             )
 
         if search.advanced.get("any"):
             search.query["bool"].setdefault("must", []).append(
                 query_string(
-                    search.advanced["any"], "OR", fields=fields, multimatch_type="best_fields", analyze_wildcard=True
+                    search.advanced["any"],
+                    ElasticDefaultOperator.OR,
+                    fields=fields,
+                    multimatch_type=ElasticQueryStringType.BEST_FIELDS,
+                    analyze_wildcard=True,
                 )
             )
 
@@ -849,9 +804,9 @@ class BaseSearchService(Service):
             search.query["bool"]["must_not"].append(
                 query_string(
                     search.advanced["exclude"],
-                    "OR",
+                    ElasticDefaultOperator.OR,
                     fields=fields,
-                    multimatch_type="best_fields",
+                    multimatch_type=ElasticQueryStringType.BEST_FIELDS,
                     analyze_wildcard=True,
                 )
             )
