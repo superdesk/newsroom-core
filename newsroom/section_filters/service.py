@@ -1,8 +1,8 @@
-from superdesk.flask import g
 from superdesk.core.resources import AsyncCacheableService
 
 from newsroom.types import SectionFilterModel
-from newsroom.search import BoolQuery
+from newsroom.auth.utils import get_current_request, is_from_request
+from newsroom.search.types import BoolQuery
 from newsroom.search.service import query_string
 from newsroom.core.resources.service import NewshubAsyncResourceService
 
@@ -11,7 +11,7 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
     resource_name = "section_filters"
     cache_lookup = {"is_enabled": True}
 
-    async def get_section_filters(self, filter_type: str) -> list[dict]:
+    async def get_section_filters(self, filter_type: str) -> list[SectionFilterModel]:
         """Get the list of section filter by filter type
 
         :param filter_type: Type of filter
@@ -19,24 +19,37 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
         section_filters = await self.get_section_filters_dict()
         return section_filters.get(filter_type) or []
 
-    async def get_section_filters_dict(self) -> dict[str, list[dict]]:
+    async def get_section_filters_dict(self) -> dict[str, list[SectionFilterModel]]:
         """Get the list of all section filters"""
-        if not getattr(g, "section_filters", None):
-            filters: dict[str, list] = {}
+
+        request = get_current_request() if is_from_request() else None
+
+        async def get_filters() -> dict[str, list[SectionFilterModel]]:
+            filters: dict[str, list[SectionFilterModel]] = {}
             for f in await self.get_cached():
                 if not filters.get(f.get("filter_type")):
                     filters[f.get("filter_type")] = []
-                filters[f.get("filter_type")].append(f)
-            g.section_filters = filters
-        return g.section_filters
+                filters[f.get("filter_type")].append(SectionFilterModel.from_dict(f))
+            return filters
 
-    async def apply_section_filter(self, query: BoolQuery, product_type: str, filters=None):
+        if not request:
+            return await get_filters()
+
+        if not request.storage.request.get("section_filters"):
+            request.storage.request.set("section_filters", await get_filters())
+        return request.storage.request.get("section_filters")
+
+    async def apply_section_filter(
+        self, query: BoolQuery, product_type: str, filters: dict[str, list[SectionFilterModel]] | None = None
+    ):
         """Get the list of base products for product type
 
         :param query: Dict of elasticsearch query
         :param product_type: Type of product
         :param filters: filters for each section
         """
+
+        section_filters: list[SectionFilterModel] | None
         if not filters:
             section_filters = await self.get_section_filters(product_type)
         else:
@@ -46,6 +59,5 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
             return
 
         for f in section_filters:
-            filter_query = f.get("query")
-            if filter_query:
-                query["bool"].setdefault("filter", []).append(query_string(str(filter_query)))
+            if f.query:
+                query["bool"].setdefault("filter", []).append(query_string(str(f.query)))
