@@ -25,33 +25,35 @@ export function renderNotificationComponent(notification: any, item: any) {
 }
 
 function getNotificationFooterText(notification: any) {
+    const createdDatetime = notification._created;
+
     switch (notification.action) {
     case 'share':
         return (
-            isToday(notification.created) ?
+            isToday(createdDatetime) ?
                 gettext('Shared by {{ first_name }} {{ last_name }} at {{ time }}', {
                     first_name: get(notification, 'data.shared_by.first_name'),
                     last_name: get(notification, 'data.shared_by.last_name'),
-                    time: formatTime(notification.created),
+                    time: formatTime(createdDatetime),
                 }) :
                 gettext('Shared by {{ first_name }} {{ last_name }} on {{ date }}', {
                     first_name: get(notification, 'data.shared_by.first_name'),
                     last_name: get(notification, 'data.shared_by.last_name'),
-                    date: formatDate(notification.created),
+                    date: formatDate(createdDatetime),
                 })
         );
     case 'topic_matches':
         return (
-            isToday(notification.created) ?
-                gettext('Created at {{ time }}', {time: formatTime(notification.created)}) :
-                gettext('Created on {{ date }}', {date: formatDate(notification.created)})
+            isToday(createdDatetime) ?
+                gettext('Created at {{ time }}', {time: formatTime(createdDatetime)}) :
+                gettext('Created on {{ date }}', {date: formatDate(createdDatetime)})
         );
     case 'history_match':
     default:
         return (
-            isToday(notification.created) ?
-                gettext('Updated at {{ time }}', {time: formatTime(notification.created)}) :
-                gettext('Updated on {{ date }}', {date: formatDate(notification.created)})
+            isToday(createdDatetime) ?
+                gettext('Updated at {{ time }}', {time: formatTime(createdDatetime)}) :
+                gettext('Updated on {{ date }}', {date: formatDate(createdDatetime)})
         );
     }
 }

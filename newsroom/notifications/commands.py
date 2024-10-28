@@ -168,12 +168,11 @@ class SendScheduledNotificationEmails:
         and the current time.
         """
 
-        try:
-            last_run_time_local = utc_to_local(schedule["timezone"], schedule["last_run_time"]).replace(
-                second=0, microsecond=0
-            )
-        except KeyError:
-            last_run_time_local = None
+        last_run_time_local = (
+            utc_to_local(schedule["timezone"], schedule.get("last_run_time")).replace(second=0, microsecond=0)
+            if schedule.get("last_run_time") is not None
+            else None
+        )
 
         if last_run_time_local is None and force:
             return True

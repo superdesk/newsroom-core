@@ -37,7 +37,7 @@ from newsroom.auth import auth_rules
 from newsroom.users.service import UsersService
 from newsroom.cards import get_card_size, get_card_type, CardsResourceService
 from newsroom.navigations import get_navigations
-from newsroom.products.products import get_products_by_company
+from newsroom.products import get_products_by_company
 from .filters import WireSearchRequestArgs
 from .module import wire_endpoints
 from newsroom.wire.utils import update_action_list
@@ -117,7 +117,7 @@ async def get_view_data() -> dict:
     topics = await get_user_topics_async(user)
     user_folders = await get_user_folders(user, "wire") if user else []
     company_folders = await get_company_folders(company, "wire") if company else []
-    products = get_products_by_company(company_dict, product_type="wire") if company_dict else []
+    products = await get_products_by_company(company_dict, product_type="wire") if company_dict else []
     ui_config_service = UiConfigResourceService()
 
     check_user_has_products(user, products)
@@ -235,7 +235,7 @@ async def get_home_data():
 
     return {
         "cards": cards,
-        "products": get_products_by_company(company_dict) if company else [],
+        "products": await get_products_by_company(company_dict) if company else [],
         "user": str(user.id),
         "userProducts": user.products or [],
         "userType": user.user_type,

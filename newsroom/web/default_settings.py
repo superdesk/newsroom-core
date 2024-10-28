@@ -116,14 +116,11 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.design",
-    "newsroom.products",
     "newsroom.reports",
-    "newsroom.public",
     "newsroom.agenda",
     "newsroom.news_api.api_tokens",
     "newsroom.monitoring",
     "newsroom.auth_server.oauth2",
-    "newsroom.company_admin",
 ]
 
 CORE_APPS = [
@@ -139,10 +136,8 @@ CORE_APPS = [
     "newsroom.wire",
     "newsroom.topics",
     "newsroom.history",
-    "newsroom.products",
     "newsroom.section_filters",
     "newsroom.reports",
-    "newsroom.public",
     "newsroom.agenda",
     "newsroom.photos",
     "newsroom.media_utils",
@@ -154,7 +149,6 @@ CORE_APPS = [
     "newsroom.oauth_clients",
     "newsroom.auth_server.client",
     "newsroom.email_templates",
-    "newsroom.company_admin",
     "newsroom.search",
     "newsroom.notifications.commands",
 ]
@@ -178,6 +172,9 @@ MODULES = [
     "newsroom.push",
     "newsroom.history_async",
     "newsroom.wire.module",
+    "newsroom.company_admin",
+    "newsroom.public",
+    "newsroom.products",
 ]
 
 SITE_NAME = "Newshub"

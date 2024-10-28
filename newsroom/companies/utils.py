@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from bson import ObjectId
 from superdesk.core.resources.cursor import ResourceCursorAsync
@@ -12,12 +12,12 @@ def restrict_coverage_info(company: Optional[Company]) -> bool:
     return False
 
 
-def get_company_section_names(company: Company) -> List[str]:
+def get_company_section_names(company: Company) -> list[str]:
     sections = company.get("sections") or {}
     return sorted([section for section, enabled in sections.items() if enabled])
 
 
-def get_company_product_ids(company: Company) -> List[Optional[ObjectId]]:
+def get_company_product_ids(company: Company) -> list[Optional[ObjectId]]:
     return sorted(
         [
             ObjectId(product.get("_id"))
@@ -28,8 +28,8 @@ def get_company_product_ids(company: Company) -> List[Optional[ObjectId]]:
     )
 
 
-def get_updated_sections(updates, original, company: Optional[CompanyResource]) -> Dict[str, bool]:
-    sections: Dict[str, bool] = {}
+def get_updated_sections(updates, original, company: Optional[CompanyResource]) -> dict[str, bool]:
+    sections: dict[str, bool] = {}
     if "sections" in updates:
         sections = updates["sections"] or {}
     elif "sections" in original:
@@ -42,8 +42,8 @@ def get_updated_sections(updates, original, company: Optional[CompanyResource]) 
     return {section: enabled and section in company_section_names for section, enabled in sections.items()}
 
 
-def get_updated_products(updates, original, company: Optional[CompanyResource]) -> List[CompanyProduct]:
-    products: List[CompanyProduct] = []
+def get_updated_products(updates, original, company: Optional[CompanyResource]) -> list[CompanyProduct]:
+    products: list[CompanyProduct] = []
     if "products" in updates:
         products = updates["products"] or []
     elif "products" in original:
@@ -63,7 +63,7 @@ def get_updated_products(updates, original, company: Optional[CompanyResource]) 
     ]
 
 
-def get_companies_id_by_product(product_id: str) -> List[str]:
+def get_companies_id_by_product(product_id: str) -> list[str]:
     """
     Get company IDs based on product ID.
 
