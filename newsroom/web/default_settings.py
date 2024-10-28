@@ -174,6 +174,7 @@ MODULES = [
     "newsroom.history_async",
     "newsroom.company_admin",
     "newsroom.public",
+    "newsroom.agenda",
     "newsroom.products",
 ]
 

@@ -5,7 +5,6 @@ from superdesk.flask import Blueprint
 from newsroom.utils import url_for_agenda
 from .agenda import AgendaResource, AgendaService, aggregations, PRIVATE_FIELDS
 from newsroom.search.config import init_nested_aggregation
-from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import (
     get_coverage_email_text,
@@ -21,11 +20,11 @@ from .utils import (
 blueprint = Blueprint("agenda", __name__)
 
 from . import views  # noqa
+from .module import module  # noqa
 
 
 def init_app(app):
     superdesk.register_resource("agenda", AgendaResource, AgendaService, _app=app)
-    superdesk.register_resource("agenda_featured", FeaturedResource, FeaturedService, _app=app)
 
     app.section("agenda", app.config["AGENDA_SECTION"], "agenda")
     app.sidenav(app.config["AGENDA_SECTION"], "agenda.index", "calendar", section="agenda")
