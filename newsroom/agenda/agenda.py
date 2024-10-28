@@ -3,12 +3,12 @@ import logging
 from copy import deepcopy
 
 from bson import ObjectId
-from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest
 from quart_babel import lazy_gettext
 
 from superdesk.core import json, get_current_app
 from superdesk.flask import abort
+from content_api.items.resource import code_mapping
 from planning.common import (
     WORKFLOW_STATE_SCHEMA,
     ASSIGNMENT_WORKFLOW_STATE,
@@ -31,7 +31,7 @@ from newsroom.agenda.email import (
 )
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.notifications import save_user_notifications
-from newsroom.search import BoolQuery, BoolQueryParams
+from newsroom.search.types import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import (
     get_user_dict,
@@ -786,6 +786,7 @@ class AgendaService(BaseSearchService):
             for c in completed_coverages
             if c.get("delivery_id") and c.get("coverage_type") == "text"
         ]
+        # TODO-ASYNC: Use new WireSearchServiceAsync service when Agenda is migrated to async
         wire_search_service = get_resource_service("wire_search")
         if text_delivery_ids:
             wire_items = wire_search_service.get_items(text_delivery_ids)
@@ -1247,7 +1248,7 @@ class AgendaService(BaseSearchService):
                 None,
                 _external=False,
                 section="wire.item",
-                _id=wire_item["guid"],
+                item_id=wire_item["guid"],
             )
             coverage["workflow_status"] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
             deliveries = coverage.get("deliveries") or []
@@ -1300,7 +1301,7 @@ class AgendaService(BaseSearchService):
             # If published first time, coverage completion will trigger email - not needed now
             if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:
                 agenda_updated_notification_sent = True
-                self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, parent_coverage)
+                await self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, parent_coverage)
         return agenda_items
 
     def set_bool_query_from_filters(
