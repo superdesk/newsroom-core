@@ -74,6 +74,7 @@ async def get_atom():
 
     for item in response[0].get("_items"):
         try:
+            # TODO-ASYNC: Use new async Wire search service
             complete_item = superdesk.get_resource_service("items").find_one(req=None, _id=item.get("_id"))
 
             # If featuremedia is not allowed for the company don't add the item

@@ -28,17 +28,17 @@ from newsroom.products.products import get_products_by_company
 class NewsAPINewsService(BaseSearchService):
     # set of parameters that the API will allow.
     allowed_params = {
-        "start_date",
-        "end_date",
+        "start_date",  # ** alias=created_from
+        "end_date",  # ** alias=created_to
         "include_fields",
         "exclude_fields",
-        "page_size",
-        "page",
+        "page_size",  # ** alias=size
+        "page",  # ** alias=from
         "version",
-        "where",
-        "q",
-        "default_operator",
-        "filter",
+        "where",  # ? Should we support this in original API?
+        "q",  # ** in original
+        "default_operator",  # ** in original
+        "filter",  # ** in original
         "service",
         "subject",
         "genre",
@@ -46,9 +46,9 @@ class NewsAPINewsService(BaseSearchService):
         "priority",
         "type",
         "item_source",
-        "sort",
-        "timezone",
-        "products",
+        "sort",  # ** in original
+        "timezone",  # alias=timezone_offset?? Double check this one
+        "products",  # alias=product (this version support list of products ID, might also support that in original)
     }
 
     default_sort = [{"versioncreated": "desc"}]

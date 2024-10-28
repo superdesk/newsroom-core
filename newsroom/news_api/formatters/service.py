@@ -30,6 +30,8 @@ class APIFormattersService(Service):
         formatter = self._get_formatter(formatter_name)
         if not formatter:
             abort(404)
+
+        # TODO-ASYNC: Use new async Wire search service
         if version:
             item = get_resource_service("items_versions").find_one(req=None, _id_document=id, version=version)
             if not item:

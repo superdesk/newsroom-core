@@ -44,6 +44,7 @@ MODULES = [
     "newsroom.history_async",
     # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
+    "newsroom.wire.module",
 ]
 
 INSTALLED_APPS = []
