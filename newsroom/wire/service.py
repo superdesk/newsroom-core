@@ -473,7 +473,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         async for item in cursor:
             for bookmark in item.bookmarks or []:
                 user = users.get(bookmark)
-                if user and (user.is_admin() or companies.get(user.company)):
+                if user and (user.is_admin() or (user.company and companies.get(user.company))):
                     bookmark_users.add(user.id)
 
         return bookmark_users
