@@ -51,7 +51,7 @@ behave==1.2.6
 billiard==4.2.1
     # via celery
 black==23.12.1
-    # via -r black-requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/black-requirements.txt
 blinker==1.8.2
     # via
     #   elastic-apm
@@ -61,9 +61,9 @@ blinker==1.8.2
     #   raven
     #   sentry-sdk
     #   superdesk-core
-boto3==1.35.41
+boto3==1.35.49
     # via superdesk-core
-botocore==1.35.41
+botocore==1.35.49
     # via
     #   boto3
     #   s3transfer
@@ -111,11 +111,11 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.6.3
+coverage[toml]==7.6.4
     # via pytest-cov
-croniter==3.0.3
+croniter==3.0.4
     # via superdesk-core
-cryptography==43.0.1
+cryptography==43.0.3
     # via
     #   authlib
     #   jwcrypto
@@ -165,21 +165,21 @@ flask==3.0.3
     #   quart
     #   raven
 flask-caching==2.3.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 flask-mail==0.10.0
     # via superdesk-core
 flask-oidc-ex==0.6.2
     # via superdesk-core
 flask-webpack==0.1.0
-    # via -r requirements.txt
-frozenlist==1.4.1
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
+frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
 future==1.0.0
     # via python-twitter
 google-auth==2.29.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 h11==0.14.0
     # via
     #   hypercorn
@@ -191,7 +191,7 @@ hachoir==3.3.0
 hermescache==1.0.0
     # via superdesk-core
 honcho==2.0.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 hpack==4.0.0
     # via h2
 html5lib==1.1
@@ -204,7 +204,7 @@ httplib2==0.22.0
     # via oauth2client
 hypercorn==0.17.3
     # via
-    #   -r requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
     #   quart
 hyperframe==6.0.1
     # via h2
@@ -254,7 +254,7 @@ lxml==5.2.2
     #   xmlsec
 lxml-html-clean==0.2.2
     # via superdesk-core
-markupsafe==3.0.1
+markupsafe==3.0.2
     # via
     #   jinja2
     #   quart
@@ -270,8 +270,8 @@ multidict==6.1.0
     #   aiohttp
     #   asgi-tools
     #   yarl
-mypy==1.12.0
-    # via -r mypy-requirements.txt
+mypy==1.13.0
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
 mypy-extensions==1.0.0
     # via
     #   black
@@ -350,10 +350,10 @@ pyparsing==3.2.0
     # via
     #   httplib2
     #   pyrtf3
-pypdf==5.0.1
+pypdf==5.1.0
     # via xhtml2pdf
 pyrtf3==0.47.5
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 pytest==8.3.3
     # via
     #   -r dev-requirements.in
@@ -368,7 +368,7 @@ pytest-mock==3.14.0
     # via -r dev-requirements.in
 python-bidi==0.4.2
     # via
-    #   -r requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
     #   xhtml2pdf
 python-dateutil==2.9.0.post0
     # via
@@ -385,7 +385,7 @@ python-magic==0.4.27
 python-twitter==3.5
     # via superdesk-core
 python3-saml==1.16.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 pytz==2024.2
     # via
     #   croniter
@@ -415,11 +415,11 @@ quart-babel @ git+https://github.com/MarkLark86/quart-babel@fix-get-format
 quart-flask-patch==0.3.0
     # via superdesk-core
 quart-rate-limiter==0.10.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 quart-uploads==0.0.4
     # via quart-wtforms
 quart-wtforms==1.0.3
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 raven[flask]==6.10.0
     # via superdesk-core
 redis==5.0.8
@@ -454,7 +454,7 @@ rsa==4.9
 s3transfer==0.10.3
     # via boto3
 sentry-sdk[quart]==2.14.0
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 sgmllib3k==1.0.0
     # via feedparser
 simplejson==3.19.3
@@ -470,15 +470,15 @@ six==1.16.0
     #   python-dateutil
 sniffio==1.3.1
     # via asgi-tools
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
-    # via -r requirements.txt
+superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@NHUB-540
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 svglib==1.5.1
     # via xhtml2pdf
 taskgroup==0.0.0a4
     # via hypercorn
-tinycss2==1.3.0
+tinycss2==1.4.0
     # via
     #   cssselect2
     #   svglib
@@ -494,36 +494,36 @@ types-aiofiles==24.1.0.20240626
 types-click==7.1.8
     # via types-flask
 types-flask==1.1.6
-    # via -r mypy-requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
 types-jinja2==2.11.9
     # via
-    #   -r mypy-requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
     #   types-flask
 types-markupsafe==1.1.10
     # via types-jinja2
 types-protobuf==5.28.0.20240924
-    # via -r mypy-requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
 types-python-dateutil==2.9.0.20241003
     # via
-    #   -r mypy-requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
     #   arrow
 types-pytz==2024.2.0.20241003
     # via
-    #   -r mypy-requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
     #   types-tzlocal
 types-requests==2.31.0.6
-    # via -r mypy-requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
 types-tzlocal==5.1.0.1
-    # via -r mypy-requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
 types-urllib3==1.26.25.14
     # via types-requests
 types-werkzeug==1.0.9
     # via
-    #   -r mypy-requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
     #   types-flask
 typing-extensions==4.12.2
     # via
-    #   -r mypy-requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/mypy-requirements.txt
     #   asgiref
     #   black
     #   hypercorn
@@ -569,7 +569,7 @@ webencodings==0.5.1
     #   tinycss2
 websockets==13.0.1
     # via superdesk-core
-werkzeug==3.0.4
+werkzeug==3.0.6
     # via
     #   flask
     #   quart
@@ -581,16 +581,16 @@ wsproto==1.2.0
     # via hypercorn
 wtforms[email]==3.1.2
     # via
-    #   -r requirements.txt
+    #   -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
     #   quart-wtforms
     #   wtforms
 xhtml2pdf==0.2.16
-    # via -r requirements.txt
+    # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 xmlsec==1.3.14
     # via
     #   python3-saml
     #   superdesk-core
-yarl==1.15.3
+yarl==1.16.0
     # via
     #   aiohttp
     #   asgi-tools
