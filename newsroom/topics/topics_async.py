@@ -115,7 +115,20 @@ async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
     return await data.to_list_raw()
 
 
-async def get_topics_with_subscribers(topic_type: Optional[str] = None) -> List[Topic]:
+# TODO-ASYNC: Replace all usage of `get_user_topics` with this one, and remove the `_async` suffix from the name
+async def get_user_topics_async(user: UserResourceModel) -> list[TopicResourceModel]:
+    data = await TopicService().find(
+        {
+            "$or": [
+                {"user": user.id},
+                {"$and": [{"company": user.company}, {"is_global": True}]},
+            ]
+        }
+    )
+    return await data.to_list()
+
+
+async def get_topics_with_subscribers(topic_type: Optional[str] = None) -> list[Topic]:
     lookup: Dict[str, Any] = (
         {"subscribers": {"$exists": True, "$ne": []}}
         if topic_type is None
@@ -130,6 +143,24 @@ async def get_topics_with_subscribers(topic_type: Optional[str] = None) -> List[
     mongo_cursor = await TopicService().search(lookup=lookup)
 
     return await mongo_cursor.to_list_raw()
+
+
+# TODO-ASYNC: Remove the above function, replace with this one and remove `_async` suffix
+async def get_topics_with_subscribers_async(topic_type: Optional[str] = None) -> list[TopicResourceModel]:
+    lookup: Dict[str, Any] = (
+        {"subscribers": {"$exists": True, "$ne": []}}
+        if topic_type is None
+        else {
+            "$and": [
+                {"subscribers": {"$exists": True, "$ne": []}},
+                {"topic_type": topic_type},
+            ]
+        }
+    )
+
+    mongo_cursor = await TopicService().search(lookup=lookup)
+
+    return await mongo_cursor.to_list()
 
 
 async def get_user_id_to_topic_for_subscribers(
