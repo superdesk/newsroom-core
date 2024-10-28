@@ -109,6 +109,8 @@ def get_product_by_id(
     return product
 
 
+# Obsolete: This method has been migrated to async and it is located under `.utils.py`
+# TODO-ASYNC: remove when everything is async.
 def get_products_by_company(
     company: Optional[Company],
     navigation_ids: Optional[NavigationIds] = None,

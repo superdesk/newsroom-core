@@ -116,7 +116,6 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.wire",
-    "newsroom.products",
     "newsroom.reports",
     "newsroom.agenda",
     "newsroom.news_api.api_tokens",
@@ -137,7 +136,6 @@ CORE_APPS = [
     "newsroom.wire",
     "newsroom.topics",
     "newsroom.history",
-    "newsroom.products",
     "newsroom.section_filters",
     "newsroom.reports",
     "newsroom.agenda",
@@ -175,6 +173,7 @@ MODULES = [
     "newsroom.history_async",
     "newsroom.company_admin",
     "newsroom.public",
+    "newsroom.products",
     "newsroom.design",
 ]
 

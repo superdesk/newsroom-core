@@ -17,6 +17,7 @@ class NINJSFormatter2(NINJSFormatter):
 
     def _transform_to_ninjs(self, item):
         company = get_company_or_none_from_request(None)
+        # TODO-ASYNC: replace then formatters are async
         products = get_products_by_company(company.to_dict() if company else None)
         if not check_association_permission(item, products):
             item.pop("associations", None)

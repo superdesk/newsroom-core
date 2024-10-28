@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 
@@ -11,11 +10,11 @@ blueprint = EndpointGroup("design", __name__)
 
 
 class RouteArguments(BaseModel):
-    page: Optional[str] = None
+    page: str | None = None
 
 
 @blueprint.endpoint("/design/detail", auth=False)
-async def detail(args: None, params: None, req: Request):
+async def detail():
     item = {
         "headline": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
         "slugline": "Slugline",
@@ -51,7 +50,7 @@ async def detail(args: None, params: None, req: Request):
 
 
 @blueprint.endpoint("/design/", auth=False)
-async def index(args: None, params: None, req: Request):
+async def index():
     return await render_template("design_index.html")
 
 
