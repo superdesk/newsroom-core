@@ -1,3 +1,4 @@
+from inspect import isawaitable
 from io import StringIO
 import csv
 
@@ -23,6 +24,8 @@ async def print_reports(report):
         abort(400, gettext("Unknown report {}".format(report)))
 
     data = func()
+    if isawaitable(data):
+        data = await data
     return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
@@ -52,6 +55,8 @@ async def get_report(report):
         abort(400, gettext("Unknown report {}".format(report)))
 
     results = func()
+    if isawaitable(results):
+        results = await results
     return jsonify(results), 200
 
 
@@ -65,6 +70,8 @@ async def export_reports(report):
         abort(400, gettext("Unknown report {}".format(report)))
 
     rows = func()
+    if isawaitable(rows):
+        rows = await rows
     data = StringIO()
     writer = csv.writer(data, dialect="excel")
 
