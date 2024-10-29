@@ -36,7 +36,7 @@ async def print_reports(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    data = func()  # type: ignore
+    data = await func()  # type: ignore
     return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
@@ -71,7 +71,7 @@ async def get_report(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    results = func()  # type: ignore
+    results = await func()  # type: ignore
     return jsonify(results), 200
 
 
@@ -89,7 +89,7 @@ async def export_reports(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    rows = func()  # type: ignore
+    rows = await func()  # type: ignore
     data = StringIO()
     writer = csv.writer(data, dialect="excel")
 
