@@ -6,9 +6,9 @@ from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
 from superdesk.core.types import Request
+from superdesk.core.web import EndpointGroup
 from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.auth import auth_rules
-from newsroom.reports import blueprint
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
@@ -17,6 +17,9 @@ from newsroom.users import get_user_profile_data
 
 class RouteArguments(BaseModel):
     report: str
+
+
+blueprint = EndpointGroup("reports", __name__)
 
 
 @blueprint.endpoint(
@@ -33,7 +36,7 @@ async def print_reports(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    data = func()
+    data = func()  # type: ignore
     return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
@@ -68,7 +71,7 @@ async def get_report(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    results = func()
+    results = func()  # type: ignore
     return jsonify(results), 200
 
 
@@ -86,7 +89,7 @@ async def export_reports(args: RouteArguments, params: None, req: Request):
     if not func:
         abort(400, gettext("Unknown report {}".format(report)))
 
-    rows = func()
+    rows = func()  # type: ignore
     data = StringIO()
     writer = csv.writer(data, dialect="excel")
 

@@ -13,10 +13,7 @@ from .reports import (
 )
 import superdesk
 from superdesk.core.module import Module
-from superdesk.core.web import EndpointGroup
 from newsroom.wire.search import WireSearchService, WireSearchResource
-
-blueprint = EndpointGroup("reports", __name__)
 
 admin_reports = {
     "company-saved-searches": get_company_saved_searches,
@@ -34,8 +31,11 @@ admin_reports = {
 
 company_admin_reports = {"company-and-user-saved-searches": get_company_and_user_saved_searches}
 
+
 def init_app(app):
     superdesk.register_resource("news_api_search", WireSearchResource, WireSearchService, _app=app)
-    
-from .views import blueprint
-module = Module(name="newsroom.reports", endpoints=[blueprint])
+
+
+from .views import blueprint  # noqa
+
+module = Module(name="newsroom.reports", endpoints=[blueprint])  # type: ignore
