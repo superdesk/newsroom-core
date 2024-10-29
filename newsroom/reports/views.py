@@ -1,9 +1,11 @@
+from pydantic import BaseModel
 from io import StringIO
 import csv
 
 from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
+from superdesk.core.types import Request
 from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.auth import auth_rules
 from newsroom.reports import blueprint
@@ -13,8 +15,18 @@ from .utils import get_current_user_reports
 from newsroom.users import get_user_profile_data
 
 
-@blueprint.endpoint("/reports/print/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
-async def print_reports(report):
+class RouteArguments(BaseModel):
+    report: str
+
+
+@blueprint.endpoint(
+    "/reports/print/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def print_reports(args: RouteArguments, params: None, req: Request):
+    report = args.report
+    if not report:
+        abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
@@ -42,8 +54,14 @@ async def company_reports():
     )
 
 
-@blueprint.endpoint("/reports/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
-async def get_report(report):
+@blueprint.endpoint(
+    "/reports/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def get_report(args: RouteArguments, params: None, req: Request):
+    report = args.report
+    if not report:
+        abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
@@ -55,9 +73,13 @@ async def get_report(report):
 
 
 @blueprint.endpoint(
-    "/reports/export/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+    "/reports/export/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
 )
-async def export_reports(report):
+async def export_reports(args: RouteArguments, params: None, req: Request):
+    report = args.report
+    if not report:
+        abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
