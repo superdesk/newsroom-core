@@ -174,7 +174,7 @@ MODULES = [
     "newsroom.products",
     "newsroom.design",
     "newsroom.auth_server.client",
-    "newsroom.reports.views",
+    "newsroom.reports",
 ]
 
 SITE_NAME = "Newshub"

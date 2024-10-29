@@ -4,17 +4,13 @@ import csv
 from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
-from superdesk.core.web import EndpointGroup
-from superdesk.core.module import Module
 from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.auth import auth_rules
+from newsroom.reports import blueprint
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
 from newsroom.users import get_user_profile_data
-
-
-blueprint = EndpointGroup("reports", __name__)
 
 
 @blueprint.endpoint("/reports/print/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
@@ -84,6 +80,3 @@ async def export_reports(report):
     response.headers["Content-Disposition"] = 'attachment; filename="report-export.csv"'
 
     return response
-
-
-module = Module(name="newsroom.reports.views", endpoints=[blueprint])
