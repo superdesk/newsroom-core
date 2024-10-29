@@ -9,9 +9,10 @@
 import logging
 import bcrypt
 from bson import ObjectId
+from typing import Optional
 from bson.errors import InvalidId
 from authlib.oauth2.rfc6749 import ClientMixin
-import superdesk
+from newsroom.oauth_clients.clients_async import ClientService
 
 logger = logging.getLogger(__name__)
 # client_id to OAuth2Client instance map
@@ -39,17 +40,16 @@ class OAuth2Client(ClientMixin):
         return ""
 
 
-def query_client(client_id):
-    clients_service = superdesk.get_resource_service("oauth_clients")
+def query_client(client_id: str) -> Optional[OAuth2Client]:
     try:
-        client_data = clients_service.find_one(req=None, _id=ObjectId(client_id))
+        client_data = ClientService().mongo.find_one({"_id": ObjectId(client_id)})
     except InvalidId as e:
         logger.error("Invalid 'client_id' was provided. Exception: {}".format(e))
         return None
 
     if client_data is None:
         return None
-    return OAuth2Client(client_data)
+    return OAuth2Client(client_data.to_dict())
 
 
 def save_token(token, request):
