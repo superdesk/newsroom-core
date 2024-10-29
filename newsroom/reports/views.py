@@ -4,17 +4,20 @@ import csv
 from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
+from superdesk.core.web import EndpointGroup
+from superdesk.core.module import Module
 from superdesk.flask import session, jsonify, render_template, abort
-from newsroom.decorator import account_manager_or_company_admin_only
-from newsroom.reports import blueprint
+from newsroom.auth import auth_rules
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
 from newsroom.users import get_user_profile_data
 
 
-@blueprint.route("/reports/print/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
+blueprint = EndpointGroup("reports", __name__)
+
+
+@blueprint.endpoint("/reports/print/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
 async def print_reports(report):
     reports = get_current_user_reports()
     func = reports.get(report)
@@ -26,8 +29,9 @@ async def print_reports(report):
     return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
-@blueprint.route("/reports/company_reports", methods=["GET"])
-@account_manager_or_company_admin_only
+@blueprint.endpoint(
+    "/reports/company_reports", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
 async def company_reports():
     companies = list(query_resource("companies"))
     user_profile_data = await get_user_profile_data()
@@ -42,8 +46,7 @@ async def company_reports():
     )
 
 
-@blueprint.route("/reports/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
+@blueprint.endpoint("/reports/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
 async def get_report(report):
     reports = get_current_user_reports()
     func = reports.get(report)
@@ -55,8 +58,9 @@ async def get_report(report):
     return jsonify(results), 200
 
 
-@blueprint.route("/reports/export/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
+@blueprint.endpoint(
+    "/reports/export/<report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
 async def export_reports(report):
     reports = get_current_user_reports()
     func = reports.get(report)
@@ -80,3 +84,6 @@ async def export_reports(report):
     response.headers["Content-Disposition"] = 'attachment; filename="report-export.csv"'
 
     return response
+
+
+module = Module(name="newsroom.reports.views", endpoints=[blueprint])

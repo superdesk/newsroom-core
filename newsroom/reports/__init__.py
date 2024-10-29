@@ -1,5 +1,3 @@
-from superdesk.flask import Blueprint
-
 from .reports import (
     get_company_saved_searches,
     get_subscriber_activity_report,
@@ -15,9 +13,6 @@ from .reports import (
 )
 import superdesk
 from newsroom.wire.search import WireSearchService, WireSearchResource
-
-
-blueprint = Blueprint("reports", __name__)
 
 admin_reports = {
     "company-saved-searches": get_company_saved_searches,
@@ -38,6 +33,3 @@ company_admin_reports = {"company-and-user-saved-searches": get_company_and_user
 
 def init_app(app):
     superdesk.register_resource("news_api_search", WireSearchResource, WireSearchService, _app=app)
-
-
-from . import views  # noqa
