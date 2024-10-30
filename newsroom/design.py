@@ -1,14 +1,24 @@
+from pydantic import BaseModel
 from datetime import datetime, timedelta
-from superdesk.flask import Blueprint, url_for, render_template
 
-blueprint = Blueprint("design", __name__)
+from superdesk.flask import url_for, render_template
+from superdesk.core.web import EndpointGroup
+from superdesk.core.types import Request
+from superdesk.core.module import Module
+
+blueprint = EndpointGroup("design", __name__)
 
 
-@blueprint.route("/design/detail")
+class RouteArguments(BaseModel):
+    page: str | None = None
+
+
+@blueprint.endpoint("/design/detail", auth=False)
 async def detail():
     item = {
         "headline": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
         "slugline": "Slugline",
+        "type": "text",
         "byline": "Author byline",
         "versioncreated": datetime.utcnow(),
         "description_html": "<p>IN this exclusive interview, Aussie rock legend Jimmy Barnes reveals how he almost paid the ultimate price for his years of hard living.</p>",  # noqa
@@ -39,11 +49,14 @@ async def detail():
     return await render_template("wire_item.html", item=item, previous_versions=previous_versions)
 
 
-@blueprint.route("/design/")
+@blueprint.endpoint("/design/", auth=False)
 async def index():
     return await render_template("design_index.html")
 
 
-@blueprint.route("/design/<page>")
-async def page(page):
-    return await render_template("design_%s.html" % page)
+@blueprint.endpoint("/design/<string:page>", auth=False)
+async def page(args: RouteArguments, params: None, req: Request):
+    return await render_template(f"design_{args.page}.html")
+
+
+module = Module(name="newsroom.design", endpoints=[blueprint])
