@@ -263,7 +263,7 @@ def export_csv(args, results):
     return rows
 
 
-def get_content_activity_report():
+async def get_content_activity_report():
     """Entrypoint for generating the data for the ContentActivity report"""
 
     args = deepcopy(request.args.to_dict())
