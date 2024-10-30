@@ -36,10 +36,7 @@ class NotificationsService(AsyncResourceService[Notification]):
                 }
                 if "data" in doc:
                     updates["data"] = doc["data"] or {}
-                await self.update(
-                    notification_id,
-                    updates=updates,
-                )
+                await self.update(notification_id, updates)
             else:
                 creation_data = {
                     "_id": notification_id,
