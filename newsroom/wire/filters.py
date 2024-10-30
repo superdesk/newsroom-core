@@ -1,5 +1,7 @@
 from typing import Any
 
+from pydantic import Field, AliasChoices
+
 from superdesk.core import get_app_config
 from newsroom.search.types import NewshubSearchRequest, BaseSearchRequestArgs, SectionEnum, SearchFilterFunction
 from newsroom.search.config import is_search_field_nested
@@ -30,7 +32,7 @@ class WireSearchRequestArgs(BaseSearchRequestArgs):
     """Search arguments for wire items"""
 
     #: If ``True``, will allow searching previous versions of an article
-    ignoreLatest: bool = False
+    ignore_latest: bool = Field(validation_alias=AliasChoices("ignore_latest", "ignoreLatest"), default=False)
 
     #: If ``True``, will exclude embargoed items from this search
     exclude_embargoed: bool = False
@@ -39,7 +41,7 @@ class WireSearchRequestArgs(BaseSearchRequestArgs):
     embargoed_only: bool = False
 
     #: If ``True``, will apply the configured NewsOnly filter for this search
-    newsOnly: bool = False
+    news_only: bool = Field(validation_alias=AliasChoices("news_only", "newsOnly"), default=False)
 
     #: An optional date_filter, from the list of configured date filters
     date_filter: str | None = None
@@ -67,7 +69,7 @@ def apply_embargoed_filters(request: NewshubSearchRequest) -> None:
 
 
 def apply_news_only_filter(request: NewshubSearchRequest) -> None:
-    if not request.args.newsOnly or request.args.navigation_ids:
+    if not request.args.news_only or request.args.navigation_ids:
         return
 
     news_only_filter = get_setting("news_only_filter")
@@ -81,7 +83,7 @@ def apply_news_only_filter(request: NewshubSearchRequest) -> None:
 
 def apply_item_type_filter(request: NewshubSearchRequest) -> None:
     request.search.query.must_not.append({"term": {"type": "composite"}})
-    if not request.args.ignoreLatest:
+    if not request.args.ignore_latest:
         request.search.query.must_not.append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
 
 

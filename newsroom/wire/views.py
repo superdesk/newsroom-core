@@ -4,7 +4,7 @@ import zipfile
 from inspect import iscoroutinefunction
 
 from bson import ObjectId
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field, AliasChoices
 from operator import itemgetter
 from werkzeug.utils import secure_filename
 from quart_babel import gettext
@@ -84,7 +84,7 @@ async def set_permissions(wire_item: WireItem, ignore_latest=False):
         cursor = await WireSearchServiceAsync().get_items_by_id(
             [wire_item.id],
             WireSearchRequestArgs(
-                ignoreLatest=ignore_latest,
+                ignore_latest=ignore_latest,
                 page_size=0,
             ),
             apply_permissions=True,
@@ -262,7 +262,7 @@ async def get_home_data():
 async def get_previous_versions(wire_item: WireItem) -> list[dict]:
     if len(wire_item.ancestors):
         cursor = await WireSearchServiceAsync().get_items_by_id(
-            wire_item.ancestors, args=WireSearchRequestArgs(ignoreLatest=True)
+            wire_item.ancestors, args=WireSearchRequestArgs(ignore_latest=True)
         )
         ancestors = await cursor.to_list_raw()
         # ancestors = await (await WireSearchServiceAsync().get_items_by_id(wire_item.ancestors)).to_list_raw()
@@ -582,7 +582,7 @@ async def versions(args: WireItemRouteArgs, params: None, request: Request) -> R
 
 
 class WireItemUrlParams(BaseModel):
-    ignoreLatest: bool = False
+    ignore_latest: bool = Field(validation_alias=AliasChoices("ignore_latest", "ignoreLatest"), default=False)
     print: bool = False
     monitoring_profile: str | None = None
     type: SectionEnum = SectionEnum.WIRE
@@ -596,7 +596,7 @@ async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Requ
     if not wire_item:
         return await request.abort(404)
 
-    await set_permissions(wire_item, params.ignoreLatest)
+    await set_permissions(wire_item, params.ignore_latest)
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("wire")
     display_char_count = config.get("char_count", False)
@@ -654,7 +654,7 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
 
     # Now get the list of items this user has permissions for
     allowed_items_cursor = await wire_search.get_items_by_id(
-        args.item_ids, WireSearchRequestArgs(ignoreLatest=params.ignoreLatest)
+        args.item_ids, WireSearchRequestArgs(ignore_latest=params.ignore_latest)
     )
     allowed_ids = {item.id async for item in allowed_items_cursor}
 

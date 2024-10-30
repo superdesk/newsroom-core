@@ -101,7 +101,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         )
 
     async def get_items_for_action(self, item_ids: list[str]):
-        cursor = await self.get_items_by_id(item_ids, args=WireSearchRequestArgs(ignoreLatest=True))
+        cursor = await self.get_items_by_id(item_ids, args=WireSearchRequestArgs(ignore_latest=True))
         async for item in cursor:
             if item.slugline and item.anpa_take_key:
                 item.slugline = f"{item.slugline} | {item.anpa_take_key}"
@@ -146,7 +146,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     async def _search_all_versions(
         self, search_request: NewshubSearchRequest[WireSearchRequestArgs]
     ) -> tuple[SearchRequest, ElasticsearchResourceCursorAsync[WireItem]]:
-        search_request.args.ignoreLatest = True
+        search_request.args.ignore_latest = True
         elastic_query = await self.run_filters_and_return_query(search_request)
         # await self.validate_request(search_request)
 
@@ -455,7 +455,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         search_request = NewshubSearchRequest(
             section=self.section,
             web_request=None,
-            args=WireSearchRequestArgs(ids=item_ids, ignoreLatest=True),
+            args=WireSearchRequestArgs(ids=item_ids, ignore_latest=True),
             search=ESQuery(),
         )
         filters: list[SearchFilterFunction] = [
