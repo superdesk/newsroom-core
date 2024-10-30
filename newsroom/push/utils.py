@@ -37,9 +37,7 @@ async def fix_updates(doc: dict[str, Any], next_item: WireItem):
 
     for i in range(50):
         updates = {"ancestors": ancestors + (next_item.ancestors or []), "original_id": doc["original_id"]}
-        # updates = {"ancestors": ancestors + (next_item.get("ancestors") or []), "original_id": doc["original_id"]}
         await wire_search.service.system_update(next_item.id, updates)
-        # service.system_update(next_item.id, updates, next_item)
         next_item = await wire_search.service.find_one(evolvedfrom=next_item.id)
         if next_item is None:
             break
