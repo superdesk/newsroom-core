@@ -180,10 +180,12 @@ async def get_company_report():
     results = []
     companies = await CompanyServiceAsync().get_all_raw_as_list()
     products_data = get_entity_dict(await ProductsService().get_all_raw_as_list())
+    users_service = UsersService()
 
     for company in companies:
         company_id = str(company["_id"])
-        users = list(query_resource("users", lookup={"company": company_id}))
+        cursor = await users_service.find({"company": company_id})
+        users = await cursor.to_list_raw()
 
         company_result = {
             "_id": company_id,
@@ -347,6 +349,7 @@ async def get_company_api_usage():
             "terms": {"size": 0, "field": "subscriber"},
         }
     }
+    # TODO-ASYNC: Change this when CompanyTokenAuth is upgraded to async
     company_ids = [t["company"] for t in query_resource(API_TOKENS)]
     source["query"]["bool"]["filter"].append({"terms": {"subscriber": company_ids}})
     companies = get_entity_dict(query_resource("companies", lookup={"_id": {"$in": company_ids}}), str_id=True)
