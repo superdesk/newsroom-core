@@ -160,9 +160,8 @@ async def get_product_stories():
     products = query_resource("products")
     # cursor = await ProductsService().find({})
     # products = await cursor.to_list_raw()
-    
+
     for product in products:
-        print("product", product, type(product))
         product_stories = {
             "_id": product["_id"],
             "name": product.get("name"),

@@ -8,7 +8,7 @@ from quart_babel import gettext
 from superdesk.core import get_current_app, get_app_config
 from superdesk.core.types import Request, Response
 from superdesk.core.web import EndpointGroup
-from superdesk.flask import render_template 
+from superdesk.flask import render_template
 from newsroom.auth import auth_rules
 from newsroom.auth.utils import get_user_from_request
 from newsroom.utils import query_resource
