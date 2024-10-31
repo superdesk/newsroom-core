@@ -222,7 +222,7 @@ QUART_RATE_LIMITER_ENABLED = True
 
 # Cache Settings
 # https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
-CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")  # in-memory cache
+CACHE_TYPE = os.environ.get("CACHE_TYPE", "redis")  # Redis cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
