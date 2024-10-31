@@ -61,6 +61,8 @@ class WireSearchRequestArgs(BaseSearchRequestArgs):
 
 
 def apply_embargoed_filters(request: NewshubSearchRequest) -> None:
+    """Applies item embargo filter based on the request args"""
+
     embargo_query_rounding = get_app_config("EMBARGO_QUERY_ROUNDING")
     if request.args.exclude_embargoed:
         request.search.query.must_not.append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
@@ -69,6 +71,8 @@ def apply_embargoed_filters(request: NewshubSearchRequest) -> None:
 
 
 def apply_news_only_filter(request: NewshubSearchRequest) -> None:
+    """Applies news only filter based on the request args"""
+
     if not request.args.news_only or request.args.navigation_ids:
         return
 
@@ -82,12 +86,16 @@ def apply_news_only_filter(request: NewshubSearchRequest) -> None:
 
 
 def apply_item_type_filter(request: NewshubSearchRequest) -> None:
+    """Applies item type filter(s) based on the request args"""
+
     request.search.query.must_not.append({"term": {"type": "composite"}})
     if not request.args.ignore_latest:
         request.search.query.must_not.append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
 
 
 def apply_bookmarks_query(request: NewshubSearchRequest) -> None:
+    """Applies user bookmark filter based on the request args"""
+
     if not len(request.args.bookmarks):
         return
 
@@ -95,6 +103,8 @@ def apply_bookmarks_query(request: NewshubSearchRequest) -> None:
 
 
 def apply_date_filters(request: NewshubSearchRequest[WireSearchRequestArgs]) -> None:
+    """Applies Wire date filter(s) based on the request args"""
+
     date_filter = request.args.date_filter
     date_range_query: DateRangeQuery | None = None
     time_filters = get_app_config("WIRE_TIME_FILTERS", [])
@@ -117,14 +127,20 @@ def apply_date_filters(request: NewshubSearchRequest[WireSearchRequestArgs]) -> 
 
 
 def apply_not_canceled_filter(request: NewshubSearchRequest) -> None:
+    """Applies not cancelled filter based on the request args"""
+
     request.search.query.must_not.append({"term": {"pubstatus": "canceled"}})
 
 
 def _get_wire_aggregations() -> dict[str, Any]:
+    """Get the list of configured aggregations for the Wire resource"""
+
     return get_app_config("WIRE_AGGS") or {}
 
 
 def _get_aggregation_field(key: str) -> str:
+    """Returns the aggregation field based on the key"""
+
     aggregations = _get_wire_aggregations()
     if key not in aggregations:
         return key
@@ -135,6 +151,8 @@ def _get_aggregation_field(key: str) -> str:
 
 
 def apply_aggs(request: NewshubSearchRequest) -> None:
+    """Adds elasticsearch aggregations to the query, based on the request args"""
+
     if request.args.page > 0 or not request.args.aggs:
         return
 

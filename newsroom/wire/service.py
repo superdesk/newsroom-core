@@ -61,6 +61,8 @@ class WireItemService(AsyncResourceService[WireItem]):
 
 
 class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, WireItem]):
+    """Wire search service class, for searching for items while applying permissions and API request args"""
+
     search_args_class = WireSearchRequestArgs
     filters = default_wire_filters
     section = SectionEnum.WIRE
@@ -71,6 +73,12 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         self.service = WireItemService()
 
     async def get_current_user_bookmarks_count(self, section: SectionEnum | None = None) -> int:
+        """Returns the number of items that have been bookmarked by the current user
+
+        :param section: The section to search for, defaults to ``SectionEnum.WIRE``
+        :returns: The number of items that have been bookmarked by the current user
+        """
+
         user = get_user_or_none_from_request(None)
         if not user:
             return 0
@@ -86,6 +94,14 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     async def get_items_by_id(
         self, item_ids: list[str], args: WireSearchRequestArgs | None = None, apply_permissions: bool = False
     ) -> ElasticsearchResourceCursorAsync[WireItem]:
+        """Searches for items by ID, optionally applying user/company permissions
+
+        :param item_ids: A list of item IDs to search for
+        :param args: Optional set of request arguments to apply
+        :param apply_permissions: Whether to apply user/company permissions or not
+        :returns: Elasticsearch cursor with the results
+        """
+
         if args is None:
             args = WireSearchRequestArgs()
 
@@ -100,7 +116,15 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
             ],
         )
 
-    async def get_items_for_action(self, item_ids: list[str]):
+    async def get_items_for_action(self, item_ids: list[str]) -> ElasticsearchResourceCursorAsync[WireItem]:
+        """Searches for item by ID, for use by downloads, sharing etc
+
+        For each item, appends the ``anpa_take_key`` to the slugline if defined
+
+        :param item_ids: A list of item IDs to search for
+        :returns: Elasticsearch cursor with the results
+        """
+
         cursor = await self.get_items_by_id(item_ids, args=WireSearchRequestArgs(ignore_latest=True))
         async for item in cursor:
             if item.slugline and item.anpa_take_key:
@@ -109,6 +133,12 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         return cursor
 
     async def process_web_request(self, request: Request) -> Response:
+        """Process q request from the WebAPI
+
+        :param request: The web request instance
+        :returns: The search request response to be returned to the web client
+        """
+
         search_request = self.get_search_request_instance(request)
 
         # If ``prepend_embargoed`` is not in url args and PREPEND_EMBARGOED_TO_WIRE_SEARCH is True
@@ -146,9 +176,14 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     async def _search_all_versions(
         self, search_request: NewshubSearchRequest[WireSearchRequestArgs]
     ) -> tuple[SearchRequest, ElasticsearchResourceCursorAsync[WireItem]]:
+        """Runs the provided search across all versions of items
+
+        :param search_request: The search request instance to use request args from
+        :returns: A tuple containing the ``SearchRequest`` instance of this search, and the combined Elasticsearch cursor with the results
+        """
+
         search_request.args.ignore_latest = True
         elastic_query = await self.run_filters_and_return_query(search_request)
-        # await self.validate_request(search_request)
 
         # Search up to 1,000 items to make sure pagination works
         # as we're getting all versions here
@@ -201,6 +236,12 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         return internal_request, result_cursor
 
     async def get_last_version_ids(self, doc: WireItem) -> str:
+        """Get the latest version ID of an item, based on the id
+
+        :param doc: The wire item to get the latest version for
+        :returns: The ID of the latest version in the wire item chain
+        """
+
         if not doc.nextversion:
             # This is already the latest version
             return str(doc.id)
@@ -244,7 +285,13 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         self,
         search_request: NewshubSearchRequest[WireSearchRequestArgs],
         cursor: ElasticsearchResourceCursorAsync[WireItem],
-    ):
+    ) -> None:
+        """Prepends embargoed items to the current request
+
+        :param search_request: The search request instance to use request args from
+        :param cursor: The Elasticsearch cursor to prepend items to
+        """
+
         search_request.args.exclude_embargoed = False
         search_request.args.prepend_embargoed = False
         search_request.args.embargoed_only = True
@@ -268,6 +315,14 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     async def get_product_items_for_dashboard(
         self, product: Product, size: int, exclude_embargoed: bool = False
     ) -> list[WireItem]:
+        """Return items for the provided product for use with the dashboard
+
+        :param product: The product to get items for
+        :param size: The number of items to return
+        :param exclude_embargoed: Whether to exclude embargoed items from the result
+        :returns: The list of wire items for the supplied product
+        """
+
         def prefill_requested_product(request: NewshubSearchRequest):
             request.products = [product]
 
@@ -303,6 +358,16 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         query: ESQuery | None = None,
         args: WireSearchRequestArgs | None = None,
     ) -> ESQuery | None:
+        """Generate an elasticsearch query, based on topic, user and company
+
+        :param topic: An optional Topic to be added to the request args
+        :param user: An optional User to be added to the request args
+        :param company: An optional Company to be added to the request args
+        :param query: An optional Elasticsearch query to start with
+        :param args: An optional request args to start with
+        :returns: The generated Elasticsearch query, or None if the supplied User does not have permission
+        """
+
         def prefill_request(request: NewshubSearchRequest):
             if topic:
                 request.topic = topic
@@ -374,6 +439,15 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         users: list[UserResourceModel],
         companies: dict[ObjectId, CompanyResource],
     ) -> set[ObjectId]:
+        """Get a set of Topic IDs that match the supplied item
+
+        :param item_id: The ID of the item to match topics against
+        :param topics: The list of Topics to match the item against
+        :param users: The list of Users to match the item against
+        :param companies: The list of Companies to match the item against
+        :returns: A set of Topic IDs that the wire item matches
+        """
+
         return await self.get_matching_topics_for_query(
             topics,
             users,
@@ -388,6 +462,15 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         companies: dict[ObjectId, CompanyResource],
         query: ESQuery | None = None,
     ) -> set[ObjectId]:
+        """Get a set of Topic IDs that match the supplied query
+
+        :param topics: The list of Topics to match the item against
+        :param users: The list of Users to match the item against
+        :param companies: The list of Companies to match the item against
+        :param query: The Elasticsearch query to match topics for
+        :returns: A set of Topic IDs that the wire item matches
+        """
+
         topic_matches: set[ObjectId] = set()
         topics_checked: set[ObjectId] = set()
 
@@ -450,6 +533,14 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     async def get_matching_item_bookmarks(
         self, item_ids: list[str], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
     ) -> set[ObjectId]:
+        """Get a set of User IDs that have bookmarked any of the provided wire items
+
+        :param item_ids: The list of item IDs to check user bookmarks for
+        :param users: The list of users to check user bookmarks for
+        :param companies: The list of Companies to check user bookmarks for
+        :returns: A set of User IDs that have bookmarked any of the wire items
+        """
+
         bookmark_users: set[ObjectId] = set()
 
         search_request = NewshubSearchRequest(
@@ -479,6 +570,12 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         return bookmark_users
 
     async def get_product_item_report(self, product: Product) -> ElasticsearchResourceCursorAsync[WireItem]:
+        """Returns aggregation results for items for the supplied product, grouped by date range
+
+        :param product: The product to get the items for the report
+        :returns: An Elasticsearch cursor with the results
+        """
+
         now = datetime.utcnow()
         aggs = {
             "today": {

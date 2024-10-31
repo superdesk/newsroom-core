@@ -33,6 +33,8 @@ from .config import get_nested_config, get_advanced_search_fields
 
 
 async def prefill_user(request: NewshubSearchRequest) -> None:
+    """Prefill the user from the current request details"""
+
     request.current_user = get_user_or_none_from_request(request.web_request)
     request.is_admin = request.current_user.is_admin() if request.current_user else False
 
@@ -52,6 +54,8 @@ async def prefill_user(request: NewshubSearchRequest) -> None:
 
 
 async def prefill_company(request: NewshubSearchRequest) -> None:
+    """Prefill the company from the current user and request details"""
+
     if request.company is not None:
         return
     elif request.current_user and request.current_user.id == request.args.user_id:
@@ -66,6 +70,8 @@ async def prefill_company(request: NewshubSearchRequest) -> None:
 
 
 async def prefill_products(request: NewshubSearchRequest) -> None:
+    """Prefill the available products based on the current user, company and section"""
+
     if request.section is None:
         # This should not happen, as it's prefilled by search service
         return
@@ -117,6 +123,8 @@ async def prefill_products(request: NewshubSearchRequest) -> None:
 
 
 def apply_date_range(request: NewshubSearchRequest) -> None:
+    """Applies date range filter based on request args"""
+
     if not request.args.start_date and not request.args.end_date:
         return
 
@@ -137,6 +145,8 @@ def apply_date_range(request: NewshubSearchRequest) -> None:
 
 
 def apply_query_string(request: NewshubSearchRequest) -> None:
+    """Applies query_string filter based on request args"""
+
     if not request.args.q:
         return
 
@@ -152,6 +162,8 @@ def apply_query_string(request: NewshubSearchRequest) -> None:
 
 
 def apply_ids_filter(request: NewshubSearchRequest) -> None:
+    """Applies item IDs filter based on request args"""
+
     if not len(request.args.ids):
         return
 
@@ -159,6 +171,8 @@ def apply_ids_filter(request: NewshubSearchRequest) -> None:
 
 
 def get_apply_filters(get_aggregation_field: Callable[[str], str]) -> SearchFilterFunction:
+    """Applies metadata filter(s) based on request args"""
+
     def apply_filters(request: NewshubSearchRequest) -> None:
         if not request.args.filter:
             return
@@ -193,6 +207,8 @@ def get_apply_filters(get_aggregation_field: Callable[[str], str]) -> SearchFilt
 
 
 def get_apply_time_limit_filter(setting_name: str) -> SearchFilterFunction:
+    """Applies the configured time limit filter based on the resource section"""
+
     def apply_time_limit_filter(request: NewshubSearchRequest) -> None:
         if request.is_admin:
             return
@@ -213,6 +229,8 @@ def get_apply_time_limit_filter(setting_name: str) -> SearchFilterFunction:
 
 
 async def apply_section_filter(request: NewshubSearchRequest) -> None:
+    """Applies section filter(s) based on the resource section"""
+
     if request.section is None:
         # This should not happen, as it's prefilled by search service
         return
@@ -230,6 +248,8 @@ async def apply_section_filter(request: NewshubSearchRequest) -> None:
 
 
 def apply_company_filter(request: NewshubSearchRequest) -> None:
+    """Applies company type filter, based on current company and configured ``COMPANY_TYPES``"""
+
     if request.is_admin or request.company is None or not request.company.company_type:
         return
 
@@ -244,6 +264,8 @@ def apply_company_filter(request: NewshubSearchRequest) -> None:
 
 
 def apply_products_filter(request: NewshubSearchRequest) -> None:
+    """Applies product filter(s) based on the list of products on the request instance"""
+
     if request.is_admin and not len(request.args.navigation_ids) and not request.args.product_ids:
         # admin will see everything by default
         return
@@ -262,6 +284,8 @@ def apply_products_filter(request: NewshubSearchRequest) -> None:
 
 
 def prefill_args_from_topic(request: NewshubSearchRequest) -> None:
+    """Prefills the request args from the topic on the request"""
+
     topic = request.topic
     if topic is None:
         return
@@ -289,6 +313,8 @@ def prefill_args_from_topic(request: NewshubSearchRequest) -> None:
 
 
 def apply_advanced_search(request: NewshubSearchRequest) -> None:
+    """Applies advanced search filter(s) based on the request args"""
+
     advanced = request.args.advanced
     if advanced is None:
         return
@@ -398,6 +424,8 @@ def get_apply_highlights(filters: list[SearchFilterFunction]) -> SearchFilterFun
 
 
 def validate_product_ids_arg(request: NewshubSearchRequest[SearchArgsType]) -> None:
+    """Validates the products on the request, based on user and company permissions"""
+
     if not len(request.args.product_ids):
         return
 
@@ -418,6 +446,8 @@ def validate_product_ids_arg(request: NewshubSearchRequest[SearchArgsType]) -> N
 
 
 def validate_request(request: NewshubSearchRequest) -> None:
+    """Validates the request args (user, company, section, products)"""
+
     if not request.is_admin:
         if not request.company:
             raise AuthorizationError(
