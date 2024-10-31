@@ -28,7 +28,6 @@ from newsroom.topics.topics_async import TopicService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.users.service import UsersService
 from newsroom.products.service import ProductsService
-from newsroom.section_filters.service import SectionFiltersService
 from newsroom.wire import WireSearchServiceAsync
 from .content_activity import get_content_activity_report  # noqa
 
@@ -156,9 +155,14 @@ async def get_product_stories():
     """Returns the story count per product for today, this week, this month ..."""
 
     results = []
-    products = await ProductsService().get_all_raw_as_list()
 
+    # TODO-ASYNC: Use Async ProductsService when get_product_item_report picks ProductResourceModel
+    products = query_resource("products")
+    # cursor = await ProductsService().find({})
+    # products = await cursor.to_list_raw()
+    
     for product in products:
+        print("product", product, type(product))
         product_stories = {
             "_id": product["_id"],
             "name": product.get("name"),

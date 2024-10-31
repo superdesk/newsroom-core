@@ -38,4 +38,4 @@ def init_app(app):
 
 from .views import blueprint  # noqa
 
-module = Module(name="newsroom.reports", endpoints=[blueprint])  # type: ignore
+module = Module(name="newsroom.reports", endpoints=[blueprint])
