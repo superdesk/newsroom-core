@@ -13,6 +13,7 @@ from newsroom.utils import any_objectid_in_list, parse_objectid
 IdsList = NavigationIds
 
 
+# TODO-ASYNC: Create Products async resource
 class ProductsResource(newsroom.Resource):
     """
     Products schema
@@ -141,6 +142,7 @@ def get_products_by_company(
     return []
 
 
+# TODO-ASYNC: Convert to use UserResourceModel instead of a dict
 def get_products_by_user(user: User, section: str, navigation_ids: Optional[NavigationIds]) -> List[Product]:
     if user.get("products"):
         ids = [parse_objectid(p["_id"]) for p in user["products"] if p["section"] == section]

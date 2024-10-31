@@ -9,10 +9,8 @@ from newsroom.mongo_utils import (
     index_elastic_from_mongo_from_timestamp,
 )
 
-from newsroom.wire.search import (
-    WireSearchResource,
-    get_aggregations as get_wire_aggregations,
-)
+from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
+from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.commands import fix_topic_nested_filters
 
@@ -121,7 +119,7 @@ async def test_fix_topic_nested_filters(app, admin):
     app.config["WIRE_GROUPS"] = [
         config_group for config_group in app.config["WIRE_GROUPS"] if config_group["field"] != "subject"
     ]
-    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], get_wire_aggregations())
+    init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], _get_wire_aggregations())
     await reset_elastic(app)
 
     app.data.insert(

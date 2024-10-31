@@ -4,6 +4,8 @@ from datetime import datetime
 from enum import Enum
 from quart_babel.speaklater import LazyString
 
+from .common import SectionEnum
+from .search import AdvancedSearchParams
 from .user_roles import UserRole
 from .products import ProductType, PRODUCT_TYPES, ProductResourceModel
 from .cards import CardResourceModel, DashboardCardConfig, DashboardCardType, DashboardCardDict
@@ -12,20 +14,23 @@ from .navigation import NavigationModel
 from .section_filters import SectionFilterModel
 from .topics import (
     NotificationType,
-    TopicType,
     TopicSubscriberModel,
     TopicResourceModel,
     SectionType,
     TopicFolderResourceModel,
     UserTopicFoldersResourceModel,
     CompanyTopicFoldersResourceModel,
+    TopicCreatedFilters,
 )
 from .users import DashboardModel, NotificationScheduleModel, UserResourceModel, UserAuthResourceModel
 from .notifications import Notification, NotificationQueue, NotificationTopic
 from .history import HistoryResourceModel
+from .wire import WireItem
 from .featured import FeaturedResourceModel
 
 __all__ = [
+    "SectionEnum",
+    "AdvancedSearchParams",
     "UserRole",
     "ProductType",
     "PRODUCT_TYPES",
@@ -38,13 +43,13 @@ __all__ = [
     "NavigationModel",
     "SectionFilterModel",
     "NotificationType",
-    "TopicType",
     "TopicSubscriberModel",
     "TopicResourceModel",
     "SectionType",
     "TopicFolderResourceModel",
     "UserTopicFoldersResourceModel",
     "CompanyTopicFoldersResourceModel",
+    "TopicCreatedFilters",
     "DashboardModel",
     "NotificationScheduleModel",
     "UserResourceModel",
@@ -53,6 +58,7 @@ __all__ = [
     "NotificationQueue",
     "NotificationTopic",
     "HistoryResourceModel",
+    "WireItem",
     "FeaturedResourceModel",
     "ProductResourceModel",
 ]

@@ -1,4 +1,3 @@
-from typing import List, Dict
 from copy import deepcopy
 
 from bson import ObjectId
@@ -6,6 +5,7 @@ from bson import ObjectId
 from superdesk.core import get_app_config
 import superdesk
 
+# TODO-ASYNC: Remove these resources & services once all Wire & Agenda is upgraded to async
 from content_api.items.resource import ItemsResource as BaseItemsResource
 from content_api.items.service import ItemsService as BaseItemsService
 
@@ -14,8 +14,10 @@ from content_api.items_versions.service import ItemsVersionsService
 
 from superdesk.metadata.item import metadata_schema
 
-from newsroom.types import Article, DashboardCardDict
+from newsroom.types import Article, CardResourceModel
 from newsroom.cards import get_card_size
+
+from .service import WireSearchServiceAsync
 
 
 class ItemsResource(BaseItemsResource):
@@ -69,9 +71,9 @@ def init_app(app):
     superdesk.register_resource("items_versions", ItemsVersionsResource, ItemsVersionsService, _app=app)
 
 
-def get_items_for_dashboard(
-    cards: List[DashboardCardDict], exclude_embargoed: bool = False, filter_public_fields: bool = False
-) -> Dict[str, List[Article]]:
+async def get_items_for_dashboard(
+    cards: list[CardResourceModel], exclude_embargoed: bool = False, filter_public_fields: bool = False
+) -> dict[str, list[Article]]:
     """Get dictionary of ``card.label`` to list of ``Article`` for the provided cards
 
     :param cards: List of cards to get items for
@@ -95,19 +97,24 @@ def get_items_for_dashboard(
         return item
 
     items_by_card = {}
+    wire_search = WireSearchServiceAsync()
+
+    # TODO-ASYNC: Convert to async Product model when available
+    all_products = {product["_id"]: product for product in superdesk.get_resource_service("products").get_cached()}
     for card in cards:
-        if card["config"].get("product"):
-            items_by_card[card["label"]] = [
-                filter_fields(item) if filter_public_fields else item
-                for item in superdesk.get_resource_service("wire_search").get_product_items(
-                    ObjectId(card["config"].get("product")),
-                    card["config"].get("size") or get_card_size(card["type"]),
+        if card.config is not None and card.config.get("product"):
+            items_by_card[card.label] = [
+                filter_fields(item.to_dict()) if filter_public_fields else item.to_dict()
+                for item in await wire_search.get_product_items_for_dashboard(
+                    all_products[ObjectId(card.config.get("product"))],
+                    card.config.get("size") or get_card_size(card.dashboard_type),
                     exclude_embargoed=exclude_embargoed,
                 )
+                if all_products.get(ObjectId(card.config.get("product")))
             ]
-        elif card["type"] == "4-photo-gallery":
+        elif card.dashboard_type == "4-photo-gallery":
             # Omit external media, let the client manually request these
             # using '/media_card_external' endpoint
-            items_by_card[card["label"]] = []
+            items_by_card[card.label] = []
 
     return items_by_card

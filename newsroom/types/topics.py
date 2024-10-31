@@ -2,11 +2,15 @@ from enum import Enum, unique
 from pydantic import Field
 from typing import Any, Annotated
 
-from newsroom.core.resources.model import NewshubResourceModel
-from superdesk.core.resources import dataclass
 
+from superdesk.core.resources import dataclass
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources.validators import validate_data_relation_async
+
+from newsroom.core.resources.model import NewshubResourceModel
+
+from .common import SectionEnum
+from .search import AdvancedSearchParams
 
 
 @unique
@@ -16,32 +20,35 @@ class NotificationType(str, Enum):
     SCHEDULED = "scheduled"
 
 
-@unique
-class TopicType(str, Enum):
-    WIRE = "wire"
-    AGENDA = "agenda"
-
-
 @dataclass
 class TopicSubscriberModel:
     user_id: Annotated[ObjectIdField, validate_data_relation_async("users")]
     notification_type: NotificationType = NotificationType.REAL_TIME
 
 
+@dataclass
+class TopicCreatedFilters:
+    created_from: Annotated[str | None, Field(alias="from")] = None
+    created_to: Annotated[str | None, Field(alias="to")] = None
+    date_filter: str | None = None
+
+
 class TopicResourceModel(NewshubResourceModel):
     label: str
     query: str | None = None
     filter: dict[str, Any] | None = None
-    created_filter: Annotated[dict[str, Any] | None, Field(alias="created")] = None
+
+    created_filter: Annotated[TopicCreatedFilters | None, Field(alias="created")] = None
+
     user: Annotated[ObjectIdField | None, validate_data_relation_async("users")] = None
     company: Annotated[ObjectIdField | None, validate_data_relation_async("companies")] = None
     is_global: bool = False
     subscribers: list[TopicSubscriberModel] = Field(default_factory=list)
     timezone_offset: int | None = None
-    topic_type: TopicType
+    topic_type: SectionEnum
     navigation: Annotated[list[ObjectIdField] | None, validate_data_relation_async("navigations")] = None
     folder: Annotated[ObjectIdField | None, validate_data_relation_async("topic_folders")] = None
-    advanced: dict[str, Any] | None = None
+    advanced: AdvancedSearchParams | None = None
 
 
 @unique

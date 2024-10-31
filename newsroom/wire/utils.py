@@ -21,6 +21,7 @@ def get_caption(picture):
         return picture.get("description_text") or picture.get("body_text")
 
 
+# TODO-ASYNC: Update this once Agenda is migrated to async
 def update_action_list(items, action_list, force_insert=False, item_type="items"):
     """
     Stores user id into array of action_list of an item

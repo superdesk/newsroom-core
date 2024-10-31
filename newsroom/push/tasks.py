@@ -6,6 +6,7 @@ from superdesk import get_resource_service
 
 from newsroom.celery_app import celery
 from newsroom.core import get_current_wsgi_app
+from newsroom.wire import WireSearchServiceAsync
 
 from .notifications import NotificationManager
 
@@ -31,9 +32,9 @@ def locked(_id: str, service: str):
 @celery.task
 async def notify_new_wire_item(_id, check_topics=True):
     with locked(_id, "wire"):
-        item = get_resource_service("items").find_one(req=None, _id=_id)
+        item = await WireSearchServiceAsync().service.find_by_id(_id)
         if item:
-            await notifier.notify_new_item(item, check_topics=check_topics)
+            await notifier.notify_new_item(item.to_dict(), check_topics=check_topics)
 
 
 @celery.task

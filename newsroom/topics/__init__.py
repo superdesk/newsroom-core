@@ -6,6 +6,7 @@ from .topics_async import (
     get_user_topics,
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
+    get_topics_with_subscribers_async,
 )
 from . import topics
 
@@ -15,6 +16,7 @@ __all__ = [
     "topic_resource_config",
     "get_agenda_notification_topics_for_query_by_id",
     "get_topics_with_subscribers",
+    "get_topics_with_subscribers_async",
 ]
 
 

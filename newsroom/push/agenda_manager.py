@@ -5,7 +5,7 @@ from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from planning.common import WORKFLOW_STATE
 
-from newsroom.wire import url_for_wire
+from newsroom.wire import url_for_wire, WireSearchServiceAsync
 from newsroom.utils import parse_date_str
 from newsroom.core import get_current_wsgi_app
 from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
@@ -156,7 +156,7 @@ class AgendaManager:
 
         return new_plan
 
-    def set_agenda_planning_items(self, agenda, orig_agenda, planning_item, action="add", send_notification=True):
+    async def set_agenda_planning_items(self, agenda, orig_agenda, planning_item, action="add", send_notification=True):
         """
         Updates the list of planning items of agenda. If action is 'add' then adds the new one.
         And updates the list of coverages
@@ -169,11 +169,11 @@ class AgendaManager:
                 len(agenda["planning_items"]) < len(existing_planning_items)
                 and len(planning_item.get("coverages") or []) > 0
             ):
-                get_resource_service("agenda").notify_agenda_update(
+                await get_resource_service("agenda").notify_agenda_update(
                     agenda, orig_agenda, planning_item, True, planning_item
                 )
 
-        agenda["coverages"], coverage_changes = self.get_coverages(
+        agenda["coverages"], coverage_changes = await self.get_coverages(
             agenda["planning_items"],
             (orig_agenda or {}).get("coverages") or [],
             planning_item if action == "add" else None,
@@ -188,12 +188,12 @@ class AgendaManager:
                 or coverage_changes.get("coverage_modified")
             )
         ):
-            get_resource_service("agenda").notify_agenda_update(agenda, orig_agenda, planning_item, True)
+            await get_resource_service("agenda").notify_agenda_update(agenda, orig_agenda, planning_item, True)
 
         agenda["display_dates"] = get_display_dates(agenda["planning_items"])
         agenda.pop("_updated", None)
 
-    def get_coverages(self, planning_items, original_coverages, new_plan):
+    async def get_coverages(self, planning_items, original_coverages, new_plan):
         """
         Returns list of coverages for given planning items
         """
@@ -212,7 +212,7 @@ class AgendaManager:
                                 None,
                                 _external=False,
                                 section="wire.item",
-                                _id=d.get("item_id"),
+                                item_id=d.get("item_id"),
                             ),
                             "delivery_state": d.get("item_state"),
                             "sequence_no": d.get("sequence_no") or 0,
@@ -306,7 +306,7 @@ class AgendaManager:
 
                             if new_coverage.get("workflow_status") == "completed":
                                 coverage_changes["coverage_modified"] = True
-                                self.set_item_reference(new_coverage)
+                                await self.set_item_reference(new_coverage)
 
                         if (
                             existing_coverage.get("scheduled") != new_coverage.get("scheduled")
@@ -319,7 +319,7 @@ class AgendaManager:
 
         return coverages, coverage_changes
 
-    def set_item_reference(self, coverage):
+    async def set_item_reference(self, coverage):
         """
         Check if the delivery in the passed coverage refers back to the agenda item and coverage.
         If the item is fulfilled after the item is published it will not have this reference
@@ -329,18 +329,14 @@ class AgendaManager:
         if coverage.get("delivery_id") is None:
             return
 
-        item = get_resource_service("items").find_one(req=None, _id=coverage.get("delivery_id"))
-        if item:
-            if "planning_id" not in item and "coverage_id" not in item:
-                service = get_resource_service("content_api")
-                service.datasource = "items"
-                service.patch(
-                    item.get("_id"),
-                    updates={
-                        "planning_id": coverage.get("planning_id"),
-                        "coverage_id": coverage.get("coverage_id"),
-                    },
-                )
-                item["planning_id"] = coverage.get("planning_id")
-                item["coverage_id"] = coverage.get("coverage_id")
-                notify_new_wire_item.delay(item["_id"], check_topics=False)
+        wire_service = WireSearchServiceAsync().service
+        item = await wire_service.find_by_id(coverage.get("delivery_id"))
+        if item is not None and item.planning_id is None and item.coverage_id is None:
+            await wire_service.update(
+                item.id,
+                {
+                    "planning_id": coverage.get("planning_id"),
+                    "coverage_id": coverage.get("coverage_id"),
+                },
+            )
+            notify_new_wire_item.delay(item.id, check_topics=False)

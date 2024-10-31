@@ -7,7 +7,10 @@ from eve.methods.get import get_internal
 from eve.render import send_response
 from eve.utils import ParsedRequest
 
+from newsroom.search.types import NewshubSearchRequest
+from newsroom.wire.filters import WireSearchRequestArgs
 from superdesk.core import get_app_config, get_current_app
+from superdesk.core.types import ESQuery
 from superdesk.flask import request, render_template, abort, jsonify
 from superdesk import get_resource_service
 
@@ -27,7 +30,6 @@ from newsroom.utils import (
     get_entity_or_404,
     is_json_request,
     get_json_or_400,
-    get_entities_elastic_or_mongo_or_404,
     get_agenda_dates,
     get_location_string,
     get_public_contacts,
@@ -35,6 +37,7 @@ from newsroom.utils import (
     get_vocabulary,
     get_groups,
 )
+from newsroom.wire import WireSearchServiceAsync
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
@@ -323,24 +326,34 @@ async def related_wire_items(wire_id):
         if cov.get("coverage_type") == "text" and cov.get("delivery_id"):
             wire_ids.append(cov["delivery_id"])
 
-    wire_items = get_entities_elastic_or_mongo_or_404(wire_ids, "items")
-    aggregations = {"ids": {"terms": {"field": "_id"}}}
-    permissioned_result = get_resource_service("wire_search").get_items(
-        wire_ids, size=0, aggregations=aggregations, apply_permissions=True
+    wire_search = WireSearchServiceAsync()
+    cursor = await wire_search.service.search({"bool": {"query": {"must": [{"terms": {"_id": wire_ids}}]}}})
+    wire_items = await cursor.to_list()
+
+    permissioned_result = await wire_search.search(
+        NewshubSearchRequest(
+            args=WireSearchRequestArgs(
+                ids=wire_ids,
+                page_size=0,
+                aggs=True,
+            ),
+            search=ESQuery(aggs={"ids": {"terms": {"field": "_id"}}}),
+        ),
     )
+
     buckets = permissioned_result.hits["aggregations"]["ids"]["buckets"]
     permissioned_ids = []
     for b in buckets:
         permissioned_ids.append(b["key"])
 
     for wire_item in wire_items:
-        set_item_permission(wire_item, wire_item.get("_id") in permissioned_ids)
+        set_item_permission(wire_item, wire_item.id in permissioned_ids)
 
     return (
         jsonify(
             {
                 "agenda_item": agenda_result.docs[0],
-                "wire_items": wire_items,
+                "wire_items": [item.to_dict() for item in wire_items],
             }
         ),
         200,

@@ -23,6 +23,9 @@ from . import views  # noqa
 from .module import module  # noqa
 
 
+AGENDA_NESTED_SEARCH_FIELDS = ["subject"]
+
+
 def init_app(app):
     superdesk.register_resource("agenda", AgendaResource, AgendaService, _app=app)
 
@@ -78,7 +81,7 @@ def init_app(app):
             },
         ]
 
-    init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)
+    init_nested_aggregation("agenda", AGENDA_NESTED_SEARCH_FIELDS, app.config.get("AGENDA_GROUPS", []), aggregations)
 
     if app.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
         PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])

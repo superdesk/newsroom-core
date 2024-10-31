@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date
 
+import pytz
 from pydantic import Field
 from typing import Annotated, List, Optional
 from dataclasses import asdict
 from quart_babel import lazy_gettext
 
+from superdesk.core import get_app_config
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import dataclass
 from superdesk.core.resources.validators import (
@@ -28,9 +30,6 @@ class DashboardModel:
 
     def to_dict(self):
         return asdict(self)
-
-
-b = lazy_gettext("123")
 
 
 @dataclass
@@ -103,6 +102,20 @@ class UserResourceModel(NewshubResourceModel):
         if self.company:
             return await CompanyService().find_by_id(self.company)
         return None
+
+    def has_paused_notifications(self) -> bool:
+        if not self.notification_schedule:
+            return False
+
+        timezone = pytz.timezone(self.notification_schedule.timezone or get_app_config("DEFAULT_TIMEZONE") or "UTC")
+        if self.notification_schedule.pause_from is not None and self.notification_schedule.pause_to is not None:
+            now = datetime.now(timezone).date()
+            pause_from_date = date.fromisoformat(self.notification_schedule.pause_from)
+            pause_to_date = date.fromisoformat(self.notification_schedule.pause_to)
+
+            return pause_from_date <= now <= pause_to_date
+
+        return False
 
 
 class UserAuthResourceModel(UserResourceModel):

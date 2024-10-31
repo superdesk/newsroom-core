@@ -97,7 +97,7 @@
                     <div class="wire-column__preview__versions">
                         <span class="wire-column__preview__versions__box-headline">{{ gettext('Previous versions') }}</span>
                         {% for prev in previous_versions %}
-                        <a class="wire-column__preview__versions__item" href="{{ url_for('wire.item', _id=prev._id)}}">
+                        <a class="wire-column__preview__versions__item" href="{{ url_for('wire.item', item_id=prev._id)}}">
                             <div class="wire-column__preview__versions__wrap">
                                 <div class="wire-column__preview__versions__time">
                                     <span>{{ prev.versioncreated | time_short }}</span>

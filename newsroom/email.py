@@ -229,24 +229,23 @@ TemplateKwargs = Dict[str, Any]
 
 # TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
 async def send_user_email(
-    user: Union[User, "UserResourceModel"],
+    user: User | UserResourceModel,
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
     **kwargs: EmailKwargs,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
-    if isinstance(user, ResourceModel):
-        user = user.to_dict()
+    user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
 
-    if not user.get("receive_email") and not ignore_preferences:
+    if not user_dict.get("receive_email") and not ignore_preferences:
         # If this is a user in the system, and has emails disabled
         # then skip this recipient
         return
 
-    language = user.get("locale") or get_app_config("DEFAULT_LANGUAGE")
-    timezone = get_user_timezone(user)
-    await _send_localized_email([user["email"]], template, language, timezone, template_kwargs or {}, kwargs)
+    language = user_dict.get("locale") or get_app_config("DEFAULT_LANGUAGE")
+    timezone = get_user_timezone(user_dict)
+    await _send_localized_email([user_dict["email"]], template, language, timezone, template_kwargs or {}, kwargs)
 
 
 async def send_template_email(
@@ -374,20 +373,28 @@ async def send_reset_password_email(user: User, token: str) -> None:
     )
 
 
-async def send_new_item_notification_email(user, topic_name, item, section="wire"):
+# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
+async def send_new_item_notification_email(
+    user: User | UserResourceModel, topic_name: str, item: dict[str, Any], section: str = "wire"
+):
     if item.get("type") == "text":
         await _send_new_wire_notification_email(user, topic_name, item, section)
     else:
         await _send_new_agenda_notification_email(user, topic_name, item)
 
 
-async def _send_new_wire_notification_email(user, topic_name, item, section):
-    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
+# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
+async def _send_new_wire_notification_email(
+    user: User | UserResourceModel, topic_name: str, item: dict[str, Any], section: str
+):
+    user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
+
+    url = url_for("wire.item", item_id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
         app_name=get_app_config("SITE_NAME"),
         is_topic=True,
         topic_name=topic_name,
-        name=user.get("first_name"),
+        name=user_dict.get("first_name"),
         item=item,
         url=url,
         type="wire",
@@ -410,14 +417,17 @@ def _remove_restricted_coverage_info(item):
         remove_restricted_coverage_info([item])
 
 
-async def _send_new_agenda_notification_email(user, topic_name, item):
+# TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
+async def _send_new_agenda_notification_email(user: User | UserResourceModel, topic_name: str, item: dict[str, Any]):
+    user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
+
     _remove_restricted_coverage_info(item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
         app_name=get_app_config("SITE_NAME"),
         is_topic=True,
         topic_name=topic_name,
-        name=user.get("first_name"),
+        name=user_dict.get("first_name"),
         item=item,
         url=url,
         type="agenda",
@@ -435,20 +445,22 @@ async def _send_new_agenda_notification_email(user, topic_name, item):
     )
 
 
-async def send_history_match_notification_email(user, item, section):
+async def send_history_match_notification_email(user: UserResourceModel, item: dict[str, Any], section: str) -> None:
     if item.get("type") == "text":
         await _send_history_match_wire_notification_email(user, item, section)
     else:
         await _send_history_match_agenda_notification_email(user, item)
 
 
-async def _send_history_match_wire_notification_email(user, item, section):
+async def _send_history_match_wire_notification_email(
+    user: UserResourceModel, item: dict[str, Any], section: str
+) -> None:
     app_name = get_app_config("SITE_NAME")
-    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
+    url = url_for("wire.item", item_id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
-        name=user.get("first_name"),
+        name=user.first_name,
         item=item,
         url=url,
         type="wire",
@@ -461,14 +473,14 @@ async def _send_history_match_wire_notification_email(user, item, section):
     )
 
 
-async def _send_history_match_agenda_notification_email(user, item):
+async def _send_history_match_agenda_notification_email(user: UserResourceModel, item: dict[str, Any]):
     _remove_restricted_coverage_info(item)
     app_name = get_app_config("SITE_NAME")
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
-        name=user.get("first_name"),
+        name=user.first_name,
         item=item,
         url=url,
         type="agenda",
@@ -486,25 +498,25 @@ async def _send_history_match_agenda_notification_email(user, item):
     )
 
 
-async def send_item_killed_notification_email(user, item):
+async def send_item_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
     if item.get("type") == "text":
         await _send_wire_killed_notification_email(user, item)
     else:
         await _send_agenda_killed_notification_email(user, item)
 
 
-async def _send_wire_killed_notification_email(user, item):
+async def _send_wire_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
     formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
-    recipients = [user["email"]]
+    recipients = [user.email]
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
 
     send_email(to=recipients, subject=subject, text_body=text_body)
 
 
-async def _send_agenda_killed_notification_email(user, item):
+async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
     formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
-    recipients = [user["email"]]
+    recipients = [user.email]
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))
 

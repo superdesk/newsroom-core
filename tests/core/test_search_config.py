@@ -3,11 +3,10 @@ from quart import json
 from quart.testing import QuartClient
 
 from newsroom.factory.app import BaseNewsroomApp
-from newsroom.agenda.agenda import AgendaResource, aggregations as agenda_aggregations
-from newsroom.wire.search import (
-    WireSearchResource,
-    get_aggregations as get_wire_aggregations,
-)
+from newsroom.agenda import AGENDA_NESTED_SEARCH_FIELDS
+from newsroom.agenda.agenda import aggregations as agenda_aggregations
+from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
+from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import deep_get
 from newsroom.tests.conftest import reset_elastic
@@ -68,7 +67,7 @@ test_wire_item_1 = {
     "genre": [{"name": "News", "code": "news"}],
     "subject": [
         {
-            "qcode": "1523",
+            "code": "1523",
             "name": "Test Subject",
         }
     ],
@@ -83,10 +82,10 @@ test_wire_item_2 = {
     "genre": [{"name": "News", "code": "news"}],
     "subject": [
         {
-            "qcode": "1523",
+            "code": "1523",
             "name": "Test Subject",
         },
-        {"qcode": "abcd", "name": "Sporting Event", "scheme": "distribution"},
+        {"code": "abcd", "name": "Sporting Event", "scheme": "distribution"},
     ],
 }
 
@@ -109,7 +108,9 @@ async def test_default_agenda_groups_config(app: BaseNewsroomApp, client: QuartC
     assert agenda_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 200}}
 
     # Test search agenda_aggregations
-    await client.post("/push", json=test_event_1)
+    response = await client.post("/push", json=test_event_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
     resp = await client.get("/agenda/search")
     data = json.loads(await resp.get_data())
     assert get_agg_keys(data, "subject") == ["Sports", "Test Subject"]
@@ -130,7 +131,7 @@ async def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: QuartCl
             },
         }
     )
-    init_nested_aggregation(AgendaResource, app.config["AGENDA_GROUPS"], agenda_aggregations)
+    init_nested_aggregation("agenda", AGENDA_NESTED_SEARCH_FIELDS, app.config["AGENDA_GROUPS"], agenda_aggregations)
     await reset_elastic(app)
 
     # Test if the Eve & agenda_aggregations config has been updated
@@ -180,8 +181,12 @@ async def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: QuartCl
     }
 
     # Test search agenda_aggregations
-    await client.post("/push", json=test_event_1)
-    await client.post("/push", json=test_event_2)
+    response = await client.post("/push", json=test_event_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    response = await client.post("/push", json=test_event_2)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
     resp = await client.get("/agenda/search")
     data = json.loads(await resp.get_data())
     assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject", "Sports"]
@@ -206,12 +211,18 @@ async def test_default_wire_groups_config(app: BaseNewsroomApp, client: QuartCli
     assert "urgency" in group_fields
     assert "place" in group_fields
 
-    wire_aggregations = get_wire_aggregations()
+    wire_aggregations = _get_wire_aggregations()
     assert wire_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 20}}
 
-    await client.post("/push", json=test_wire_item_1)
-    res = await client.get("/wire/search")
+    response = await client.post("/push", json=test_wire_item_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    res = await client.get("/wire/search?aggs=1")
     data = json.loads(await res.get_data())
+    from pprint import pprint
+
+    pprint(data["_aggregations"])
+    pprint(data["_items"])
     assert get_agg_keys(data, "subject") == ["Test Subject"]
 
 
@@ -225,8 +236,8 @@ async def test_custom_wire_groups_config(app: BaseNewsroomApp, client: QuartClie
             "nested": {"parent": "subject", "field": "scheme", "value": "distribution"},
         }
     )
-    wire_aggregations = get_wire_aggregations()
-    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], wire_aggregations)
+    wire_aggregations = _get_wire_aggregations()
+    init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], wire_aggregations)
     await reset_elastic(app)
 
     # Test generated/modified aggregation configs
@@ -253,16 +264,20 @@ async def test_custom_wire_groups_config(app: BaseNewsroomApp, client: QuartClie
     }
 
     # Test search wire_aggregations
-    await client.post("/push", json=test_wire_item_1)
-    await client.post("/push", json=test_wire_item_2)
-    resp = await client.get("/wire/search")
+    response = await client.post("/push", json=test_wire_item_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    response = await client.post("/push", json=test_wire_item_2)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    resp = await client.get("/wire/search?aggs=1")
     data = json.loads(await resp.get_data())
 
     assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject"]
     assert get_agg_keys(data, "distribution.distribution_filtered.distribution") == ["Sporting Event"]
 
     # Search using the new search group, ``distribution==Sporting Event``
-    resp = await client.get("/wire/search?filter=%7B%22distribution%22%3A%5B%22Sporting%20Event%22%5D%7D")
+    resp = await client.get("/wire/search?aggs=1&filter=%7B%22distribution%22%3A%5B%22Sporting%20Event%22%5D%7D")
     data = json.loads(await resp.get_data())
     assert len(data["_items"]) == 1
     assert data["_items"][0]["_id"] == "foo2"

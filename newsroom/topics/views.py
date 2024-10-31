@@ -142,16 +142,17 @@ def can_edit_topic(topic: TopicResourceModel, user: UserResourceModel) -> bool:
 
 def get_topic_url(topic: TopicResourceModel):
     url_params = {}
-    if topic.query:
-        url_params["q"] = topic.query
-    if topic.filter:
-        url_params["filter"] = json.dumps(topic.filter)
-    if topic.navigation:
-        url_params["navigation"] = json.dumps(topic.navigation)
-    if topic.created_filter:
-        url_params["created"] = json.dumps(topic.created_filter)
-    if topic.advanced:
-        url_params["advanced"] = json.dumps(topic.advanced)
+    topic_dict = topic.to_dict()
+    if topic_dict.get("query"):
+        url_params["q"] = topic_dict["query"]
+    if topic_dict.get("filter"):
+        url_params["filter"] = json.dumps(topic_dict["filter"])
+    if topic_dict.get("navigation"):
+        url_params["navigation"] = json.dumps(topic_dict["navigation"])
+    if topic_dict.get("created"):
+        url_params["created"] = json.dumps({field: value for field, value in topic_dict["created"].items() if value})
+    if topic_dict.get("advanced"):
+        url_params["advanced"] = json.dumps({field: value for field, value in topic_dict["advanced"].items() if value})
 
     return url_for(
         "wire.wire" if topic.topic_type == "wire" else f"{topic.topic_type}.index",

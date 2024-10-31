@@ -1,20 +1,24 @@
 import logging
 from typing import Any, Optional
-from copy import copy, deepcopy
+from copy import deepcopy
 from datetime import timedelta
 
-from planning.common import WORKFLOW_STATE
-
-from newsroom import signals
 from superdesk.types import Item
 from superdesk.utc import utcnow
 from superdesk.core import get_app_config
 from superdesk import get_resource_service
-from superdesk.resource_fields import VERSION
+from superdesk.resource_fields import VERSION, ID_FIELD, GUID_FIELD
 from superdesk.text_utils import get_word_count, get_char_count
 
-from newsroom.utils import parse_date_str
+from content_api.publish.utils import process_associations
+
+from planning.common import WORKFLOW_STATE
+
+from newsroom import signals
 from newsroom.core import get_current_wsgi_app
+from newsroom.types import WireItem
+from newsroom.utils import parse_date_str
+from newsroom.wire import WireSearchServiceAsync
 
 from .tasks import notify_new_agenda_item
 from .agenda_manager import AgendaManager
@@ -33,7 +37,10 @@ class Publisher:
         """Duplicating the logic from content_api.publish service."""
         set_dates(doc)
 
-        doc["firstpublished"] = parse_date_str(doc.get("firstpublished"))
+        if doc.get("firstpublished"):
+            # If ``firstpublished`` is not defined, it will default to now (in the model)
+            doc["firstpublished"] = parse_date_str(doc.get("firstpublished"))
+
         doc["publish_schedule"] = parse_date_str(doc.get("publish_schedule"))
         doc.setdefault("wordcount", get_word_count(doc.get("body_html", "")))
         doc.setdefault("charcount", get_char_count(doc.get("body_html", "")))
@@ -43,21 +50,20 @@ class Publisher:
         if doc.get("source") in source_expiry:
             doc["expiry"] = utcnow().replace(second=0, microsecond=0) + timedelta(days=source_expiry[doc["source"]])
 
-        service = get_resource_service("content_api")
-        service.datasource = "items"
-
+        wire_search = WireSearchServiceAsync()
+        parent_item = None
         if doc.get("evolvedfrom"):
-            parent_item = service.find_one(req=None, _id=doc["evolvedfrom"])
+            parent_item = await wire_search.service.find_by_id(doc["evolvedfrom"])
             if parent_item:
-                if parent_item.get("original_id"):
-                    doc["original_id"] = parent_item["original_id"]
-                doc["ancestors"] = copy(parent_item.get("ancestors", []))
+                if parent_item.original_id:
+                    doc["original_id"] = parent_item.original_id
+                doc["ancestors"] = (parent_item.ancestors or []).copy()
                 doc["ancestors"].append(doc["evolvedfrom"])
-                doc["bookmarks"] = parent_item.get("bookmarks", [])
-                doc["planning_id"] = parent_item.get("planning_id")
-                doc["coverage_id"] = parent_item.get("coverage_id")
-                if parent_item.get("expiry"):
-                    doc["expiry"] = parent_item["expiry"]
+                doc["bookmarks"] = parent_item.bookmarks or []
+                doc["planning_id"] = parent_item.planning_id
+                doc["coverage_id"] = parent_item.coverage_id
+                if parent_item.expiry:
+                    doc["expiry"] = parent_item.expiry
             else:
                 logger.warning(
                     "Failed to find evolvedfrom item %s for %s",
@@ -66,10 +72,10 @@ class Publisher:
                 )
 
         if not original and get_app_config("PUSH_FIX_UPDATES"):  # check if there are updates of this item already
-            next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
+            next_item = await wire_search.service.find_one(evolvedfrom=doc["guid"])
             if next_item:  # there is an update, add missing ancestor
-                doc["nextversion"] = next_item["_id"]
-                fix_updates(doc, next_item)
+                doc["nextversion"] = next_item.id
+                await fix_updates(doc, next_item)
 
         fix_hrefs(doc)
         logger.debug("publishing %s", doc["guid"])
@@ -101,14 +107,31 @@ class Publisher:
 
         signals.publish_item.send(app, item=doc, is_new=original is None)
 
-        _id = service.create([doc])[0]
-        if "associations" not in doc and original is not None and bool(original.get("associations", {})):
-            service.patch(_id, updates={"associations": None})
+        doc_id = await self.publish_doc_to_content_api(doc)
         if "evolvedfrom" in doc and parent_item:
-            service.system_update(parent_item["_id"], {"nextversion": _id}, parent_item)
-        return _id
+            await wire_search.service.system_update(parent_item.id, {"nextversion": doc_id})
+        return doc_id
 
-    def publish_event(self, event: dict[str, Any], orig: dict[str, Any]):
+    async def publish_doc_to_content_api(self, item_dict: dict[str, Any]) -> str:
+        # Copied from content_api.publish.utils.publish_doc_to_content_api
+        wire_search = WireSearchServiceAsync()
+        service = wire_search.service
+        item_dict[ID_FIELD] = item_dict.pop(GUID_FIELD)
+        item = WireItem.from_dict(item_dict)
+
+        original = await service.find_by_id(item.id)
+        if original:
+            item.subscribers = list(set(original.subscribers or []) | set(item.subscribers or []))
+
+        process_associations(item, original)
+
+        if original:
+            await service.update(original.id, item.to_dict(context={"use_objectid": True}))
+            return original.id
+        else:
+            return (await service.create([item]))[0]
+
+    async def publish_event(self, event: dict[str, Any], orig: dict[str, Any]):
         logger.debug("publishing event %s", event)
         validate_event_push(orig, event)
 
@@ -134,7 +157,7 @@ class Publisher:
             for plan in service.find(where={"_id": {"$in": plan_ids}}):
                 planning_item = plan["planning_items"][0]
                 agenda["planning_items"].append(planning_item)
-                agenda_manager.set_agenda_planning_items(
+                await agenda_manager.set_agenda_planning_items(
                     agenda, orig, planning_item, action="add", send_notification=False
                 )
 
@@ -201,11 +224,11 @@ class Publisher:
                 signals.publish_event.send(app.as_any(), item=updated, updates=updates, orig=orig, is_new=False)
                 service.patch(orig["_id"], updates)
                 updates["_id"] = orig["_id"]
-                get_resource_service("agenda").notify_agenda_update(updates, orig)
+                await get_resource_service("agenda").notify_agenda_update(updates, orig)
 
         return _id
 
-    def publish_planning_item(self, planning: dict[str, Any], orig: dict[str, Any]):
+    async def publish_planning_item(self, planning: dict[str, Any], orig: dict[str, Any]):
         service = get_resource_service("agenda")
         agenda = deepcopy(orig)
 
@@ -215,7 +238,7 @@ class Publisher:
         new_plan = agenda_manager.set_metadata_from_planning(agenda, planning, force_adhoc=True)
 
         # Add the planning item to the list
-        agenda_manager.set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
+        await agenda_manager.set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
         app = get_current_wsgi_app()
 
         if not agenda.get("_id"):
@@ -230,7 +253,7 @@ class Publisher:
             service.patch(agenda["_id"], agenda)
             return agenda["_id"]
 
-    def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
+    async def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
         if not planning.get("event_item"):
             return None
 
@@ -257,7 +280,7 @@ class Publisher:
             or planning.get("pubstatus") == "cancelled"
         ):
             # Remove the Planning item from the list
-            agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
+            await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
             service.patch(agenda["_id"], agenda)
             return None
 
@@ -265,7 +288,9 @@ class Publisher:
         new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
 
         # Add the Planning item to the list
-        agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="add" if new_plan else "update")
+        await agenda_manager.set_agenda_planning_items(
+            agenda, orig_agenda, planning, action="add" if new_plan else "update"
+        )
 
         if not agenda.get("_id"):
             # setting _id of agenda to be equal to planning if there's no event id

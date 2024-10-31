@@ -29,6 +29,7 @@ from newsroom.companies import CompanyServiceAsync
 from newsroom.users.service import UsersService
 from newsroom.products.service import ProductsService
 from newsroom.section_filters.service import SectionFiltersService
+from newsroom.wire import WireSearchServiceAsync
 from .content_activity import get_content_activity_report  # noqa
 
 
@@ -156,7 +157,6 @@ async def get_product_stories():
 
     results = []
     products = await ProductsService().get_all_raw_as_list()
-    section_filters = await SectionFiltersService().get_section_filters_dict()
 
     for product in products:
         product_stories = {
@@ -164,8 +164,7 @@ async def get_product_stories():
             "name": product.get("name"),
             "is_enabled": product.get("is_enabled"),
         }
-        # TODO-ASYNC: Change this when Wire is upgraded to async
-        counts = superdesk.get_resource_service("wire_search").get_product_item_report(product, section_filters)
+        counts = await WireSearchServiceAsync().get_product_item_report(product)
         for key, value in counts.hits["aggregations"].items():
             product_stories[key] = value["buckets"][0]["doc_count"]
 
