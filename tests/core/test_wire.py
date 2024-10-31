@@ -1,13 +1,19 @@
+from typing import Any
+
 from pytest import fixture
 import pytz
-from quart import json, g, session as server_session
+from quart import g
 from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
-from copy import deepcopy
 
+from superdesk.core import json
+
+from newsroom.types import Product
 from newsroom.companies import CompanyServiceAsync
-from newsroom.wire.search import WireSearchService, SearchQuery
+from newsroom.search.types import NewshubSearchRequest
+from newsroom.wire import WireSearchServiceAsync
+from newsroom.wire.filters import WireSearchRequestArgs, apply_date_filters, apply_date_range
 
 from tests.core.utils import add_company_products, create_entries_for
 from ..fixtures import (  # noqa: F401
@@ -22,8 +28,6 @@ from ..fixtures import (  # noqa: F401
 )
 from ..utils import get_json, get_admin_user_id, login, mock_send_email
 from unittest import mock
-from newsroom.tests.users import ADMIN_USER_ID
-from superdesk import get_resource_service
 
 
 NAV_1 = ObjectId("5e65964bf5db68883df561c0")
@@ -137,7 +141,7 @@ async def test_share_items(client, app):
 
 
 async def get_bookmarks_count(client, user):
-    resp = await client.get("/api/wire_search?bookmarks=%s" % str(user))
+    resp = await client.get(f"/wire/search?bookmarks={user}")
     assert resp.status_code == 200
     data = json.loads(await resp.get_data())
     return data["_meta"]["total"]
@@ -257,7 +261,7 @@ async def test_search_filter_by_category(client, app):
 
 
 async def test_filter_by_product_anonymous_user_gets_all(client, app):
-    resp = await client.get("/wire/search?products=%s" % json.dumps({"10": True}))
+    resp = await client.get(f"/wire/search?products={PROD_1}")
     data = json.loads(await resp.get_data())
     assert 3 == len(data["_items"])
     assert "_aggregations" in data
@@ -273,6 +277,10 @@ async def test_search_sort(client, app):
     assert "urn:localhost:weather" == data["_items"][2]["_id"]
 
     resp = await client.get("/wire/search?q=weather+OR+flood+OR+waters&sort=_score")
+    data = json.loads(await resp.get_data())
+    assert "urn:localhost:weather" == data["_items"][0]["_id"]
+
+    resp = await client.get("/wire/search?q=weather+OR+flood+OR+waters&sort=-_score")
     data = json.loads(await resp.get_data())
     assert "urn:localhost:flood" == data["_items"][0]["_id"]
 
@@ -521,7 +529,7 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
         "section_filters",
         [
             {
-                "_id": "f-1",
+                "_id": ObjectId(),
                 "name": "product test 2",
                 "query": "headline:Weather",
                 "is_enabled": True,
@@ -552,7 +560,7 @@ async def test_administrator_gets_results_based_on_section_filter(client, app):
         "section_filters",
         [
             {
-                "_id": "f-1",
+                "_id": ObjectId(),
                 "name": "product test 2",
                 "query": "headline:Weather",
                 "is_enabled": True,
@@ -646,38 +654,35 @@ async def test_company_type_filter(client, app, public_user):
     assert "WEATHER" != data["_items"][0]["slugline"]
 
 
-async def test_search_by_products_and_filtered_by_embargoe(app):
-    async with app.test_request_context("/") as client:
-        client.session["user"] = PUBLIC_USER_ID
-        product_id = ObjectId()
-        add_company_products(
-            app,
-            COMPANY_1_ID,
-            [
-                {
-                    "_id": product_id,
-                    "name": "product test",
-                    "query": "headline:china",
-                    "is_enabled": True,
-                    "product_type": "wire",
-                }
-            ],
-        )
+async def test_search_by_products_and_filtered_by_embargoe(app, public_user):
+    product_id = ObjectId()
+    product = Product(
+        _id=product_id,
+        name="product test",
+        query="headline:china",
+        is_enabled=True,
+        product_type="wire",
+    )
+    add_company_products(app, COMPANY_1_ID, [product])
 
-        # embargoed item is not fetched
-        app.data.insert(
-            "items",
-            [
-                {
-                    "_id": "foo",
-                    "headline": "china",
-                    "embargoed": (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
-                    "products": [{"code": "10"}],
-                }
-            ],
-        )
+    # embargoed item is not fetched
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "china",
+                "embargoed": (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
+                "products": [{"code": "10", "name": "product-10"}],
+            }
+        ],
+    )
 
-        items = get_resource_service("wire_search").get_product_items(product_id, 20)
+    async with app.test_request_context("/") as request:
+        request.session["user"] = PUBLIC_USER_ID
+
+        wire_search = WireSearchServiceAsync()
+        items = await wire_search.get_product_items_for_dashboard(product, 20)
         assert 1 == len(items)
 
         app.config["COMPANY_TYPES"] = [
@@ -685,7 +690,7 @@ async def test_search_by_products_and_filtered_by_embargoe(app):
         ]
 
         await CompanyServiceAsync().update(COMPANY_1_ID, {"company_type": "test"})
-        items = get_resource_service("wire_search").get_product_items(product_id, 20)
+        items = await wire_search.get_product_items_for_dashboard(product, 20)
         assert 0 == len(items)
 
         # ex-embargoed item is fetched
@@ -696,14 +701,14 @@ async def test_search_by_products_and_filtered_by_embargoe(app):
                     "_id": "bar",
                     "headline": "china story",
                     "embargoed": (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
-                    "products": [{"code": "10"}],
+                    "products": [{"code": "10", "name": "product-10"}],
                 }
             ],
         )
 
-        items = get_resource_service("wire_search").get_product_items(product_id, 20)
+        items = await wire_search.get_product_items_for_dashboard(product, 20)
         assert 1 == len(items)
-        assert items[0]["headline"] == "china story"
+        assert items[0].headline == "china story"
 
 
 async def test_wire_delete(client, app):
@@ -712,43 +717,17 @@ async def test_wire_delete(client, app):
         items[3],
         items[4],
     ]
-    versions = [
-        deepcopy(items[1]),
-        deepcopy(items[3]),
-        deepcopy(items[4]),
-    ]
 
-    versions[0].update(
-        {
-            "_id": ObjectId(),
-            "_id_document": docs[0]["_id"],
-        }
-    )
-    versions[1].update(
-        {
-            "_id": ObjectId(),
-            "_id_document": docs[1]["_id"],
-        }
-    )
-    versions[2].update(
-        {
-            "_id": ObjectId(),
-            "_id_document": docs[2]["_id"],
-        }
-    )
-
-    app.data.insert("items_versions", versions)
+    wire_service = WireSearchServiceAsync().service
 
     for doc in docs:
-        assert get_resource_service("items").find_one(req=None, _id=doc["_id"]) is not None
-        assert get_resource_service("items_versions").find_one(req=None, _id_document=doc["_id"]) is not None
+        assert await wire_service.find_by_id(doc["_id"]) is not None
 
     resp = await client.delete("/wire", json={"items": [docs[0]["_id"]]})
     assert resp.status_code == 200
 
     for doc in docs:
-        assert get_resource_service("items").find_one(req=None, _id=doc["_id"]) is None
-        assert get_resource_service("items_versions").find_one(req=None, _id_document=doc["_id"]) is None
+        assert await wire_service.find_by_id(doc["_id"]) is None, doc["_id"]
 
 
 async def test_highlighting(client, app):
@@ -976,51 +955,47 @@ async def test_date_filters(client, app):
 
 
 async def test_date_filters_query(client, app):
-    service = WireSearchService()
     app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
 
-    async with app.test_request_context("/"):
+    def _get_search_query(args: WireSearchRequestArgs) -> list[dict[str, Any]]:
+        request = NewshubSearchRequest(args=args)
+        apply_date_range(request)
+        apply_date_filters(request)
+        return request.search.query.must
 
-        def _set_search_query(user_id, args):
-            server_session["user"] = user_id
-            search = SearchQuery()
-            search.args = args
-            service.apply_request_filter(search)
-            return search.query["bool"]["must"]
+    # Last week
+    assert _get_search_query(WireSearchRequestArgs(date_filter="last_week")) == [
+        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
+    ]
 
-        # Last week
-        assert [
-            {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
-        ] == _set_search_query(ADMIN_USER_ID, {"date_filter": "last_week"})
+    # Last 30 Days
+    assert _get_search_query(WireSearchRequestArgs(date_filter="last_30_days")) == [
+        {"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}
+    ]
 
-        # Last 30 Days
-        assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
-            ADMIN_USER_ID, {"date_filter": "last_30_days"}
-        )
+    # Today
+    assert _get_search_query(WireSearchRequestArgs(date_filter="today")) == [
+        {"range": {"versioncreated": {"gte": "now/d", "time_zone": "Europe/Berlin"}}}
+    ]
 
-        # Today
-        assert [{"range": {"versioncreated": {"gte": "now/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
-            ADMIN_USER_ID, {"date_filter": "today"}
-        )
+    # Default
+    assert _get_search_query(WireSearchRequestArgs()) == [
+        {"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}
+    ]
 
-        # Default
-        assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
-            ADMIN_USER_ID, {}
-        )
-
-        # Custom Date
-        assert [
-            {
-                "range": {
-                    "versioncreated": {
-                        "gte": datetime(2024, 6, 20, 0, 0, tzinfo=pytz.UTC),
-                        "lte": datetime(2024, 6, 23, 23, 59, 59, tzinfo=pytz.UTC),
-                    }
+    # Custom Date
+    assert _get_search_query(
+        WireSearchRequestArgs(date_filter="custom_date", start_date="2024-06-20", end_date="2024-06-23")
+    ) == [
+        {
+            "range": {
+                "versioncreated": {
+                    "gte": datetime(2024, 6, 20, 0, 0, tzinfo=pytz.UTC),
+                    "lte": datetime(2024, 6, 23, 23, 59, 59, tzinfo=pytz.UTC),
                 }
             }
-        ] == _set_search_query(
-            ADMIN_USER_ID, {"date_filter": "custom_date", "created_from": "2024-06-20", "created_to": "2024-06-23"}
-        )
+        }
+    ]
 
 
 async def test_bookmark_old_items(client, public_user, company_products):

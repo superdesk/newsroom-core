@@ -12,12 +12,13 @@ from superdesk.flask import jsonify, send_file, request, render_template
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
-from newsroom.auth.utils import get_user_from_request, get_user_id_from_request, get_company_from_request
+from newsroom.types import SectionEnum
+from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.email import send_user_email
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print
 from newsroom.notifications import push_user_notification
-from newsroom.wire.search import get_bookmarks_count
+from newsroom.wire import WireSearchServiceAsync
 from newsroom.monitoring import blueprint
 from newsroom.monitoring.utils import (
     get_date_items_dict,
@@ -33,7 +34,6 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
     is_json_request,
-    get_items_for_user_action,
 )
 
 from .forms import MonitoringForm, alert_types
@@ -53,7 +53,7 @@ async def get_view_data():
         "context": "monitoring",
         "groups": get_app_config("MONITORING_GROUPS") or get_app_config("WIRE_GROUPS", []),
         "ui_config": await ui_config_service.get_section_config("monitoring"),
-        "saved_items": get_bookmarks_count(user.id, "monitoring"),
+        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MONITORING),
         "formats": [
             {"format": f["format"], "name": f["name"]}
             for f in get_current_app().as_any().download_formatters.values()
@@ -156,8 +156,9 @@ async def create():
 @login_required
 async def edit(_id):
     if request.args.get("context", "") == "wire":
-        items = get_items_for_user_action([_id], "items")
-        if not items:
+        cursor = await WireSearchServiceAsync().get_items_for_action([_id])
+        items = await cursor.to_list_raw()
+        if not len(items):
             return
 
         item = items[0]
@@ -311,8 +312,10 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id_from_request(None)
-    push_user_notification("saved_items", count=get_bookmarks_count(user_id, "monitoring"))
+    push_user_notification(
+        "saved_items",
+        count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MONITORING),
+    )
     return jsonify(), 200
 
 

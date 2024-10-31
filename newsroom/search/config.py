@@ -1,9 +1,8 @@
-from typing import List, Dict, Any, Optional, Type, TypedDict
+from typing import List, Dict, Any, Optional, TypedDict
 import logging
 from copy import deepcopy
 
 from superdesk.core import get_app_config
-from newsroom import Resource
 from newsroom.web.default_settings import CLIENT_CONFIG as DEFAULT_CLIENT_CONFIG
 
 
@@ -40,15 +39,15 @@ def get_nested_config(resource_type: str, field: str) -> Optional[SearchGroupNes
     return None
 
 
-def init_nested_aggregation(resource: Type[Resource], groups: List[SearchGroupConfig], aggs: Dict[str, Any]):
+def init_nested_aggregation(
+    resource_type: str, supported_fields: list[str], groups: List[SearchGroupConfig], aggs: Dict[str, Any]
+):
     """Applies aggregation & mapping changes for nested search groups"""
-
-    resource_type = resource.datasource["source"]
 
     if not len(groups):
         logger.info(f"Resource '{resource_type}': no search groups defined, no need to continue")
         return
-    elif not len(resource.SUPPORTED_NESTED_SEARCH_FIELDS):
+    elif not len(supported_fields):
         logger.warning(f"Resource '{resource_type}': no nested search fields supported")
         return
 
@@ -65,7 +64,7 @@ def init_nested_aggregation(resource: Type[Resource], groups: List[SearchGroupCo
         elif not nested.get("field") or not nested.get("parent") or not nested.get("value"):
             logger.warning(f"Resource '{resource_type}' search group '{field}': incorrectly configured")
             continue
-        elif nested["parent"] not in resource.SUPPORTED_NESTED_SEARCH_FIELDS:
+        elif nested["parent"] not in supported_fields:
             logger.warning(f"Resource '{resource_type}' search group '{field}': nesting not supported")
             continue
 

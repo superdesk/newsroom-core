@@ -24,6 +24,7 @@ from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
 from newsroom.companies.utils import get_companies_id_by_product
+from newsroom.wire import WireSearchServiceAsync
 from .content_activity import get_content_activity_report  # noqa
 
 
@@ -144,12 +145,11 @@ def get_company_products():
     return {"results": sorted_results, "name": gettext("Products per company")}
 
 
-def get_product_stories():
+async def get_product_stories():
     """Returns the story count per product for today, this week, this month ..."""
 
     results = []
     products = query_resource("products")
-    section_filters = superdesk.get_resource_service("section_filters").get_section_filters_dict()
 
     for product in products:
         product_stories = {
@@ -157,7 +157,7 @@ def get_product_stories():
             "name": product.get("name"),
             "is_enabled": product.get("is_enabled"),
         }
-        counts = superdesk.get_resource_service("wire_search").get_product_item_report(product, section_filters)
+        counts = await WireSearchServiceAsync().get_product_item_report(product)
         for key, value in counts.hits["aggregations"].items():
             product_stories[key] = value["buckets"][0]["doc_count"]
 

@@ -6,7 +6,7 @@ from copy import deepcopy
 from bson import ObjectId
 import pymongo
 
-from newsroom.types import UserResourceModel, TopicResourceModel, TopicType
+from newsroom.types import UserResourceModel, TopicResourceModel, SectionEnum
 from newsroom.topics.views import get_topic_url
 from newsroom.users.service import UsersService
 from ..fixtures import (  # noqa: F401
@@ -193,7 +193,7 @@ async def test_share_agenda_topics(client, app, navigation_items):
 
 
 async def test_get_topic_share_url(app):
-    topic = TopicResourceModel(id=ObjectId(), label="Test Topic", topic_type=TopicType.WIRE, query="art exhibition")
+    topic = TopicResourceModel(id=ObjectId(), label="Test Topic", topic_type=SectionEnum.WIRE, query="art exhibition")
     assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
     topic.query = None
@@ -223,7 +223,7 @@ async def test_get_topic_share_url(app):
     topic = TopicResourceModel(
         id=ObjectId(),
         label="Test Topic",
-        topic_type=TopicType.WIRE,
+        topic_type=SectionEnum.WIRE,
         query="art exhibition",
         filter={"urgency": [3]},
         navigation=[NAV1_ID],

@@ -8,7 +8,7 @@ from superdesk.core.web import EndpointGroup
 from superdesk.core import get_current_app, get_app_config
 
 from newsroom.auth.utils import is_valid_session
-from newsroom.types import Article, DashboardCardDict
+from newsroom.types import Article, CardResourceModel
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
@@ -39,19 +39,19 @@ async def get_public_items_by_cards() -> Dict[str, List[Article]]:
     if app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
 
-    items_by_card = get_items_for_dashboard(await get_public_cards(), True, True)
+    items_by_card = await get_items_for_dashboard(await get_public_cards(), True, True)
     app.cache.set(
         PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return items_by_card
 
 
-async def get_public_cards() -> List[DashboardCardDict]:
+async def get_public_cards() -> List[CardResourceModel]:
     app = get_current_app().as_any()
     if app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
 
-    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
     app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
 
     return cards
@@ -72,7 +72,7 @@ async def render_public_dashboard():
     return await render_template(
         "public_dashboard.html",
         data={
-            "cards": await get_public_cards(),
+            "cards": [card.to_dict() for card in await get_public_cards()],
             "ui_config": await get_public_dashboard_config(),
             "items_by_card": await get_public_items_by_cards(),
             "groups": get_app_config("WIRE_GROUPS", []),

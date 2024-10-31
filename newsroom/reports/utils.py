@@ -1,10 +1,10 @@
-from typing import Callable, Dict, Union
+from typing import Callable, Awaitable
 
 from newsroom.auth.utils import get_user_or_none_from_request
 from . import admin_reports, company_admin_reports
 
 
-def get_current_user_reports() -> Union[Dict[str, Callable], Dict]:
+def get_current_user_reports() -> dict[str, Callable[[], Awaitable[dict] | dict]]:
     """Return reports according to the user type"""
 
     user = get_user_or_none_from_request(None)

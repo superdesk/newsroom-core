@@ -6,15 +6,15 @@ from copy import deepcopy
 from datetime import datetime
 
 from superdesk.utc import utcnow
-from superdesk.types import Item
 from superdesk.core.types import Request
 from superdesk.core import get_app_config
-from superdesk import get_resource_service
 from superdesk.errors import SuperdeskApiError
 from superdesk.resource_fields import VERSION
 
-from newsroom.utils import parse_date_str, parse_dates
 from newsroom.core import get_current_wsgi_app
+from newsroom.types import WireItem
+from newsroom.utils import parse_date_str, parse_dates
+from newsroom.wire import WireSearchServiceAsync
 
 
 logger = logging.getLogger(__name__)
@@ -31,14 +31,14 @@ def set_dates(doc: dict[str, Any]):
     doc.setdefault(VERSION, 1)
 
 
-def fix_updates(doc: dict[str, Any], next_item: Item):
-    service = get_resource_service("content_api")
+async def fix_updates(doc: dict[str, Any], next_item: WireItem):
+    wire_search = WireSearchServiceAsync()
     ancestors = (doc.get("ancestors") or []) + [doc["guid"]]
 
     for i in range(50):
-        updates = {"ancestors": ancestors + (next_item.get("ancestors") or []), "original_id": doc["original_id"]}
-        service.system_update(next_item["_id"], updates, next_item)
-        next_item = service.find_one(req=None, evolvedfrom=next_item["_id"])
+        updates = {"ancestors": ancestors + (next_item.ancestors or []), "original_id": doc["original_id"]}
+        await wire_search.service.system_update(next_item.id, updates)
+        next_item = await wire_search.service.find_one(evolvedfrom=next_item.id)
         if next_item is None:
             break
     else:

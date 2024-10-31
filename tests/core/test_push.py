@@ -9,10 +9,10 @@ from bson import ObjectId
 from quart import json
 from quart.datastructures import FileStorage
 
-from superdesk import get_resource_service
-
-from newsroom.types import UserResourceModel, CompanyResource, UserRole
-from newsroom.utils import get_company_dict, get_entity_or_404, get_user_dict
+from newsroom.types import UserResourceModel, CompanyResource, UserRole, TopicResourceModel, SectionEnum
+from newsroom.utils import get_company_dict_async, get_entity_or_404, get_user_dict_async
+from newsroom.wire import WireSearchServiceAsync
+from newsroom.notifications import NotificationsService
 
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
@@ -392,11 +392,11 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
-        notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
-        assert notification["action"] == "history_match"
-        assert notification["item"] == "bar"
-        assert notification["resource"] == "text"
-        assert notification["user"] == user_ids[0]
+        notification = await NotificationsService().find_one(user=user_ids[0])
+        assert notification.action == "history_match"
+        assert notification.item == "bar"
+        assert notification.resource == "text"
+        assert notification.user == user_ids[0]
 
         assert len(outbox) == 1
         assert "http://localhost:5050/wire?item=bar" in outbox[0].body
@@ -485,11 +485,11 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
-    notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
-    assert notification["action"] == "history_match"
-    assert notification["item"] == "bar"
-    assert notification["resource"] == "text"
-    assert notification["user"] == user_ids[0]
+    notification = await NotificationsService().find_one(user=user_ids[0])
+    assert notification.action == "history_match"
+    assert notification.item == "bar"
+    assert notification.resource == "text"
+    assert notification.user == user_ids[0]
 
 
 @markers.requires_async_celery
@@ -559,11 +559,11 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
-        notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
-        assert notification["action"] == "history_match"
-        assert notification["item"] == "bar"
-        assert notification["resource"] == "text"
-        assert notification["user"] == user_ids[0]
+        notification = await NotificationsService().find_one(user=user_ids[0])
+        assert notification.action == "history_match"
+        assert notification.item == "bar"
+        assert notification.resource == "text"
+        assert notification.user == user_ids[0]
 
     assert len(outbox) == 1
     assert "http://localhost:5050/wire?item=bar" in outbox[0].body
@@ -741,25 +741,25 @@ async def test_send_notification_emails(client, app):
 async def test_matching_topics(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
     await client.post("/push", json=item)
-    search = get_resource_service("wire_search")
 
     user_id = ObjectId()
     company_id = ObjectId()
-    users: dict[str, dict] = {
-        str(user_id): UserResourceModel(
+    users: list[UserResourceModel] = [
+        UserResourceModel(
             id=user_id,
             email="foo@bar.org",
             first_name="foo",
             last_name="bar",
             user_type=UserRole.ADMINISTRATOR,
             company=company_id,
-        ).to_dict(),
-    }
-    companies: dict[str, dict] = {
-        str(company_id): CompanyResource(
+        )
+    ]
+    companies: dict[ObjectId, CompanyResource] = {
+        company_id: CompanyResource(
             id=company_id,
             name="test-comp",
-        ).to_dict(),
+            sections={"wire": True},
+        ),
     }
     topic_ids = dict(
         created_to_old=ObjectId(),
@@ -767,19 +767,51 @@ async def test_matching_topics(client, app):
         filter=ObjectId(),
         query=ObjectId(),
     )
-    topics = [
-        {"_id": topic_ids["created_to_old"], "created": {"to": "2017-01-01"}, "user": user_id},
-        {
-            "_id": topic_ids["created_from_future"],
-            "created": {"from": "now/d"},
-            "user": user_id,
-            "timezone_offset": 60 * 28,
-        },
-        {"_id": topic_ids["filter"], "filter": {"genre": ["other"]}, "user": user_id},
-        {"_id": topic_ids["query"], "query": "Foo", "user": user_id},
+    topics: list[TopicResourceModel] = [
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_to_old"],
+                _created=None,
+                label="Created - Too old",
+                created={"to": "2017-01-01"},
+                user=user_id,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_from_future"],
+                _created=None,
+                label="Created - From future",
+                created={"from": "now/d"},
+                timezone_offset=60 * 28,
+                user=user_id,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["filter"],
+                _created=None,
+                label="Filter",
+                filter={"genre": ["other"]},
+                user=user_id,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["query"],
+                _created=None,
+                label="Query",
+                query="Foo",
+                user=user_id,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
     ]
-    matching = search.get_matching_topics(item["guid"], topics, users, companies)
-    assert [topic_ids["created_from_future"], topic_ids["query"]] == matching
+    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(item["guid"], topics, users, companies)
+    assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
 
 
 async def test_matching_topics_for_public_user(client, app):
@@ -798,26 +830,65 @@ async def test_matching_topics_for_public_user(client, app):
         ],
     )
 
-    item["products"] = [{"code": "p-1"}]
+    item["products"] = [{"code": "p-1", "name": "Sport"}]
     await client.post("/push", json=item)
-    search = get_resource_service("wire_search")
 
-    users = await get_user_dict(use_globals=False)
-    assert str(PUBLIC_USER_ID) in users
-    companies = await get_company_dict(use_globals=False)
-    topics = [
-        {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": PUBLIC_USER_ID},
-        {
-            "_id": "created_from_future",
-            "created": {"from": "now/d"},
-            "user": PUBLIC_USER_ID,
-            "timezone_offset": 60 * 28,
-        },
-        {"_id": "filter", "filter": {"genre": ["other"]}, "user": PUBLIC_USER_ID},
-        {"_id": "query", "query": "Foo", "user": PUBLIC_USER_ID},
+    users = await get_user_dict_async(use_globals=False)
+    assert PUBLIC_USER_ID in users
+    companies = await get_company_dict_async(use_globals=False)
+    topic_ids = dict(
+        created_to_old=ObjectId(),
+        created_from_future=ObjectId(),
+        filter=ObjectId(),
+        query=ObjectId(),
+    )
+    topics: list[TopicResourceModel] = [
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_to_old"],
+                _created=None,
+                label="Created - Too old",
+                created={"to": "2017-01-01"},
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_from_future"],
+                _created=None,
+                label="Created - From future",
+                created={"from": "now/d"},
+                timezone_offset=60 * 28,
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["filter"],
+                _created=None,
+                label="Filter",
+                filter={"genre": ["other"]},
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["query"],
+                _created=None,
+                label="Query",
+                query="Foo",
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
     ]
-    matching = search.get_matching_topics(item["guid"], topics, users, companies)
-    assert ["created_from_future", "query"] == matching
+    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+        item["guid"], topics, list(users.values()), companies
+    )
+    assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
 
 
 async def test_matching_topics_for_user_with_inactive_company(client, app):
@@ -836,26 +907,64 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
         ],
     )
 
-    item["products"] = [{"code": "p-1"}]
+    item["products"] = [{"code": "p-1", "name": "Sport"}]
     await client.post("/push", json=item)
-    search = get_resource_service("wire_search")
 
-    users = await get_user_dict(use_globals=False)
-    companies = await get_company_dict(use_globals=False)
-    topics = [
-        {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "bar"},
-        {
-            "_id": "created_from_future",
-            "created": {"from": "now/d"},
-            "user": PUBLIC_USER_ID,
-            "timezone_offset": 60 * 28,
-        },
-        {"_id": "filter", "filter": {"genre": ["other"]}, "user": "bar"},
-        {"_id": "query", "query": "Foo", "user": PUBLIC_USER_ID},
+    users = await get_user_dict_async(use_globals=False)
+    companies = await get_company_dict_async(use_globals=False)
+    topic_ids = dict(
+        created_to_old=ObjectId(),
+        created_from_future=ObjectId(),
+        filter=ObjectId(),
+        query=ObjectId(),
+    )
+    topics: list[TopicResourceModel] = [
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_to_old"],
+                _created=None,
+                label="Created - Too old",
+                created={"to": "2017-01-01"},
+                user=ObjectId(),
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["created_from_future"],
+                _created=None,
+                label="Created - From future",
+                created={"from": "now/d"},
+                timezone_offset=60 * 28,
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["filter"],
+                _created=None,
+                label="Filter",
+                filter={"genre": ["other"]},
+                user=ObjectId(),
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["query"],
+                _created=None,
+                label="Query",
+                query="Foo",
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+            )
+        ),
     ]
-    async with app.app_context():
-        matching = search.get_matching_topics(item["guid"], topics, users, companies)
-        assert ["created_from_future", "query"] == matching
+    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+        item["guid"], topics, list(users.values()), companies
+    )
+    assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
 
 
 async def test_push_parsed_item(client, app):
@@ -917,19 +1026,42 @@ async def test_matching_topics_with_mallformed_query(client, app):
         ],
     )
 
-    item["products"] = [{"code": "p-1"}]
+    item["products"] = [{"code": "p-1", "name": "Sport"}]
     await client.post("/push", json=item)
-    search = get_resource_service("wire_search")
 
-    users = await get_user_dict(use_globals=False)
-    companies = await get_company_dict(use_globals=False)
-    topics = [
-        {"_id": "good", "query": "*:*", "user": TEST_USER_ID},
-        {"_id": "bad", "query": "AND Foo", "user": PUBLIC_USER_ID},
+    users = await get_user_dict_async(use_globals=False)
+    companies = await get_company_dict_async(use_globals=False)
+    topic_ids = dict(
+        good=ObjectId(),
+        bad=ObjectId(),
+    )
+    topics: list[TopicResourceModel] = [
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["good"],
+                _created=None,
+                label="Good",
+                user=TEST_USER_ID,
+                topic_type=SectionEnum.WIRE,
+                query="*:*",
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["bad"],
+                _created=None,
+                label="Bad",
+                user=PUBLIC_USER_ID,
+                topic_type=SectionEnum.WIRE,
+                query="AND Foo",
+            )
+        ),
     ]
-    async with app.app_context():
-        matching = search.get_matching_topics(item["guid"], topics, users, companies)
-        assert ["good"] == matching
+
+    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+        item["guid"], topics, list(users.values()), companies
+    )
+    assert {topic_ids["good"]} == matching
 
 
 async def test_matching_topics_when_disabling_section(client, app):
@@ -947,15 +1079,37 @@ async def test_matching_topics_when_disabling_section(client, app):
     )
 
     await client.post("/push", json=item)
-    search = get_resource_service("wire_search")
 
-    users = await get_user_dict(use_globals=False)
-    companies = await get_company_dict(use_globals=False)
-    topics = [
-        {"_id": "all wire", "query": "*:*", "user": TEST_USER_ID, "topic_type": "wire"},
-        {"_id": "all agenda", "query": "*:*", "user": TEST_USER_ID, "topic_type": "agenda"},
+    users = await get_user_dict_async(use_globals=False)
+    companies = await get_company_dict_async(use_globals=False)
+    topic_ids = dict(
+        all_wire=ObjectId(),
+        all_agenda=ObjectId(),
+    )
+    topics: list[TopicResourceModel] = [
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["all_wire"],
+                _created=None,
+                label="All Wire",
+                user=TEST_USER_ID,
+                topic_type=SectionEnum.WIRE,
+                query="*:*",
+            )
+        ),
+        TopicResourceModel.from_dict(
+            dict(
+                _id=topic_ids["all_agenda"],
+                _created=None,
+                label="All Agenda",
+                user=TEST_USER_ID,
+                topic_type=SectionEnum.AGENDA,
+                query="*:*",
+            )
+        ),
     ]
-    users[str(TEST_USER_ID)]["sections"] = {"wire": False, "agenda": True}
-    async with app.app_context():
-        matching = search.get_matching_topics(item["guid"], topics, users, companies)
-        assert [] == matching
+    users[TEST_USER_ID].sections = {"wire": False, "agenda": True}
+    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+        item["guid"], topics, list(users.values()), companies
+    )
+    assert set() == matching

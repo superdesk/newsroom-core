@@ -79,12 +79,12 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
 
 
 async def get_history_users(
-    item_ids: list[ObjectId | str],
-    active_user_ids: list[ObjectId | str],
-    active_company_ids: list[ObjectId | str],
+    item_ids: list[str],
+    active_user_ids: list[ObjectId],
+    active_company_ids: list[ObjectId],
     section: str,
     action: str,
-) -> list[str]:
+) -> set[ObjectId]:
     source = {
         "query": {
             "bool": {
@@ -108,16 +108,10 @@ async def get_history_users(
         "from": 0,
     }
 
-    histories_cursor = await HistoryService().find(source)
+    histories_cursor = await HistoryService().search(source)
 
-    # Collect the history items
-    histories_items = []
-    async for history in histories_cursor:
-        histories_items.append(history)
-
-    # Filter out the users
-    user_ids = [str(uid) for uid in active_user_ids]
-    return [str(h["user"]) for h in histories_items if str(h["user"]) in user_ids]
+    # Return list of active user IDs who have an action on these items
+    return set([history.user async for history in histories_cursor if history.user in active_user_ids])
 
 
 history_resource_config = ResourceConfig(

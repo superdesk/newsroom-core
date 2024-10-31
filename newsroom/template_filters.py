@@ -19,7 +19,7 @@ from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
 
-from newsroom.types import UserRole
+from newsroom.types import UserRole, UserResourceModel, User
 from newsroom.gettext import get_session_timezone
 
 from .template_loaders import template_locale
@@ -234,10 +234,11 @@ def is_admin(user=None):
     return session.get("user_type") == "administrator"
 
 
-def is_admin_or_internal(user=None):
+def is_admin_or_internal(user: UserResourceModel | User | dict[str, Any] | None = None) -> bool:
     allowed_user_types = ["administrator", "internal", "account_management"]
     if user:
-        return user.get("user_type") in allowed_user_types
+        user_type = user.user_type if isinstance(user, UserResourceModel) else user.get("user_type")
+        return user_type in allowed_user_types
     return session.get("user_type") in allowed_user_types
 
 

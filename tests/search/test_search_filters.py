@@ -9,7 +9,7 @@ from newsroom import auth  # noqa
 from newsroom.search.service import SearchQuery, BaseSearchService
 from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import get_local_date
-from newsroom.wire.search import WireSearchResource
+from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
 from tests.core.utils import create_entries_for
 
 from .fixtures import (
@@ -259,7 +259,7 @@ async def test_apply_request_filter__filters_using_groups_config(client, app):
             },
         },
     ]
-    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], {})
+    init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], {})
 
     search = SearchQuery()
     search.args = {"filter": json.dumps({"testfield": ["valuea", "valueb"]})}

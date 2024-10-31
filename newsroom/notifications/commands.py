@@ -227,7 +227,7 @@ class SendScheduledNotificationEmails:
             if item_id in exclude_items:
                 continue
 
-            # TODO-ASYNC: update when `wire_search` is migrated to async
+            # TODO-ASYNC: update when `wire_search` and `agenda_search` are migrated to async
             search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
 
             query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
