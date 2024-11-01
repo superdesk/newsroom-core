@@ -63,7 +63,7 @@ def get_updated_products(updates, original, company: Optional[CompanyResource]) 
     ]
 
 
-def get_companies_id_by_product(product_id: str) -> list[str]:
+async def get_companies_id_by_product(product_id: str) -> list[str]:
     """
     Get company IDs based on product ID.
 
@@ -73,9 +73,9 @@ def get_companies_id_by_product(product_id: str) -> list[str]:
     Returns:
         List[str]: A list of company IDs associated with the specified product.
     """
-    from newsroom.utils import query_resource
+    from newsroom.companies import CompanyServiceAsync
 
-    companies = list(query_resource("companies"))
+    companies = await CompanyServiceAsync().get_all_raw_as_list()
     return [
         str(company["_id"])
         for company in companies
