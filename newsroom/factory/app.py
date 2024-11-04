@@ -16,7 +16,6 @@ from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
 from pydantic import ValidationError
 from eve.io.mongo import ensure_mongo_indexes
-import sentry_sdk.integrations
 
 from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
