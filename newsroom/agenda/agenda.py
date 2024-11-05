@@ -669,7 +669,8 @@ def planning_items_query_string(query, fields=None, nested=False):
         # in query with `planning_items.` otherwise it will never match in nested
         # field and negative queries eg. NOT service.name:Sport will match all
         # nested planning items
-        query = re.sub(r'''\b(
+        query = re.sub(
+            r"""\b(
                 service\.name|
                 service\.code|
                 subject\.name|
@@ -678,8 +679,8 @@ def planning_items_query_string(query, fields=None, nested=False):
                 slugline|
                 description_text|
                 guid
-            ):''',
-            r'planning_items.\1:',
+            ):""",
+            r"planning_items.\1:",
             query,
             flags=re.VERBOSE,
         )
