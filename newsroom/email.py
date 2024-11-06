@@ -81,7 +81,7 @@ def handle_long_lines_html(html):
 
 
 @celery.task(soft_time_limit=120)
-def _send_email(to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=None):
+def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
     if attachments_info is None:
         attachments_info = []
 
@@ -109,7 +109,7 @@ def _send_email(to, subject, text_body, cc=None, html_body=None, sender=None, se
     return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=None):
+def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
     """
     Sends the email
     :param to: List of recipients
