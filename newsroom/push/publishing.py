@@ -6,7 +6,6 @@ from datetime import timedelta
 from superdesk.types import Item
 from superdesk.utc import utcnow
 from superdesk.core import get_app_config
-from superdesk import get_resource_service
 from superdesk.resource_fields import VERSION, ID_FIELD, GUID_FIELD
 from superdesk.text_utils import get_word_count, get_char_count
 
@@ -19,17 +18,16 @@ from newsroom.core import get_current_wsgi_app
 from newsroom.types import WireItem
 from newsroom.utils import parse_date_str
 from newsroom.wire import WireSearchServiceAsync
+from newsroom.agenda import AgendaItemService
+from newsroom.agenda.notifications import notify_agenda_update
 
 from .tasks import notify_new_agenda_item
 from .agenda_manager import AgendaManager
-from .utils import fix_hrefs, fix_updates, get_event_dates, set_dates, validate_event_push
+from .utils import fix_hrefs, fix_updates, set_dates, validate_event_push
 
 
 logger = logging.getLogger(__name__)
 agenda_manager = AgendaManager()
-
-
-# TODO-ASYNC: Revisit when agenda and content_api are async
 
 
 class Publisher:
@@ -91,7 +89,7 @@ class Publisher:
 
         try:
             if doc.get("coverage_id"):
-                agenda_items = await get_resource_service("agenda").set_delivery(doc)
+                agenda_items = await AgendaItemService().set_delivery(doc)
                 if agenda_items:
                     [notify_new_agenda_item.delay(item["_id"], check_topics=False) for item in agenda_items]
         except Exception as ex:
@@ -142,19 +140,20 @@ class Publisher:
                 if file_ref.get("media"):
                     file_ref.setdefault("href", app.upload_url(file_ref["media"]))
 
-        _id = event["guid"]
-        service = get_resource_service("agenda")
-        plan_ids = event.pop("plans", [])
+        agenda_id = event["guid"]
+        service = AgendaItemService()
+        # plan_ids = event.pop("plans", [])
 
         if not orig:
             # new event
-            agenda: dict[str, Any] = {}
-            agenda_manager.set_metadata_from_event(agenda, event)
-            agenda["dates"] = get_event_dates(event)
+            agenda, plan_ids = service.convert_event_to_agenda_dict({}, event)
+            # agenda: dict[str, Any] = {}
+            # agenda_manager.set_metadata_from_event(agenda, event)
+            # agenda["dates"] = get_event_dates(event)
 
             # Retrieve all current Planning items and add them into this Event
             agenda.setdefault("planning_items", [])
-            for plan in service.find(where={"_id": {"$in": plan_ids}}):
+            for plan in await (await service.search({"_id": {"$in": plan_ids}}, use_mongo=True)).to_list_raw():
                 planning_item = plan["planning_items"][0]
                 agenda["planning_items"].append(planning_item)
                 await agenda_manager.set_agenda_planning_items(
@@ -164,10 +163,10 @@ class Publisher:
                 if not plan.get("event_id"):
                     # Make sure the Planning item has an ``event_id`` defined
                     # This can happen when pushing a Planning item before linking to an Event
-                    service.system_update(plan["_id"], {"event_id": _id}, plan)
+                    await service.system_update(plan["_id"], {"event_id": agenda_id})
 
             signals.publish_event.send(app.as_any(), item=agenda, is_new=True)
-            _id = service.post([agenda])[0]
+            agenda_id = (await service.create([agenda]))[0]
         else:
             # replace the original document
             updates = None
@@ -195,9 +194,10 @@ class Publisher:
                 WORKFLOW_STATE.POSTPONED,
             ]:
                 # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
-                updates = {}
-                agenda_manager.set_metadata_from_event(updates, event, False)
-                updates["dates"] = get_event_dates(event)
+                updates, _ = service.convert_event_to_agenda_dict({}, event, set_doc_id=False)
+                # updates = {}
+                # agenda_manager.set_metadata_from_event(updates, event, False)
+                # updates["dates"] = get_event_dates(event)
                 updates["coverages"] = None
                 updates["planning_items"] = None
 
@@ -208,12 +208,13 @@ class Publisher:
                     "event": event,
                     "version": event.get("version", event.get(VERSION)),
                     "state": event["state"],
-                    "dates": get_event_dates(event),
+                    # "dates": get_event_dates(event),
                     "planning_items": orig.get("planning_items"),
                     "coverages": orig.get("coverages"),
                 }
 
-                agenda_manager.set_metadata_from_event(updates, event, False)
+                service.convert_event_to_agenda_dict(updates, event, set_doc_id=False)
+                # agenda_manager.set_metadata_from_event(updates, event, False)
 
             else:
                 logger.info("Ignoring event %s", orig["_id"])
@@ -222,53 +223,60 @@ class Publisher:
                 updated = orig.copy()
                 updated.update(updates)
                 signals.publish_event.send(app.as_any(), item=updated, updates=updates, orig=orig, is_new=False)
-                service.patch(orig["_id"], updates)
+                await service.update(orig["_id"], updates)
                 updates["_id"] = orig["_id"]
-                await get_resource_service("agenda").notify_agenda_update(updates, orig)
+                await notify_agenda_update(updates, orig)
 
-        return _id
+        return agenda_id
 
     async def publish_planning_item(self, planning: dict[str, Any], orig: dict[str, Any]):
-        service = get_resource_service("agenda")
+        service = AgendaItemService()
         agenda = deepcopy(orig)
 
-        agenda_manager.init_adhoc_agenda(planning, agenda)
+        # agenda_manager.init_adhoc_agenda(planning, agenda)
 
         # Update agenda metadata
-        new_plan = agenda_manager.set_metadata_from_planning(agenda, planning, force_adhoc=True)
+        _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning, force_adhoc=True)
+
+        # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning, force_adhoc=True)
 
         # Add the planning item to the list
         await agenda_manager.set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
         app = get_current_wsgi_app()
 
-        if not agenda.get("_id"):
+        if not orig.get("_id"):
             # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
             agenda.setdefault("_id", planning["guid"])
             agenda.setdefault("guid", planning["guid"])
             signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
-            return service.post([agenda])[0]
+            return (await service.create([agenda]))[0]
         else:
             # Replace the original
             signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
-            service.patch(agenda["_id"], agenda)
+            await service.update(agenda["_id"], agenda)
             return agenda["_id"]
 
     async def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
         if not planning.get("event_item"):
             return None
 
-        service = get_resource_service("agenda")
+        service = AgendaItemService()
 
         event_id = planning["event_item"]
         plan_id = planning["guid"]
-        orig_agenda = service.find_one(req=None, _id=event_id)
 
-        if not orig_agenda:
+        orig_agenda: dict[str, Any] | None = None
+        event = await service.find_by_id(event_id)
+        if event:
+            orig_agenda = event.to_dict()
+        else:
             # Item not found using ``event_item`` attribute
             # Try again using ``guid`` attribute
-            orig_agenda = service.find_one(req=None, _id=plan_id)
+            plan = await service.find_by_id(plan_id)
+            if plan:
+                orig_agenda = plan.to_dict()
 
-        if (orig_agenda or {}).get("item_type") != "event":
+        if orig_agenda is None or (orig_agenda or {}).get("item_type") != "event":
             # event id exists in planning item but event is not in the system
             logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
             return None
@@ -281,11 +289,12 @@ class Publisher:
         ):
             # Remove the Planning item from the list
             await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
-            service.patch(agenda["_id"], agenda)
+            await service.update(agenda["_id"], agenda)
             return None
 
         # Update agenda metadata
-        new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
+        _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
+        # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
 
         # Add the Planning item to the list
         await agenda_manager.set_agenda_planning_items(
@@ -296,8 +305,8 @@ class Publisher:
             # setting _id of agenda to be equal to planning if there's no event id
             agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
             agenda.setdefault("guid", planning.get("event_item", planning["guid"]) or planning["guid"])
-            return service.post([agenda])[0]
+            return (await service.create([agenda]))[0]
         else:
             # Replace the original document
-            service.patch(agenda["_id"], agenda)
+            await service.update(agenda["_id"], agenda)
             return agenda["_id"]
