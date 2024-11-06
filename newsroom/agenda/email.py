@@ -85,7 +85,7 @@ def send_coverage_request_email(user, message, item):
     email = user.get("email")
 
     # send coverage request email copy to current User.
-    cc = [email] if app.config.get("INCLUDE_CURRENT_USER_IN_CC") else []
+    cc = [email] if app.config.get("COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER") else []
 
     item_name = item.get("name") or item.get("slugline")
     user_company = get_company(user)
