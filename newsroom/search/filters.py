@@ -5,7 +5,6 @@ from quart_babel import gettext
 
 from superdesk.core import get_app_config
 from superdesk.core.types import ESQuery
-from superdesk import get_resource_service
 from content_api.errors import BadParameterValueError
 
 from newsroom.types import SectionEnum
@@ -15,10 +14,11 @@ from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_no
 from newsroom.settings import get_setting
 
 from newsroom.users import UsersService
-from newsroom.products.products import (
-    get_products_by_navigation,
-    get_products_by_company,
-    get_products_by_user,
+from newsroom.products import (
+    ProductsService,
+    get_products_by_company_async,
+    get_products_by_user_async,
+    get_products_by_navigation_async,
 )
 
 from .types import (
@@ -76,18 +76,15 @@ async def prefill_products(request: NewshubSearchRequest) -> None:
         # This should not happen, as it's prefilled by search service
         return
 
-    products_service = get_resource_service("products")
+    products_service = ProductsService()
     request.products = []
     if request.is_admin:
         if len(request.args.navigation_ids):
-            request.products = get_products_by_navigation(
-                request.args.navigation_ids, product_type=request.section.value
+            request.products = await get_products_by_navigation_async(
+                request.args.navigation_ids, product_type=request.section
             )
         elif len(request.args.product_ids):
-            # TODO-ASYNC: Convert to Async service when it's available
-            request.products = list(
-                products_service.get_from_mongo(req=None, lookup={"_id": {"$in": request.args.product_ids}})
-            )
+            request.products = await products_service.find_by_ids(request.args.product_ids)
     elif request.company is not None:
         if request.args.product_ids:
             allowed_product_ids = (
@@ -99,23 +96,20 @@ async def prefill_products(request: NewshubSearchRequest) -> None:
                 if request.company is not None and request.company.products is not None
                 else []
             )
-            # TODO-ASYNC: Convert to Async service when it's available
-            request.products = list(
-                products_service.get_from_mongo(req=None, lookup={"_id": {"$in": allowed_product_ids}})
-            )
+            request.products = await products_service.find_by_ids(allowed_product_ids)
         else:
             if request.user and request.user.products:
-                request.products = get_products_by_user(
-                    request.user.to_dict(context={"use_objectid": True}),
-                    str(request.section.value),
+                request.products = await get_products_by_user_async(
+                    request.user,
+                    request.section,
                     request.args.navigation_ids,
                 )
 
             # add unlimited (seats=0) company products
-            company_products = get_products_by_company(
-                request.company.to_dict(context={"use_objectid": True}),
+            company_products = await get_products_by_company_async(
+                request.company,
                 request.args.navigation_ids,
-                product_type=request.section.value,
+                product_type=request.section,
                 unlimited_only=True,
             )
             if company_products:
@@ -167,7 +161,7 @@ def apply_ids_filter(request: NewshubSearchRequest) -> None:
     if not len(request.args.ids):
         return
 
-    request.search.query.must.append({"ids": {"values": request.args.ids}})
+    request.search.query.filter.append({"ids": {"values": request.args.ids}})
 
 
 def get_apply_filters(get_aggregation_field: Callable[[str], str]) -> SearchFilterFunction:
@@ -273,14 +267,13 @@ def apply_products_filter(request: NewshubSearchRequest) -> None:
         # This should not happen, as it's prefilled by search service
         return
 
-    # TODO-ASYNC: Convert to async Product model when available
-    sdesk_product_ids = [product["sd_product_id"] for product in request.products if product.get("sd_product_id")]
+    sdesk_product_ids = [product.sd_product_id for product in request.products if product.sd_product_id]
     if sdesk_product_ids:
         request.search.query.should.append({"terms": {"products.code": sdesk_product_ids}})
 
     for product in request.products:
-        if product.get("query"):
-            request.search.query.should.append(query_string_for_section(request.section, product["query"]))
+        if product.query:
+            request.search.query.should.append(query_string_for_section(request.section, product.query))
 
 
 def prefill_args_from_topic(request: NewshubSearchRequest) -> None:
@@ -324,6 +317,22 @@ def apply_advanced_search(request: NewshubSearchRequest) -> None:
 
     if not advanced["fields"]:
         return
+
+    if request.section is SectionEnum.AGENDA:
+        if "slugline" in advanced["fields"]:
+            # Add ``slugline`` field for Planning & Coverages too
+            advanced["fields"].extend(["planning_items.slugline", "coverages.slugline"])
+
+        if "headline" in advanced["fields"]:
+            # Add ``headline`` field for Planning items too
+            advanced["fields"].append("planning_items.headline")
+
+        if "description" in advanced["fields"]:
+            # Replace ``description`` alias with appropriate description fields
+            advanced["fields"].remove("description")
+            advanced["fields"].extend(
+                ["definition_short", "definition_long", "description_text", "planning_items.description_text"]
+            )
 
     if advanced.get("all"):
         request.search.query.must.append(
