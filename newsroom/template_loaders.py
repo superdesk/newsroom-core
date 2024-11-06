@@ -42,6 +42,8 @@ def template_locale(locale: Optional[str] = None, timezone: Optional[str] = None
     elif timezone:
         with switch_timezone(timezone):
             yield
+    else:
+        yield
 
 
 class LocaleTemplateLoader(jinja2.FileSystemLoader):
