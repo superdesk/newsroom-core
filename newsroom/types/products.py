@@ -1,4 +1,3 @@
-from enum import Enum
 from bson import ObjectId
 from typing import Annotated
 
@@ -7,13 +6,7 @@ from superdesk.core.resources.fields import Field
 from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.validators import validate_multi_field_iunique_value_async, validate_valid_objectid
 
-PRODUCT_TYPES = ["wire", "agenda", "news_api"]
-
-
-class ProductType(str, Enum):
-    WIRE = "wire"
-    AGENDA = "agenda"
-    NEWS_API = "news_api"
+from .common import SectionEnum
 
 
 class ProductResourceModel(NewshubResourceModel):
@@ -26,7 +19,7 @@ class ProductResourceModel(NewshubResourceModel):
     query: str | None = None
     planning_item_query: str | None = None
     is_enabled: bool = True
-    product_type: ProductType = ProductType.WIRE
+    product_type: SectionEnum = SectionEnum.WIRE
     navigations: list[
         Annotated[
             ObjectId,

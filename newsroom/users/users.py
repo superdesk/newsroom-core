@@ -5,7 +5,7 @@ import superdesk
 
 from superdesk.flask import request
 
-from newsroom.types import PRODUCT_TYPES, UserRole
+from newsroom.types import SectionEnum, UserRole
 from newsroom.auth.eve_auth import SessionAuth
 
 
@@ -96,7 +96,7 @@ class UsersResource(newsroom.Resource):
                 "type": "dict",
                 "schema": {
                     "_id": newsroom.Resource.rel("products", required=True),
-                    "section": {"type": "string", "required": True, "allowed": PRODUCT_TYPES},
+                    "section": {"type": "string", "required": True, "allowed": [t.value for t in SectionEnum]},
                 },
             },
         },

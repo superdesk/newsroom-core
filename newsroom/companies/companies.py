@@ -7,7 +7,7 @@ from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 import newsroom
 
-from newsroom.types import PRODUCT_TYPES
+from newsroom.types import SectionEnum
 from newsroom.signals import company_create
 
 from .utils import get_company_section_names, get_company_product_ids
@@ -64,7 +64,7 @@ class CompaniesResource(newsroom.Resource):
                 "schema": {
                     "_id": newsroom.Resource.rel("products"),
                     "seats": {"type": "number", "default": 0},
-                    "section": {"type": "string", "required": True, "allowed": PRODUCT_TYPES},
+                    "section": {"type": "string", "required": True, "allowed": [t.value for t in SectionEnum]},
                 },
             },
         },
