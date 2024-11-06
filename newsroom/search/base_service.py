@@ -139,8 +139,7 @@ class BaseNewshubSearchService(Generic[SearchArgsType, SearchItemType]):
                 total=count,
             ),
         )
-        if hasattr(cursor, "extra"):
-            getattr(cursor, "extra")(response)
+        cursor.extra(response)
 
         return response, count
 

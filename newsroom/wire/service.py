@@ -5,31 +5,33 @@ import logging
 from bson import ObjectId
 
 from content_api.items.model import PubStatusType
-from superdesk.core.types import Request, Response, SearchRequest, ESQuery, ESBoolQuery
+from superdesk.core.types import Request, Response, SearchRequest, ESQuery
 from superdesk.core import get_app_config
 from superdesk.core.resources import AsyncResourceService
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 
-from newsroom.exceptions import AuthorizationError
-from newsroom.types import SectionEnum, Product, TopicResourceModel, UserResourceModel, CompanyResource, WireItem
-from newsroom.auth.utils import get_user_or_none_from_request, get_user_sections
+from newsroom.types import (
+    SectionEnum,
+    ProductResourceModel,
+    UserResourceModel,
+    CompanyResource,
+    WireItem,
+)
+from newsroom.auth.utils import get_user_or_none_from_request
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
-from newsroom.search.base_service import BaseNewshubSearchService
+from newsroom.search.base_web_service import BaseWebSearchService
 from newsroom.search.filters import (
     apply_query_string,
     apply_date_range,
     apply_advanced_search,
     prefill_user,
     prefill_company,
-    prefill_products,
-    prefill_args_from_topic,
     apply_section_filter,
     apply_company_filter,
     apply_products_filter,
     validate_request,
     apply_ids_filter,
 )
-from newsroom.products.products import get_products_by_navigation
 
 from .filters import (
     WireSearchRequestArgs,
@@ -39,6 +41,7 @@ from .filters import (
     apply_embargoed_filters,
     apply_not_canceled_filter,
     apply_time_limit_filter,
+    apply_highlights,
 )
 
 
@@ -50,17 +53,18 @@ class WireItemService(AsyncResourceService[WireItem]):
         await super().insert_versioned_document(doc_dict)
 
         if doc_dict.get("pubstatus") == PubStatusType.CANCELLED.value:
+            # versioned_document = self._get_versioned_document(doc_dict)
             # If the update is a cancel, we need to cancel all versions
             await self.mongo_versioned_async.update_many(
                 {
-                    "_id_document": doc_dict["_id_document"],
+                    "_id_document": doc_dict["_id"],
                     "pubstatus": {"$ne": PubStatusType.CANCELLED.value},
                 },
                 {"$set": {"pubstatus": PubStatusType.CANCELLED.value}},
             )
 
 
-class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, WireItem]):
+class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireItem]):
     """Wire search service class, for searching for items while applying permissions and API request args"""
 
     search_args_class = WireSearchRequestArgs
@@ -68,6 +72,28 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
     section = SectionEnum.WIRE
     default_sort = [{"versioncreated", -1}]
     default_page_size = 25
+    service: WireItemService
+
+    get_items_by_id_filters = [
+        apply_item_type_filter,
+        apply_ids_filter,
+    ]
+    get_topic_items_query_execute_filters = [
+        apply_products_filter,
+        apply_embargoed_filters,
+        apply_query_string,
+        apply_ids_filter,
+        apply_filters,
+        apply_advanced_search,
+        apply_date_range,
+        apply_highlights,
+    ]
+    get_topic_items_query_user_filters = [
+        apply_section_filter,
+        apply_item_type_filter,
+        apply_company_filter,
+        apply_time_limit_filter,
+    ]
 
     def __init__(self):
         self.service = WireItemService()
@@ -91,46 +117,22 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
         )
         return await cursor.count()
 
-    async def get_items_by_id(
-        self, item_ids: list[str], args: WireSearchRequestArgs | None = None, apply_permissions: bool = False
-    ) -> ElasticsearchResourceCursorAsync[WireItem]:
-        """Searches for items by ID, optionally applying user/company permissions
-
-        :param item_ids: A list of item IDs to search for
-        :param args: Optional set of request arguments to apply
-        :param apply_permissions: Whether to apply user/company permissions or not
-        :returns: Elasticsearch cursor with the results
-        """
-
-        if args is None:
-            args = WireSearchRequestArgs()
-
-        args.ids = item_ids
-        return await self.search(
-            args,
-            filters=None
-            if apply_permissions
-            else [
-                apply_item_type_filter,
-                apply_ids_filter,
-            ],
-        )
-
-    async def get_items_for_action(self, item_ids: list[str]) -> ElasticsearchResourceCursorAsync[WireItem]:
+    async def get_items_for_action(self, item_ids: list[str]) -> list[dict[str, Any]]:
         """Searches for item by ID, for use by downloads, sharing etc
 
         For each item, appends the ``anpa_take_key`` to the slugline if defined
 
         :param item_ids: A list of item IDs to search for
-        :returns: Elasticsearch cursor with the results
+        :returns: The list of WIre items
         """
 
         cursor = await self.get_items_by_id(item_ids, args=WireSearchRequestArgs(ignore_latest=True))
-        async for item in cursor:
-            if item.slugline and item.anpa_take_key:
-                item.slugline = f"{item.slugline} | {item.anpa_take_key}"
+        items = await cursor.to_list_raw()
+        for item in items:
+            if item.get("slugline") and item.get("anpa_take_key"):
+                item["slugline"] = item["slugline"] + " | " + item["anpa_take_key"]
 
-        return cursor
+        return items
 
     async def process_web_request(self, request: Request) -> Response:
         """Process q request from the WebAPI
@@ -311,9 +313,8 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
             cursor.hits["hits"]["hits"] = embargoed_cursor.hits["hits"]["hits"] + cursor.hits["hits"]["hits"]
             cursor.hits["hits"]["total"] = await embargoed_cursor.count() + await cursor.count()
 
-    # TODO-ASYNC: Convert to async Product model when available
     async def get_product_items_for_dashboard(
-        self, product: Product, size: int, exclude_embargoed: bool = False
+        self, product: ProductResourceModel, size: int, exclude_embargoed: bool = False
     ) -> list[WireItem]:
         """Return items for the provided product for use with the dashboard
 
@@ -328,7 +329,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
 
         cursor = await self.search(
             WireSearchRequestArgs(
-                product_ids=[product["_id"]],
+                product_ids=[product.id],
                 page_size=size,
                 exclude_embargoed=not get_app_config("DASHBOARD_EMBARGOED") or exclude_embargoed,
             ),
@@ -349,186 +350,6 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
             ],
         )
         return await cursor.to_list()
-
-    async def get_topic_items_query(
-        self,
-        topic: TopicResourceModel | None,
-        user: UserResourceModel | None,
-        company: CompanyResource | None,
-        query: ESQuery | None = None,
-        args: WireSearchRequestArgs | None = None,
-    ) -> ESQuery | None:
-        """Generate an elasticsearch query, based on topic, user and company
-
-        :param topic: An optional Topic to be added to the request args
-        :param user: An optional User to be added to the request args
-        :param company: An optional Company to be added to the request args
-        :param query: An optional Elasticsearch query to start with
-        :param args: An optional request args to start with
-        :returns: The generated Elasticsearch query, or None if the supplied User does not have permission
-        """
-
-        def prefill_request(request: NewshubSearchRequest):
-            if topic:
-                request.topic = topic
-            if user:
-                request.user = request.current_user = user
-                request.is_admin = request.user.is_admin()
-            else:
-                request.is_admin = False
-
-            if company:
-                request.company = company
-            if query:
-                request.search = query
-
-            if user is None and topic is not None and topic.navigation is not None:
-                # TODO-ASYNC: Convert to Async service when it's available
-                request.products = get_products_by_navigation(topic.navigation)
-
-        search_request = NewshubSearchRequest(
-            section=self.section,
-            web_request=None,
-            args=args or WireSearchRequestArgs(),
-            search=query or ESQuery(),
-        )
-
-        filters: list[SearchFilterFunction] = [
-            # Pre-fill the request arguments
-            prefill_request,
-            prefill_args_from_topic,
-            # Apply standard filters used to match a topic
-            apply_products_filter,
-            apply_embargoed_filters,
-            apply_query_string,
-            apply_ids_filter,
-            apply_filters,
-            apply_advanced_search,
-            apply_date_range,
-        ]
-
-        if user is not None:
-            # If this query is from a User's perspective, then add
-            # validation and section/company filters
-            filters.extend(
-                [
-                    prefill_products,
-                    # Make sure the request has been validated
-                    validate_request,
-                    # Base topics:
-                    apply_section_filter,
-                    apply_item_type_filter,
-                    apply_company_filter,
-                    apply_time_limit_filter,
-                ]
-            )
-
-        try:
-            return await self.run_filters_and_return_query(search_request, filters)
-        except AuthorizationError:
-            if user and topic:
-                logger.info(f"Notification for user:{user.id} and topic:{topic.id} is skipped")
-            pass
-
-        return None
-
-    async def get_mathing_topics_for_item(
-        self,
-        item_id: str,
-        topics: list[TopicResourceModel],
-        users: list[UserResourceModel],
-        companies: dict[ObjectId, CompanyResource],
-    ) -> set[ObjectId]:
-        """Get a set of Topic IDs that match the supplied item
-
-        :param item_id: The ID of the item to match topics against
-        :param topics: The list of Topics to match the item against
-        :param users: The list of Users to match the item against
-        :param companies: The list of Companies to match the item against
-        :returns: A set of Topic IDs that the wire item matches
-        """
-
-        return await self.get_matching_topics_for_query(
-            topics,
-            users,
-            companies,
-            ESQuery(query=ESBoolQuery(must=[{"term": {"_id": item_id}}])),
-        )
-
-    async def get_matching_topics_for_query(
-        self,
-        topics: list[TopicResourceModel],
-        users: list[UserResourceModel],
-        companies: dict[ObjectId, CompanyResource],
-        query: ESQuery | None = None,
-    ) -> set[ObjectId]:
-        """Get a set of Topic IDs that match the supplied query
-
-        :param topics: The list of Topics to match the item against
-        :param users: The list of Users to match the item against
-        :param companies: The list of Companies to match the item against
-        :param query: The Elasticsearch query to match topics for
-        :returns: A set of Topic IDs that the wire item matches
-        """
-
-        topic_matches: set[ObjectId] = set()
-        topics_checked: set[ObjectId] = set()
-
-        for user in users:
-            company = companies.get(user.company) if user.company else None
-            user_sections = get_user_sections(user, company)
-            if not user_sections.get(self.section):
-                continue
-
-            if user.has_paused_notifications():
-                continue
-
-            aggs: dict[str, Any] = {"topics": {"filters": {"filters": {}}}}
-
-            # There will be one base search for a user with aggs for user topics
-            search = await self.get_topic_items_query(None, user, company, query=query)
-            if not search:
-                continue
-            queried_topics: list[TopicResourceModel] = []
-            for topic in topics:
-                if topic.user is None or topic.user != user.id:
-                    continue
-                elif topic.id in topics_checked:
-                    continue
-                topics_checked.add(topic.id)
-
-                topic_query = await self.get_topic_items_query(topic, None, None)
-                if not topic_query:
-                    continue
-
-                try:
-                    aggs["topics"]["filters"]["filters"][str(topic.id)] = topic_query.generate_query_dict()["query"]
-                    queried_topics.append(topic)
-                except (KeyError, TypeError, IndexError):
-                    continue
-
-            if not len(queried_topics):
-                continue
-
-            search.aggs = aggs
-            search_request = SearchRequest(
-                max_results=0,
-                aggregations=True,
-                elastic=search,
-            )
-
-            try:
-                search_results: ElasticsearchResourceCursorAsync[WireItem] = await self.service.find(search_request)
-                for topic in queried_topics:
-                    try:
-                        if search_results.hits["aggregations"]["topics"]["buckets"][str(topic.id)]["doc_count"] > 0:
-                            topic_matches.add(topic.id)
-                    except (KeyError, IndexError, TypeError):
-                        logger.warning(f"Failed to find aggregation result for topic {topic.id}")
-            except Exception:
-                logger.exception("Error in get_matching_topics", extra=dict(query=search_request, user=user.id))
-
-        return topic_matches
 
     async def get_matching_item_bookmarks(
         self, item_ids: list[str], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
@@ -569,7 +390,9 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
 
         return bookmark_users
 
-    async def get_product_item_report(self, product: Product) -> ElasticsearchResourceCursorAsync[WireItem]:
+    async def get_product_item_report(
+        self, product: ProductResourceModel
+    ) -> ElasticsearchResourceCursorAsync[WireItem]:
         """Returns aggregation results for items for the supplied product, grouped by date range
 
         :param product: The product to get the items for the report
@@ -629,7 +452,7 @@ class WireSearchServiceAsync(BaseNewshubSearchService[WireSearchRequestArgs, Wir
 
         return await self.search(
             NewshubSearchRequest(
-                section=cast(SectionEnum | None, product.get("product_type")) or self.section or SectionEnum.WIRE,
+                section=cast(SectionEnum | None, product.product_type) or self.section or SectionEnum.WIRE,
                 products=[product],
                 args=WireSearchRequestArgs(page_size=0),
                 search=ESQuery(aggs=aggs),
