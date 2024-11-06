@@ -1,4 +1,5 @@
 mypy
+pydantic
 types-Flask
 types-Jinja2
 types-python-dateutil
