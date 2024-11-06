@@ -12,9 +12,20 @@ from newsroom.types import ProductResourceModel
 from . import products
 from .service import ProductsService
 from .views import get_settings_data, products_endpoints
-from .utils import get_products_by_company
+from .utils import (
+    get_products_by_company,
+    get_products_by_company_async,
+    get_products_by_user_async,
+    get_products_by_navigation_async,
+)
 
-__all__ = ["get_products_by_company", "ProducsService"]
+__all__ = [
+    "get_products_by_company",
+    "get_products_by_company_async",
+    "get_products_by_user_async",
+    "get_products_by_navigation_async",
+    "ProductsService",
+]
 
 
 def init_module(app: SuperdeskAsyncApp):
