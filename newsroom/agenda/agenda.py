@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Set, Any, Optional, List
 import logging
 from copy import deepcopy
@@ -662,7 +663,28 @@ def _remove_fields(source, fields):
     source["_source"]["exclude"].extend(fields)
 
 
-def planning_items_query_string(query, fields=None):
+def planning_items_query_string(query, fields=None, nested=False):
+    if nested:
+        # when searching nested planning items we need to prefix field names
+        # in query with `planning_items.` otherwise it will never match in nested
+        # field and negative queries eg. NOT service.name:Sport will match all
+        # nested planning items
+        query = re.sub(
+            r"""\b(
+                service\.name|
+                service\.code|
+                subject\.name|
+                subject\.code|
+                headline|
+                slugline|
+                description_text|
+                guid
+            ):""",
+            r"planning_items.\1:",
+            query,
+            flags=re.VERBOSE,
+        )
+
     return query_string(query, fields=fields or ["planning_items.*"])
 
 
@@ -1632,7 +1654,7 @@ class AgendaService(BaseSearchService):
                 "bool": {
                     "should": [
                         self.query_string(query),
-                        nested_query("planning_items", planning_items_query_string(query), name="query"),
+                        nested_query("planning_items", planning_items_query_string(query, nested=True), name="query"),
                     ]
                 },
             }
