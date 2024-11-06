@@ -114,6 +114,16 @@ def get_mongo_uri(key, dbname):
 
 @fixture
 async def app(request):
+    # Make sure old DB connections are closed
+    prev_instance = getattr(app, "instance", None)
+    if prev_instance:
+        # Close all PyMongo Connections (new ones will be created with ``app_factory`` call)
+        for key, val in prev_instance.extensions["pymongo"].items():
+            val[0].close()
+
+        prev_instance.async_app.stop()
+        await prev_instance.async_app.elastic.stop()
+
     cfg = Config(root)
     update_config(cfg)
 
@@ -128,7 +138,8 @@ async def app(request):
     # drop mongodb now, indexes will be created during app init
     drop_mongo(cfg)
 
-    app = get_app(config=cfg, testing=True)
+    app_instance = get_app(config=cfg, testing=True)
+    setattr(app, "instance", app_instance)
     limiter_key = str(ObjectId())
 
     async def limiter_key_function():
@@ -136,16 +147,16 @@ async def app(request):
 
     limiter.key_function = limiter_key_function
 
-    async with app.app_context():
-        await reset_elastic(app)
+    async with app_instance.app_context():
+        await reset_elastic(app_instance)
         cache.clean()
-        app.init_indexes()
-        yield app
+        app_instance.init_indexes()
+        yield app_instance
 
     # Clean up blueprints, so they can be re-registered
     import importlib
 
-    for name in app.config["BLUEPRINTS"]:
+    for name in app_instance.config["BLUEPRINTS"]:
         mod = importlib.import_module(name)
         if getattr(mod, "blueprint"):
             mod.blueprint._got_registered_once = False
