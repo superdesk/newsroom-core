@@ -81,12 +81,15 @@ def handle_long_lines_html(html):
 
 
 @celery.task(soft_time_limit=120)
-def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
+def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
     if attachments_info is None:
         attachments_info = []
 
     if sender is None:
         sender = current_app.config["MAIL_DEFAULT_SENDER"]
+
+    if cc is None:
+        cc = []
 
     if sender_name is not None:
         sender = (sender_name, sender)
@@ -99,14 +102,14 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
         except Exception as e:
             logger.error("Error attaching {} file to mail. Receipient(s): {}. Error: {}".format(a["file_desc"], to, e))
 
-    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
+    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, cc=cc, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
     return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
+def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
     """
     Sends the email
     :param to: List of recipients
@@ -119,6 +122,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
 
     kwargs = {
         "to": to,
+        "cc": cc,
         "subject": subject,
         "text_body": handle_long_lines_text(text_body) if text_body else None,
         "html_body": handle_long_lines_html(html_body) if html_body else None,
@@ -246,12 +250,13 @@ def send_template_email(
     to: List[str],
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
+    cc: Optional[List[str]] = None,
     **kwargs: EmailKwargs,
 ) -> None:
     """Send email to list of recipients using default locale."""
     language = current_app.config["DEFAULT_LANGUAGE"]
     timezone = current_app.config["DEFAULT_TIMEZONE"]
-    _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs)
+    _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs, cc)
 
 
 def _send_localized_email(
@@ -261,6 +266,7 @@ def _send_localized_email(
     timezone: str,
     template_kwargs: TemplateKwargs,
     email_kwargs: EmailKwargs,
+    cc: Optional[List[str]] = None,
 ) -> None:
     language = to_email_language(language)
     email_templates = get_resource_service("email_templates")
@@ -272,6 +278,7 @@ def _send_localized_email(
         template_kwargs.setdefault("recipient_language", language)
         send_email(
             to=to,
+            cc=cc,
             subject=subject,
             text_body=render_template(text_template, **template_kwargs),
             html_body=render_template(html_template, **template_kwargs),
