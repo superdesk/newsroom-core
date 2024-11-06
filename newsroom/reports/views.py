@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from inspect import isawaitable
 from io import StringIO
 import csv
@@ -5,23 +6,37 @@ import csv
 from quart_babel import gettext
 
 from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import session, jsonify, render_template, abort
-from newsroom.decorator import account_manager_or_company_admin_only
-from newsroom.reports import blueprint
+from superdesk.core.types import Request, Response
+from superdesk.core.web import EndpointGroup
+from superdesk.flask import render_template
+from newsroom.auth import auth_rules
+from newsroom.auth.utils import get_user_from_request
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
 from newsroom.users import get_user_profile_data
 
 
-@blueprint.route("/reports/print/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-async def print_reports(report):
+class RouteArguments(BaseModel):
+    report: str
+
+
+blueprint = EndpointGroup("reports", __name__)
+
+
+@blueprint.endpoint(
+    "/reports/print/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def print_reports(args: RouteArguments, params: None, request: Request):
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     data = func()
     if isawaitable(data):
@@ -29,45 +44,57 @@ async def print_reports(report):
     return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
-@blueprint.route("/reports/company_reports", methods=["GET"])
-@account_manager_or_company_admin_only
-async def company_reports():
+@blueprint.endpoint(
+    "/reports/company_reports", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def company_reports(request: Request):
     companies = list(query_resource("companies"))
     user_profile_data = await get_user_profile_data()
+    user = get_user_from_request(request)
     data = {
         "companies": companies,
         "sections": get_current_app().as_any().sections,
         "api_enabled": get_app_config("NEWS_API_ENABLED", False),
-        "current_user_type": session.get("user_type"),
+        "current_user_type": user.user_type,
     }
     return await render_template(
         "company_reports.html", setting_type="company_reports", data=data, user_profile_data=user_profile_data
     )
 
 
-@blueprint.route("/reports/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-async def get_report(report):
+@blueprint.endpoint(
+    "/reports/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def get_report(args: RouteArguments, params: None, request: Request) -> Response:
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     results = func()
     if isawaitable(results):
         results = await results
-    return jsonify(results), 200
+    return Response(results)
 
 
-@blueprint.route("/reports/export/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-async def export_reports(report):
+@blueprint.endpoint(
+    "/reports/export/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def export_reports(args: RouteArguments, params: None, request: Request):
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     rows = func()
     if isawaitable(rows):

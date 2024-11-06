@@ -26,19 +26,22 @@ from newsroom.agenda.filters import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
 from newsroom.companies.utils import get_companies_id_by_product
+from newsroom.topics.topics_async import TopicService
+from newsroom.companies import CompanyServiceAsync
+from newsroom.users.service import UsersService
+from newsroom.products.service import ProductsService
 from newsroom.wire import WireSearchServiceAsync
 from .content_activity import get_content_activity_report  # noqa
 
 
-def get_company_saved_searches():
+async def get_company_saved_searches():
     """Returns number of saved searches by company"""
     results = []
     company_topics = defaultdict(int)
-    companies = get_entity_dict(query_resource("companies"))
-    users = get_entity_dict(query_resource("users"))
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    users = get_entity_dict(await UsersService().get_all_raw_as_list())
 
-    # TODO-Async:- update when this reports resource convert to async
-    topics = query_resource("topics")
+    topics = await TopicService().get_all_raw_as_list()
 
     for topic in topics:
         company = users.get(topic.get("user", ""), {}).get("company")
@@ -59,15 +62,14 @@ def get_company_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved searches per company")}
 
 
-def get_user_saved_searches():
+async def get_user_saved_searches():
     """Returns number of saved searches by user"""
     results = []
     user_topics = defaultdict(int)
-    companies = get_entity_dict(query_resource("companies"))
-    users = get_entity_dict(query_resource("users"))
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    users = get_entity_dict(await UsersService().get_all_raw_as_list())
 
-    # TODO-Async:- update when this reports resource convert to async
-    topics = query_resource("topics")
+    topics = await TopicService().get_all_raw_as_list()
 
     for topic in topics:
         company = users.get(topic.get("user", ""), {}).get("company")
@@ -92,7 +94,7 @@ def get_user_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved searches per user")}
 
 
-def get_company_and_user_saved_searches():
+async def get_company_and_user_saved_searches():
     """
     Returns saved My topics and Company topics per user in their company
     """
@@ -100,8 +102,12 @@ def get_company_and_user_saved_searches():
     results = []
     current_company = get_company_from_request(None)
     lookup_company = dict(company=current_company.id if current_company else None)
-    users = get_entity_dict(query_resource("users", lookup=lookup_company))
-    topics = query_resource("topics", lookup=lookup_company)
+
+    users_cursor = await UsersService().find(lookup_company)
+    users = get_entity_dict(await users_cursor.to_list_raw())
+
+    cursor = await TopicService().find(lookup_company)
+    topics = await cursor.to_list_raw()
 
     saved_topics = defaultdict(lambda: dict(my_topics=0, company_topics=0))
 
@@ -127,11 +133,11 @@ def get_company_and_user_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved My Topics and Company Topics")}
 
 
-def get_company_products():
+async def get_company_products():
     """Returns products by company"""
     results = []
-    companies = get_entity_dict(query_resource("companies"))
-    products_data = get_entity_dict(query_resource("products"))
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    products_data = get_entity_dict(await ProductsService().get_all_raw_as_list())
     for company_id, company_details in companies.items():
         company_result = {
             "_id": str(company_id),
@@ -168,15 +174,17 @@ async def get_product_stories():
     return {"results": sorted_results, "name": gettext("Stories per product")}
 
 
-def get_company_report():
+async def get_company_report():
     """Returns products by company"""
     results = []
-    companies = list(query_resource("companies"))
-    products_data = get_entity_dict(query_resource("products"))
+    companies = await CompanyServiceAsync().get_all_raw_as_list()
+    products_data = get_entity_dict(await ProductsService().get_all_raw_as_list())
+    users_service = UsersService()
 
     for company in companies:
         company_id = str(company["_id"])
-        users = list(query_resource("users", lookup={"company": company_id}))
+        cursor = await users_service.find({"company": company_id})
+        users = await cursor.to_list_raw()
 
         company_result = {
             "_id": company_id,
@@ -193,7 +201,7 @@ def get_company_report():
     return {"results": sorted_results, "name": gettext("Company")}
 
 
-def get_subscriber_activity_report():
+async def get_subscriber_activity_report():
     args = deepcopy(request.args.to_dict())
 
     # Elastic query
@@ -327,7 +335,7 @@ def get_subscriber_activity_report():
         )
 
 
-def get_company_api_usage():
+async def get_company_api_usage():
     args = deepcopy(request.args.to_dict())
     date_range = get_date_filters(
         BaseSearchRequestArgs(
@@ -352,6 +360,7 @@ def get_company_api_usage():
             "terms": {"size": 0, "field": "subscriber"},
         }
     }
+    # TODO-ASYNC: Change this when CompanyTokenAuth is upgraded to async
     company_ids = [t["company"] for t in query_resource(API_TOKENS)]
     source["query"]["bool"]["filter"].append({"terms": {"subscriber": company_ids}})
     companies = get_entity_dict(query_resource("companies", lookup={"_id": {"$in": company_ids}}), str_id=True)
@@ -374,12 +383,12 @@ def get_company_api_usage():
     return results
 
 
-def get_company_names(company_ids):
-    service = superdesk.get_resource_service("companies")
+async def get_company_names(company_ids):
+    service_async = CompanyServiceAsync()
     enabled_companies = []
     disabled_companies = []
     for company_id in company_ids:
-        company = service.find_one(req=None, _id=company_id)
+        company = await service_async.find_by_id_raw(company_id)
         if company:
             if not company.get("is_enabled"):
                 disabled_companies.append(company.get("name"))
@@ -391,33 +400,32 @@ def get_company_names(company_ids):
     }
 
 
-def get_product_company():
+async def get_product_company():
     args = deepcopy(request.args.to_dict())
     lookup = {"_id": ObjectId(args.get("product"))} if args.get("product") else None
-    products = query_resource("products", lookup=lookup)
+    cursor = await ProductsService().find(lookup)
+    products = await cursor.to_list_raw()
 
     res = [
         {
             "_id": product.get("_id"),
             "product": product.get("name"),
-            "companies": get_companies_id_by_product(product.get("_id")),
+            "companies": await get_companies_id_by_product(product.get("_id")),
         }
         for product in products
     ]
 
     for r in res:
-        r.update(get_company_names(r.get("companies", [])))
+        r.update(await get_company_names(r.get("companies", [])))
 
     results = {"results": res, "name": gettext("Companies permissioned per product")}
     return results
 
 
-def get_expired_companies():
-    expired = list(
-        superdesk.get_resource_service("companies").find(
-            {"expiry_date": {"$lte": utcnow().replace(hour=0, minute=0, second=0)}}
-        )
-    )
+async def get_expired_companies():
+    lookup = {"expiry_date": {"$lte": utcnow().replace(hour=0, minute=0, second=0)}}
+    cursor = await CompanyServiceAsync().find(lookup)
+    expired = await cursor.to_list_raw()
 
     results = {"results": expired, "name": gettext("Expired companies")}
     return results
