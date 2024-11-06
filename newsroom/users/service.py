@@ -7,13 +7,12 @@ import re
 from quart_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.types import User
 from superdesk.core import get_app_config
 from superdesk.core.types import HTTP_METHOD, Request
 from superdesk.flask import abort
 from superdesk.utils import is_hashed, get_hash
 
-from newsroom.types import UserResourceModel, UserAuthResourceModel
+from newsroom.types import User, UserResourceModel, UserAuthResourceModel
 from newsroom.exceptions import AuthorizationError
 from newsroom.settings import get_setting
 from newsroom.auth.utils import (
@@ -156,7 +155,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         lookup = {"$regex": re.compile("^{}$".format(re.escape(email)), re.IGNORECASE)}
         return await self.find_one(email=lookup)
 
-    async def update_notification_schedule_run_time(self, user: dict[str, Any], run_time: datetime):
+    async def update_notification_schedule_run_time(self, user: UserResourceModel, run_time: datetime):
         """
         Updates the user's notification schedule with the provided run time and clears related cache.
 
@@ -164,13 +163,19 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             user: The user object containing the current notification schedule.
             run_time: The new run time to be updated in the notification schedule.
         """
-        notification_schedule = deepcopy(user["notification_schedule"])
-        notification_schedule["last_run_time"] = run_time
-        await self.update(user["_id"], {"notification_schedule": notification_schedule})
+
+        if not user.notification_schedule:
+            # No need to update the schedule if None is set
+            # A default is populated in the ``SendScheduledNotificationEmails`` class anyway
+            return
+
+        notification_schedule = deepcopy(user.notification_schedule)
+        notification_schedule.last_run_time = run_time
+        await self.update(user.id, {"notification_schedule": notification_schedule})
 
         app = self.app.wsgi
-        app.cache.delete(str(user["_id"]))
-        app.cache.delete(user["email"])
+        app.cache.delete(str(user.id))
+        app.cache.delete(user.email)
 
     @staticmethod
     def user_has_paused_notifications(user: User) -> bool:

@@ -1,6 +1,4 @@
-from typing import Any
-
-from newsroom.types import UserResourceModel
+from newsroom.types import UserResourceModel, AgendaItem
 from newsroom.email import send_template_email, send_user_email
 from newsroom.utils import (
     get_agenda_dates,
@@ -65,7 +63,7 @@ async def send_agenda_notification_email(
         )
 
 
-async def send_coverage_request_email(user: UserResourceModel, message: str, item: dict[str, Any]) -> None:
+async def send_coverage_request_email(user: UserResourceModel, message: str, item: AgendaItem) -> None:
     """
     Forms and sends coverage request email
     :param user: User that makes the request
@@ -81,11 +79,11 @@ async def send_coverage_request_email(user: UserResourceModel, message: str, ite
     recipients = general_settings.get("values").get("coverage_request_recipients").split(",")
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for_agenda({"_id": item["_id"]}, _external=True)
+    url = url_for_agenda({"_id": item.id}, _external=True)
     name = f"{user.first_name} {user.last_name}"
     email = user.email
 
-    item_name = item.get("name") or item.get("slugline")
+    item_name = item.name or item.slugline
     user_company = await user.get_company()
     company_name = user_company.name if user_company else None
 
@@ -97,7 +95,7 @@ async def send_coverage_request_email(user: UserResourceModel, message: str, ite
         company=company_name,
         recipients=recipients,
         item_name=item_name,
-        item=item,
+        item=item.to_dict(),
     )
 
     await send_template_email(
