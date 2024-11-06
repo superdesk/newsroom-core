@@ -156,8 +156,7 @@ async def create():
 @login_required
 async def edit(_id):
     if request.args.get("context", "") == "wire":
-        cursor = await WireSearchServiceAsync().get_items_for_action([_id])
-        items = await cursor.to_list_raw()
+        items = await WireSearchServiceAsync().get_items_for_action([_id])
         if not len(items):
             return
 
@@ -243,7 +242,7 @@ async def export(_ids):
             return jsonify({"message": "Error exporting items to file"}), 400
 
         if _file:
-            update_action_list(_ids.split(","), "export", force_insert=True)
+            await update_action_list(_ids.split(","), "export", force_insert=True)
             await HistoryService().create_history_record(items, "export", user.id, user.company, "monitoring")
 
             return send_file(
@@ -296,7 +295,7 @@ async def share():
             ],
         )
 
-    update_action_list(data.get("items"), "shares")
+    await update_action_list(data.get("items"), "shares")
     await HistoryService().create_history_record(items, "share", current_user.id, current_user.company, "monitoring")
     return jsonify({"success": True}), 200
 
@@ -311,7 +310,7 @@ async def bookmark():
     """
     data = await get_json_or_400()
     assert data.get("items")
-    update_action_list(data.get("items"), "bookmarks", item_type="items")
+    await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification(
         "saved_items",
         count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MONITORING),
