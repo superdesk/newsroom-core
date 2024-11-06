@@ -20,7 +20,6 @@ from newsroom.utils import (
     get_items_by_id,
     MAX_TERMS_SIZE,
 )
-from newsroom.products import ProductsService
 from newsroom.search.types import BaseSearchRequestArgs
 from newsroom.agenda.filters import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
