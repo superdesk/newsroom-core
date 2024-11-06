@@ -9,6 +9,7 @@ from newsroom.utils import (
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.auth import get_company
+from flask import current_app as app
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
@@ -84,7 +85,7 @@ def send_coverage_request_email(user, message, item):
     email = user.get("email")
 
     # send coverage request email copy to current User.
-    recipients.append(email)
+    cc = [email] if app.config.get("INCLUDE_CURRENT_USER_IN_CC") else []
 
     item_name = item.get("name") or item.get("slugline")
     user_company = get_company(user)
@@ -104,6 +105,7 @@ def send_coverage_request_email(user, message, item):
 
     send_template_email(
         to=recipients,
+        cc=cc,
         template="coverage_request_email",
         template_kwargs=template_kwargs,
     )

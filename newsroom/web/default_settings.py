@@ -851,3 +851,9 @@ AGENDA_TIME_FILTERS = [
         "query": "now/M",
     },
 ]
+
+#: Include Current User In Mail CC for Coverage Inquiry
+#:
+#: .. versionadded:: 2.8
+#:
+INCLUDE_CURRENT_USER_IN_CC = False
