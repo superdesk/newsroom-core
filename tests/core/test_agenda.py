@@ -314,7 +314,7 @@ def test_agenda_search_filtered_by_query_product(client, app, public_company):
 @mock.patch("newsroom.email.send_email", mock_send_email)
 def test_coverage_request(client, app):
     # enable config to include current user in CC
-    app.config["INCLUDE_CURRENT_USER_IN_CC"] = True
+    app.config["COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER"] = True
 
     post_json(
         client,
