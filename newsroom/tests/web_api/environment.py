@@ -8,7 +8,7 @@ from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 
 from newsroom.web.factory import get_app
 from newsroom.web.default_settings import CORE_APPS, BLUEPRINTS
-from newsroom.agenda.agenda import aggregations as agenda_aggs
+from newsroom.agenda.filters import aggregations as agenda_aggs
 from tests.search.fixtures import USERS, COMPANIES
 
 
@@ -95,6 +95,7 @@ async def before_scenario_async(context, scenario):
     context.app = get_app(config=config, testing=True)
     async with context.app.app_context():
         await reset_elastic(context.app)
+        context.app.cache.clear()
 
     context.headers = [("Content-Type", "application/json"), ("Origin", "localhost")]
     context.client = context.app.test_client()

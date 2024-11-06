@@ -7,6 +7,7 @@ from bson import ObjectId
 from newsroom.companies import CompanyServiceAsync
 
 from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
+from tests.core.utils import create_entries_for, find_one_for
 
 company_id = "5c3eb6975f627db90c84093c"
 
@@ -19,11 +20,11 @@ def audit_check(item_id):
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [{"_id": ObjectId(company_id), "name": "Test Company", "is_enabled": True}],
     )
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -45,12 +46,12 @@ async def init(app):
 
 
 async def test_get_item_audit_creation(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items",
         [{"_id": "111", "pubstatus": "usable", "headline": "Headline of the story"}],
     )
-    app.data.insert("news_api_tokens", [{"company": ObjectId(company_id), "enabled": True}])
-    token = app.data.find_one("news_api_tokens", req=None, company=ObjectId(company_id))
+    await create_entries_for("news_api_tokens", [{"company": ObjectId(company_id), "enabled": True}])
+    token = await find_one_for("news_api_tokens", company=ObjectId(company_id))
     response = await client.get(
         "api/v1/news/item/111?format=NINJSFormatter",
         headers={"Authorization": token.get("token")},
@@ -76,14 +77,17 @@ async def test_get_single_product_audit_creation(client, app):
 
 
 async def test_search_audit_creation(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
                 "_id": "5ab03a87bdd78169bb6d0785",
                 "body_html": "Once upon a time there was a fish who could swim",
             },
-            {"body_html": "Once upon a time there was a aardvark that could not swim"},
+            {
+                "_id": "5ab03a87bdd78169bb6d0786",
+                "body_html": "Once upon a time there was a aardvark that could not swim",
+            },
         ],
     )
 

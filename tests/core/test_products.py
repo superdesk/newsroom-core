@@ -37,7 +37,7 @@ async def companies(app):
         {"name": "test3"},
     ]
 
-    app.data.insert("companies", _companies)
+    await create_entries_for("companies", _companies)
     return _companies
 
 
@@ -131,7 +131,7 @@ async def test_gets_all_products(client, app):
     await test_login_succeeds_for_admin(client)
 
     for i in range(250):
-        app.data.insert(
+        await create_entries_for(
             "products",
             [
                 {
@@ -216,8 +216,8 @@ async def test_company_and_user_products(client, app, public_company, public_use
         "product_type": "wire",
     }
 
-    app.data.insert("products", [test_product])
-    app.data.insert(
+    await create_entries_for("products", [test_product])
+    await create_entries_for(
         "items",
         [
             {"headline": "finance item", "type": "text", "versioncreated": datetime.utcnow()},

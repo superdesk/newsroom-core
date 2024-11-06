@@ -16,6 +16,7 @@ from newsroom.commands import fix_topic_nested_filters
 
 from newsroom.tests.conftest import reset_elastic
 from ..fixtures import items, init_items, init_auth, init_company  # noqa
+from tests.core.utils import create_entries_for, delete_entries_for, find_one_by_id
 
 
 async def test_item_detail(app, client):
@@ -66,7 +67,7 @@ async def test_index_from_mongo_collection(app, client):
 
 
 async def test_index_from_mongo_from_timestamp(app, client):
-    app.data.remove("items")
+    await delete_entries_for("items")
     sorted_items = [
         {
             "_id": "tag:foo-1",
@@ -79,7 +80,7 @@ async def test_index_from_mongo_from_timestamp(app, client):
         {"_id": "urn:bar-3", "_created": datetime.now() - timedelta(hours=3)},
     ]
 
-    app.data.insert("items", sorted_items)
+    await create_entries_for("items", sorted_items)
     await reset_elastic(app)
     assert 0 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
@@ -122,7 +123,7 @@ async def test_fix_topic_nested_filters(app, admin):
     init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], _get_wire_aggregations())
     await reset_elastic(app)
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -149,7 +150,7 @@ async def test_fix_topic_nested_filters(app, admin):
         ],
     )
     topic_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
@@ -169,7 +170,7 @@ async def test_fix_topic_nested_filters(app, admin):
 
     await fix_topic_nested_filters()
 
-    updated_topic = app.data.find_one("topics", None, topic_id)
+    updated_topic = await find_one_by_id("topics", topic_id)
 
     assert "subject" not in updated_topic["filter"]
     assert len(updated_topic["filter"]["distribution"]) == 2

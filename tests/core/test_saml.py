@@ -5,6 +5,7 @@ from bson import ObjectId
 
 from newsroom.auth.saml import get_userdata
 from newsroom.companies import CompanyServiceAsync, CompanyResource
+from tests.core.utils import create_entries_for, update_entries_for
 
 
 async def test_user_data_with_matching_company(app):
@@ -12,7 +13,7 @@ async def test_user_data_with_matching_company(app):
         "name": "test",
         "auth_domains": ["example.com"],
     }
-    app.data.insert("companies", [company])
+    await create_entries_for("companies", [company])
 
     saml_data = {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": ["Foo"],
@@ -35,7 +36,7 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
         "auth_domains": ["samplecomp"],
     }
 
-    app.data.insert("companies", [company])
+    await create_entries_for("companies", [company])
 
     saml_data = {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": ["Foo"],
@@ -59,7 +60,7 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
         assert user_data.get("company") == company["_id"]
         assert user_data.get("user_type") == "public"
 
-    app.data.update("companies", company["_id"], {"internal": True}, company)
+    await update_entries_for("companies", company["_id"], {"internal": True}, company)
 
     async with app.test_client() as c:
         resp = await c.get("/login/samplecomp")

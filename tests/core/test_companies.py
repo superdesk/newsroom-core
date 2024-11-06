@@ -8,6 +8,7 @@ from newsroom.tests.fixtures import COMPANY_1_ID
 
 from newsroom.users.service import UsersService
 from tests.utils import logout
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id, find_one_for
 
 
 async def test_delete_company_deletes_company_and_users(client):
@@ -106,7 +107,7 @@ async def test_get_company_users(client):
 async def test_save_company_permissions(client, app):
     await logout(client)
     sports_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -123,7 +124,6 @@ async def test_save_company_permissions(client, app):
                 "description": "news product",
                 "is_enabled": True,
                 "product_type": "wire",
-                "product_type": "wire",
             },
         ],
     )
@@ -138,7 +138,7 @@ async def test_save_company_permissions(client, app):
         },
     )
 
-    updated = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    updated = await find_one_by_id("companies", COMPANY_1_ID)
     assert updated["sections"]["wire"]
     assert not updated["sections"].get("agenda")
     assert updated["archive_access"]
@@ -149,9 +149,9 @@ async def test_save_company_permissions(client, app):
     assert resp.status_code == 200
 
     # set company with wire only
-    user = app.data.find_one("users", req=None, first_name="admin")
+    user = await find_one_for("users", first_name="admin")
     assert user
-    app.data.update("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
+    await update_entries_for("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
 
     # refresh session with new type
     await logout(client)

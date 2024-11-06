@@ -10,13 +10,13 @@ from quart import json
 from quart.datastructures import FileStorage
 
 from newsroom.types import UserResourceModel, CompanyResource, UserRole, TopicResourceModel, SectionEnum
-from newsroom.utils import get_company_dict_async, get_entity_or_404, get_user_dict_async
+from newsroom.utils import get_company_dict_async, get_user_dict_async
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.notifications import NotificationsService
 
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
-from tests.core.utils import add_company_products, create_entries_for
+from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email
 
@@ -276,8 +276,8 @@ async def test_push_binary_invalid_signature(client, app):
 
 @markers.requires_async_celery
 async def test_notify_topic_matches_for_new_item(client, app, mocker):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
@@ -344,7 +344,7 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
@@ -363,9 +363,10 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         "company": company_ids[0],
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
+    # TODO-ASYNC-AGENDA: Replace this with proper function call
     app.data.insert(
         "history",
         docs=[
@@ -429,7 +430,7 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
@@ -448,9 +449,10 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
         "company": company_ids[0],
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
+    # TODO-ASYNC-AGENDA: Replace this with proper function call
     app.data.insert(
         "history",
         docs=[
@@ -505,10 +507,10 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         "company": COMPANY_1_ID,
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -523,7 +525,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -571,7 +573,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
 
 @markers.requires_async_celery
 async def test_do_not_notify_disabled_user(client, app, mocker):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -582,8 +584,8 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
         ],
     )
 
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
@@ -605,8 +607,8 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
     assert 201 == resp.status_code
 
     # disable user
-    user = app.data.find_one("users", req=None, _id=user_ids[0])
-    app.data.update("users", user_ids[0], {"is_enabled": False}, user)
+    user = await find_one_by_id("users", user_ids[0])
+    await update_entries_for("users", user_ids[0], {"is_enabled": False}, user)
     # clean cache
     app.cache.delete(str(user_ids[0]))
 
@@ -624,7 +626,7 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_checks_service_subscriptions(client, app, mocker):
     company_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -635,7 +637,7 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
         ],
     )
 
-    user_ids = app.data.insert(
+    user_ids = await create_entries_for(
         "auth_user",
         [
             {
@@ -679,8 +681,8 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_notification_emails(client, app):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
@@ -692,7 +694,7 @@ async def test_send_notification_emails(client, app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
@@ -810,13 +812,13 @@ async def test_matching_topics(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(item["guid"], topics, users, companies)
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(item["guid"], topics, users, companies)
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
 
 
 async def test_matching_topics_for_public_user(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -885,7 +887,7 @@ async def test_matching_topics_for_public_user(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
@@ -893,7 +895,7 @@ async def test_matching_topics_for_public_user(client, app):
 
 async def test_matching_topics_for_user_with_inactive_company(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -961,7 +963,7 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
@@ -969,7 +971,7 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
 
 async def test_push_parsed_item(client, app):
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "wire_search")
+    parsed = await find_one_by_id("items", item["guid"])
     assert isinstance(parsed["firstcreated"], datetime)
     assert 2 == parsed["wordcount"]
     assert 7 == parsed["charcount"]
@@ -979,7 +981,7 @@ async def test_push_parsed_dates(client, app):
     payload = item.copy()
     payload["embargoed"] = "2019-01-31T00:01:00+00:00"
     await client.post("/push", json=payload)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert isinstance(parsed["firstcreated"], datetime)
     assert isinstance(parsed["versioncreated"], datetime)
     assert isinstance(parsed["embargoed"], datetime)
@@ -987,7 +989,7 @@ async def test_push_parsed_dates(client, app):
 
 async def test_push_event_coverage_info(client, app):
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert parsed["event_id"] == "urn:event/1"
     assert parsed["coverage_id"] == "urn:coverage/1"
 
@@ -995,7 +997,7 @@ async def test_push_event_coverage_info(client, app):
 async def test_push_wire_subject_whitelist(client, app):
     app.config["WIRE_SUBJECT_SCHEME_WHITELIST"] = ["b"]
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert 1 == len(parsed["subject"])
     assert "b" == parsed["subject"][0]["name"]
 
@@ -1005,14 +1007,14 @@ async def test_push_custom_expiry(client, app):
     updated = item.copy()
     updated["source"] = "foo"
     await client.post("/push", json=updated)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     now = datetime.utcnow().replace(second=0, microsecond=0)
     expiry: datetime = parsed["expiry"].replace(tzinfo=None)
     assert now + timedelta(days=49) < expiry < now + timedelta(days=51)
 
 
 async def test_matching_topics_with_mallformed_query(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -1058,14 +1060,14 @@ async def test_matching_topics_with_mallformed_query(client, app):
         ),
     ]
 
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["good"]} == matching
 
 
 async def test_matching_topics_when_disabling_section(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -1109,7 +1111,7 @@ async def test_matching_topics_when_disabling_section(client, app):
         ),
     ]
     users[TEST_USER_ID].sections = {"wire": False, "agenda": True}
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert set() == matching

@@ -4,6 +4,7 @@ import tests.utils as utils
 
 from quart import g
 from newsroom.users.users import UserRole
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 from .fixtures import (
     USERS,
@@ -15,9 +16,9 @@ from .fixtures import (
 
 @pytest.fixture(autouse=True)
 async def init(app):
-    app.data.insert("users", USERS)
-    app.data.insert("companies", COMPANIES)
-    app.data.insert("products", PRODUCTS)
+    await create_entries_for("companies", COMPANIES)
+    await create_entries_for("users", USERS)
+    await create_entries_for("products", PRODUCTS)
 
 
 @pytest.fixture
@@ -28,7 +29,7 @@ async def product(app):
         "is_enabled": True,
         "product_type": "wire",
     }
-    app.data.insert("products", [product])
+    await create_entries_for("products", [product])
     return product
 
 
@@ -43,7 +44,7 @@ async def company(app, product):
         }
     ]
     company.pop("_id")
-    app.data.insert("companies", [company])
+    await create_entries_for("companies", [company])
     return company
 
 
@@ -55,7 +56,7 @@ async def manager(app, client, product, company):
     manager["user_type"] = UserRole.COMPANY_ADMIN.value
     manager.pop("_id")
 
-    app.data.insert("users", [manager])
+    await create_entries_for("auth_user", [manager])
 
     manager.pop("password")
     await utils.login(client, manager)
@@ -82,7 +83,7 @@ async def test_user_products(app, client, manager, product, company):
     data = await utils.get_json(client, "/wire/search?q=weather")
     assert 0 == len(data["_items"])
 
-    app.data.update("products", product["_id"], {"query": "headline:WEATHER"}, product)
+    await update_entries_for("products", product["_id"], {"query": "headline:WEATHER"}, product)
     g.pop("cached:products", None)
 
     data = await utils.get_json(client, "/wire/search")
@@ -100,7 +101,7 @@ async def test_user_products_after_company_update(app, client, manager, product,
         },
     )
 
-    user = app.data.find_one("users", req=None, _id=manager["_id"])
+    user = await find_one_by_id("users", manager["_id"])
     assert user["products"]
 
 
@@ -155,9 +156,9 @@ async def test_user_sections(app, client, manager, product):
     data = utils.get_json(client, "/agenda/search")
     assert data
 
-    company = app.data.find_one("companies", req=None, _id=manager["company"])
+    company = await find_one_by_id("companies", manager["company"])
     assert company
-    app.data.update("companies", manager["company"], {"sections": {"agenda": True}}, company)
+    await update_entries_for("companies", manager["company"], {"sections": {"agenda": True}}, company)
 
     with pytest.raises(AssertionError) as err:
         await utils.get_json(client, "/wire/search")
@@ -181,8 +182,7 @@ async def test_other_company_user_changes_blocked(client, manager):
     assert "401" in str(err)
 
 
-async def test_public_user_can_edit_his_dashboard(client, manager):
-    public_user = next((user for user in USERS if user["_id"] == PUBLIC_USER_ID))
-    public_user.pop("password")
-    await utils.login(client, public_user)
-    await utils.patch_json(client, f"/api/_users/{PUBLIC_USER_ID}", {"dashboards": []})
+async def test_public_user_can_edit_his_dashboard(app, client, public_user):
+    async with app.test_request_context("/") as request:
+        request.session["user"] = str(PUBLIC_USER_ID)
+        await utils.patch_json(client, f"/api/_users/{PUBLIC_USER_ID}", {"dashboards": []})

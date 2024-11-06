@@ -150,14 +150,14 @@ Feature: Agenda Restricted Coverage Details
             "coverages": [{
                 "coverage_id": "plan1_cov1",
                 "coverage_type": "text",
-                "scheduled": "2018-05-28T10:51:52+0000",
+                "scheduled": "2018-05-28T10:51:52+00:00",
                 "slugline": "Vivid planning item",
                 "workflow_status": "draft",
                 "coverage_status": "coverage intended"
             }, {
                 "coverage_id": "plan1_cov2",
                 "coverage_type": "text",
-                "scheduled": "2018-05-28T10:51:52+0000",
+                "scheduled": "2018-05-28T10:51:52+00:00",
                 "slugline": "Vivid planning item",
                 "workflow_status": "draft",
                 "coverage_status": "coverage intended"
@@ -166,7 +166,7 @@ Feature: Agenda Restricted Coverage Details
                 "guid": "plan1",
                 "slugline": "New Press Conference",
                 "name": "Prime minister press conference",
-                "planning_date": "2018-05-28T05:00:00+0000",
+                "planning_date": "2018-05-28T05:00:00+00:00",
                 "coverages": [{
                     "coverage_id": "plan1_cov1",
                     "news_coverage_status": {
@@ -283,7 +283,7 @@ Feature: Agenda Restricted Coverage Details
             }, {
                 "coverage_id": "plan1_cov2",
                 "coverage_type": "text",
-                "scheduled": "2018-05-28T10:51:52+0000",
+                "scheduled": "2018-05-28T10:51:52+00:00",
                 "slugline": "Vivid planning item",
                 "workflow_status": "completed",
                 "coverage_status": "coverage intended",
