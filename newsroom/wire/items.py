@@ -15,6 +15,7 @@ from content_api.items_versions.service import ItemsVersionsService
 from superdesk.metadata.item import metadata_schema
 
 from newsroom.types import Article, CardResourceModel
+from newsroom.products import ProductsService
 from newsroom.cards import get_card_size
 
 from .service import WireSearchServiceAsync
@@ -99,8 +100,7 @@ async def get_items_for_dashboard(
     items_by_card = {}
     wire_search = WireSearchServiceAsync()
 
-    # TODO-ASYNC: Convert to async Product model when available
-    all_products = {product["_id"]: product for product in superdesk.get_resource_service("products").get_cached()}
+    all_products = {product.id: product async for product in ProductsService().get_all()}
     for card in cards:
         if card.config is not None and card.config.get("product"):
             items_by_card[card.label] = [

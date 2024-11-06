@@ -153,7 +153,7 @@ def _get_aggregation_field(key: str) -> str:
 def apply_aggs(request: NewshubSearchRequest) -> None:
     """Adds elasticsearch aggregations to the query, based on the request args"""
 
-    if request.args.page > 0 or not request.args.aggs:
+    if request.args.page > 0 or not request.args.aggs or request.search.aggs:
         return
 
     request.search.aggs = _get_wire_aggregations()
