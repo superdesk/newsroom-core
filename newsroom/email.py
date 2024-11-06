@@ -88,6 +88,9 @@ def _send_email(to, subject, text_body, cc=None, html_body=None, sender=None, se
     if sender is None:
         sender = current_app.config["MAIL_DEFAULT_SENDER"]
 
+    if cc is None:
+        cc = []
+
     if sender_name is not None:
         sender = (sender_name, sender)
 
@@ -106,7 +109,7 @@ def _send_email(to, subject, text_body, cc=None, html_body=None, sender=None, se
     return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, cc=[], html_body=None, sender=None, sender_name=None, attachments_info=None):
+def send_email(to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=None):
     """
     Sends the email
     :param to: List of recipients
@@ -247,7 +250,7 @@ def send_template_email(
     to: List[str],
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
-    cc: Optional[List[str]] = [],
+    cc: Optional[List[str]] = None,
     **kwargs: EmailKwargs,
 ) -> None:
     """Send email to list of recipients using default locale."""
@@ -263,7 +266,7 @@ def _send_localized_email(
     timezone: str,
     template_kwargs: TemplateKwargs,
     email_kwargs: EmailKwargs,
-    cc: Optional[List[str]] = [],
+    cc: Optional[List[str]] = None,
 ) -> None:
     language = to_email_language(language)
     email_templates = get_resource_service("email_templates")

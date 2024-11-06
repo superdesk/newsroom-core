@@ -71,6 +71,9 @@ def mock_send_email(
     if sender is None:
         sender = app.config["MAIL_DEFAULT_SENDER"]
 
+    if cc is None:
+        cc = []
+
     msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, cc=cc)
     msg.body = text_body
     msg.html = html_body
