@@ -20,7 +20,9 @@ from newsroom.utils import (
     get_items_by_id,
     MAX_TERMS_SIZE,
 )
-from newsroom.agenda.agenda import get_date_filters
+from newsroom.products import ProductsService
+from newsroom.search.types import BaseSearchRequestArgs
+from newsroom.agenda.filters import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
 from newsroom.companies.utils import get_companies_id_by_product
@@ -149,13 +151,12 @@ async def get_product_stories():
     """Returns the story count per product for today, this week, this month ..."""
 
     results = []
-    products = query_resource("products")
 
-    for product in products:
+    async for product in ProductsService().get_all():
         product_stories = {
-            "_id": product["_id"],
-            "name": product.get("name"),
-            "is_enabled": product.get("is_enabled"),
+            "_id": product.id,
+            "name": product.name,
+            "is_enabled": product.is_enabled,
         }
         counts = await WireSearchServiceAsync().get_product_item_report(product)
         for key, value in counts.hits["aggregations"].items():
@@ -209,7 +210,13 @@ def get_subscriber_activity_report():
     if args.get("section"):
         must_terms.append({"term": {"section": args.get("section")}})
 
-    date_range = get_date_filters(args)
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_from"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
     if date_range.get("gt") or date_range.get("lt"):
         must_terms.append({"range": {"versioncreated": date_range}})
 
@@ -322,7 +329,13 @@ def get_subscriber_activity_report():
 
 def get_company_api_usage():
     args = deepcopy(request.args.to_dict())
-    date_range = get_date_filters(args)
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_from"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
 
     if not date_range.get("gt") and date_range.get("lt"):
         abort(400, "No date range specified.")
