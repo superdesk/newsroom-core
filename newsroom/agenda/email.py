@@ -83,6 +83,9 @@ def send_coverage_request_email(user, message, item):
     name = "{} {}".format(user.get("first_name"), user.get("last_name"))
     email = user.get("email")
 
+    # send coverage request email copy to current User.
+    recipients.append(email)
+
     item_name = item.get("name") or item.get("slugline")
     user_company = get_company(user)
     if user_company:
