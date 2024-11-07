@@ -54,7 +54,7 @@ async def test_notification_date_time_filters():
         assert "11:00 octobre 31, 2023" == template_filters.notification_datetime(d)
 
 
-async def test_format_event_datetime():
+def test_format_event_datetime():
     # Case 1: Regular event with specific start and end times
     event1 = {
         "dates": {
@@ -65,7 +65,7 @@ async def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta)" == await format_event_datetime(event1)
+    assert "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta)" == format_event_datetime(event1)
 
     # Case 2: All-day event
     event2 = {
@@ -77,7 +77,7 @@ async def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Date: 18/12/2023 00:00 (Asia/Calcutta)" == await format_event_datetime(event2)
+    assert "Date: 18/12/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event2)
 
     # Case 3: Time-to-be-confirmed event
     event3 = {
@@ -94,7 +94,7 @@ async def test_format_event_datetime():
     }
     assert (
         "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)"
-        == await format_event_datetime(event3)
+        == format_event_datetime(event3)
     )
 
     # Case 4: Event with no end time
@@ -106,7 +106,7 @@ async def test_format_event_datetime():
             "no_end_time": True,
         }
     }
-    assert "Date: 01/11/2023 00:00 (Asia/Calcutta)" == await format_event_datetime(event4)
+    assert "Date: 01/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event4)
 
     # Case 5: All-day event with no_end_time
     event5 = {
@@ -118,7 +118,7 @@ async def test_format_event_datetime():
             "no_end_time": True,
         },
     }
-    assert "Date: 01/11/2023 00:00 (Asia/Calcutta)" == await format_event_datetime(event5)
+    assert "Date: 01/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event5)
 
     # Case 6: Multi-day event
     event6 = {
@@ -130,7 +130,7 @@ async def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Date: 01/11/2023 00:00 to 03/11/2023 02:15 (Asia/Calcutta)" == await format_event_datetime(event6)
+    assert "Date: 01/11/2023 00:00 to 03/11/2023 02:15 (Asia/Calcutta)" == format_event_datetime(event6)
 
     # Case 7: REGULAR schedule_type with end_time
     event7 = {
@@ -142,7 +142,7 @@ async def test_format_event_datetime():
             "no_end_time": False,
         }
     }
-    assert "Time: 00:59 AM to 21:00 PM on Date: November 2, 2023 (Asia/Calcutta)" == await format_event_datetime(event7)
+    assert "Time: 00:59 AM to 21:00 PM on Date: November 2, 2023 (Asia/Calcutta)" == format_event_datetime(event7)
 
     # Case 8: REGULAR schedule_type with no end time
     event8 = {
@@ -153,4 +153,4 @@ async def test_format_event_datetime():
             "no_end_time": True,
         },
     }
-    assert "Date: 02/11/2023 00:00 (Asia/Calcutta)" == await format_event_datetime(event8)
+    assert "Date: 02/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event8)
