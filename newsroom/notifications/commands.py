@@ -99,7 +99,7 @@ class SendScheduledNotificationEmails:
                 if not user.get("notification_schedule"):
                     user["notification_schedule"] = {}
 
-                user["notification_schedule"].setdefault("timezone", await get_session_timezone())
+                user["notification_schedule"].setdefault("timezone", get_session_timezone())
                 user["notification_schedule"].setdefault(
                     "times", get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
                 )

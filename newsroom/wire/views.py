@@ -551,7 +551,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
         await request.abort(404)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
-    locale = (await get_session_locale() or "en").lower()
+    locale = (get_session_locale() or "en").lower()
     template_name = get_language_template_name(template_filename, locale, "txt")
 
     template_kwargs = {"item": item}
