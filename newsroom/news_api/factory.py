@@ -1,10 +1,12 @@
 import os
 import logging
 import jinja2
+import traceback
 
 from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 
+from newsroom.exceptions import AuthorizationError
 from superdesk.flask import Config, jsonify, g
 from superdesk.errors import SuperdeskApiError
 from superdesk.utc import utcnow
@@ -97,16 +99,16 @@ class NewsroomNewsAPI(BaseNewsroomApp):
                 }
             )
 
-        def superdesk_api_error(err):
+        def superdesk_api_error(err: SuperdeskApiError):
             return json_error(
                 {
                     "error": err.message or "",
-                    "message": err.payload,
+                    "message": getattr(err, "payload", ""),
                     "code": err.status_code or 500,
                 }
             )
 
-        def assertion_error(err):
+        def assertion_error(err: AssertionError):
             return json_error(
                 {
                     "error": err.args[0] if err.args else 1,
@@ -115,14 +117,27 @@ class NewsroomNewsAPI(BaseNewsroomApp):
                 }
             )
 
-        def base_exception_error(err):
+        def authorization_error_handler(err: AuthorizationError):
+            """Handles NewsAPI Authorization errors"""
+            return json_error(
+                {
+                    "code": err.code,
+                    "error": err.title or err.message,
+                    "message": err.message,
+                }
+            )
+
+        def base_exception_error(err: Exception):
             if type(err) is ElasticRequestError and err.error == "search_phase_execution_exception":
                 return json_error({"error": 1, "message": "Invalid search query", "code": 400})
+
+            # let's log the error so it doesn't get completely swallowed by the handler
+            logger.error(traceback.format_exc())
 
             return json_error(
                 {
                     "error": err.args[0] if err.args else 1,
-                    "message": str(err),
+                    "message": str(err) or "Internal Server Error",
                     "code": 500,
                 }
             )
@@ -131,6 +146,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
             self.register_error_handler(cls, handle_werkzeug_errors)
 
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
+        self.register_error_handler(AuthorizationError, authorization_error_handler)
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(Exception, base_exception_error)
 
