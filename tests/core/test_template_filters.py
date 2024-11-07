@@ -54,7 +54,7 @@ async def test_notification_date_time_filters():
         assert "11:00 octobre 31, 2023" == template_filters.notification_datetime(d)
 
 
-def test_format_event_datetime():
+async def test_format_event_datetime():
     # Case 1: Regular event with specific start and end times
     event1 = {
         "dates": {
@@ -92,9 +92,8 @@ def test_format_event_datetime():
             "_time_to_be_confirmed": True,
         },
     }
-    assert (
-        "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)"
-        == format_event_datetime(event3)
+    assert "Date: 01/11/2023 00:00 to 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)" == format_event_datetime(
+        event3
     )
 
     # Case 4: Event with no end time
