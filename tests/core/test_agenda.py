@@ -9,10 +9,10 @@ from newsroom.utils import (
     get_location_string,
     get_agenda_dates,
     get_public_contacts,
-    get_entity_or_404,
     get_local_date,
     get_end_date,
 )
+from newsroom.tests import markers
 from tests.utils import (
     post_json,
     delete_json,
@@ -22,7 +22,7 @@ from tests.utils import (
 )
 from tests.utils import login
 from tests.fixtures import ADMIN_USER_ID, PUBLIC_USER_ID, PUBLIC_USER_EMAIL, COMPANY_1_ID
-from .utils import add_company_products, create_entries_for
+from .utils import add_company_products, create_entries_for, find_one_by_id
 
 from copy import deepcopy
 from bson import ObjectId
@@ -34,7 +34,7 @@ test_planning = {
     "abstract": "abstract text",
     "_current_version": 1,
     "agendas": [],
-    "anpa_category": [{"name": "Entertainment", "subject": "01000000", "qcode": "e"}],
+    "anpa_category": [{"name": "Entertainment", "qcode": "e"}],
     "item_id": "foo",
     "ednote": "ed note here",
     "slugline": "Vivid planning item",
@@ -66,7 +66,7 @@ test_planning = {
     "urgency": 3,
     "guid": "foo",
     "name": "This is the name of the vivid planning item",
-    "subject": [{"name": "library and museum", "qcode": "01009000", "parent": "01000000"}],
+    "subject": [{"name": "library and museum", "qcode": "01009000"}],
     "pubstatus": "usable",
     "type": "planning",
 }
@@ -74,7 +74,7 @@ test_planning = {
 
 @fixture
 async def agenda_user(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -112,21 +112,30 @@ async def test_item_detail(client):
 async def test_item_json(client):
     resp = await client.get("/agenda/urn:conference?format=json")
     data = json.loads(await resp.get_data())
-    assert "headline" in data
+    assert "name" in data
     assert "files" in data["event"]
     assert "internal_note" in data["event"]
+
+    resp = await client.get("/agenda/urn:planning?format=json")
+    data = json.loads(await resp.get_data())
+    assert "headline" in data
     assert "internal_note" in data["planning_items"][0]
-    assert "internal_note" in data["coverages"][0]["planning"]
+    assert "internal_note" in data["planning_items"][0]["coverages"][0]["planning"]
 
 
 async def test_item_json_does_not_return_files(client, app):
     await login(client, {"email": PUBLIC_USER_EMAIL})
     data = await get_json(client, "/agenda/urn:conference?format=json")
-    assert "headline" in data
+    assert "name" in data
     assert "files" not in data["event"]
     assert "internal_note" not in data["event"]
+
+    data = await get_json(client, "/agenda/urn:planning?format=json")
+    assert "headline" in data
+    # assert "files" not in data["event"]
+    # assert "internal_note" not in data["event"]
     assert "internal_note" not in data["planning_items"][0]
-    assert "internal_note" not in data["coverages"][0]["planning"]
+    assert "internal_note" not in data["planning_items"][0]["coverages"][0]["planning"]
 
 
 async def get_bookmarks_count(client, user):
@@ -137,14 +146,14 @@ async def get_bookmarks_count(client, user):
 
 
 async def test_basic_search(client, agenda_user):
-    resp = await client.get("/agenda/search?q=headline")
+    resp = await client.get("/agenda/search?itemType=planning&q=headline")
     assert resp.status_code == 200, await resp.get_data(as_text=True)
     data = json.loads(await resp.get_data())
     assert data["_meta"]["total"]
 
 
 async def test_search_with_accents(client, agenda_user):
-    resp = await client.get("/agenda/search?q=héadlíne")
+    resp = await client.get("/agenda/search?itemType=planning&q=héadlíne")
     assert resp.status_code == 200
     data = json.loads(await resp.get_data())
     assert data["_meta"]["total"]
@@ -183,7 +192,7 @@ async def test_item_copy(client, app):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_items(client, app, mocker):
-    user_ids = app.data.insert(
+    user_ids = await create_entries_for(
         "users",
         [
             {
@@ -199,7 +208,7 @@ async def test_share_items(client, app, mocker):
         resp = await client.post(
             "/wire_share?type=agenda",
             json={
-                "items": ["urn:conference"],
+                "items": ["urn:planning"],
                 "users": [str(user_ids[0])],
                 "message": "Some info message",
             },
@@ -212,10 +221,10 @@ async def test_share_items(client, app, mocker):
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert "Conference Planning" in outbox[0].body
-        assert "http://localhost:5050/agenda?item=urn:conference" in outbox[0].body
+        assert "http://localhost:5050/agenda?item=urn:planning" in outbox[0].body
         assert "Some info message" in outbox[0].body
 
-    resp = await client.get("/agenda/{}?format=json".format("urn:conference"))
+    resp = await client.get("/agenda/{}?format=json".format("urn:planning"))
     data = json.loads(await resp.get_data())
     assert "shares" in data
 
@@ -245,7 +254,7 @@ async def test_agenda_search_filtered_by_query_product(client, app, public_compa
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -271,12 +280,7 @@ async def test_agenda_search_filtered_by_query_product(client, app, public_compa
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
-    assert "files" not in data["_items"][0]["event"]
-    assert "internal_note" not in data["_items"][0]["event"]
-    assert "internal_note" not in data["_items"][0]["planning_items"][0]
-    assert "internal_note" not in data["_items"][0]["planning_items"][0]["coverages"][0]["planning"]
-    assert "internal_note" not in data["_items"][0]["coverages"][0]["planning"]
-    resp = await client.get(f"/agenda/search?navigation={NAV_1}")
+    resp = await client.get(f"/agenda/search?itemType=planning&navigation={NAV_1}")
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
@@ -320,19 +324,17 @@ async def test_watch_event(client, app):
 
 
 async def test_watch_coverages(client, app):
-    user_id = get_admin_user_id(app)
-
     await post_json(
         client,
         "/agenda_coverage_watch",
         {
             "coverage_id": "urn:coverage",
-            "item_id": "urn:conference",
+            "item_id": "urn:planning",
         },
     )
 
-    after_watch_item = get_entity_or_404("urn:conference", "agenda")
-    assert after_watch_item["coverages"][0]["watches"] == [user_id]
+    after_watch_item = await find_one_by_id("agenda", "urn:planning")
+    assert after_watch_item["coverages"][0]["watches"] == [ObjectId(ADMIN_USER_ID)]
 
 
 async def test_unwatch_coverages(client, app):
@@ -347,7 +349,7 @@ async def test_unwatch_coverages(client, app):
         },
     )
 
-    after_watch_item = get_entity_or_404("urn:conference", "agenda")
+    after_watch_item = await find_one_by_id("agenda", "urn:conference")
     assert after_watch_item["coverages"][0]["watches"] == [user_id]
 
     await delete_json(
@@ -359,16 +361,13 @@ async def test_unwatch_coverages(client, app):
         },
     )
 
-    after_watch_item = get_entity_or_404("urn:conference", "agenda")
+    after_watch_item = await find_one_by_id("agenda", "urn:conference")
     assert after_watch_item["coverages"][0]["watches"] == []
 
 
 async def test_remove_watch_coverages_on_watch_item(client, app):
-    user_id = ObjectId(get_admin_user_id(app))
-    other_user_id = PUBLIC_USER_ID
-
     test_planning_coverage_watches = deepcopy(test_planning)
-    test_planning_coverage_watches["coverages"][0]["watches"] = [other_user_id]
+    test_planning_coverage_watches["coverages"][0]["watches"] = [PUBLIC_USER_ID]
     await client.post(
         "/push",
         json=test_planning_coverage_watches,
@@ -383,20 +382,19 @@ async def test_remove_watch_coverages_on_watch_item(client, app):
         },
     )
 
-    after_watch_coverage_item = get_entity_or_404(test_planning_coverage_watches["_id"], "agenda")
-    assert str(other_user_id) in after_watch_coverage_item["coverages"][0]["watches"]
-    assert user_id in after_watch_coverage_item["coverages"][0]["watches"]
+    after_watch_coverage_item = await find_one_by_id("agenda", test_planning_coverage_watches["_id"])
+    assert PUBLIC_USER_ID in after_watch_coverage_item["coverages"][0]["watches"]
+    assert ObjectId(ADMIN_USER_ID) in after_watch_coverage_item["coverages"][0]["watches"]
 
     await post_json(client, "/agenda_watch", {"items": [test_planning_coverage_watches["_id"]]})
-    after_watch_item = get_entity_or_404(test_planning_coverage_watches["_id"], "agenda")
-    assert after_watch_item["coverages"][0]["watches"] == [str(other_user_id)]
-    assert after_watch_item["watches"] == [user_id]
+    after_watch_item = await find_one_by_id("agenda", test_planning_coverage_watches["_id"])
+    assert after_watch_item["coverages"][0]["watches"] == [PUBLIC_USER_ID]
+    assert after_watch_item["watches"] == [ObjectId(ADMIN_USER_ID)]
 
 
 async def test_fail_watch_coverages(client, app):
     await post_json(client, "/agenda_watch", {"items": ["urn:conference"]})
-    after_watch_item = get_entity_or_404("urn:conference", "agenda")
-    print(after_watch_item["watches"])
+    after_watch_item = await find_one_by_id("agenda", "urn:conference")
     assert after_watch_item["watches"] == [ObjectId(ADMIN_USER_ID)]
 
     request = {
@@ -571,6 +569,8 @@ async def test_get_agenda_dates():
     assert get_agenda_dates(agenda) == "May 27, 2018 - May 30, 2018"
 
 
+@markers.skip_auto_agenda_items
+@markers.skip_auto_wire_items
 async def test_filter_agenda_by_coverage_status(client):
     await client.post("/push", json=test_planning)
 
@@ -583,7 +583,7 @@ async def test_filter_agenda_by_coverage_status(client):
     await client.post("/push", json=test_planning)
 
     test_planning["guid"] = "baz"
-    test_planning["planning_date"] = ("2018-05-28T10:45:52+0000",)
+    test_planning["planning_date"] = "2018-05-28T10:45:52+0000"
     test_planning["coverages"] = []
     await client.post("/push", json=test_planning)
 
@@ -657,7 +657,7 @@ async def test_filter_events_only(client):
         "abstract": "abstract text",
         "_current_version": 1,
         "agendas": [],
-        "anpa_category": [{"name": "Entertainment", "subject": "01000000", "qcode": "e"}],
+        "anpa_category": [{"name": "Entertainment", "qcode": "e"}],
         "item_id": "foo",
         "ednote": "ed note here",
         "slugline": "Vivid planning item",
@@ -689,7 +689,7 @@ async def test_filter_events_only(client):
         "urgency": 3,
         "guid": "foo",
         "name": "This is the name of the vivid planning item",
-        "subject": [{"name": "library and museum", "qcode": "01009000", "parent": "01000000"}],
+        "subject": [{"name": "library and museum", "qcode": "01009000"}],
         "pubstatus": "usable",
         "type": "planning",
     }

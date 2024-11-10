@@ -7,11 +7,13 @@ from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.search.config import init_nested_aggregation
 
 from . import utils
-
-from .service import WireSearchServiceAsync
+from .filters import WireSearchRequestArgs
+from .service import WireSearchServiceAsync, WireItemService
 
 __all__ = [
     "WireSearchServiceAsync",
+    "WireItemService",
+    "WireSearchRequestArgs",
 ]
 
 

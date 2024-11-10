@@ -1,18 +1,17 @@
 import logging
-from datetime import datetime
 
 from superdesk.utc import utcnow
-from superdesk import get_resource_service
 from planning.common import WORKFLOW_STATE
 
 from newsroom.wire import url_for_wire, WireSearchServiceAsync
 from newsroom.utils import parse_date_str
 from newsroom.core import get_current_wsgi_app
+
 from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
+from newsroom.agenda.notifications import notify_agenda_update
 
 from .tasks import notify_new_wire_item
-from .utils import format_qcode_items, get_display_dates, parse_dates, set_dates
-
+from .utils import get_display_dates
 
 logger = logging.getLogger(__name__)
 
@@ -21,141 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class AgendaManager:
-    def init_adhoc_agenda(self, planning, agenda):
-        """
-        Inits an adhoc agenda item
-        """
-        # check if there's an existing ad-hoc
-        agenda["item_type"] = "planning"
-
-        # planning dates is saved as the dates of the new agenda
-        agenda["dates"] = {
-            "start": planning["planning_date"],
-            "end": planning["planning_date"],
-        }
-
-        agenda["state"] = planning["state"]
-        if planning.get("pubstatus") == "cancelled":
-            agenda["watches"] = []
-
-        return agenda
-
-    def set_metadata_from_event(self, agenda, event, set_doc_id=True):
-        """
-        Sets agenda metadata from a given event
-        """
-        parse_dates(event)
-
-        # setting _id of agenda to be equal to event
-        if set_doc_id:
-            agenda.setdefault("_id", event["guid"])
-
-        agenda["item_type"] = "event"
-        agenda["guid"] = event["guid"]
-        agenda["event_id"] = event["guid"]
-        agenda["recurrence_id"] = event.get("recurrence_id")
-        agenda["name"] = event.get("name")
-        agenda["slugline"] = event.get("slugline")
-        agenda["definition_short"] = event.get("definition_short")
-        agenda["definition_long"] = event.get("definition_long")
-        agenda["version"] = event.get("version")
-        agenda["versioncreated"] = event.get("versioncreated")
-        agenda["calendars"] = event.get("calendars")
-        agenda["location"] = event.get("location")
-        agenda["ednote"] = event.get("ednote")
-        agenda["state"] = event.get("state")
-        agenda["state_reason"] = event.get("state_reason")
-        agenda["place"] = event.get("place")
-        agenda["subject"] = format_qcode_items(event.get("subject"))
-        agenda["products"] = event.get("products")
-        agenda["service"] = format_qcode_items(event.get("anpa_category"))
-        agenda["event"] = event
-        agenda["registration_details"] = event.get("registration_details")
-        agenda["invitation_details"] = event.get("invitation_details")
-        agenda["language"] = event.get("language")
-        agenda["source"] = event.get("source")
-
-        set_dates(agenda)
-
-    def set_metadata_from_planning(self, agenda, planning_item, force_adhoc=False):
-        """Sets agenda metadata from a given planning"""
-
-        parse_dates(planning_item)
-        set_dates(agenda)
-
-        if not planning_item.get("event_item") or force_adhoc:
-            # adhoc planning item
-            agenda["name"] = planning_item.get("name")
-            agenda["headline"] = planning_item.get("headline")
-            agenda["slugline"] = planning_item.get("slugline")
-            agenda["ednote"] = planning_item.get("ednote")
-            agenda["place"] = planning_item.get("place")
-            agenda["subject"] = format_qcode_items(planning_item.get("subject"))
-            agenda["products"] = planning_item.get("products")
-            agenda["urgency"] = planning_item.get("urgency")
-            agenda["definition_short"] = planning_item.get("description_text") or agenda.get("definition_short")
-            agenda["definition_long"] = planning_item.get("abstract") or agenda.get("definition_long")
-            agenda["service"] = format_qcode_items(planning_item.get("anpa_category"))
-            agenda["state"] = planning_item.get("state")
-            agenda["state_reason"] = planning_item.get("state_reason")
-            agenda["language"] = planning_item.get("language")
-            agenda["source"] = planning_item.get("source")
-
-        if planning_item.get("event_item") and force_adhoc:
-            agenda["event_id"] = planning_item["event_item"]
-
-        if not agenda.get("planning_items"):
-            agenda["planning_items"] = []
-
-        new_plan = False
-        plan = next(
-            (p for p in (agenda.get("planning_items")) if p.get("guid") == planning_item.get("guid")),
-            {},
-        )
-
-        if not plan:
-            new_plan = True
-
-        agenda_versioncreated: datetime = agenda["versioncreated"]
-        plan_versioncreated: datetime = parse_date_str(planning_item.get("versioncreated")) or agenda_versioncreated
-
-        plan["_id"] = planning_item.get("_id") or planning_item.get("guid")
-        plan["guid"] = planning_item.get("guid")
-        plan["slugline"] = planning_item.get("slugline")
-        plan["description_text"] = planning_item.get("description_text")
-        plan["headline"] = planning_item.get("headline")
-        plan["name"] = planning_item.get("name")
-        plan["abstract"] = planning_item.get("abstract")
-        plan["place"] = planning_item.get("place")
-        plan["subject"] = format_qcode_items(planning_item.get("subject"))
-        plan["service"] = format_qcode_items(planning_item.get("anpa_category"))
-        plan["urgency"] = planning_item.get("urgency")
-        plan["planning_date"] = planning_item.get("planning_date")
-        plan["coverages"] = planning_item.get("coverages") or []
-        plan["ednote"] = planning_item.get("ednote")
-        plan["internal_note"] = planning_item.get("internal_note")
-        plan["versioncreated"] = plan_versioncreated
-        plan["firstcreated"] = parse_date_str(planning_item.get("firstcreated")) or agenda["firstcreated"]
-        plan["state"] = planning_item.get("state")
-        plan["state_reason"] = planning_item.get("state_reason")
-        plan["products"] = planning_item.get("products")
-        plan["agendas"] = planning_item.get("agendas")
-        plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
-        plan["language"] = planning_item.get("language")
-        plan["source"] = planning_item.get("source")
-
-        if new_plan:
-            agenda["planning_items"].append(plan)
-
-        # Update the versioncreated datetime from Planning item if it's newer than the parent item
-        try:
-            if plan_versioncreated > agenda_versioncreated:
-                agenda["versioncreated"] = plan_versioncreated
-        except (KeyError, TypeError):
-            pass
-
-        return new_plan
-
     async def set_agenda_planning_items(self, agenda, orig_agenda, planning_item, action="add", send_notification=True):
         """
         Updates the list of planning items of agenda. If action is 'add' then adds the new one.
@@ -169,9 +33,7 @@ class AgendaManager:
                 len(agenda["planning_items"]) < len(existing_planning_items)
                 and len(planning_item.get("coverages") or []) > 0
             ):
-                await get_resource_service("agenda").notify_agenda_update(
-                    agenda, orig_agenda, planning_item, True, planning_item
-                )
+                await notify_agenda_update(agenda, orig_agenda, planning_item, True, planning_item)
 
         agenda["coverages"], coverage_changes = await self.get_coverages(
             agenda["planning_items"],
@@ -188,7 +50,7 @@ class AgendaManager:
                 or coverage_changes.get("coverage_modified")
             )
         ):
-            await get_resource_service("agenda").notify_agenda_update(agenda, orig_agenda, planning_item, True)
+            await notify_agenda_update(agenda, orig_agenda, planning_item, True)
 
         agenda["display_dates"] = get_display_dates(agenda["planning_items"])
         agenda.pop("_updated", None)

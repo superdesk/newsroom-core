@@ -2,6 +2,8 @@ from datetime import datetime, date
 
 import pytz
 from pydantic import Field
+
+# from pydantic.dataclasses import dataclass
 from typing import Annotated, List, Optional
 from dataclasses import asdict
 from quart_babel import lazy_gettext
@@ -34,8 +36,8 @@ class DashboardModel:
 
 @dataclass
 class NotificationScheduleModel:
-    timezone: str
-    times: List[str]
+    timezone: str | None = None
+    times: list[str] = Field(default_factory=list)
     last_run_time: Optional[datetime] = None
     pause_from: Optional[str] = None
     pause_to: Optional[str] = None
@@ -116,6 +118,9 @@ class UserResourceModel(NewshubResourceModel):
             return pause_from_date <= now <= pause_to_date
 
         return False
+
+    def is_events_only_access(self, company: CompanyResource | None) -> bool:
+        return company.events_only if company and not self.is_admin() else False
 
 
 class UserAuthResourceModel(UserResourceModel):

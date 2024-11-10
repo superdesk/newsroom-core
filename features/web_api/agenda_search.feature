@@ -13,9 +13,9 @@ Feature: Agenda Search
             },
             "calendars": [{"qcode": "cal1", "name": "Calendar1"}],
             "subject": [
-                {"code": "d1", "scheme": "sttdepartment", "name": "Dep1"},
-                {"code": "s1", "scheme": "sttsubj", "name": "Sub1"},
-                {"code": "e1", "scheme": "event_type", "name": "Sports"}
+                {"qcode": "d1", "scheme": "sttdepartment", "name": "Dep1"},
+                {"qcode": "s1", "scheme": "sttsubj", "name": "Sub1"},
+                {"qcode": "e1", "scheme": "event_type", "name": "Sports"}
             ],
             "place": [
                 {"code": "NSW", "name": "New South Wales"}
@@ -51,9 +51,9 @@ Feature: Agenda Search
                 {"_id": "test", "name": "Agenda2"}
             ],
             "subject": [
-                {"code": "d2", "scheme": "sttdepartment", "name": "Dep2"},
-                {"code": "s1", "scheme": "sttsubj", "name": "Sub1"},
-                {"code": "s2", "scheme": "sttsubj", "name": "Sub2"}
+                {"qcode": "d2", "scheme": "sttdepartment", "name": "Dep2"},
+                {"qcode": "s1", "scheme": "sttsubj", "name": "Sub1"},
+                {"qcode": "s2", "scheme": "sttsubj", "name": "Sub2"}
             ],
             "place": [
                 {"code": "VIC", "name": "Victoria"}
@@ -95,9 +95,9 @@ Feature: Agenda Search
                 {"_id": "test", "name": "Agenda2"}
             ],
             "subject": [
-                {"code": "d3", "scheme": "sttdepartment", "name": "Dep3"},
-                {"code": "s1", "scheme": "sttsubj", "name": "Sub1"},
-                {"code": "s2", "scheme": "sttsubj", "name": "Sub2"}
+                {"qcode": "d3", "scheme": "sttdepartment", "name": "Dep3"},
+                {"qcode": "s1", "scheme": "sttsubj", "name": "Sub1"},
+                {"qcode": "s2", "scheme": "sttsubj", "name": "Sub2"}
             ],
             "place": [
                 {"code": "VIC", "name": "Victoria"}

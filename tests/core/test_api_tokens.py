@@ -2,6 +2,8 @@ from quart import json
 from bson import ObjectId
 import urllib.parse
 
+from tests.core.utils import create_entries_for
+
 
 async def test_api_tokens_create(client):
     response = await client.post(
@@ -44,7 +46,7 @@ async def test_api_tokens_create_only_one_per_company(client):
 
 
 async def test_api_tokens_patch(client, app):
-    data = app.data.insert(
+    data = await create_entries_for(
         "news_api_tokens",
         [
             {

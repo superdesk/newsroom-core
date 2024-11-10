@@ -10,6 +10,7 @@ from superdesk import get_resource_service
 from newsroom.types import AuthProviderType
 from newsroom.tests import markers
 from tests.utils import get_user_by_email, logout
+from tests.core.utils import create_entries_for
 
 
 companies = {
@@ -28,7 +29,7 @@ async def init(app):
             {"_id": "saml", "name": "Azure", "auth_type": AuthProviderType.SAML},
         ]
     )
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -66,8 +67,8 @@ async def test_password_auth_denies_other_auth_types(app, client):
     users_service = UsersService()
 
     user_id = ObjectId()
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": user_id,
@@ -210,8 +211,8 @@ async def test_google_oauth_denies_other_auth_types(app, client):
     await logout(client)
     companies_service = get_resource_service("companies")
     user_id = ObjectId()
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": user_id,

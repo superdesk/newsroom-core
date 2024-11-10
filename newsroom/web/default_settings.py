@@ -115,7 +115,6 @@ if not DEFAULT_TIMEZONE:
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
-    "newsroom.agenda",
     "newsroom.news_api.api_tokens",
     "newsroom.monitoring",
 ]
@@ -170,7 +169,7 @@ MODULES = [
     "newsroom.wire.module",
     "newsroom.company_admin",
     "newsroom.public",
-    "newsroom.agenda",
+    "newsroom.agenda.module",
     "newsroom.products",
     "newsroom.design",
     "newsroom.auth_server.client",

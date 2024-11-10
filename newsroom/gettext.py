@@ -61,7 +61,7 @@ def get_user_timezone(user: User) -> str:
     return get_app_config("BABEL_DEFAULT_TIMEZONE") or get_app_config("DEFAULT_TIMEZONE")
 
 
-def get_session_timezone():
+def get_session_timezone() -> str:
     from newsroom.auth.utils import get_user_or_none_from_request
 
     try:

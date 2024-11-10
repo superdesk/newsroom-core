@@ -5,12 +5,10 @@ from bson import ObjectId
 
 from superdesk.core.types import SearchRequest
 
-from superdesk import get_resource_service
 from superdesk.core import get_app_config
 
 from newsroom.core import get_current_wsgi_app
-from newsroom.types import Company, Topic, User, UserResourceModel, CompanyResource, TopicResourceModel, SectionEnum
-from newsroom.wire.filters import WireSearchRequestArgs
+from newsroom.types import User, UserResourceModel, CompanyResource, TopicResourceModel, SectionEnum
 from newsroom.history_async import get_history_users
 from newsroom.utils import get_user_dict_async, get_company_dict_async
 from newsroom.agenda.utils import push_agenda_item_notification
@@ -25,11 +23,11 @@ from newsroom.topics import (
 )
 from newsroom.notifications import push_notification, save_user_notifications, NotificationQueueService
 from newsroom.wire import WireSearchServiceAsync
+from newsroom.wire.filters import WireSearchRequestArgs
+from newsroom.agenda import AgendaSearchServiceAsync
+from newsroom.agenda.filters import AgendaSearchRequestArgs
 
 logger = logging.getLogger(__name__)
-
-
-# TODO-ASYNC: revisit when agenda and wire_search are async
 
 
 def is_canceled(item: dict[str, Any]) -> bool:
@@ -82,7 +80,7 @@ class NotificationManager:
         self, item: dict[str, Any], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
     ) -> set[ObjectId]:
         topics = await get_topics_with_subscribers_async("wire")
-        topic_matches = await WireSearchServiceAsync().get_mathing_topics_for_item(
+        topic_matches = await WireSearchServiceAsync().get_matching_topics_for_item(
             item["_id"], topics, list(users.values()), companies
         )
 
@@ -157,12 +155,19 @@ class NotificationManager:
                         cursor = await wire_service.service.find(SearchRequest(elastic=query))
                         items = await cursor.to_list_raw()
                     else:
-                        search_service = get_resource_service("agenda")
-                        query = search_service.get_topic_query(
-                            topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
+                        agenda_service = AgendaSearchServiceAsync()
+                        query = await agenda_service.get_topic_items_query(
+                            topic,
+                            user,
+                            company,
+                            args=AgendaSearchRequestArgs(
+                                page_size=1,
+                                ids=[item["_id"]],
+                                es_highlight=True,
+                            ),
                         )
-
-                        items = list(search_service.get_items_by_query(query, size=1))
+                        cursor = await agenda_service.service.find(SearchRequest(elastic=query))
+                        items = await cursor.to_list_raw()
                     highlighted_item = item
 
                     if len(items) > 0:
@@ -278,16 +283,13 @@ class NotificationManager:
     ) -> set[ObjectId]:
         topics = await get_topics_with_subscribers_async("agenda")
 
-        # TODO-ASYNC: Remove these conversions once Agenda is updated to async
-        users_dict: dict[str, User] = {str(user.id): user.to_dict() for user in users.values()}
-        companies_dict: dict[str, Company] = {str(company.id): company.to_dict() for company in companies.values()}
-        topics_list: list[Topic] = [topic.to_dict() for topic in topics]
-        topic_matches = get_resource_service("agenda").get_matching_topics(
-            item["_id"], topics_list, users_dict, companies_dict
+        topic_matches = await AgendaSearchServiceAsync().get_matching_topics_for_item(
+            item["_id"], topics, list(users.values()), companies
         )
 
         # Include topics where the ``query`` is ``item["_id"]``
-        topic_matches.extend(
+        users_dict: dict[str, User] = {str(user.id): user.to_dict() for user in users.values()}
+        topic_matches |= set(
             [
                 topic
                 for topic in await get_agenda_notification_topics_for_query_by_id(item, users_dict)

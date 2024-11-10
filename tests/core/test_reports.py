@@ -8,8 +8,8 @@ from tests.core.utils import create_entries_for
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId("5cc94454bc43165c045ffec0"),
@@ -36,7 +36,7 @@ async def init(app):
             },
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -55,7 +55,7 @@ async def init(app):
             },
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -174,7 +174,7 @@ async def test_product_companies(client):
 
 
 async def test_expired_companies(client, app):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {

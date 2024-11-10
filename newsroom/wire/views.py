@@ -11,7 +11,6 @@ from quart_babel import gettext
 
 from superdesk.core.types import Request, Response
 from superdesk.core import get_app_config, get_current_app
-from superdesk import get_resource_service
 from superdesk.flask import render_template, send_file
 from superdesk.utc import utcnow
 
@@ -55,7 +54,6 @@ from newsroom.utils import (
     get_location_string,
     get_public_contacts,
     get_links,
-    get_items_for_user_action,
 )
 from newsroom.notifications import push_user_notification, push_notification, save_user_notifications
 from newsroom.template_filters import is_admin_or_internal
@@ -73,7 +71,7 @@ from newsroom.users import get_user_profile_data
 from newsroom.history_async import HistoryService
 
 from .items import get_items_for_dashboard
-from .service import WireSearchServiceAsync
+from .service import WireSearchServiceAsync, WireItemService
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -117,7 +115,7 @@ async def get_view_data() -> dict:
     topics = await get_user_topics_async(user)
     user_folders = await get_user_folders(user, "wire") if user else []
     company_folders = await get_company_folders(company, "wire") if company else []
-    products = await get_products_by_company(company_dict, product_type="wire") if company_dict else []
+    products = await get_products_by_company(company_dict, product_type=SectionEnum.WIRE) if company_dict else []
     ui_config_service = UiConfigResourceService()
 
     check_user_has_products(user, products)
@@ -265,7 +263,6 @@ async def get_previous_versions(wire_item: WireItem) -> list[dict]:
             wire_item.ancestors, args=WireSearchRequestArgs(ignore_latest=True)
         )
         ancestors = await cursor.to_list_raw()
-        # ancestors = await (await WireSearchServiceAsync().get_items_by_id(wire_item.ancestors)).to_list_raw()
         return sorted(ancestors, key=itemgetter("versioncreated"), reverse=True)
     return []
 
@@ -344,12 +341,12 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
 
     if item_type == "agenda":
         # Getting Event and/or Planning items
-        # TODO-ASYNC: Update when Agenda is migrated to async
-        items = get_items_for_user_action(data["items"], item_type)
+        from newsroom.agenda import AgendaSearchServiceAsync
+
+        items = await AgendaSearchServiceAsync().get_items_for_action(data["items"])
     else:
         # Getting Wire items
-        cursor = await WireSearchServiceAsync().get_items_for_action(data["items"])
-        items = await cursor.to_list_raw()
+        items = await WireSearchServiceAsync().get_items_for_action(data["items"])
 
     _file = io.BytesIO()
     formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
@@ -406,7 +403,7 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
                 )
         _file.seek(0)
 
-    update_action_list(data["items"], "downloads", force_insert=True)
+    await update_action_list(data["items"], "downloads", force_insert=True)
     await HistoryService().create_history_record(items, "download", user.id, user.company, params.type.value)
     return await send_file(
         _file,
@@ -431,12 +428,12 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
     users_service = UsersService()
     if item_type == "agenda":
         # Getting Event and/or Planning items
-        # TODO-ASYNC: Update when Agenda is migrated to async
-        items = get_items_for_user_action(data.get("items"), item_type)
+        from newsroom.agenda import AgendaSearchServiceAsync
+
+        items = await AgendaSearchServiceAsync().get_items_for_action(data.get("items"))
     else:
         # Getting Wire items
-        cursor = await WireSearchServiceAsync().get_items_for_action(data.get("items"))
-        items = await cursor.to_list_raw()
+        items = await WireSearchServiceAsync().get_items_for_action(data.get("items"))
 
     for user_id in data["users"]:
         user = await users_service.find_by_id(user_id)
@@ -489,7 +486,7 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
             template=f"share_{item_type}",
             template_kwargs=template_kwargs,
         )
-    update_action_list(data.get("items"), "shares", item_type=item_type)
+    await update_action_list(data.get("items"), "shares", item_type=item_type)
     await HistoryService().create_history_record(
         items, "share", current_user.id, current_user.company, params.type.value
     )
@@ -528,7 +525,7 @@ async def bookmark() -> Response:
     """
     data = await get_json_or_400()
     assert data.get("items")
-    update_action_list(data.get("items"), "bookmarks", item_type="items")
+    await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification("saved_items", count=await WireSearchServiceAsync().get_current_user_bookmarks_count())
     return Response("")
 
@@ -541,34 +538,34 @@ class WireItemRouteArgs(BaseModel):
 async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Request) -> Response:
     """Endpoint to copy Wire OR Agenda item(s)"""
 
-    item_type = get_type()
-    if item_type == "agenda":
-        item = get_resource_service("agenda").find_one(req=None, _id=args.item_id)
-    else:
-        item = (await WireSearchServiceAsync().service.find_by_id(args.item_id)).to_dict()
+    from newsroom.agenda import AgendaItemService
 
-    if not item:
+    item_type = get_type()
+    service = AgendaItemService() if item_type == "agenda" else WireItemService()
+    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()
+
+    if not item_to_copy:
         await request.abort(404)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
     locale = (get_session_locale() or "en").lower()
     template_name = get_language_template_name(template_filename, locale, "txt")
 
-    template_kwargs = {"item": item}
+    template_kwargs = {"item": item_to_copy}
     if item_type == "agenda":
         template_kwargs.update(
             {
-                "location": "" if item_type != "agenda" else get_location_string(item),
-                "contacts": get_public_contacts(item),
-                "calendars": ", ".join([calendar.get("name") for calendar in item.get("calendars") or []]),
+                "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
+                "contacts": get_public_contacts(item_to_copy),
+                "calendars": ", ".join([calendar.get("name") for calendar in item_to_copy.get("calendars") or []]),
                 "user_profile_data": await get_user_profile_data(),
             }
         )
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
-    update_action_list([args.item_id], "copies", item_type=item_type)
+    await update_action_list([args.item_id], "copies", item_type=item_type)
     user = get_user_from_request(request)
-    await HistoryService().create_history_record([item], "copy", user.id, user.company, params.type.value)
+    await HistoryService().create_history_record([item_to_copy], "copy", user.id, user.company, params.type.value)
 
     return Response({"data": copy_data})
 
@@ -586,6 +583,11 @@ class WireItemUrlParams(BaseModel):
     print: bool = False
     monitoring_profile: str | None = None
     type: SectionEnum = SectionEnum.WIRE
+
+    @field_validator("print", mode="before")
+    def parse_print(cls, value: str | bool | None) -> bool | str | None:
+        # Support this URL param as a toggle, if `print` is provided in the URL then it is `True`
+        return True if value == "" else value
 
 
 @wire_endpoints.endpoint("/wire/<item_id>")
@@ -620,7 +622,7 @@ async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Requ
         else:
             template = "wire_item_print.html"
 
-        update_action_list([wire_item.id], "prints", force_insert=True)
+        await update_action_list([wire_item.id], "prints", force_insert=True)
         user = get_user_from_request(request)
         await HistoryService().create_history_record(
             [wire_item.to_dict()], "print", user.id, user.company, params.type.value
@@ -648,7 +650,7 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
     wire_search = WireSearchServiceAsync()
 
     # First get the items directly from the resource service
-    items_cursor = await wire_search.service.search({"bool": {"query": {"must": [{"terms": {"_id": args.item_ids}}]}}})
+    items_cursor = await wire_search.service.search({"_id": {"$in": args.item_ids}}, use_mongo=True)
     if not await items_cursor.count():
         return Response([])
 
@@ -659,7 +661,9 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
     allowed_ids = {item.id async for item in allowed_items_cursor}
 
     # And set the item permissions for each item
-    async for item in items_cursor:
-        set_item_permission(item, item.id in allowed_ids)
+    response = []
+    async for wire_item in items_cursor:
+        set_item_permission(wire_item, wire_item.id in allowed_ids)
+        response.append(wire_item.to_dict())
 
-    return Response(await items_cursor.to_list_raw())
+    return Response(response)

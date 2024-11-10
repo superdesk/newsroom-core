@@ -3,8 +3,7 @@ from quart import json
 from quart.testing import QuartClient
 
 from newsroom.factory.app import BaseNewsroomApp
-from newsroom.agenda import AGENDA_NESTED_SEARCH_FIELDS
-from newsroom.agenda.agenda import aggregations as agenda_aggregations
+from newsroom.agenda.filters import aggregations as agenda_aggregations
 from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
 from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
@@ -131,7 +130,7 @@ async def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: QuartCl
             },
         }
     )
-    init_nested_aggregation("agenda", AGENDA_NESTED_SEARCH_FIELDS, app.config["AGENDA_GROUPS"], agenda_aggregations)
+    init_nested_aggregation("agenda", ["subject"], app.config["AGENDA_GROUPS"], agenda_aggregations)
     await reset_elastic(app)
 
     # Test if the Eve & agenda_aggregations config has been updated

@@ -8,7 +8,7 @@ from newsroom.companies import CompanyServiceAsync
 from newsroom.topics.topics_async import TopicService
 
 from datetime import datetime
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, delete_entries_for, update_entries_for
 
 
 async def test_user_dashboards(app, client, public_user, public_company, company_products):
@@ -16,11 +16,11 @@ async def test_user_dashboards(app, client, public_user, public_company, company
     topic_id = (await create_entries_for("topics", topics))[0]
     topic = await TopicService().find_by_id(topic_id)
 
-    app.data.remove("products")
+    await delete_entries_for("products")
     products = [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
-    app.data.insert("products", products)
+    await create_entries_for("products", products)
 
-    assert app.data.update(
+    await update_entries_for(
         "companies",
         public_company["_id"],
         {
@@ -32,13 +32,13 @@ async def test_user_dashboards(app, client, public_user, public_company, company
     public_company_instance = await CompanyServiceAsync().find_by_id(public_company["_id"])
     assert 1 == len(public_company_instance.products)
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
-            {"guid": "test1", "headline": "foo", "versioncreated": datetime.utcnow()},
-            {"guid": "test2", "headline": "bar", "versioncreated": datetime.utcnow()},
-            {"guid": "test3", "headline": "baz", "versioncreated": datetime.utcnow()},
-            {"guid": "test4", "headline": "foo bar", "versioncreated": datetime.utcnow()},
+            {"_id": "test1", "guid": "test1", "headline": "foo", "versioncreated": datetime.utcnow()},
+            {"_id": "test2", "guid": "test2", "headline": "bar", "versioncreated": datetime.utcnow()},
+            {"_id": "test3", "guid": "test3", "headline": "baz", "versioncreated": datetime.utcnow()},
+            {"_id": "test4", "guid": "test4", "headline": "foo bar", "versioncreated": datetime.utcnow()},
         ],
     )
 
@@ -84,10 +84,10 @@ async def test_user_dashboards(app, client, public_user, public_company, company
 
 async def test_dashboard_data_for_user_without_wire_section(app):
     products = [
-        {"product_type": "wire"},
+        {"name": "Sports", "product_type": "wire"},
     ]
 
-    app.data.insert("products", products)
+    await create_entries_for("products", products)
 
     topic = TopicResourceModel.from_dict(
         {

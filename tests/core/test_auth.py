@@ -12,6 +12,7 @@ from newsroom.users import UsersService
 from newsroom.tests.users import ADMIN_USER_EMAIL
 from newsroom.companies import CompanyServiceAsync
 from tests.utils import get_user_by_email, login, logout
+from tests.core.utils import create_entries_for
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -20,7 +21,7 @@ company = ObjectId()
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -46,8 +47,8 @@ async def test_login_fails_for_wrong_username_or_password(client):
 
 async def test_login_fails_for_disabled_user(app, client):
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -71,8 +72,8 @@ async def test_login_fails_for_disabled_user(app, client):
 
 async def test_login_fails_for_user_with_disabled_company(app, client):
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -96,8 +97,8 @@ async def test_login_fails_for_user_with_disabled_company(app, client):
 
 async def test_login_succesfull_for_user_with_expired_company(app, client):
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -124,8 +125,8 @@ async def test_login_succesfull_for_user_with_expired_company(app, client):
 
 async def test_login_for_user_with_enabled_company_succeeds(app, client):
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -150,8 +151,8 @@ async def test_login_for_user_with_enabled_company_succeeds(app, client):
 
 async def test_login_fails_for_not_approved_user(app, client):
     # If user is created more than 14 days ago login fails
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -189,8 +190,8 @@ async def test_login_fails_for_many_times_gets_limited(client, app):
 async def test_account_is_locked_after_5_wrong_passwords(app, client):
     await logout(client)
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -229,8 +230,8 @@ async def test_account_is_locked_after_5_wrong_passwords(app, client):
 async def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
     await logout(client)
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -297,8 +298,8 @@ async def test_account_appears_locked_for_non_existing_user(client):
 
 async def test_login_with_remember_me_selected_creates_permanent_session(app, client):
     # Register a new account
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -396,8 +397,8 @@ async def test_is_user_valid_empty_password():
 
 
 async def test_login_for_public_user_if_company_not_assigned(client, app):
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -419,8 +420,8 @@ async def test_login_for_public_user_if_company_not_assigned(client, app):
 
 
 async def test_login_for_internal_user_if_company_not_assigned(client, app):
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId(),
@@ -444,8 +445,8 @@ async def test_login_for_internal_user_if_company_not_assigned(client, app):
 async def test_access_for_disabled_user(app, client):
     # Register a new account
     user_id = ObjectId()
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": user_id,
@@ -506,8 +507,8 @@ async def test_access_for_disabled_user(app, client):
 async def test_access_for_disabled_company(app, client):
     # Register a new account
     user_id = ObjectId()
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": user_id,
@@ -533,8 +534,8 @@ async def test_access_for_disabled_company(app, client):
 
 
 async def test_access_for_not_approved_user(client, app):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",

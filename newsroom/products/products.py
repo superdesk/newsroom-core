@@ -7,7 +7,7 @@ import newsroom
 import superdesk
 from superdesk.services import CacheableService
 
-from newsroom.types import Company, Product, User, NavigationIds, PRODUCT_TYPES
+from newsroom.types import Company, Product, User, NavigationIds, SectionEnum
 from newsroom.utils import any_objectid_in_list, parse_objectid
 
 IdsList = NavigationIds
@@ -35,7 +35,7 @@ class ProductsResource(newsroom.Resource):
             "schema": newsroom.Resource.rel("companies"),
             "nullable": True,
         },
-        "product_type": {"type": "string", "default": "wire", "allowed": PRODUCT_TYPES},
+        "product_type": {"type": "string", "default": "wire", "allowed": [t.value for t in SectionEnum]},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
     }

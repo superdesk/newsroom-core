@@ -3,6 +3,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from superdesk import get_resource_service
 from newsroom.email_templates import RESOURCE
+from tests.core.utils import create_entries_for
 
 
 async def test_email_template_find_one(app):
@@ -21,7 +22,7 @@ async def test_email_template_find_one(app):
 
 
 async def test_default_subjects(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {
@@ -39,7 +40,7 @@ async def test_default_subjects(app):
 
 
 async def test_get_subject_translation(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {
@@ -67,7 +68,7 @@ async def test_get_subject_translation(app):
 
 
 async def test_subject_translation_falls_back_to_default(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {
@@ -92,7 +93,7 @@ async def test_subject_translation_falls_back_to_default(app):
 
 
 async def test_get_subject_translation_with_template_variables(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {
@@ -120,7 +121,7 @@ async def test_get_subject_translation_with_template_variables(app):
 
 
 async def test_get_subject_falls_back_to_default_on_render_error(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {
@@ -142,7 +143,7 @@ async def test_get_subject_falls_back_to_default_on_render_error(app):
 
 
 async def test_get_from_mongo_returns_working_cursor(app):
-    app.data.insert(
+    await create_entries_for(
         RESOURCE,
         [
             {

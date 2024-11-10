@@ -48,7 +48,7 @@ class AppInitializeWithDataCommand:
 
             if app.config.get("REBUILD_ELASTIC_ON_INIT_DATA_ERROR"):
                 logger.warning("Can't update the mapping, running elastic_rebuild command now.")
-                elastic_rebuild()
+                await elastic_rebuild()
             else:
                 logger.warning("Can't update the mapping, please run elastic_rebuild command.")
 

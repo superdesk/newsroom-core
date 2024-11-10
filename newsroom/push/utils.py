@@ -50,7 +50,8 @@ def format_qcode_items(items: list[dict[str, Any]] | None = None):
         return []
 
     for item in items:
-        item["code"] = item.get("qcode")
+        if not item.get("code"):
+            item["code"] = item.get("qcode")
 
     return items
 

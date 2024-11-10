@@ -32,15 +32,15 @@ class ProductsService(NewshubAsyncResourceService[ProductResourceModel], AsyncCa
 
         company_service = CompanyService()
         for company_id, products in company_products.items():
-            company = await company_service.find_by_id(company_id)
+            company = await company_service.find_by_id_raw(company_id)
 
             if company:
                 updates = {
-                    "products": company.products or [],
+                    "products": company.get("products") or [],
                 }
                 for product in products:
                     updates["products"].append({"_id": product["_id"], "section": product["product_type"], "seats": 0})
-                await company_service.system_update(company.id, updates)
+                await company_service.system_update(company["_id"], updates)
 
         return res
 

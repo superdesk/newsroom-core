@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from newsroom.notifications import get_user_notifications
 from newsroom.tests import markers
-from tests.core.utils import add_company_products, create_entries_for
+from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -26,19 +26,19 @@ NAV_2 = ObjectId("5e65964bf5db68883df561c1")
 
 @fixture(autouse=True)
 async def set_events_only_company(app):
-    company = app.data.find_one("companies", None, _id=COMPANY_1_ID)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company is not None
     updates = {
         "events_only": True,
         "sections": {"wire": True, "agenda": True},
         "is_enabled": True,
     }
-    app.data.update("companies", COMPANY_1_ID, updates, company)
-    company = app.data.find_one("companies", None, _id=COMPANY_1_ID)
+    await update_entries_for("companies", COMPANY_1_ID, updates, company)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company.get("events_only") is True
-    user = app.data.find_one("users", None, _id=PUBLIC_USER_ID)
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
     assert user is not None
-    app.data.update("users", PUBLIC_USER_ID, {"is_enabled": True, "receive_email": True}, user)
+    await update_entries_for("users", PUBLIC_USER_ID, {"is_enabled": True, "receive_email": True}, user)
 
 
 @fixture
@@ -61,7 +61,7 @@ async def agenda_products(app):
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -87,7 +87,7 @@ async def test_item_json(client):
     await login_public(client)
     resp = await client.get("/agenda/urn:conference?format=json")
     data = json.loads(await resp.get_data())
-    assert "headline" in data
+    assert "slugline" in data
     assert "planning_items" not in data
     assert "coverages" not in data
 
@@ -104,7 +104,7 @@ async def test_search(client, app, agenda_products):
     assert "planning_items" not in data["_items"][0]
     assert "coverages" not in data["_items"][0]
 
-    resp = await client.get(f"/agenda/search?navigation={NAV_1}")
+    resp = await client.get(f"/agenda/search?navigation={NAV_2}")
     data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
@@ -128,7 +128,7 @@ async def set_watch_products(app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -289,7 +289,7 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
                 "ednote": "ed note here",
                 "scheduled": "2018-05-29T10:51:52+0000",
             },
-            "coverage_status": {
+            "news_coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int",

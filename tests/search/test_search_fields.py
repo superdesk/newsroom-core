@@ -57,7 +57,13 @@ async def test_agenda_search_fields(client, app):
     await create_entries_for(
         "agenda",
         [
-            {"name": "foo", "ednote": "bar", "guid": "test"},
+            {
+                "name": "foo",
+                "ednote": "bar",
+                "guid": "test",
+                "type": "event",
+                "dates": {"start": datetime.utcnow(), "end": datetime.utcnow()},
+            },
         ],
     )
 
