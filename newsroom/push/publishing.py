@@ -142,14 +142,10 @@ class Publisher:
 
         agenda_id = event["guid"]
         service = AgendaItemService()
-        # plan_ids = event.pop("plans", [])
 
         if not orig:
             # new event
             agenda, plan_ids = service.convert_event_to_agenda_dict({}, event)
-            # agenda: dict[str, Any] = {}
-            # agenda_manager.set_metadata_from_event(agenda, event)
-            # agenda["dates"] = get_event_dates(event)
 
             # Retrieve all current Planning items and add them into this Event
             agenda.setdefault("planning_items", [])
@@ -195,9 +191,6 @@ class Publisher:
             ]:
                 # schedule is changed, recalculate the dates, planning id and coverages from dates will be removed
                 updates, _ = service.convert_event_to_agenda_dict({}, event, set_doc_id=False)
-                # updates = {}
-                # agenda_manager.set_metadata_from_event(updates, event, False)
-                # updates["dates"] = get_event_dates(event)
                 updates["coverages"] = None
                 updates["planning_items"] = None
 
@@ -214,7 +207,6 @@ class Publisher:
                 }
 
                 service.convert_event_to_agenda_dict(updates, event, set_doc_id=False)
-                # agenda_manager.set_metadata_from_event(updates, event, False)
 
             else:
                 logger.info("Ignoring event %s", orig["_id"])
@@ -233,12 +225,8 @@ class Publisher:
         service = AgendaItemService()
         agenda = deepcopy(orig)
 
-        # agenda_manager.init_adhoc_agenda(planning, agenda)
-
         # Update agenda metadata
         _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning, force_adhoc=True)
-
-        # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning, force_adhoc=True)
 
         # Add the planning item to the list
         await agenda_manager.set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
