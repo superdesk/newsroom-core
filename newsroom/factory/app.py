@@ -145,18 +145,13 @@ class BaseNewsroomApp(SuperdeskEve):
             self.media = SuperdeskGridFSMediaStorage(self)
 
     def setup_babel(self):
-        # TODO-ASYNC: Add support to quart_babel to support multiple directories on the domain
-        # Set `root_path` to `NEWSROOM_DIR`, so quart-babel imports translations from newsroom.translations
-        self.root_path = str(NEWSROOM_DIR)
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))
 
         if self.config.get("TRANSLATIONS_PATH"):
-            self.config["BABEL_TRANSLATION_DIRECTORIES"] = ";".join(
-                [
-                    str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
-                    str(self.config["TRANSLATIONS_PATH"]),
-                ]
-            )
+            self.config["BABEL_TRANSLATION_DIRECTORIES"] = [
+                str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
+                str(self.config["TRANSLATIONS_PATH"]),
+            ]
 
         # avoid events on this
         self.babel_tzinfo = None

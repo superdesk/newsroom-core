@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 
+import pytz
 import jinja2
 
 from typing import Optional
-from quart_babel import get_locale, switch_locale, switch_timezone
+from quart_babel import get_timezone, force_locale
+from quart_babel.utils import _get_current_context
 
 from superdesk.flask import g
 
@@ -29,21 +31,27 @@ def noop():
 def template_locale(locale: Optional[str] = None, timezone: Optional[str] = None):
     """Overriding babel locale and timezone using internals, but there is no public api for that."""
 
-    if locale and timezone:
-        with switch_locale(locale), switch_timezone(timezone):
-            set_template_locale(str(get_locale()))
-            yield
-        set_template_locale(None)
-    elif locale:
-        with switch_locale(locale):
-            set_template_locale(str(get_locale()))
-            yield
-        set_template_locale(None)
-    elif timezone:
-        with switch_timezone(timezone):
-            yield
-    else:
+    ctx = _get_current_context()
+
+    if ctx is None or (locale is None and timezone is None):
         yield
+        return
+
+    old_tzinfo = get_timezone()
+
+    try:
+        if timezone:
+            ctx.babel_tzinfo = pytz.timezone(timezone)
+        if locale:
+            set_template_locale(locale)
+            with force_locale(locale):
+                yield
+        else:
+            yield
+    finally:
+        if timezone:
+            ctx.babel_tzinfo = old_tzinfo
+        set_template_locale(None)
 
 
 class LocaleTemplateLoader(jinja2.FileSystemLoader):

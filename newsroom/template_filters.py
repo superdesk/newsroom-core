@@ -117,13 +117,13 @@ def is_item_tbc(item: dict) -> bool:
     return event_tbc or (planning and planning[0].get("_time_to_be_confirmed", False))
 
 
-async def format_event_datetime(item: dict) -> str:
+def format_event_datetime(item: dict) -> str:
     date_info = item.get("dates", {})
 
     if not date_info:
         return ""
 
-    tz = date_info.get("tz", await get_session_timezone())
+    tz = date_info.get("tz", get_session_timezone())
     # Set the session timezone
     with template_locale(timezone=tz):
         start = parse_date(date_info.get("start"))

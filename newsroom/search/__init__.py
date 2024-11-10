@@ -8,7 +8,7 @@ def init_app(app):
 
 
 async def render_search_tips_html(search_type) -> str:
-    locale = (await get_session_locale() or "en").lower()
+    locale = (get_session_locale() or "en").lower()
     template_name = get_language_template_name(f"search_tips_{search_type}", locale, "html")
 
     return await render_template(template_name)

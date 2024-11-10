@@ -102,12 +102,12 @@ class SendScheduledNotificationEmails:
                 if not user.notification_schedule:
                     # MyPy fails here with call-arg error, not sure why. Ignore it for now
                     user.notification_schedule = NotificationScheduleModel(  # type: ignore[call-arg]
-                        timezone=await get_session_timezone(),
+                        timezone=get_session_timezone(),
                         times=[],
                     )
 
                 if not user.notification_schedule.timezone:
-                    user.notification_schedule.timezone = await get_session_timezone()
+                    user.notification_schedule.timezone = get_session_timezone()
                 if not user.notification_schedule.times:
                     user.notification_schedule.times = get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
 
@@ -135,7 +135,7 @@ class SendScheduledNotificationEmails:
         timezone: str = (
             user.notification_schedule.timezone
             if user.notification_schedule and user.notification_schedule.timezone
-            else await get_session_timezone()
+            else get_session_timezone()
         )
         now_local = utc_to_local(timezone, now_utc)
 
