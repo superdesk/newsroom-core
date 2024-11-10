@@ -559,41 +559,43 @@ def get_apply_agenda_filters(highlights: bool) -> SearchFilterFunction:
         query = request.search.post_filter if get_app_config("FILTER_BY_POST_FILTER", False) else request.search.query
 
         for key, val in request.args.filter.items():
-            if not val:
+            is_event_type = request.args.item_type == AgendaItemType.EVENT
+            if not val or (is_event_type and key in planning_filters):
                 continue
-            elif request.args.item_type == AgendaItemType.EVENT and key in planning_filters:
-                continue
-            elif key == "location":
-                apply_location_filter(query, val)
-            elif key == "coverage":
-                apply_coverage_filter(query, val)
-            elif key == "coverage_status":
-                apply_coverage_status_filter(query, val)
-            elif key == "agendas":
-                apply_agendas_filter(query, val)
-            else:
-                if request.args.item_type != AgendaItemType.EVENT:
+
+            match key:
+                case "location":
+                    apply_location_filter(query, val)
+                case "coverage":
+                    apply_coverage_filter(query, val)
+                case "coverage_status":
+                    apply_coverage_status_filter(query, val)
+                case "agendas":
+                    apply_agendas_filter(query, val)
+                case _:
                     agg_field = get_aggregation_field(key)
-                    query.filter.append(
-                        {
-                            "bool": {
-                                "minimum_should_match": 1,
-                                "should": [
-                                    get_filter_query(key, val, agg_field, get_nested_config("agenda", key)),
-                                    nested_query(
-                                        path="planning_items",
-                                        query={"bool": {"filter": [{"terms": {f"planning_items.{agg_field}": val}}]}},
-                                        name=key,
-                                        inner_hits=highlights,
-                                    ),
-                                ],
-                            },
-                        }
-                    )
-                else:
-                    query.filter.append(
-                        get_filter_query(key, val, get_aggregation_field(key), get_nested_config("agenda", key))
-                    )
+                    filter_query = get_filter_query(key, val, agg_field, get_nested_config("agenda", key))
+                    if not is_event_type:
+                        query.filter.append(
+                            {
+                                "bool": {
+                                    "minimum_should_match": 1,
+                                    "should": [
+                                        filter_query,
+                                        nested_query(
+                                            path="planning_items",
+                                            query={
+                                                "bool": {"filter": [{"terms": {f"planning_items.{agg_field}": val}}]}
+                                            },
+                                            name=key,
+                                            inner_hits=highlights,
+                                        ),
+                                    ],
+                                },
+                            }
+                        )
+                    else:
+                        query.filter.append(filter_query)
 
     return _apply_agenda_filters
 
