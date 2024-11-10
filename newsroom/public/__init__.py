@@ -15,7 +15,7 @@ module = Module(name="newsroom.public", init=init_module, endpoints=[public_endp
 
 
 async def render_restricted_action_modal_body():
-    locale = (await get_session_locale() or "en").lower()
+    locale = (get_session_locale() or "en").lower()
     template_name = get_language_template_name("public_restricted_action_modal_body", locale, "html")
 
     return await render_template(template_name)
