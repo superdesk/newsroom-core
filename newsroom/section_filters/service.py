@@ -26,7 +26,7 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
 
         async def get_filters() -> dict[str, list[SectionFilterModel]]:
             filters: dict[str, list[SectionFilterModel]] = {}
-            for f in await self.get_cached():
+            async for f in self.get_all_raw():
                 if not filters.get(f.get("filter_type")):
                     filters[f.get("filter_type")] = []
                 filters[f.get("filter_type")].append(SectionFilterModel.from_dict(f))
