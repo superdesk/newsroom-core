@@ -1,7 +1,7 @@
 import click
 from bson import ObjectId
 
-from newsroom.users.service import UsersService
+from newsroom.users.service import UsersAuthService
 
 from .cli import newsroom_cli
 
@@ -32,13 +32,14 @@ async def create_user(email, password, first_name, last_name, is_admin):
         "is_approved": True,
         "_id": ObjectId(),
     }
-    user = await UsersService().get_by_email(email)
+    service = UsersAuthService()
+    user = await service.get_by_email(email)
 
     if user:
         print(f"User already exists {new_user}")
     else:
         print("Creating user...")
-        await UsersService().create([new_user])
+        await service.create([new_user])
         print(f"User created successfully {new_user}")
 
     return new_user
