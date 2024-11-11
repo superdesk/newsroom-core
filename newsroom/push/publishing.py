@@ -91,7 +91,7 @@ class Publisher:
             if doc.get("coverage_id"):
                 agenda_items = await AgendaItemService().set_delivery(doc)
                 if agenda_items:
-                    [notify_new_agenda_item.delay(item["_id"], check_topics=False) for item in agenda_items]
+                    [await notify_new_agenda_item.delay(item["_id"], check_topics=False) for item in agenda_items]
         except Exception as ex:
             logger.info("Failed to notify new wire item for Agenda watches")
             logger.exception(ex)

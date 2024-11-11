@@ -37,7 +37,7 @@ PublishHandlerFunc = Callable[[dict[str, Any]], Awaitable[None]]
 async def handle_publish_event(item):
     orig = await AgendaItemService().find_by_id(item["guid"])
     event_id = await publisher.publish_event(item, orig.to_dict() if orig else None)
-    notify_new_agenda_item.delay(event_id, check_topics=True, is_new=orig is None)
+    await notify_new_agenda_item.delay(event_id, check_topics=True, is_new=orig is None)
 
 
 async def handle_publish_planning(item):
@@ -49,7 +49,7 @@ async def handle_publish_planning(item):
 
     # Prefer parent Event when sending notificaitons
     _id = event_id or plan_id
-    notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
+    await notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
 
 
 async def handle_publish_text_item(item):
@@ -57,7 +57,7 @@ async def handle_publish_text_item(item):
     item["_id"] = await publisher.publish_item(item, orig.to_dict() if orig else None)
 
     if not item.get("nextversion"):
-        notify_new_wire_item.delay(
+        await notify_new_wire_item.delay(
             item["_id"], check_topics=orig is None or get_app_config("WIRE_NOTIFICATIONS_ON_CORRECTIONS")
         )
 
