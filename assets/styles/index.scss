@@ -1659,6 +1659,21 @@ article.list {
     }
 }
 
+.popup-text--label {
+    font-size: 0.875rem;
+    color: var(--color-text--muted);
+    line-height: 1.2;
+    margin-inline-end: 8px;
+}
+
+.popup-text--info {
+    font-size: 0.875rem;
+    color: var(--color-text--muted);
+    line-height: 1.2;
+    letter-spacing: 0.02rem;
+    margin: 0;
+}
+
 .text-break {
     overflow-wrap: break-word;
     word-break: break-word;

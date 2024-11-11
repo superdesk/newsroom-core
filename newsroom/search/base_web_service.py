@@ -1,5 +1,6 @@
 from typing import Generic, Any
 import logging
+from copy import deepcopy
 
 from bson import ObjectId
 
@@ -94,7 +95,10 @@ class BaseWebSearchService(
                 request.products = await get_products_by_navigation_async(topic.navigation)
 
         search_request = NewshubSearchRequest(
-            section=self.section, web_request=None, args=args or self.search_args_class(), search=query or ESQuery()
+            section=self.section,
+            web_request=None,
+            args=args or self.search_args_class(),
+            search=deepcopy(query) if query is not None else ESQuery(),
         )
 
         prefill_filter_params: list[SearchFilterFunction] = [
@@ -178,7 +182,8 @@ class BaseWebSearchService(
 
             queried_topics: list[TopicResourceModel] = []
             for topic in topics:
-                if topic.user is None or topic.user != user.id:
+                topic_subscribers = {subscriber.user_id for subscriber in topic.subscribers or []}
+                if user.id not in topic_subscribers and topic.user != user.id:
                     continue
                 elif topic.id in topics_checked:
                     continue

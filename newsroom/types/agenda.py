@@ -5,6 +5,7 @@ from enum import Enum, unique
 from pydantic import Field, field_validator, model_validator
 
 from superdesk.core.resources import ResourceModel, fields, dataclass, ModelWithVersions
+from superdesk.utc import utcnow
 from content_api.items.model import Place, CVItemWithCode, CVItem, PubStatusType
 
 
@@ -149,8 +150,8 @@ class AgendaPlanningItem:
     state: fields.Keyword
     pubstatus: Annotated[PubStatusType | None, fields.keyword_mapping()] = None
     time_to_be_confirmed: Annotated[bool, Field(alias="_time_to_be_confirmed")] = False
-    firstcreated: datetime = Field(default_factory=datetime.now)
-    versioncreated: datetime = Field(default_factory=datetime.now)
+    firstcreated: datetime = Field(default_factory=utcnow)
+    versioncreated: datetime = Field(default_factory=utcnow)
     language: fields.Keyword | None = None
     source: fields.Keyword | None = None
     name: fields.Keyword | None = None
@@ -205,8 +206,8 @@ class AgendaItem(ResourceModel, ModelWithVersions):
     definition_long: fields.HTML | None = None
     description_text: fields.HTML | None = None
     headline: fields.HTML | None = None
-    firstcreated: datetime = Field(default_factory=datetime.now)
-    versioncreated: datetime = Field(default_factory=datetime.now)
+    firstcreated: datetime = Field(default_factory=utcnow)
+    versioncreated: datetime = Field(default_factory=utcnow)
     version: int | None = None
     ednote: fields.HTML | None = None
     registration_details: str | None = None

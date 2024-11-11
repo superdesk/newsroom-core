@@ -23,8 +23,10 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
-import {IDateFilter} from 'interfaces/common';
+import {IDateFilters} from 'interfaces/common';
 import {ToolTip} from 'ui/components/ToolTip';
+import {ICreatedFilter} from 'interfaces/search';
+import {Popup} from 'ui/components/Popover';
 
 interface ISortOption {
     label: string;
@@ -73,6 +75,7 @@ interface IOwnProps {
     showTotalLabel?: boolean;
     showSaveTopic?: boolean;
     showSortDropdown?: boolean;
+    showDefaultTimeframeLabel?: boolean;
     totalItems?: number;
     activeTopic: ITopic;
     topicType: ITopic['topic_type'];
@@ -83,7 +86,8 @@ interface IOwnProps {
     onClearAll?(): void;
     setQuery(query: string): void;
     setSortQuery(query: ISearchSortValue): void;
-    dateFilters?: IDateFilter
+    dateFilters?: IDateFilters;
+    activeDateFilter?: ICreatedFilter;
 }
 
 type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
@@ -187,6 +191,8 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         const sortOptions = this.props.sortOptions || defaultSortOptions;
         const selectedSortOption = sortOptions.find((option) => option.value === (this.props.searchParams.sortQuery || ''));
 
+        const defaultDateFilter = this.props.dateFilters?.find(dateFilter => dateFilter.default === true);
+
         return (
             <React.Fragment>
                 <div
@@ -196,13 +202,62 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                     {!this.props.showTotalItems ? null : (
                         <div className="navbar navbar--flex line-shadow-end--light navbar--search-results">
                             {!this.props.showTotalItems ? null : (
-                                <div className="search-result-count">
-                                    {this.props.totalItems === 1 ?
-                                        gettext('1 result') :
-                                        gettext('{{ count }} results', {
-                                            count: numberFormatter.format(this.props.totalItems || 0)
-                                        })
-                                    }
+                                <div>
+                                    <div className="search-result-count">
+                                        {this.props.totalItems === 1 ?
+                                            gettext('1 result') :
+                                            gettext('{{ count }} results', {
+                                                count: numberFormatter.format(this.props.totalItems || 0)
+                                            })
+                                        }
+                                    </div>
+                                    {this.props.showDefaultTimeframeLabel && (() => {
+                                        if (!(this.props.activeDateFilter?.date_filter == null && defaultDateFilter?.name != null)) {
+                                            return null;
+                                        }
+                                        const dateFilterName = defaultDateFilter.name;
+
+                                        return (
+                                            <span className='d-flex align-items-center'>
+                                                <span className='popup-text--label'>{dateFilterName}</span>
+    
+                                                <Popup
+                                                    placement='right'
+                                                    component={({closePopup}) => (
+                                                        <div className='p-1'>
+                                                            <div className='d-flex justify-content-end'>
+                                                                <button
+                                                                    type="button"
+                                                                    className="icon-button icon-button--secondary icon-button--small"
+                                                                    aria-label={gettext('Close')}
+                                                                    onClick={closePopup}
+                                                                >
+                                                                    <i className="icon--close-thin" />
+                                                                </button>
+                                                            </div>
+                                                            <div className='pb-3 ps-3 pe-3'>
+                                                                <p className='popup-text--info'>
+                                                                    {gettext(
+                                                                        'The initial search is limited to the {{dateFilterName}}. Please find different date ranges in the filter panel using the burger menu.',
+                                                                        {dateFilterName: dateFilterName},
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                >
+                                                    {
+                                                        (togglePopup) => (
+                                                            <i
+                                                                className="icon--info icon--info--smaller"
+                                                                onClick={togglePopup}
+                                                            />
+                                                        )
+                                                    }
+                                                </Popup>
+                                            </span>
+                                        );
+                                    })()}
                                 </div>
                             )}
                             <div className="navbar__button-group">
@@ -299,6 +354,7 @@ const mapStateToProps = (state: IAgendaState) => ({
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(state.context),
     dateFilters: state.dateFilters,
+    activeDateFilter: state.search.createdFilter
 });
 
 const mapDispatchToProps = {

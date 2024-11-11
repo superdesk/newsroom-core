@@ -67,11 +67,14 @@ def to_json(value):
     return htmlsafe_json_dumps(obj=value, dumps=app.json_encoder().dumps)
 
 
-def parse_date(datetime):
+def parse_date(datetime: str | datetime) -> datetime:
     """Return datetime instance for datetime."""
     if isinstance(datetime, str):
         try:
-            return str_to_date(datetime)
+            parsed = str_to_date(datetime)
+            if not parsed:
+                raise ValueError()
+            return parsed
         except ValueError:
             return arrow.get(datetime).datetime
     return datetime

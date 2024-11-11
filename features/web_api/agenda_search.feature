@@ -21,7 +21,8 @@ Feature: Agenda Search
                 {"code": "NSW", "name": "New South Wales"}
             ],
             "anpa_category": [
-                {"qcode": "a", "name": "Australian General News"}
+                {"qcode": "e", "name": "Entertainment"},
+                {"qcode": "f", "name": "Finance"}
             ],
             "location": [{
                 "name": "Sydney Harbour Bridge",
@@ -60,7 +61,8 @@ Feature: Agenda Search
             ],
             "urgency": 3,
             "anpa_category": [
-                {"qcode": "e", "name": "Entertainment"}
+                {"qcode": "e", "name": "Entertainment"},
+                {"qcode": "f", "name": "Finance"}
             ],
             "coverages": [{
                 "coverage_id": "plan1_cov1",
@@ -104,7 +106,8 @@ Feature: Agenda Search
             ],
             "urgency": 3,
             "anpa_category": [
-                {"qcode": "e", "name": "Entertainment"}
+                {"qcode": "e", "name": "Entertainment"},
+                {"qcode": "f", "name": "Finance"}
             ],
             "coverages": [{
                 "coverage_id": "plan2_cov1",
@@ -150,7 +153,11 @@ Feature: Agenda Search
                     "label": "Planned",
                     "qcode": "ncostat:int"
                 }
-            }]
+            }],
+            "anpa_category": [
+                {"qcode": "e", "name": "Entertainment"},
+                {"qcode": "f", "name": "Finance"}
+            ]
         }
         """
 
@@ -183,7 +190,7 @@ Feature: Agenda Search
             "place": ["New South Wales", "Victoria"],
             "coverage.coverage_type": ["text", "photo"],
             "urgency": [3],
-            "service": ["Australian General News", "Entertainment"],
+            "service": ["Entertainment", "Finance"],
             "event_type.event_type_filtered.event_type": ["Sports"],
             "sttdepartment.sttdepartment_filtered.sttdepartment": ["Dep1", "Dep2", "Dep3"],
             "sttsubj.sttsubj_filtered.sttsubj": ["Sub1", "Sub2"]
@@ -364,3 +371,8 @@ Feature: Agenda Search
         """
         ["helsinki_event1"]
         """
+
+    @auth @admin
+    Scenario: Search should not match planning items (CPCN-666)
+        When we get "/agenda/search?q=NOT service.name:Finance NOT service.name:Entertainment&date_from=2018-05-28"
+        Then we get list with 0 items

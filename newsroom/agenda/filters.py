@@ -1,5 +1,6 @@
 from typing import Any, Annotated
 from datetime import datetime
+import re
 
 from pydantic import field_validator, Field, AliasChoices
 
@@ -199,7 +200,28 @@ def apply_item_type_filter(request: NewshubSearchRequest[AgendaSearchRequestArgs
         )
 
 
-def planning_items_query_string(query, fields=None):
+def planning_items_query_string(query: str, fields: list[str] | None = None, nested: bool = False) -> QueryStringQuery:
+    if nested:
+        # when searching nested planning items we need to prefix field names
+        # in query with `planning_items.` otherwise it will never match in nested
+        # field and negative queries eg. NOT service.name:Sport will match all
+        # nested planning items
+        query = re.sub(
+            r"""\b(
+                service\.name|
+                service\.code|
+                subject\.name|
+                subject\.code|
+                headline|
+                slugline|
+                description_text|
+                guid
+            ):""",
+            r"planning_items.\1:",
+            query,
+            flags=re.VERBOSE,
+        )
+
     return query_string(query, fields=fields or ["planning_items.*"])
 
 
@@ -258,7 +280,7 @@ def apply_agenda_query_string(request: NewshubSearchRequest[AgendaSearchRequestA
                             query,
                             nested_query(
                                 "planning_items",
-                                planning_items_query_string(request.args.q),
+                                planning_items_query_string(request.args.q, nested=True),
                                 name="query",
                             ),
                         ],
