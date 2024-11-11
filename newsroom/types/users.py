@@ -3,7 +3,6 @@ from datetime import datetime, date
 import pytz
 from pydantic import Field
 
-# from pydantic.dataclasses import dataclass
 from typing import Annotated, List, Optional
 from dataclasses import asdict
 from quart_babel import lazy_gettext
@@ -12,7 +11,6 @@ from superdesk.core import get_app_config
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import dataclass
 from superdesk.core.resources.validators import (
-    validate_minlength,
     validate_email,
     validate_iunique_value_async,
     validate_data_relation_async,
@@ -124,6 +122,6 @@ class UserResourceModel(NewshubResourceModel):
 
 
 class UserAuthResourceModel(UserResourceModel):
-    password: Optional[Annotated[str, validate_minlength(8)]] = None
-    token: Optional[str] = None
-    token_expiry_date: Optional[datetime] = None
+    password: str | None = None
+    token: str | None = None
+    token_expiry_date: datetime | None = None

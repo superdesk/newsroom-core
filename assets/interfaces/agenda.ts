@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
-import {IFilterGroup, IOccurStatus, ISingleItemAction, IResourceItem, ISection, ISubject, TDatetime, IDateFilter} from './common';
+import {IFilterGroup, IOccurStatus, ISingleItemAction, IResourceItem, ISection, ISubject, TDatetime, IDateFilters} from './common';
 import {IAgendaUIConfig} from './configs';
 import {IUser, IUserType} from './user';
 import {ITopic, ITopicFolder} from './topic';
@@ -313,7 +313,7 @@ export interface IAgendaState {
     };
     errors?: {[field: string]: Array<string>};
     loadingAggregations?: boolean;
-    dateFilters?: IDateFilter
+    dateFilters?: IDateFilters;
 }
 
 export type AgendaGetState = () => IAgendaState;

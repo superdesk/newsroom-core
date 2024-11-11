@@ -47,6 +47,7 @@ async def test_item_notification_template(client, app, mocker):
 
     sub.assert_called_with(
         to=[user["email"]],
+        cc=None,
         subject="New story for followed topic: Topic",
         sender_name=None,
         text_body=await render_template_string(

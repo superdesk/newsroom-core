@@ -44,6 +44,7 @@ def query_resource(
     req.max_results = max_results
     req.sort = sort
     req.projection = json.dumps(projection) if projection else None
+    req.args = {}
     cursor, count = get_current_app().data.find(resource, req, lookup, perform_count=False)
     return cursor
 

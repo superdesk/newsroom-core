@@ -1,3 +1,4 @@
+from superdesk.core import get_app_config
 from newsroom.types import UserResourceModel, AgendaItem
 from newsroom.email import send_template_email, send_user_email
 from newsroom.utils import (
@@ -83,6 +84,9 @@ async def send_coverage_request_email(user: UserResourceModel, message: str, ite
     name = f"{user.first_name} {user.last_name}"
     email = user.email
 
+    # send coverage request email copy to current User.
+    cc = [email] if get_app_config("COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER") else []
+
     item_name = item.name or item.slugline
     user_company = await user.get_company()
     company_name = user_company.name if user_company else None
@@ -100,6 +104,7 @@ async def send_coverage_request_email(user: UserResourceModel, message: str, ite
 
     await send_template_email(
         to=recipients,
+        cc=cc,
         template="coverage_request_email",
         template_kwargs=template_kwargs,
     )

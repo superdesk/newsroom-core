@@ -69,11 +69,16 @@ def get_admin_user_id(app):
     return (get_resource_service("users").find_one(req=None, _id=ADMIN_USER_ID) or {}).get("_id")
 
 
-def mock_send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=[]):
+def mock_send_email(
+    to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=[]
+):
     if sender is None:
         sender = get_app_config("MAIL_DEFAULT_SENDER")
 
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to)
+    if cc is None:
+        cc = []
+
+    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, cc=cc)
     msg.body = text_body
     msg.html = html_body
     msg.attachments = [a["file_name"] for a in attachments_info]

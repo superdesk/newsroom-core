@@ -1115,3 +1115,40 @@ async def test_matching_topics_when_disabling_section(client, app):
         item["guid"], topics, list(users.values()), companies
     )
     assert set() == matching
+
+
+# CPCN-967
+async def test_global_topic_after_deleting_user(client, app):
+    await add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "All",
+                "query": "*:*",
+                "is_enabled": True,
+                "product_type": "wire",
+            }
+        ],
+    )
+
+    await client.post("/push", json=item)
+
+    users = await get_user_dict_async(use_globals=False)
+    companies = await get_company_dict_async(use_globals=False)
+    topic_id = ObjectId()
+    topic = TopicResourceModel.from_dict(
+        dict(
+            _id=topic_id,
+            _created=None,
+            label="All Wire",
+            query="*:*",
+            user=None,
+            topic_type=SectionEnum.WIRE,
+            subscribers=[{"user_id": TEST_USER_ID, "notification_type": "real-time"}],
+        )
+    )
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
+        item["guid"], [topic], list(users.values()), companies
+    )
+    assert matching == {topic_id}
