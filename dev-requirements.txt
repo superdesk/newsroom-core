@@ -245,7 +245,7 @@ lxml==5.2.2
     #   superdesk-core
     #   svglib
     #   xmlsec
-lxml-html-clean==0.2.2
+lxml-html-clean==0.3.1
     # via superdesk-core
 markupsafe==3.0.2
     # via
@@ -416,11 +416,11 @@ quart-wtforms==1.0.3
     # via -r /home/marklark/dev/sourcefabric/instances/async/newsroom-core/requirements.txt
 raven[flask]==6.10.0
     # via superdesk-core
-redis==5.0.8
+redis==5.1.1
     # via
     #   celery
     #   superdesk-core
-regex==2024.7.24
+regex==2024.9.11
     # via superdesk-core
 reportlab==4.2.5
     # via
@@ -560,7 +560,7 @@ webencodings==0.5.1
     #   cssselect2
     #   html5lib
     #   tinycss2
-websockets==13.0.1
+websockets==13.1
     # via superdesk-core
 werkzeug==3.1.3
     # via
