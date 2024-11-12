@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, debounce} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext, getConfig} from 'utils';
 import server from 'server';
 import {KEYS} from 'common';
 
@@ -315,9 +315,9 @@ export class LocationFilter extends React.Component<any, any> {
      */
     renderRegionSearchResult(item: any, index: any) {
         const {selectedIndex} = this.state;
-
-        if (item.type === LOCATION_TYPE.CITY) {
-            return (
+        const enabledOptions = getConfig('calendar_location_filter_options');
+        if (item.type === LOCATION_TYPE.CITY && enabledOptions.city) {
+            return(
                 <button
                     key={`city.${item.name}[${index}]`}
                     data-item-index={index}
@@ -336,7 +336,8 @@ export class LocationFilter extends React.Component<any, any> {
                     })}
                 </button>
             );
-        } else if (item.type === LOCATION_TYPE.STATE) {
+        } else if (item.type === LOCATION_TYPE.STATE && enabledOptions.state) {
+            const stateLabel = getConfig('location_state_display_label');
             return (
                 <button
                     key={`state.${item.name}[${index}]`}
@@ -349,13 +350,14 @@ export class LocationFilter extends React.Component<any, any> {
                     )}
                     onClick={() => this.onChange(item)}
                 >
-                    {gettext('{{ name }} (State, {{ country }})', {
+                    {gettext('{{ name }} ({{ label }}, {{ country }})', {
                         name: item.name,
+                        label: stateLabel,
                         country: item.country,
                     })}
                 </button>
             );
-        } else if (item.type === LOCATION_TYPE.COUNTRY) {
+        } else if (item.type === LOCATION_TYPE.COUNTRY && enabledOptions.country) {
             return (
                 <button
                     key={`country.${item.name}[${index}]`}
@@ -371,7 +373,7 @@ export class LocationFilter extends React.Component<any, any> {
                     {gettext('{{ name }} (Country)', {name: item.name})}
                 </button>
             );
-        } else {
+        } else if (enabledOptions.places && !['city', 'state', 'country'].includes(item.type)) {
             const results = this.state.results;
 
             return (
@@ -389,6 +391,8 @@ export class LocationFilter extends React.Component<any, any> {
                     {item}
                 </button>
             );
+        } else {
+            return null;
         }
     }
 
@@ -432,6 +436,7 @@ export class LocationFilter extends React.Component<any, any> {
     render() {
         const activeFilter = get(this.props, 'activeFilter.location') || {};
         const isActive = activeFilter.type != null;
+        const isPlaceEnabled = getConfig('calendar_location_filter_options').places;
 
         return (
             <div
@@ -522,17 +527,21 @@ export class LocationFilter extends React.Component<any, any> {
                                         </button>
                                     )}
 
-                                    <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
-                                    {this.state.results.places.length > 0 ? (
-                                        this.state.results.places.map(this.renderRegionSearchResult)
-                                    ) : (
-                                        <button
-                                            key="empty-places"
-                                            className="dropdown-item disabled"
-                                            disabled={true}
-                                        >
-                                            {gettext('No places found')}
-                                        </button>
+                                    {isPlaceEnabled && (
+                                        <>
+                                            <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
+                                            {this.state.results.places.length > 0 ? (
+                                                this.state.results.places.map(this.renderRegionSearchResult)
+                                            ) : (
+                                                <button
+                                                    key="empty-places"
+                                                    className="dropdown-item disabled"
+                                                    disabled={true}
+                                                >
+                                                    {gettext('No places found')}
+                                                </button>
+                                            )}
+                                        </>
                                     )}
                                 </React.Fragment>
                             )}

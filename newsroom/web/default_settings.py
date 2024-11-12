@@ -399,6 +399,13 @@ CLIENT_CONFIG = {
     },
     "agenda_sort_events_with_coverage_on_top": False,
     "collapsed_search_by_default": False,
+    "calendar_location_filter_options": {
+        "city": True,
+        "state": True,
+        "country": True,
+        "place": True,
+    },
+    "location_state_display_label": "State",
 }
 
 # Enable rendering of the date in the base view

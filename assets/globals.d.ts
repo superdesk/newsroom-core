@@ -65,6 +65,8 @@ interface IClientConfig {
     show_user_register?: boolean;
     multimedia_website_search_url?: string;
     show_default_time_frame_label?: boolean;
+    calendar_location_filter_options?:{city: boolean, state: boolean, country: boolean, place:boolean};
+    location_state_display_label?:boolean;
 }
 
 interface Window {
