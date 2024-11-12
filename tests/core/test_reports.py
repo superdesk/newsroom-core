@@ -8,8 +8,8 @@ from tests.core.utils import create_entries_for
 
 @fixture(autouse=True)
 async def init(app):
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId("5cc94454bc43165c045ffec0"),
@@ -36,7 +36,7 @@ async def init(app):
             },
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -55,7 +55,7 @@ async def init(app):
             },
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -174,7 +174,7 @@ async def test_product_companies(client):
 
 
 async def test_expired_companies(client, app):
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -207,24 +207,22 @@ async def test_companies(client):
     assert report["results"][2]["name"] == "Paper Co."
 
 
-# TODO-ASYNC :- Needs async reports Resource
+async def test_content_activity_csv(client):
+    today = datetime.now().date()
+    resp = await client.get(
+        "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
+            today.isoformat(), today.isoformat()
+        )
+    )
+    assert 200 == resp.status_code
 
-# async def test_content_activity_csv(client):
-#     today = datetime.now().date()
-#     resp = await client.get(
-#         "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
-#             today.isoformat(), today.isoformat()
-#         )
-#     )
-#     assert 200 == resp.status_code
+    report = await resp.get_data(as_text=True)
+    lines = report.splitlines()
+    assert len(lines) > 1
 
-#     report = await resp.get_data(as_text=True)
-#     lines = report.splitlines()
-#     assert len(lines) > 1
+    fields = lines[0].split(",")
+    assert "Headline" == fields[1]
 
-#     fields = lines[0].split(",")
-#     assert "Headline" == fields[1]
-
-#     values = lines[1].split(",")
-#     assert "Amazon Is Opening More Bookstores" == values[1]
-#     assert "0" == values[-1]
+    values = lines[1].split(",")
+    assert "Amazon Is Opening More Bookstores" == values[1]
+    assert "0" == values[-1]

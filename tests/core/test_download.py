@@ -18,6 +18,7 @@ from ..fixtures import (  # noqa: F401
 )
 from .test_push import upload_binary
 from newsroom.history_async import HistoryService
+from tests.core.utils import update_entries_for
 
 items_ids = [item["_id"] for item in items[:2]]
 item = items[:2][0]
@@ -138,7 +139,7 @@ async def setup_image(client, app):
             },
         }
     }
-    app.data.update("items", item["_id"], {"associations": associations}, item)
+    await update_entries_for("items", item["_id"], {"associations": associations}, item)
 
 
 async def test_download_single(client, app):

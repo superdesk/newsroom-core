@@ -83,12 +83,15 @@ def handle_long_lines_html(html):
 
 
 @celery.task(soft_time_limit=120)
-def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
+def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
     if attachments_info is None:
         attachments_info = []
 
     if sender is None:
         sender = get_app_config("MAIL_DEFAULT_SENDER")
+
+    if cc is None:
+        cc = []
 
     if sender_name is not None:
         sender = (sender_name, sender)
@@ -101,14 +104,16 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
         except Exception as e:
             logger.error("Error attaching {} file to mail. Receipient(s): {}. Error: {}".format(a["file_desc"], to, e))
 
-    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
+    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, cc=cc, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = get_current_app().as_any()
     return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
+async def send_email(
+    to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None
+):
     """
     Sends the email
     :param to: List of recipients
@@ -121,6 +126,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
 
     kwargs = {
         "to": to,
+        "cc": cc,
         "subject": subject,
         "text_body": handle_long_lines_text(text_body) if text_body else None,
         "html_body": handle_long_lines_html(html_body) if html_body else None,
@@ -128,7 +134,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
         "sender_name": sender_name or get_app_config("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
-    _send_email.apply_async(kwargs=kwargs)
+    await _send_email.apply_async(kwargs=kwargs)
 
 
 async def send_new_signup_email(company: Company, user: User, is_new_company: bool):
@@ -252,12 +258,13 @@ async def send_template_email(
     to: List[str],
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
+    cc: Optional[List[str]] = None,
     **kwargs: EmailKwargs,
 ) -> None:
     """Send email to list of recipients using default locale."""
     language = get_app_config("DEFAULT_LANGUAGE")
     timezone = get_app_config("DEFAULT_TIMEZONE")
-    await _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs)
+    await _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs, cc)
 
 
 async def _send_localized_email(
@@ -267,6 +274,7 @@ async def _send_localized_email(
     timezone: str,
     template_kwargs: TemplateKwargs,
     email_kwargs: EmailKwargs,
+    cc: Optional[List[str]] = None,
 ) -> None:
     language = to_email_language(language)
     email_templates = get_resource_service("email_templates")
@@ -280,8 +288,9 @@ async def _send_localized_email(
         text_body = await render_template(text_template, **template_kwargs)
         html_body = await render_template(html_template, **template_kwargs)
 
-        send_email(
+        await send_email(
             to=to,
+            cc=cc,
             subject=subject,
             text_body=text_body,
             html_body=html_body,
@@ -511,7 +520,7 @@ async def _send_wire_killed_notification_email(user: UserResourceModel, item: di
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    await send_email(to=recipients, subject=subject, text_body=text_body)
 
 
 async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
@@ -520,7 +529,7 @@ async def _send_agenda_killed_notification_email(user: UserResourceModel, item: 
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    await send_email(to=recipients, subject=subject, text_body=text_body)
 
 
 def to_text(output: Union[str, bytes]) -> str:

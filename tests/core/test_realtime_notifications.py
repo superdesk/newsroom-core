@@ -8,13 +8,12 @@ from bson import ObjectId
 from newsroom.push.tasks import notify_new_agenda_item, notify_new_wire_item
 from superdesk.utc import utcnow
 
-from newsroom.tests import markers
 from newsroom.users import UsersService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.notifications import NotificationsService
 from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from newsroom.tests.users import ADMIN_USER_ID
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 from ..utils import mock_send_email
 
@@ -45,7 +44,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
             # we want only products which will filter out everything
             continue
         updates = {"navigations": [navigations[0]["_id"]]}
-        app.data.update("products", product["_id"], updates, product)
+        await update_entries_for("products", product["_id"], updates, product)
 
     await create_entries_for(
         "topics",
@@ -214,7 +213,7 @@ async def test_realtime_notifications_agenda(app, mocker):
 
     topic_id = ObjectId()
 
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -227,13 +226,13 @@ async def test_realtime_notifications_agenda(app, mocker):
         ],
     )
 
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company
-    app.data.update(
+    await update_entries_for(
         "companies", company["_id"], {"products": [{"_id": topic_id, "seats": 0, "section": "agenda"}]}, company
     )
 
-    app.data.insert(
+    await create_entries_for(
         "agenda",
         [
             {
@@ -279,12 +278,14 @@ async def test_realtime_notifications_agenda(app, mocker):
 
 
 async def test_realtime_notifications_agenda_reccuring_event(app):
-    app.data.insert(
+    await create_entries_for(
         "agenda",
         [
             {
                 "_id": "event_id_1",
                 "type": "agenda",
+                "item_type": "event",
+                "state": "scheduled",
                 "versioncreated": utcnow(),
                 "name": "cheese event",
                 "dates": {
@@ -296,6 +297,8 @@ async def test_realtime_notifications_agenda_reccuring_event(app):
             {
                 "_id": "event_id_2",
                 "type": "agenda",
+                "item_type": "event",
+                "state": "scheduled",
                 "versioncreated": utcnow(),
                 "name": "another event",
                 "dates": {
@@ -320,24 +323,26 @@ async def test_realtime_notifications_agenda_reccuring_event(app):
         assert notifier.notify_new_item.call_count == 2
 
 
-@markers.requires_async_celery
+# @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_pause_notifications(app, mocker, company_products):
-    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
     updates = {
         "notification_schedule": dict(
             pause_from=(datetime.now() - timedelta(days=1)).date().isoformat(),
             pause_to=(datetime.now() + timedelta(days=1)).date().isoformat(),
         )
     }
-    app.data.update("users", user["_id"], updates, user)
+    await update_entries_for("users", user["_id"], updates, user)
 
-    app.data.insert(
+    await create_entries_for(
         "agenda",
         [
             {
                 "_id": "event_id_1",
                 "type": "agenda",
+                "item_type": "event",
+                "state": "scheduled",
                 "versioncreated": utcnow(),
                 "name": "cheese event",
                 "dates": {
@@ -348,7 +353,7 @@ async def test_pause_notifications(app, mocker, company_products):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {

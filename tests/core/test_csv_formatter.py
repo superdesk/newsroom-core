@@ -1,7 +1,7 @@
 from .test_push_events import test_event
 import copy
-from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import CSVFormatter
+from tests.core.utils import find_one_by_id
 import csv
 
 
@@ -31,12 +31,12 @@ event["subject"] = [
     {"name": "Statistics & Economic Indicators", "qcode": "150", "scheme": "event_types", "code": "150"},
     {"name": "Economic Indicators", "qcode": "3", "scheme": "categories", "code": "3"},
     {
-        "name": None,
+        "name": "custom something",
         "qcode": "20001237",
         "parent": "08000000",
-        "iptc_subject": None,
-        "ap_subject": None,
-        "in_jimi": False,
+        # "iptc_subject": None,
+        # "ap_subject": None,
+        # "in_jimi": False,
         "translations": {"name": {"en-CA": "anniversary", "fr-CA": None}},
         "scheme": "subject_custom",
         "code": "20001237",
@@ -49,7 +49,7 @@ formatter = CSVFormatter()
 
 def read_csv(data):
     csv_data = formatter.format_item(data, item_type="agenda")
-    csv_string = csv_data.decode("utf-8")
+    csv_string = csv_data.decode("utf-8-sig")
     csv_lines = csv_string.split("\n")
     csv_reader = csv.reader(csv_lines)
     header = next(csv_reader)
@@ -58,8 +58,9 @@ def read_csv(data):
 
 
 async def test_csv_formatter_item(client, app):
-    await client.post("/push", json=event)
-    parsed = get_entity_or_404(event["guid"], "agenda")
+    response = await client.post("/push", json=event)
+    print(await response.get_data(as_text=True))
+    parsed = await find_one_by_id("agenda", event["guid"])
 
     assert formatter.format_filename(parsed).endswith("new-press-conference.csv")
 
@@ -139,7 +140,7 @@ async def test_csv_formatter_item(client, app):
         ],
     }
     await client.post("/push", json=event2)
-    parsed = get_entity_or_404(event2["guid"], "agenda")
+    parsed = await find_one_by_id("agenda", event2["guid"])
 
     assert formatter.format_filename(parsed).endswith("latest-press-conference.csv")
     # update config

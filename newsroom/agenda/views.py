@@ -1,334 +1,403 @@
-import json
-from typing import Dict
+from typing import Annotated, Any, cast
+from asyncio import gather
 
 from bson import ObjectId
+from pydantic import Field, field_validator
 from quart_babel import gettext
-from eve.methods.get import get_internal
-from eve.render import send_response
-from eve.utils import ParsedRequest
 
-from newsroom.search.types import NewshubSearchRequest
-from newsroom.wire.filters import WireSearchRequestArgs
 from superdesk.core import get_app_config, get_current_app
-from superdesk.core.types import ESQuery
-from superdesk.flask import request, render_template, abort, jsonify
-from superdesk import get_resource_service
+from superdesk.core.types import ESQuery, BaseModel, Request, Response, RestGetResponse
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
+from superdesk.flask import render_template
 
+from newsroom.types import AgendaItem, AgendaItemType, SectionEnum
+from newsroom.auth import auth_rules
 from newsroom.auth.utils import (
     get_user_from_request,
-    get_user_id_from_request,
     get_company_from_request,
     check_user_has_products,
 )
-from newsroom.agenda import blueprint
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 from newsroom.products import get_products_by_company
-from newsroom.topics import get_user_topics
+from newsroom.topics import get_user_topics_async
 from newsroom.topics_folders import get_company_folders, get_user_folders
 from newsroom.navigations import get_navigations
-from newsroom.decorator import login_required, section
+from newsroom.notifications import push_user_notification
+from newsroom.history_async import HistoryService
+from newsroom.search.types import NewshubSearchRequest
+from newsroom.search.config import merge_planning_aggs
+
+from newsroom.wire import WireSearchServiceAsync
+from newsroom.wire.utils import update_action_list
+from newsroom.wire.views import set_item_permission
+from newsroom.wire.filters import WireSearchRequestArgs
+
 from newsroom.utils import (
-    get_entity_or_404,
     is_json_request,
     get_json_or_400,
     get_agenda_dates,
     get_location_string,
     get_public_contacts,
     get_links,
-    get_vocabulary,
+    get_vocabulary_async,
     get_groups,
 )
-from newsroom.wire import WireSearchServiceAsync
-from newsroom.wire.utils import update_action_list
-from newsroom.wire.views import set_item_permission
-from newsroom.agenda.email import send_coverage_request_email
-from newsroom.agenda.service import FeaturedService
-from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
-from newsroom.notifications import push_user_notification
-from newsroom.search.config import merge_planning_aggs
-from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
-from newsroom.history_async import HistoryService
+
+from .email import send_coverage_request_email
+from .featured_service import FeaturedService
+from .utils import remove_fields_for_public_user, remove_restricted_coverage_info
+from .module import agenda_endpoints
+from .agenda_service import AgendaItemService
+from .agenda_search import AgendaSearchServiceAsync
+from .filters import AgendaSearchRequestArgs
 
 
-@blueprint.route("/agenda")
-@login_required
-@section("agenda")
-async def index():
+@agenda_endpoints.endpoint("/agenda", auth=[auth_rules.section_required("agenda")])
+async def index() -> str:
     user_profile_data = await get_user_profile_data()
     data = await get_view_data()
     return await render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
 
 
-@blueprint.route("/bookmarks_agenda")
-@login_required
-async def bookmarks():
+@agenda_endpoints.endpoint("/bookmarks_agenda")
+async def bookmarks() -> str:
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
     return await render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
-@blueprint.route("/agenda/<_id>")
-@login_required
-async def item(_id):
-    item = get_entity_or_404(_id, "agenda")
-    user_profile_data = await get_user_profile_data()
+class AgendaItemViewArgs(BaseModel):
+    item_id: Annotated[str, Field(alias="_id")]
+
+
+class AgendaItemParams(BaseModel):
+    print: bool = False
+    map: str | None = None
+    type: str = "agenda"
+
+    @field_validator("print", mode="before")
+    def parse_print(cls, value: str | bool | None) -> bool | str | None:
+        # Support this URL param as a toggle, if `print` is provided in the URL then it is `True`
+        return True if value == "" else value
+
+
+@agenda_endpoints.endpoint("/agenda/<_id>")
+async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Request) -> Response | str:
+    agenda_item = await AgendaItemService().find_by_id(args.item_id)
+    if not agenda_item:
+        await request.abort(404)
+
+    agenda_item_dict = agenda_item.to_dict()
     user = get_user_from_request(None)
     company = get_company_from_request(None)
     if not user.is_admin_or_internal():
-        remove_fields_for_public_user(item)
+        remove_fields_for_public_user(agenda_item_dict)
 
     if company and not user.is_admin() and company.events_only:
         # if the company has permission events only permission then
         # remove planning items and coverages.
-        if not item.get("event"):
+        if not agenda_item_dict.get("event"):
             # for adhoc planning items abort the request
-            abort(403)
+            return await request.abort(403)
 
-        item.pop("planning_items", None)
-        item.pop("coverages", None)
+        agenda_item_dict.pop("planning_items", None)
+        agenda_item_dict.pop("coverages", None)
 
     if company and company.restrict_coverage_info:
-        remove_restricted_coverage_info([item])
+        remove_restricted_coverage_info([agenda_item_dict])
 
     if is_json_request(request):
-        return jsonify(item)
+        return Response(agenda_item_dict)
 
-    if "print" in request.args:
-        map = request.args.get("map")
+    user_profile_data = await get_user_profile_data()
+    if params.print:
         template = "agenda_item_print.html"
-        update_action_list([_id], "prints", force_insert=True)
-        await HistoryService().create_history_record(
-            [item], "print", user.id, user.company, request.args.get("type", "agenda")
-        )
+        await update_action_list([args.item_id], "prints", force_insert=True)
+        await HistoryService().create_history_record([agenda_item_dict], "print", user.id, user.company, params.type)
         return await render_template(
             template,
-            item=item,
-            map=map,
-            dateString=get_agenda_dates(item),
-            location=get_location_string(item),
-            contacts=get_public_contacts(item),
-            links=get_links(item),
+            item=agenda_item_dict,
+            map=params.map,
+            dateString=get_agenda_dates(agenda_item_dict),
+            location=get_location_string(agenda_item_dict),
+            contacts=get_public_contacts(agenda_item_dict),
+            links=get_links(agenda_item_dict),
             is_admin=user.is_admin_or_internal(),
             user_profile_data=user_profile_data,
         )
 
     data = await get_view_data()
-    data["item"] = item
+    data["item"] = agenda_item_dict
     return await render_template(
         "agenda_index.html",
         data=data,
-        title=item.get("name", item.get("headline")),
+        title=agenda_item_dict.get("name", agenda_item_dict.get("headline")),
         user_profile_data=user_profile_data,
     )
 
 
-@blueprint.route("/agenda/search")
-@login_required
-@section("agenda")
-async def search():
-    if request.args.get("featured"):
-        date_from = request.args.get("date_from")
-        timezone_offset = int(request.args.get("timezone_offset", 0))
-        query_string = request.args.get("q")
-        filter_string = request.args.get("filter")
-        from_offset = int(request.args.get("from", 0))
+@agenda_endpoints.endpoint("/agenda/search", auth=[auth_rules.section_required("agenda")])
+async def search(args: None, params: AgendaSearchRequestArgs, request: Request) -> Response:
+    user = get_user_from_request(request)
+    company = get_company_from_request(None)
+    if params.featured:
+        if user.is_events_only_access(company):
+            return await request.abort(403)
+        elif params.start_date is None:
+            return await request.abort(400, gettext("No date specified."))
+
         response = await FeaturedService().get_featured_stories(
-            date_from, timezone_offset, query_string, filter_string, from_offset
+            params.start_date,
+            params.timezone_offset or 0,
+            params.q,
+            params.filter,
+            params.page or 0,
         )
-        return await send_response("agenda", response)
+        return Response(response)
 
-    response = await get_internal("agenda")
-    if len(response):
-        company = get_company_from_request(None)
-        if company and company.restrict_coverage_info:
-            remove_restricted_coverage_info(response[0].get("_items") or [])
-        if response[0].get("_aggregations"):
-            merge_planning_aggs(response[0]["_aggregations"])
-    return await send_response("agenda", response)
+    response = await AgendaSearchServiceAsync().process_web_request(request)
+    body: RestGetResponse = response.body
+
+    if len(body.get("_items") or []) and company and company.restrict_coverage_info:
+        remove_restricted_coverage_info(body["_items"])
+
+    if body.get("_aggregations"):
+        merge_planning_aggs(body["_aggregations"])
+
+    return response
 
 
-async def get_view_data() -> Dict:
+async def get_view_data() -> dict:
     user = get_user_from_request(None)
     user_dict = None if not user else user.to_dict()
     company = get_company_from_request(None)
     company_dict = None if not company else company.to_dict()
 
-    topics = await get_user_topics(user.id) if user else []
-    products = await get_products_by_company(company_dict, product_type="agenda") if company else []
+    # Helper function to provide an async function, otherwise ``gather`` fails with
+    # TypeError('An asyncio.Future, a coroutine or an awaitable is required')
+    async def empty_array():
+        return []
+
+    (
+        topics,
+        products,
+        navigations,
+        ui_config,
+        featured_count,
+        user_folders,
+        company_folders,
+        saved_items,
+        locators,
+    ) = await gather(
+        get_user_topics_async(user) if user else empty_array(),
+        get_products_by_company(company_dict, product_type=SectionEnum.AGENDA) if company else empty_array(),
+        get_navigations(user_dict, company_dict, "agenda"),
+        UiConfigResourceService().get_section_config("agenda"),
+        FeaturedService().count(),
+        get_user_folders(user, "agenda") if user else empty_array(),
+        get_company_folders(company, "agenda") if company else empty_array(),
+        AgendaSearchServiceAsync().get_saved_items_count(user, company),
+        get_vocabulary_async("locators"),
+    )
 
     check_user_has_products(user, products)
-    ui_config_service = UiConfigResourceService()
 
     return {
         "user": user_dict or {},
         "company": company.id if company else None,
-        "topics": [t for t in topics if t.get("topic_type") == "agenda"],
+        "topics": [t.to_dict() for t in topics if t.topic_type == "agenda"],
         "formats": [
             {"format": f["format"], "name": f["name"]}
             for f in get_current_app().as_any().download_formatters.values()
             if "agenda" in f["types"]
         ],
-        "navigations": await get_navigations(user_dict, company_dict, "agenda"),
-        "saved_items": get_resource_service("agenda").get_saved_items_count(),
+        "navigations": navigations,
+        "saved_items": saved_items,
         "events_only": company.events_only if company else False,
         "restrict_coverage_info": company.restrict_coverage_info if company else False,
-        "locators": get_vocabulary("locators"),
-        "ui_config": await ui_config_service.get_section_config("agenda"),
+        "locators": locators,
+        "ui_config": ui_config,
         "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company_dict),
-        "has_agenda_featured_items": await FeaturedService().count() > 0,
-        "user_folders": await get_user_folders(user, "agenda") if user else [],
-        "company_folders": await get_company_folders(company, "agenda") if company else [],
+        "has_agenda_featured_items": featured_count > 0,
+        "user_folders": user_folders,
+        "company_folders": company_folders,
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
     }
 
 
-@blueprint.route("/agenda/request_coverage", methods=["POST"])
-@login_required
-async def request_coverage():
+@agenda_endpoints.endpoint("/agenda/request_coverage", methods=["POST"])
+async def request_coverage(request: Request) -> Response:
     user = get_user_from_request(None)
     data = await get_json_or_400()
     assert data.get("item")
     assert data.get("message")
-    item = get_entity_or_404(data.get("item"), "agenda")
-    await send_coverage_request_email(user, data.get("message"), item)
-    return jsonify(), 201
+    agenda_item = await AgendaItemService().find_by_id(data.get("item"))
+    if not agenda_item:
+        return await request.abort(404)
+    await send_coverage_request_email(user, data.get("message"), agenda_item)
+    return Response("", 201)
 
 
-@blueprint.route("/agenda_bookmark", methods=["POST", "DELETE"])
-@login_required
-async def bookmark():
+@agenda_endpoints.endpoint("/agenda_bookmark", methods=["POST", "DELETE"])
+async def bookmark(request: Request) -> Response:
     data = await get_json_or_400()
     assert data.get("items")
-    update_action_list(data.get("items"), "bookmarks", item_type="agenda")
-    push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
-    return jsonify(), 200
+    await update_action_list(data.get("items"), "bookmarks", item_type="agenda")
+    item_count = await AgendaSearchServiceAsync().get_saved_items_count(
+        get_user_from_request(request),
+        get_company_from_request(request),
+    )
+    push_user_notification("saved_items", count=item_count)
+    return Response("")
 
 
-@blueprint.route("/agenda_watch", methods=["POST", "DELETE"])
-@login_required
-async def follow():
+class WatchAgendaParams(BaseModel):
+    bookmarks: bool = False
+
+
+@agenda_endpoints.endpoint("/agenda_watch", methods=["POST", "DELETE"])
+async def follow(args: None, params: WatchAgendaParams, request: Request) -> Response:
     data = await get_json_or_400()
     assert data.get("items")
-    user_id = get_user_id_from_request(None)
+    user = get_user_from_request(request)
+    company = get_company_from_request(request)
+
+    agenda_service = AgendaItemService()
+    cursor = await agenda_service.search({"_id": {"$in": data.get("items")}}, use_mongo=True)
+    agenda_items: dict[str, AgendaItem] = {agenda_item.id: agenda_item async for agenda_item in cursor}
+
     for item_id in data.get("items"):
-        item = get_entity_or_404(item_id, "agenda")
-        coverage_updates = {"coverages": item.get("coverages") or []}
+        agenda_item = agenda_items.get(item_id)
+        if not agenda_item:
+            return await request.abort(404)
+        coverage_updates = {"coverages": agenda_item.coverages or []}
+
         for c in coverage_updates["coverages"]:
-            if c.get("watches") and user_id in c["watches"]:
-                c["watches"].remove(user_id)
+            if c.watches and user.id in c.watches:
+                c.watches.remove(user.id)
 
         if request.method == "POST":
-            updates = {"watches": list(set((item.get("watches") or []) + [user_id]))}
-            if item.get("coverages"):
+            updates = {"watches": list(set((agenda_item.watches or []) + [user.id]))}
+
+            if agenda_item.coverages:
                 updates.update(coverage_updates)
 
-            get_resource_service("agenda").patch(item_id, updates)
+            await agenda_service.update(agenda_item.id, updates)
         else:
-            if request.args.get("bookmarks"):
-                user_item_watches = [u for u in (item.get("watches") or []) if str(u) == str(user_id)]
+            if params.bookmarks:
+                user_item_watches = [user_id for user_id in (agenda_item.watches or []) if user_id == user.id]
                 if not user_item_watches:
                     # delete user watches of all coverages
-                    get_resource_service("agenda").patch(item_id, coverage_updates)
-                    return jsonify(), 200
+                    await agenda_service.update(agenda_item.id, coverage_updates)
+                    return Response("")
 
-            update_action_list(data.get("items"), "watches", item_type="agenda")
+            await update_action_list(data.get("items"), "watches", item_type="agenda")
 
-    push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
-    return jsonify(), 200
+    item_count = await AgendaSearchServiceAsync().get_saved_items_count(user, company)
+    push_user_notification("saved_items", count=item_count)
+    return Response("")
 
 
-@blueprint.route("/agenda_coverage_watch", methods=["POST", "DELETE"])
-@login_required
-async def watch_coverage():
-    user_id = get_user_id_from_request(None)
+@agenda_endpoints.endpoint("/agenda_coverage_watch", methods=["POST", "DELETE"])
+async def watch_coverage(request: Request) -> Response:
+    user = get_user_from_request(request)
+    company = get_company_from_request(request)
     data = await get_json_or_400()
-    assert data.get("item_id")
+    item_id = data.get("item_id")
+    assert item_id
     assert data.get("coverage_id")
-    response = update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
-    push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
-    return response
+    agenda_item = await AgendaItemService().find_by_id(item_id)
+    if not agenda_item:
+        return Response({"error": gettext(f"Agenda item '{item_id}' not found")}, 404)
+
+    body, return_code = await _update_coverage_watch(
+        agenda_item, data["coverage_id"], user.id, add=request.method == "POST"
+    )
+    if return_code == 404:
+        return Response(body, 404)
+
+    item_count = await AgendaSearchServiceAsync().get_saved_items_count(user, company)
+    push_user_notification("saved_items", count=item_count)
+    return Response(body or "", return_code)
 
 
-def update_coverage_watch(item_id: str, coverage_id: str, user_id: ObjectId, add: bool, skip_associated: bool = False):
-    item = get_entity_or_404(item_id, "agenda")
+async def _update_coverage_watch(
+    agenda_item: AgendaItem, coverage_id: str, user_id: ObjectId, add: bool, skip_associated: bool = False
+) -> tuple[None, int] | tuple[dict[str, str], int]:
+    agenda_service = AgendaItemService()
 
-    if user_id in item.get("watches", []):
-        return (
-            jsonify({"error": gettext("Cannot edit coverage watch when watching parent item")}),
-            403,
-        )
+    if user_id in (agenda_item.watches or []):
+        return {"error": gettext("Cannot edit coverage watch when watching parent item")}, 403
 
     try:
-        coverage_index = [c["coverage_id"] for c in (item.get("coverages") or [])].index(coverage_id)
+        coverage_index = [c.coverage_id for c in (agenda_item.coverages or [])].index(coverage_id)
     except ValueError:
-        return jsonify({"error": gettext("Coverage not found")}), 404
+        return {"error": gettext(f"Coverage '{coverage_id}' not found on agenda item '{agenda_item.id}'")}, 404
 
-    updates = {"coverages": item["coverages"]}
-
+    updates = {"coverages": agenda_item.coverages}
     if add:
-        updates["coverages"][coverage_index]["watches"] = list(
-            set((updates["coverages"][coverage_index].get("watches") or []) + [user_id])
+        updates["coverages"][coverage_index].watches = list(
+            set((updates["coverages"][coverage_index].watches or []) + [user_id])
         )
     else:
         try:
-            updates["coverages"][coverage_index]["watches"].remove(user_id)
+            updates["coverages"][coverage_index].watches.remove(user_id)
         except Exception:
-            return jsonify({"error": gettext("Error removing watch.")}), 404
+            return {"error": gettext("Error removing watch.")}, 404
 
-    get_resource_service("agenda").patch(item_id, updates)
+    await agenda_service.update(agenda_item.id, updates)
 
     if skip_associated:
-        return jsonify(), 200
-    elif item.get("item_type") == "planning" and item.get("event_id"):
+        return None, 200
+    elif agenda_item.item_type == AgendaItemType.PLANNING and agenda_item.event_id:
         # Need to also update the parent Event's list of coverage watches
-        return update_coverage_watch(item["event_id"], coverage_id, user_id, add, skip_associated=True)
-    elif item.get("item_type") == "event":
+        event_item = await agenda_service.find_by_id(agenda_item.event_id)
+        if event_item:
+            return await _update_coverage_watch(event_item, coverage_id, user_id, add, skip_associated=True)
+
+        # return await _update_coverage_watch(agenda_item.event_id, coverage_id, user_id, add, skip_associated=True)
+    elif agenda_item.item_type == AgendaItemType.EVENT:
         # Need to also update the Planning item's list of coverage watches
-        return update_coverage_watch(
-            item["coverages"][coverage_index]["planning_id"],
-            coverage_id,
-            user_id,
-            add,
-            skip_associated=True,
-        )
+        planning_item = await agenda_service.find_by_id(agenda_item.coverages[coverage_index].planning_id)
+        if planning_item:
+            return await _update_coverage_watch(
+                planning_item,
+                coverage_id,
+                user_id,
+                add,
+                skip_associated=True,
+            )
 
-    return jsonify(), 200
+    return None, 200
 
 
-@blueprint.route("/agenda/wire_items/<wire_id>")
-@login_required
-async def related_wire_items(wire_id):
-    elastic = get_current_app().data._search_backend("agenda")
-    source = {}
-    must_terms = [{"term": {"coverages.delivery_id": {"value": wire_id}}}]
-    query = {
-        "bool": {"filter": must_terms},
-    }
+class RelatedWireUrlArgs(BaseModel):
+    wire_id: str
 
-    source.update({"query": {"nested": {"path": "coverages", "query": query}}})
-    internal_req = ParsedRequest()
-    internal_req.args = {"source": json.dumps(source)}
-    agenda_result, _ = elastic.find("agenda", internal_req, None)
 
-    if len(agenda_result.docs) == 0:
-        return (
-            jsonify({"error": gettext("%(section)s item not found", section=get_app_config("AGENDA_SECTION"))}),
-            404,
-        )
+@agenda_endpoints.endpoint("/agenda/wire_items/<wire_id>")
+async def related_wire_items(args: RelatedWireUrlArgs, params: None, request: Request) -> Response:
+    agenda_service = AgendaItemService()
+    query = {"bool": {"filter": [{"term": {"coverages.delivery_id": args.wire_id}}]}}
+    cursor = await agenda_service.search({"query": {"nested": {"path": "coverages", "query": query}}})
+    agenda_item = await cursor.next_raw()
+
+    if agenda_item is None:
+        return Response({"error": gettext("%(section)s item not found", section=get_app_config("AGENDA_SECTION"))}, 404)
 
     company = get_company_from_request(None)
     if company and company.restrict_coverage_info:
-        remove_restricted_coverage_info([agenda_result.docs[0]])
+        remove_restricted_coverage_info([agenda_item])
 
     wire_ids = []
-    for cov in agenda_result.docs[0].get("coverages") or []:
+    for cov in agenda_item.get("coverages") or []:
         if cov.get("coverage_type") == "text" and cov.get("delivery_id"):
             wire_ids.append(cov["delivery_id"])
 
     wire_search = WireSearchServiceAsync()
-    cursor = await wire_search.service.search({"bool": {"query": {"must": [{"terms": {"_id": wire_ids}}]}}})
-    wire_items = await cursor.to_list()
+    cursor = await wire_search.service.search({"query": {"bool": {"must": [{"terms": {"_id": wire_ids}}]}}})
 
     permissioned_result = await wire_search.search(
         NewshubSearchRequest(
@@ -346,24 +415,27 @@ async def related_wire_items(wire_id):
     for b in buckets:
         permissioned_ids.append(b["key"])
 
-    for wire_item in wire_items:
+    wire_items = []
+    async for wire_item in cursor:
         set_item_permission(wire_item, wire_item.id in permissioned_ids)
+        wire_items.append(wire_item.to_dict())
 
-    return (
-        jsonify(
-            {
-                "agenda_item": agenda_result.docs[0],
-                "wire_items": [item.to_dict() for item in wire_items],
-            }
-        ),
+    return Response(
+        {
+            "agenda_item": agenda_item,
+            "wire_items": wire_items,
+        },
         200,
     )
 
 
-@blueprint.route("/agenda/search_locations")
-@login_required
-async def search_locations():
-    query = request.args.get("q") or ""
+class SearchLocationsParams(BaseModel):
+    q: str = ""
+
+
+@agenda_endpoints.endpoint("/agenda/search_locations")
+async def search_locations(args: None, params: SearchLocationsParams, request: Request) -> Response:
+    query = params.q
     apply_filters = len(query) > 0
 
     if apply_filters and not query.startswith("*") and not query.endswith("*"):
@@ -389,7 +461,7 @@ async def search_locations():
             "size": 1000,
         }
 
-    es_query = {
+    es_query: dict[str, Any] = {
         "size": 0,
         "aggs": {
             "city_search_country": {
@@ -456,10 +528,7 @@ async def search_locations():
             "aggs": {"places": es_query["aggs"].pop("places")},
         }
 
-    req = ParsedRequest()
-    req.args = {"source": json.dumps(es_query)}
-    service = get_resource_service("agenda")
-    cursor = service.internal_get(req, {})
+    cursor = cast(ElasticsearchResourceCursorAsync, await AgendaItemService().search(es_query))
     aggs = cursor.hits.get("aggregations") or {}
 
     regions = []
@@ -491,10 +560,9 @@ async def search_locations():
             }
         )
 
-    return (
+    return Response(
         {
             "regions": regions,
             "places": [bucket["key"] for bucket in (aggs.get("places") or aggs["place_search"]["places"])["buckets"]],
-        },
-        200,
+        }
     )

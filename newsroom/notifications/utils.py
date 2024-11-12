@@ -4,21 +4,18 @@ from asyncio import gather
 from bson import ObjectId
 from typing import Any
 
-import superdesk
 from superdesk.utc import utcnow
-from superdesk.flask import session
 from superdesk.core import get_app_config
 from superdesk.notification import push_notification
 
+from newsroom.exceptions import AuthorizationError
+from newsroom.auth.utils import get_user_id_from_request
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.topics.topics_async import TopicService
 from .services import NotificationsService
 
 
-def user_notifications_lookup(user_id: str | ObjectId) -> dict[str, Any]:
-    if isinstance(user_id, str):
-        user_id = ObjectId(user_id)
-
+def user_notifications_lookup(user_id: ObjectId) -> dict[str, Any]:
     ttl = get_app_config("NOTIFICATIONS_TTL", 1)
     return {
         "user": user_id,
@@ -26,7 +23,7 @@ def user_notifications_lookup(user_id: str | ObjectId) -> dict[str, Any]:
     }
 
 
-async def get_user_notifications(user_id: str) -> list[dict[str, Any]]:
+async def get_user_notifications(user_id: ObjectId) -> list[dict[str, Any]]:
     """
     Returns the notification entries for the given user
     """
@@ -40,10 +37,12 @@ async def get_initial_notifications() -> dict[str, Any] | None:
     Returns the stories that user has notifications for
     :return: List of stories. None if there is not user session.
     """
-    if not session.get("user"):
+
+    try:
+        user_id = get_user_id_from_request(None)
+    except AuthorizationError:
         return None
 
-    user_id = session["user"]
     lookup = user_notifications_lookup(user_id)
     notifications = await NotificationsService().search(lookup)
 
@@ -58,30 +57,30 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     Returns the stories that user has notifications for
     :return: List of stories. None if there is not user session.
     """
-    if not session.get("user"):
-        return None
 
-    saved_notifications = await get_user_notifications(session["user"])
-    item_ids = [n["item"] for n in saved_notifications]
-    items = []
-
-    wire_cursor, topics_cursor = await gather(
-        WireSearchServiceAsync().get_items_by_id(item_ids),
-        TopicService().search({"_id": {"$in": item_ids}}),
-    )
-    wire_items, topic_items = await gather(wire_cursor.to_list_raw(), topics_cursor.to_list_raw())
-
-    items.extend(wire_items)
-    items.extend(topic_items)
+    from newsroom.agenda import AgendaSearchServiceAsync
 
     try:
-        items.extend(superdesk.get_resource_service("agenda").get_items(item_ids))
-    except (KeyError, TypeError):  # agenda disabled
-        pass
+        user_id = get_user_id_from_request(None)
+    except AuthorizationError:
+        return None
+
+    saved_notifications = await get_user_notifications(user_id)
+    item_ids = [n["item"] for n in saved_notifications]
+
+    wire_cursor, agenda_cursor, topic_items = await gather(
+        WireSearchServiceAsync().get_items_by_id(item_ids),
+        AgendaSearchServiceAsync().get_items_by_id(item_ids),
+        TopicService().find_by_ids_raw(item_ids),
+    )
+    wire_items, agenda_items = await gather(
+        wire_cursor.to_list_raw(),
+        agenda_cursor.to_list_raw(),
+    )
 
     return {
-        "user": session["user"],
-        "items": list(items),
+        "user": str(user_id),
+        "items": wire_items + agenda_items + topic_items,
         "notifications": saved_notifications,
     }
 

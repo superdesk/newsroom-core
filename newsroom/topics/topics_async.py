@@ -1,8 +1,10 @@
 from bson import ObjectId
 from typing import Optional, List, Dict, Any, Union
 
+from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
+
 from newsroom import MONGO_PREFIX
-from newsroom.types import TopicResourceModel, UserResourceModel
+from newsroom.types import TopicResourceModel, UserResourceModel, NotificationType
 from newsroom.exceptions import AuthorizationError
 from newsroom.auth.utils import get_user_from_request
 
@@ -15,7 +17,6 @@ from newsroom.types import User, Topic
 from superdesk.core.web import EndpointGroup
 
 # from superdesk.core.module import SuperdeskAsyncApp
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 
 
 class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
@@ -146,7 +147,7 @@ async def get_topics_with_subscribers(topic_type: Optional[str] = None) -> list[
 
 
 # TODO-ASYNC: Remove the above function, replace with this one and remove `_async` suffix
-async def get_topics_with_subscribers_async(topic_type: Optional[str] = None) -> list[TopicResourceModel]:
+async def get_topics_with_subscribers_async(topic_type: str | None = None) -> list[TopicResourceModel]:
     lookup: Dict[str, Any] = (
         {"subscribers": {"$exists": True, "$ne": []}}
         if topic_type is None
@@ -164,15 +165,15 @@ async def get_topics_with_subscribers_async(topic_type: Optional[str] = None) ->
 
 
 async def get_user_id_to_topic_for_subscribers(
-    notification_type: Optional[str] = None,
-) -> Dict[ObjectId, Dict[ObjectId, Topic]]:
-    user_topic_map: Dict[ObjectId, Dict[ObjectId, Topic]] = {}
-    for topic in await get_topics_with_subscribers():
-        for subscriber in topic.get("subscribers") or []:
-            if notification_type is not None and subscriber.get("notification_type") != notification_type:
+    notification_type: NotificationType | None = None,
+) -> dict[ObjectId, dict[ObjectId, TopicResourceModel]]:
+    user_topic_map: dict[ObjectId, dict[ObjectId, TopicResourceModel]] = {}
+    for topic in await get_topics_with_subscribers_async():
+        for subscriber in topic.subscribers or []:
+            if notification_type is not None and subscriber.notification_type != notification_type:
                 continue
-            user_topic_map.setdefault(subscriber["user_id"], {})
-            user_topic_map[subscriber["user_id"]][topic["_id"]] = topic
+            user_topic_map.setdefault(subscriber.user_id, {})
+            user_topic_map[subscriber.user_id][topic.id] = topic
 
     return user_topic_map
 

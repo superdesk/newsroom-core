@@ -42,7 +42,7 @@ class CSVFormatter(BaseFormatter):
             csv_writer.writerow(item)
 
         csv_string.seek(0)  # Reset the buffer position
-        return csv_string.getvalue().encode("utf-8")
+        return csv_string.getvalue().encode("utf-8-sig")
 
     def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
         subj_schemas = get_app_config("AGENDA_CSV_SUBJECT_SCHEMES", [])
@@ -99,9 +99,7 @@ class CSVFormatter(BaseFormatter):
         return ""
 
     def format_list(self, item: Dict[str, Any], key: str, language: Optional[str] = None) -> str:
-        values = [
-            v.get("translations", {}).get("name", {}).get(language) or v.get("name", "") for v in item.get(key, [])
-        ]
+        values = [get_translated_name(v, language) for v in item.get(key, [])]
         return ",".join(list(filter(bool, values)))
 
     def format_contact_info(self, item: Dict[str, Any]) -> str:
@@ -132,3 +130,13 @@ class CSVFormatter(BaseFormatter):
             for coverage in coverages:
                 value.append(coverage.get(field, ""))
         return ",".join(value)
+
+
+def get_translated_name(value: Dict[str, Any], language: Optional[str] = None) -> str:
+    """
+    Get translation for the given language
+    """
+    try:
+        return value["translations"]["name"][language]
+    except (KeyError, TypeError):
+        return value.get("name", "")

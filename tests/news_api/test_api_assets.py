@@ -1,6 +1,7 @@
 import os
 from bson import ObjectId
 from tests.news_api.test_api_audit import audit_check
+from tests.core.utils import create_entries_for, find_one_for
 
 
 def get_fixture_path(fixture):
@@ -18,12 +19,12 @@ async def setup_image(app):
 
 async def test_get_asset(client, app):
     company_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [{"_id": company_id, "name": "Test Company", "is_enabled": True}],
     )
-    app.data.insert("news_api_tokens", [{"company": company_id, "enabled": True}])
-    token = app.data.find_one("news_api_tokens", req=None, company=company_id)
+    await create_entries_for("news_api_tokens", [{"company": company_id, "enabled": True}])
+    token = await find_one_for("news_api_tokens", company=company_id)
 
     image_id = await setup_image(app)
     response = await client.get("api/v1/assets/{}".format(image_id), headers={"Authorization": token.get("token")})

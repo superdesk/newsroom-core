@@ -18,14 +18,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-09-09 16:06+0200\n"
+"POT-Creation-Date: 2024-10-21 11:35+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Maija Paikkala, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -51,7 +51,7 @@ msgstr "Sähköpostitemplatea '%(name)s' ei löytynyt"
 msgid "Activity History: Inavlid request"
 msgstr "Historia: Virheellinen pyyntö"
 
-#: newsroom/push.py:115
+#: newsroom/push.py:119
 msgid "Unknown type {}"
 msgstr "Tuntematon tyyppi {}"
 
@@ -135,58 +135,58 @@ msgstr ""
 "Anna organisaation admin-käyttäjille oikeus muuttaa organisaationsa "
 "käyttäjien pääsyä tuotteisiin"
 
-#: newsroom/template_filters.py:139
+#: newsroom/template_filters.py:142
 msgid "Date: {start} to {end} ({tz}) (Time to be confirmed)"
 msgstr "{start} – {end} ({tz}) (Vahvistamaton aika)"
 
-#: newsroom/template_filters.py:144
+#: newsroom/template_filters.py:147
 msgid "Date: {start} ({tz}) (Time to be confirmed)"
 msgstr "{start} ({tz}) (Vahvistamaton aika)"
 
-#: newsroom/template_filters.py:147
+#: newsroom/template_filters.py:150
 msgid "Date: {start} ({tz})"
 msgstr "{start} ({tz})"
 
-#: newsroom/template_filters.py:150
+#: newsroom/template_filters.py:153
 msgid "Date: {start} to {end} ({tz})"
 msgstr "{start} – {end} ({tz})"
 
-#: newsroom/template_filters.py:152
+#: newsroom/template_filters.py:155
 msgid "Time: {start_time} to {end_time} on Date: {date} ({tz})"
 msgstr "{start_time} – {end_time} {date} ({tz})"
 
-#: newsroom/template_filters.py:160
+#: newsroom/template_filters.py:163
 msgid "Date: {start_time} {start_date} to {end_time} {end_date} ({tz})"
 msgstr "{start_time} {start_date} – {end_time} {end_date} ({tz})"
 
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:213
+#: newsroom/utils.py:214
 msgid "ALL DAY"
 msgstr "KOKO PÄIVÄ"
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:305
-#: newsroom/utils.py:416
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:306
+#: newsroom/utils.py:417
 msgid "Account is disabled"
 msgstr "Tili on suljettu."
 
-#: newsroom/utils.py:313
+#: newsroom/utils.py:314
 msgid "Account has not been approved"
 msgstr "Tiliä ei ole hyväksytty"
 
 #: newsroom/auth/views.py:83 newsroom/auth/views.py:92
-#: newsroom/auth/views.py:184 newsroom/utils.py:406
+#: newsroom/auth/views.py:184 newsroom/utils.py:407
 msgid "Invalid username or password."
 msgstr "Väärä käyttäjänimi tai salasana"
 
-#: newsroom/utils.py:412
+#: newsroom/utils.py:413
 msgid "Insufficient Permissions. Access denied."
 msgstr "Oikeudet eivät riitä. Pääsy evätty."
 
-#: newsroom/auth/views.py:176 newsroom/utils.py:420
+#: newsroom/auth/views.py:176 newsroom/utils.py:421
 msgid "Company account has been disabled."
 msgstr "Organisaation tili on suljettu."
 
-#: newsroom/auth/views.py:179 newsroom/utils.py:424
+#: newsroom/auth/views.py:179 newsroom/utils.py:425
 msgid "Company account has expired."
 msgstr "Organisaation tili on vanhentunut."
 
@@ -400,7 +400,7 @@ msgstr "Hyväksyn"
 #: assets/user-profile/components/profile/UserProfile.tsx:104
 #: assets/users/components/EditUser.tsx:236
 #: assets/users/components/UsersList.tsx:33 newsroom/auth/forms.py:39
-#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:62
+#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:63
 #: newsroom/users/forms.py:48
 msgid "Email"
 msgstr "Sähköposti"
@@ -413,19 +413,19 @@ msgstr "Salasana"
 msgid "Remember Me"
 msgstr "Muista minut"
 
-#: newsroom/auth/forms.py:53
+#: newsroom/auth/forms.py:54
 msgid "Passwords must match."
 msgstr "Salasanojen on oltava yhteneväiset."
 
-#: newsroom/auth/forms.py:56
+#: newsroom/auth/forms.py:57
 msgid "Current password"
 msgstr "Nykyinen salasana"
 
-#: newsroom/auth/forms.py:59
+#: newsroom/auth/forms.py:60
 msgid "New password"
 msgstr "Uusi salasana"
 
-#: newsroom/auth/forms.py:60
+#: newsroom/auth/forms.py:61
 msgid "Confirm new password"
 msgstr "Vahvista salasana"
 
@@ -462,7 +462,7 @@ msgstr "Organisaatio on vanhentunut"
 msgid "Invalid login type, Oauth not enabled for your user"
 msgstr "Väärä kirjautumistapa, Oauth ei ole mahdollinen tälle käyttäjälle"
 
-#: newsroom/auth/saml.py:137
+#: newsroom/auth/saml.py:145
 msgid "There was an error when using SSO"
 msgstr "Kirjautumisessa tapahtui virhe"
 
@@ -1013,7 +1013,7 @@ msgstr "Päävalikko"
 #: assets/public/components/PublicApp.tsx:79
 #: newsroom/templates/base_layout.html:62
 #: newsroom/templates/login_client.html:4
-#: newsroom/templates/login_layout.html:53
+#: newsroom/templates/login_layout.html:52
 msgid "Login"
 msgstr "Kirjaudu sisään"
 
@@ -1051,17 +1051,17 @@ msgstr "Asetukset"
 
 #: newsroom/templates/change_password.html:13
 #: newsroom/templates/change_password.html:44
-#: newsroom/templates/reset_password.html:37
+#: newsroom/templates/reset_password.html:36
 msgid "Change Password"
 msgstr "Vaihda salasana"
 
 #: newsroom/templates/change_password.html:36
-#: newsroom/templates/reset_password.html:30
+#: newsroom/templates/reset_password.html:29
 msgid "Please use 8 or more characters."
 msgstr "Käytä vähintään 8:aa merkkiä"
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:47
+#: newsroom/templates/login_layout.html:46
 msgid "Forgot your password?"
 msgstr "Unohditko salasanasi?"
 
@@ -1096,7 +1096,7 @@ msgid "Stop impersonation"
 msgstr "Lopeta käyttäjätesti"
 
 #: newsroom/templates/login_client.html:9
-#: newsroom/templates/login_layout.html:73
+#: newsroom/templates/login_layout.html:72
 msgid "Login using Single Sign On"
 msgstr "Kirjaudu sisään käyttäen organisaatiosi kirjautumistapaa"
 
@@ -1106,38 +1106,38 @@ msgstr ""
 "Jos sinulla on vaikeuksia kirjautumisen kanssa, ole yhteydessä oman "
 "organisaatiosi tietohallintoon."
 
-#: newsroom/templates/login_layout.html:14
+#: newsroom/templates/login_layout.html:13
 msgid "Login to Newshub"
 msgstr "Kirjaudu Medipankkiin"
 
-#: newsroom/templates/login_layout.html:48
+#: newsroom/templates/login_layout.html:47
 msgid "Reset password"
 msgstr "Uusi salasanasi"
 
-#: newsroom/templates/login_layout.html:48
+#: newsroom/templates/login_layout.html:47
 msgid "Click here to reset"
 msgstr "Klikkaa tästä uusiaksesi salasanasi"
 
-#: newsroom/templates/login_layout.html:60
+#: newsroom/templates/login_layout.html:59
 msgid "Log In with Google"
 msgstr "Kirjaudu Googlella."
 
-#: newsroom/templates/login_layout.html:70
+#: newsroom/templates/login_layout.html:69
 msgid "Or"
 msgstr "TAI"
 
-#: newsroom/templates/login_layout.html:82
+#: newsroom/templates/login_layout.html:81
 msgid "Don't have an account?"
 msgstr "Puuttuko sinulta tunnukset?"
 
-#: newsroom/templates/login_layout.html:83 newsroom/templates/signup.html:13
+#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:13
 #: newsroom/templates/signup_form.html:61
 msgid "Sign up"
 msgstr "Rekisteröidy"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:235
 #: assets/users/components/EditUser.tsx:308
-#: newsroom/templates/login_layout.html:93
+#: newsroom/templates/login_layout.html:92
 #: newsroom/templates/login_locale_dropdown.html:5
 msgid "Language"
 msgstr "Kieli"
@@ -1176,19 +1176,16 @@ msgstr ""
 "Sähköpostin linkki on vanhentunut. Tilaa uusi linkki vaihtaaksesi "
 "salasanasi."
 
+#: assets/users/components/EditUser.tsx:476
 #: newsroom/templates/request_token.html:4
-msgid "Password Reset"
-msgstr "Salasanan uusiminen"
+#: newsroom/templates/request_token.html:22
+#: newsroom/templates/reset_password.html:11
+msgid "Reset Password"
+msgstr "Uusi salasanasi"
 
 #: newsroom/templates/request_token.html:20
 msgid "Validate"
 msgstr "Vahvista"
-
-#: assets/users/components/EditUser.tsx:476
-#: newsroom/templates/request_token.html:22
-#: newsroom/templates/reset_password.html:12
-msgid "Reset Password"
-msgstr "Uusi salasanasi"
 
 #: assets/agenda/components/AgendaCoverageRequest.tsx:57
 #: assets/components/CardEditor.tsx:73 assets/components/CardEditor.tsx:75
@@ -1200,7 +1197,7 @@ msgstr "Uusi salasanasi"
 #: assets/search/components/TopicFolderEditor.jsx:39
 #: assets/user-profile/components/profile/UserProfile.tsx:251
 #: assets/wire/components/SelectedItemsBar.tsx:48
-#: newsroom/templates/reset_password.html:38
+#: newsroom/templates/reset_password.html:37
 msgid "Cancel"
 msgstr "Peruuta"
 
@@ -1242,6 +1239,7 @@ msgstr "Käyttäjätiedot"
 #: assets/products/components/EditProduct.tsx:90
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
+#: assets/search/components/SearchResultsBar/index.tsx:232
 #: assets/search/components/TopicEditor.tsx:459
 #: assets/search/components/TopicFolder.tsx:100
 #: assets/section-filters/components/EditSectionFilter.tsx:27
@@ -1489,27 +1487,27 @@ msgstr "Ehkä"
 msgid "Not Intended / Cancelled"
 msgstr "STT ei uutisoi"
 
-#: newsroom/web/default_settings.py:636
+#: newsroom/web/default_settings.py:637
 msgid "Home"
 msgstr "Etusivu"
 
-#: newsroom/web/default_settings.py:641
+#: newsroom/web/default_settings.py:642
 msgid "Wire"
 msgstr "Uutiset"
 
-#: newsroom/web/default_settings.py:646
+#: newsroom/web/default_settings.py:647
 msgid "Agenda"
 msgstr "Luotsi"
 
-#: newsroom/web/default_settings.py:651
+#: newsroom/web/default_settings.py:652
 msgid "Monitoring"
 msgstr "Seuranta"
 
-#: newsroom/web/default_settings.py:656
+#: newsroom/web/default_settings.py:657
 msgid "Saved / Watched"
 msgstr "Tallennetut"
 
-#: newsroom/web/default_settings.py:694
+#: newsroom/web/default_settings.py:695
 msgid "Newshub"
 msgstr "Mediapankki"
 
@@ -1518,23 +1516,23 @@ msgstr "Mediapankki"
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
 #: assets/components/ExpiryDateInput.tsx:94
-#: newsroom/web/default_settings.py:817 newsroom/web/default_settings.py:843
+#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:844
 msgid "Today"
 msgstr "Tänään"
 
-#: newsroom/web/default_settings.py:819
+#: newsroom/web/default_settings.py:820
 msgid "Last Week"
 msgstr "Edeltävä viikko"
 
-#: newsroom/web/default_settings.py:825
+#: newsroom/web/default_settings.py:826
 msgid "Last 30 days"
 msgstr "Edeltävät 30 päivää"
 
-#: newsroom/web/default_settings.py:845
+#: newsroom/web/default_settings.py:846
 msgid "This Week"
 msgstr "Tämä viikko"
 
-#: newsroom/web/default_settings.py:849
+#: newsroom/web/default_settings.py:850
 msgid "This Month"
 msgstr "Tämä kuukausi"
 
@@ -1872,7 +1870,7 @@ msgid "Oldest updates"
 msgstr "Vanhimmat päivitykset"
 
 #: assets/agenda/components/AgendaApp.tsx:259
-#: assets/search/components/SearchResultsBar/index.tsx:65
+#: assets/search/components/SearchResultsBar/index.tsx:67
 msgid "Relevance"
 msgstr "Relevanssi"
 
@@ -2994,7 +2992,7 @@ msgstr "Ei uusia ilmoituksia"
 
 #: assets/components/NotificationPopup.tsx:72
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:238
+#: assets/search/components/SearchResultsBar/index.tsx:293
 msgid "Clear All"
 msgstr "Tyhjennä kaikki"
 
@@ -4004,36 +4002,44 @@ msgstr "Tallenna uutena hakuna"
 msgid "Save new topic"
 msgstr "Tallenna haku"
 
-#: assets/search/components/SearchResultsBar/index.tsx:57
+#: assets/search/components/SearchResultsBar/index.tsx:59
 msgid "Newest first"
 msgstr "Uusin ensin"
 
-#: assets/search/components/SearchResultsBar/index.tsx:61
+#: assets/search/components/SearchResultsBar/index.tsx:63
 msgid "Oldest first"
 msgstr "Vanhin ensin"
 
-#: assets/search/components/SearchResultsBar/index.tsx:201
+#: assets/search/components/SearchResultsBar/index.tsx:208
 msgid "1 result"
 msgstr "1 tulos"
 
-#: assets/search/components/SearchResultsBar/index.tsx:203
+#: assets/search/components/SearchResultsBar/index.tsx:210
 msgid "{{ count }} results"
 msgstr "{{ count }} tulosta"
 
-#: assets/search/components/SearchResultsBar/index.tsx:211
+#: assets/search/components/SearchResultsBar/index.tsx:240
+msgid ""
+"The initial search is limited to the {{dateFilterName}}. Please find "
+"different date ranges in the filter panel using the burger menu."
+msgstr ""
+"Alkuperäinen haku on rajattu {{dateFilterName}}. Voit muuttaa aikarajausta "
+"hampurilaisvalikon takaa suodattimista."
+
+#: assets/search/components/SearchResultsBar/index.tsx:266
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr "Järjestä:"
 
-#: assets/search/components/SearchResultsBar/index.tsx:214
+#: assets/search/components/SearchResultsBar/index.tsx:269
 msgid "Sort results by"
 msgstr "Järjestä tulokset"
 
-#: assets/search/components/SearchResultsBar/index.tsx:244
+#: assets/search/components/SearchResultsBar/index.tsx:299
 msgid "Hide search terms"
 msgstr "Piilota hakutermit"
 
-#: assets/search/components/SearchResultsBar/index.tsx:245
+#: assets/search/components/SearchResultsBar/index.tsx:300
 msgid "Show search terms"
 msgstr "Näytä hakutermi"
 

@@ -9,8 +9,7 @@ from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations import get_navigations
 from newsroom.types import Product
-from tests.core.utils import add_company_products, create_entries_for
-
+from tests.core.utils import add_company_products, create_entries_for, find_one_by_id
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
 AGENDA_NAV_ID = ObjectId()
@@ -111,11 +110,15 @@ async def test_delete_navigation_removes_references(client):
 
 
 async def test_create_navigation_with_products(client, app):
-    app.data.insert(
+    product_ids = [
+        ObjectId(),
+        ObjectId(),
+    ]
+    await create_entries_for(
         "products",
         [
             {
-                "_id": "p-1",
+                "_id": product_ids[0],
                 "name": "Sport",
                 "description": "sport product",
                 "navigations": [],
@@ -123,7 +126,7 @@ async def test_create_navigation_with_products(client, app):
                 "product_type": "wire",
             },
             {
-                "_id": "p-2",
+                "_id": product_ids[1],
                 "name": "News",
                 "description": "news product",
                 "navigations": [],
@@ -143,7 +146,7 @@ async def test_create_navigation_with_products(client, app):
                     "description": "Breaking news",
                     "product_type": "wire",
                     "is_enabled": True,
-                    "products": ["p-2"],
+                    "products": [product_ids[1]],
                 }
             )
         },
@@ -157,16 +160,21 @@ async def test_create_navigation_with_products(client, app):
 
     response = await client.get("/products")
     data = json.loads(await response.get_data())
-    assert [p for p in data if p["_id"] == "p-1"][0]["navigations"] == []
-    assert [p for p in data if p["_id"] == "p-2"][0]["navigations"] == [nav_id]
+    print(data)
+    assert [p for p in data if p["_id"] == str(product_ids[0])][0]["navigations"] == []
+    assert [p for p in data if p["_id"] == str(product_ids[1])][0]["navigations"] == [nav_id]
 
 
 async def test_update_navigation_with_products(client, app):
-    app.data.insert(
+    product_ids = [
+        ObjectId(),
+        ObjectId(),
+    ]
+    await create_entries_for(
         "products",
         [
             {
-                "_id": "p-1",
+                "_id": product_ids[0],
                 "name": "Sport",
                 "description": "sport product",
                 "navigations": [],
@@ -174,7 +182,7 @@ async def test_update_navigation_with_products(client, app):
                 "product_type": "wire",
             },
             {
-                "_id": "p-2",
+                "_id": product_ids[1],
                 "name": "News",
                 "description": "news product",
                 "navigations": [NAV_ID],
@@ -187,13 +195,13 @@ async def test_update_navigation_with_products(client, app):
     await test_login_succeeds_for_admin(client)
     await client.post(
         f"navigations/{NAV_ID}",
-        form={"navigation": json.dumps({"name": "Sports 2", "is_enabled": True, "products": ["p-1"]})},
+        form={"navigation": json.dumps({"name": "Sports 2", "is_enabled": True, "products": [product_ids[0]]})},
     )
 
     response = await client.get("/products")
     data = json.loads(await response.get_data())
-    assert [p for p in data if p["_id"] == "p-1"][0]["navigations"] == [str(NAV_ID)]
-    assert [p for p in data if p["_id"] == "p-2"][0]["navigations"] == []
+    assert [p for p in data if p["_id"] == str(product_ids[0])][0]["navigations"] == [str(NAV_ID)]
+    assert [p for p in data if p["_id"] == str(product_ids[1])][0]["navigations"] == []
 
 
 async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
@@ -209,7 +217,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -232,7 +240,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     )
 
     await test_login_succeeds_for_admin(client)
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     navigations = await get_navigations(None, company, "agenda")
     assert navigations[0].get("name") == "Uber"
     navigations = await get_navigations(None, company, "wire")
@@ -241,6 +249,7 @@ async def test_get_agenda_navigations_by_company_returns_ordered(client, app):
 
 async def test_get_products_by_navigation_caching(app):
     nav_id = ObjectId()
+    product_id = ObjectId()
     await create_entries_for(
         "navigations",
         [
@@ -253,11 +262,11 @@ async def test_get_products_by_navigation_caching(app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
-                "_id": "p-2",
+                "_id": product_id,
                 "name": "A News",
                 "navigations": [nav_id],
                 "description": "news product",
@@ -312,7 +321,7 @@ async def test_get_navigations_for_user(public_user, public_company, app):
         ),
     ]
 
-    app.data.insert("products", products)
+    await create_entries_for("products", products)
     public_user["products"] = [get_product_ref(products[0]), get_product_ref(products[1])]
 
     navigations = await get_navigations(public_user, public_company, "wire")

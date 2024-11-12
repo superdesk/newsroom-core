@@ -1,19 +1,27 @@
 from typing import Annotated
+from datetime import datetime
 
 from pydantic import Field
 
-from superdesk.core.resources import fields
+from superdesk.core.resources import fields, dataclass
 from content_api.items.model import ContentAPIItem, CVItemWithCode
 
 
+@dataclass
+class PublishedProduct:
+    code: fields.Keyword
+    name: fields.Keyword | None = None
+
+
 class WireItem(ContentAPIItem):
-    products: Annotated[list[CVItemWithCode], Field(default_factory=list)]
+    products: Annotated[list[PublishedProduct], Field(default_factory=list)]
+    publish_schedule: datetime | None = None
 
     bookmarks: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
-    downloads: Annotated[list[fields.Keyword], fields.keyword_mapping(), Field(default_factory=list)]
-    shares: Annotated[list[fields.Keyword], fields.keyword_mapping(), Field(default_factory=list)]
-    prints: Annotated[list[fields.Keyword], fields.keyword_mapping(), Field(default_factory=list)]
-    copies: Annotated[list[fields.Keyword], fields.keyword_mapping(), Field(default_factory=list)]
+    downloads: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
+    shares: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
+    prints: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
+    copies: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
 
     # Overrides from ContentAPI Schema
     subject: Annotated[list[CVItemWithCode], fields.nested_list(include_in_parent=True), Field(default_factory=list)]

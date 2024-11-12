@@ -7,7 +7,7 @@ from quart_babel.speaklater import LazyString
 from .common import SectionEnum
 from .search import AdvancedSearchParams
 from .user_roles import UserRole
-from .products import ProductType, PRODUCT_TYPES, ProductResourceModel
+from .products import ProductResourceModel
 from .cards import CardResourceModel, DashboardCardConfig, DashboardCardType, DashboardCardDict
 from .company import CompanyProduct, CompanyResource
 from .navigation import NavigationModel
@@ -27,13 +27,19 @@ from .notifications import Notification, NotificationQueue, NotificationTopic
 from .history import HistoryResourceModel
 from .wire import WireItem
 from .featured import FeaturedResourceModel
+from .agenda import (
+    AgendaItem,
+    AgendaItemType,
+    AgendaCoverage,
+    AgendaCoverageDelivery,
+    AgendaPlanningItem,
+    AgendaWorkflowState,
+)
 
 __all__ = [
     "SectionEnum",
     "AdvancedSearchParams",
     "UserRole",
-    "ProductType",
-    "PRODUCT_TYPES",
     "CardResourceModel",
     "DashboardCardConfig",
     "DashboardCardType",
@@ -61,6 +67,12 @@ __all__ = [
     "WireItem",
     "FeaturedResourceModel",
     "ProductResourceModel",
+    "AgendaItem",
+    "AgendaItemType",
+    "AgendaPlanningItem",
+    "AgendaCoverage",
+    "AgendaCoverageDelivery",
+    "AgendaWorkflowState",
 ]
 
 

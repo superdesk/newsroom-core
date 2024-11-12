@@ -6,8 +6,8 @@ from superdesk.core import get_app_config
 import superdesk
 
 # TODO-ASYNC: Remove these resources & services once all Wire & Agenda is upgraded to async
-from content_api.items.resource import ItemsResource as BaseItemsResource
-from content_api.items.service import ItemsService as BaseItemsService
+from content_api.items.resource import ItemsResource as BaseItemsResource, InternalItemsResource
+from content_api.items.service import ItemsService as BaseItemsService, InternalItemsService as BaseInternalItemsService
 
 from content_api.items_versions.resource import ItemsVersionsResource as BaseItemsVersionsResource
 from content_api.items_versions.service import ItemsVersionsService
@@ -15,6 +15,7 @@ from content_api.items_versions.service import ItemsVersionsService
 from superdesk.metadata.item import metadata_schema
 
 from newsroom.types import Article, CardResourceModel
+from newsroom.products import ProductsService
 from newsroom.cards import get_card_size
 
 from .service import WireSearchServiceAsync
@@ -45,15 +46,24 @@ class ItemsService(BaseItemsService):
         # logic related to subscribers
         return False
 
+
+class InternalItemsService(BaseInternalItemsService):
     def get_expired_items(self, expiry_datetime=None, expiry_days=None, max_results=None, include_children=True):
         # remove old items based on expiry days config
         for items in super().get_expired_items(expiry_datetime, expiry_days, max_results, include_children):
             yield items
+        source = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"range": {"expiry": {"lt": expiry_datetime}}},
+                    ]
+                }
+            },
+            "size": max_results or 100,
+        }
         # remove items with custom expiry
-        lookup = {"expiry": {"$lt": expiry_datetime}}
-        if max_results is None:
-            max_results = 100
-        for item in self.get_all_batch(max_results, 100, lookup):
+        for item in self.search(source):
             yield [item]
 
 
@@ -69,6 +79,8 @@ class ItemsVersionsResource(BaseItemsVersionsResource):
 def init_app(app):
     superdesk.register_resource("items", ItemsResource, ItemsService, _app=app)
     superdesk.register_resource("items_versions", ItemsVersionsResource, ItemsVersionsService, _app=app)
+
+    superdesk.register_resource("capi_items_internal", InternalItemsResource, InternalItemsService, _app=app)
 
 
 async def get_items_for_dashboard(
@@ -99,8 +111,7 @@ async def get_items_for_dashboard(
     items_by_card = {}
     wire_search = WireSearchServiceAsync()
 
-    # TODO-ASYNC: Convert to async Product model when available
-    all_products = {product["_id"]: product for product in superdesk.get_resource_service("products").get_cached()}
+    all_products = {product.id: product async for product in ProductsService().get_all()}
     for card in cards:
         if card.config is not None and card.config.get("product"):
             items_by_card[card.label] = [

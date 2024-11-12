@@ -49,6 +49,9 @@ def get_updated_products(updates, original, company: Optional[CompanyResource]) 
     elif "products" in original:
         products = original["products"] or []
 
+    # Make sure the products are of the correct type
+    products = [CompanyProduct(**product) if isinstance(product, dict) else product for product in products]
+
     if not company:
         return products
 

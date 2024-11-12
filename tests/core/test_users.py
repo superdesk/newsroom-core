@@ -18,7 +18,7 @@ from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, find_one_by_id
 from tests.utils import get_user_by_email, mock_send_email, login, login_public, logout
 
 
@@ -527,7 +527,7 @@ async def test_signals(client, app):
     assert user["email"] == updated_user["email"]
     updated_listener.reset_mock()
 
-    token = app.data.find_one("auth_user", req=None, _id=user_id)["token"]
+    token = (await find_one_by_id("auth_user", user_id))["token"]
     resp = await client.get(f"/validate/{token}")
     assert 302 == resp.status_code, await resp.get_data(as_text=True)
     updated_listener.assert_called_once()
@@ -580,7 +580,7 @@ async def test_user_can_update_notification_schedule(app, client):
 
     # Update the schedules ``last_run_time``
     now = utcnow()
-    await UsersService().update_notification_schedule_run_time(user, now)
+    await UsersService().update_notification_schedule_run_time(UserResourceModel.from_dict(user), now)
 
     user = await (await client.get(f"/users/{ADMIN_USER_ID}")).get_json()
     assert user["notification_schedule"]["timezone"] == "Australia/Sydney"

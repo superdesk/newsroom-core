@@ -2,11 +2,12 @@ from unittest import mock
 
 from quart import url_for
 
-from newsroom.types import CompanyType, Country, ProductType, CompanyProduct
+from newsroom.types import CompanyType, Country, SectionEnum, CompanyProduct
 from newsroom.users import UsersAuthService
 from newsroom.companies.companies_async import CompanyService
 
 from tests.utils import get_user_by_email, mock_send_email
+from tests.core.utils import create_entries_for, find_one_for
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -15,7 +16,7 @@ async def test_new_user_signup_sends_email(app, client):
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
-    product_ids = app.data.insert(
+    product_ids = await create_entries_for(
         "products", [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
     )
     with app.mail.record_messages() as outbox:
@@ -66,13 +67,13 @@ async def test_new_user_signup_sends_email(app, client):
     assert new_company.products == [
         CompanyProduct(
             _id=product_ids[0],
-            section=ProductType.WIRE,
+            section=SectionEnum.WIRE,
             seats=0,
         )
     ]
 
     # Test that the new User has been created
-    new_user = app.data.find_one("users", req=None, email="newuser@abc.org")
+    new_user = await find_one_for("users", email="newuser@abc.org")
     assert new_user is not None
     assert new_user["first_name"] == "John"
     assert new_user["last_name"] == "Doe"
@@ -138,7 +139,7 @@ async def test_approve_company_and_users(app, client):
         assert response.status_code == 200
 
     # Test the Company & User are not enabled nor approved
-    new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+    new_company = await find_one_for("companies", name="Doe Press Co.")
     assert new_company["is_enabled"] is False
     assert new_company["is_approved"] is False
 
@@ -153,7 +154,7 @@ async def test_approve_company_and_users(app, client):
         assert response.status_code == 200
 
         # Test the Company & User are now enabled and approved, but not yet validated
-        new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+        new_company = await find_one_for("companies", name="Doe Press Co.")
         assert new_company["is_enabled"] is True
         assert new_company["is_approved"] is True
 
@@ -187,10 +188,10 @@ async def test_approve_company_and_users(app, client):
     assert response.status_code == 200
 
     # Test the Company is enabled and approved, but new User is not
-    new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+    new_company = await find_one_for("companies", name="Doe Press Co.")
     assert new_company["is_enabled"] is True
     assert new_company["is_approved"] is True
-    new_user = app.data.find_one("users", req=None, email="jane@doe.org")
+    new_user = await find_one_for("users", email="jane@doe.org")
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False

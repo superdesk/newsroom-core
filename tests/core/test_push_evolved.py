@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from tests.core.utils import delete_entries_for
 
 
 def ids(items):
@@ -6,7 +7,7 @@ def ids(items):
 
 
 async def test_evolved_from_order(client, app):
-    app.data.remove("items")
+    await delete_entries_for("items")
 
     async def push_item(data):
         resp = await client.post("/push", json=data)

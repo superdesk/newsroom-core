@@ -4,11 +4,16 @@ from datetime import datetime, timedelta
 
 from newsroom.topics.topics_async import TopicService
 from superdesk.utc import utcnow, utc_to_local
-from newsroom.types import NotificationSchedule, NotificationQueue, NotificationTopic
+from newsroom.types import (
+    NotificationQueue,
+    NotificationTopic,
+    UserResourceModel,
+    TopicResourceModel,
+    NotificationScheduleModel,
+)
 from newsroom.notifications import NotificationQueueService
 from newsroom.notifications.commands import SendScheduledNotificationEmails
-
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, get_all
 
 
 def test_convert_schedule_times():
@@ -110,7 +115,7 @@ async def test_get_latest_item_from_topic_queue(app, user):
             ],
         )
     )[0]
-    topic = (await TopicService().find_by_id(topic_id)).to_dict()
+    topic = await TopicService().find_by_id(topic_id)
 
     await create_entries_for(
         "items",
@@ -133,9 +138,14 @@ async def test_get_latest_item_from_topic_queue(app, user):
     )
 
     command = SendScheduledNotificationEmails()
-    item = command.get_latest_item_from_topic_queue(topic_queue, topic, user, None, set())
+    item = await command.get_latest_item_from_topic_queue(
+        topic_queue, topic, UserResourceModel.from_dict(user), None, set()
+    )
 
     assert item["_id"] == "topic1_item1"
+    from superdesk.core import json
+
+    print(json.dumps(item))
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["body_html"][0]
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["slugline"][0]
 
@@ -158,7 +168,7 @@ async def test_get_topic_entries_and_match_table(app, user):
             },
         ],
     )
-    user_topics = {topic["_id"]: topic for topic in app.data.find_all("topics")}
+    user_topics = {topic["_id"]: TopicResourceModel.from_dict(topic) for topic in await get_all("topics")}
     await create_entries_for(
         "items",
         [
@@ -186,7 +196,9 @@ async def test_get_topic_entries_and_match_table(app, user):
     )
 
     command = SendScheduledNotificationEmails()
-    topic_entries, topic_match_table = command.get_topic_entries_and_match_table(schedule, user, None, user_topics)
+    topic_entries, topic_match_table = await command.get_topic_entries_and_match_table(
+        schedule, UserResourceModel.from_dict(user), None, user_topics
+    )
 
     assert len(topic_entries["wire"]) == 1
     assert topic_entries["wire"][0]["topic"]["label"] == "Cheesy Stuff"
@@ -202,7 +214,7 @@ async def test_is_scheduled_to_run_for_user():
     timezone = "Australia/Sydney"
 
     # Run schedule if ``last_run_time`` is not defined and ``force=True``
-    assert command.is_scheduled_to_run_for_user({"timezone": timezone}, utcnow(), True) is True
+    assert command.is_scheduled_to_run_for_user(NotificationScheduleModel(timezone=timezone), utcnow(), True) is True
 
     times = ["07:00", "15:00", "20:00"]
     tests = [
@@ -222,12 +234,12 @@ async def test_is_scheduled_to_run_for_user():
         return utc_to_local(timezone, utcnow()).replace(hour=hour, minute=minute, second=0, microsecond=0)
 
     for test in tests:
-        schedule: NotificationSchedule = {
-            "timezone": timezone,
-            "times": times,
-        }
+        schedule = NotificationScheduleModel(
+            timezone=timezone,
+            times=times,
+        )
         if test.get("last_run"):
-            schedule["last_run_time"] = create_datetime_instance(test["last_run"][0], test["last_run"][1])
+            schedule.last_run_time = create_datetime_instance(test["last_run"][0], test["last_run"][1])
 
         now = create_datetime_instance(test["now"][0], test["now"][1])
 

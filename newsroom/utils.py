@@ -17,7 +17,7 @@ from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
 from superdesk.core.types import Request
-from superdesk.core import json, get_current_app, get_app_config
+from superdesk.core import json, get_current_app, get_app_config, get_current_async_app
 from superdesk.flask import abort, request, g, url_for, Request as FlaskRequest
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
@@ -44,6 +44,7 @@ def query_resource(
     req.max_results = max_results
     req.sort = sort
     req.projection = json.dumps(projection) if projection else None
+    req.args = {}
     cursor, count = get_current_app().data.find(resource, req, lookup, perform_count=False)
     return cursor
 
@@ -103,24 +104,6 @@ def get_entity_or_404(_id, resource):
     if not item:
         abort(404)
     return item
-
-
-# TODO-ASYNC: Remove this once Agenda is migrated to async
-def get_entities_elastic_or_mongo_or_404(_ids, resource):
-    """Finds item in elastic search as fist preference. If not configured, finds from mongo"""
-    elastic = get_current_app().data._search_backend(resource)
-    items = []
-    if elastic:
-        for id in _ids:
-            item = elastic.find_one("items", req=None, _id=id)
-            if not item:
-                item = get_entity_or_404(id, resource)
-
-            items.append(item)
-    else:
-        items = [get_entity_or_404(i, resource) for i in _ids]
-
-    return items
 
 
 async def get_json_or_400():
@@ -454,6 +437,13 @@ def get_vocabulary(id):
     return None
 
 
+async def get_vocabulary_async(cv_id) -> dict[str, Any] | None:
+    vocabularies = get_current_async_app().mongo.get_db_async("items").get_collection("vocabularies")
+    if vocabularies is not None:
+        return await vocabularies.find_one({"_id": cv_id})
+    return None
+
+
 def url_for_agenda(item, _external=True):
     """Get url for agenda item."""
     return url_for("agenda.index", item=item["_id"], _external=_external)
@@ -469,30 +459,6 @@ def set_version_creator(doc):
     from newsroom.auth.utils import get_user_id_from_request
 
     doc["version_creator"] = get_user_id_from_request(None)
-
-
-# TODO-ASYNC: Remove this once Agenda is upgraded to async
-def get_items_for_user_action(_ids, item_type):
-    # Getting entities from elastic first so that we get all fields
-    # even those which are not a part of ItemsResource(content_api) schema.
-    items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
-
-    if not items:
-        return items
-    elif items[0].get("type") == "text":
-        for item in items:
-            if item.get("slugline") and item.get("anpa_take_key"):
-                item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
-    elif items[0].get("type") == "agenda":
-        # Import here to prevent circular imports
-        from newsroom.auth.utils import get_company_from_request
-        from newsroom.agenda.utils import remove_restricted_coverage_info
-
-        company = get_company_from_request(None)
-        if company and company.restrict_coverage_info:
-            remove_restricted_coverage_info(items)
-
-    return items
 
 
 def get_utcnow():

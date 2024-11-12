@@ -2,6 +2,7 @@ from datetime import datetime, date
 
 import pytz
 from pydantic import Field
+
 from typing import Annotated, List, Optional
 from dataclasses import asdict
 from quart_babel import lazy_gettext
@@ -10,7 +11,6 @@ from superdesk.core import get_app_config
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import dataclass
 from superdesk.core.resources.validators import (
-    validate_minlength,
     validate_email,
     validate_iunique_value_async,
     validate_data_relation_async,
@@ -34,8 +34,8 @@ class DashboardModel:
 
 @dataclass
 class NotificationScheduleModel:
-    timezone: str
-    times: List[str]
+    timezone: str | None = None
+    times: list[str] = Field(default_factory=list)
     last_run_time: Optional[datetime] = None
     pause_from: Optional[str] = None
     pause_to: Optional[str] = None
@@ -117,8 +117,11 @@ class UserResourceModel(NewshubResourceModel):
 
         return False
 
+    def is_events_only_access(self, company: CompanyResource | None) -> bool:
+        return company.events_only if company and not self.is_admin() else False
+
 
 class UserAuthResourceModel(UserResourceModel):
-    password: Optional[Annotated[str, validate_minlength(8)]] = None
-    token: Optional[str] = None
-    token_expiry_date: Optional[datetime] = None
+    password: str | None = None
+    token: str | None = None
+    token_expiry_date: datetime | None = None

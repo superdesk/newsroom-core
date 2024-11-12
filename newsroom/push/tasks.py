@@ -2,11 +2,10 @@ import logging
 
 from contextlib import contextmanager
 from superdesk.lock import lock, unlock
-from superdesk import get_resource_service
 
 from newsroom.celery_app import celery
-from newsroom.core import get_current_wsgi_app
 from newsroom.wire import WireSearchServiceAsync
+from newsroom.agenda import AgendaItemService
 
 from .notifications import NotificationManager
 
@@ -40,13 +39,16 @@ async def notify_new_wire_item(_id, check_topics=True):
 @celery.task
 async def notify_new_agenda_item(_id, check_topics=True, is_new=False):
     with locked(_id, "agenda"):
-        app = get_current_wsgi_app()
-        agenda = app.data.find_one("agenda", req=None, _id=_id)
+        service = AgendaItemService()
+        agenda = await service.find_by_id(_id)
 
-        if agenda:
-            if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id and is_new:
-                logger.info("Ignoring recurring event %s", _id)
-                return
+        if not agenda:
+            return
 
-            get_resource_service("agenda").enhance_items([agenda])
-            await notifier.notify_new_item(agenda, check_topics=check_topics)
+        if agenda.recurrence_id and agenda.recurrence_id != _id and is_new:
+            logger.info("Ignoring recurring event %s", _id)
+            return
+
+        agenda_dict = agenda.to_dict()
+        await AgendaItemService().enhance_item(agenda_dict)
+        await notifier.notify_new_item(agenda_dict, check_topics=check_topics)

@@ -8,13 +8,13 @@ from superdesk.core.resources.fields import ObjectId, Field
 
 from newsroom.core.resources import NewshubResourceModel, validate_ip_address, validate_auth_provider
 
-from .products import ProductType
+from .common import SectionEnum
 
 
 @dataclass
 class CompanyProduct:
     _id: Annotated[ObjectId, validate_data_relation_async("products")]
-    section: ProductType
+    section: SectionEnum
     seats: int = 0
 
     def to_dict(self):
@@ -51,3 +51,4 @@ class CompanyResource(NewshubResourceModel):
     auth_provider: Annotated[Optional[str], validate_auth_provider()] = None
     company_size: Optional[str] = None
     referred_by: Optional[str] = None
+    internal: bool = False

@@ -10,7 +10,7 @@ import re
 import pathlib
 import importlib
 
-# import sentry_sdk
+import sentry_sdk
 from flask_mail import Mail
 from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
@@ -28,7 +28,7 @@ from superdesk.cache import cache_backend
 from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.factory.app import SuperdeskEve
 
-# from sentry_sdk.integrations.quart import QuartIntegration
+from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
 from newsroom.auth.eve_auth import SessionAuth
@@ -145,18 +145,13 @@ class BaseNewsroomApp(SuperdeskEve):
             self.media = SuperdeskGridFSMediaStorage(self)
 
     def setup_babel(self):
-        # TODO-ASYNC: Add support to quart_babel to support multiple directories on the domain
-        # Set `root_path` to `NEWSROOM_DIR`, so quart-babel imports translations from newsroom.translations
-        self.root_path = str(NEWSROOM_DIR)
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))
 
         if self.config.get("TRANSLATIONS_PATH"):
-            self.config["BABEL_TRANSLATION_DIRECTORIES"] = ";".join(
-                [
-                    str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
-                    str(self.config["TRANSLATIONS_PATH"]),
-                ]
-            )
+            self.config["BABEL_TRANSLATION_DIRECTORIES"] = [
+                str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
+                str(self.config["TRANSLATIONS_PATH"]),
+            ]
 
         # avoid events on this
         self.babel_tzinfo = None
@@ -287,13 +282,15 @@ class BaseNewsroomApp(SuperdeskEve):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
 
     def setup_sentry(self):
-        # TODO-ASYNC: Fix sentry/quart integrations
-        pass
-        # if self.config.get("SENTRY_DSN"):
-        #     sentry_sdk.init(
-        #         dsn=self.config["SENTRY_DSN"],
-        #         integrations=[QuartIntegration()],
-        #     )
+        if self.config.get("SENTRY_DSN"):
+            # Given how quart_flask_patch patches things, it makes Sentry SDK to think that flask is installed
+            # mistakenly enabling FlaskIntegration, which breaks QuartIntegration, and preventing sentry from working properly.
+            # https://github.com/pgjones/quart-flask-patch/blob/0.3.0/src/quart_flask_patch/_patch.py#L110
+            # This prevents flask integration from being enabled at all until we're can use a newer version of sentry-sdk where
+            # specific integrations can be disabled https://github.com/getsentry/sentry-python/releases/tag/2.11.0
+            sentry_sdk.integrations._processed_integrations.add("flask")
+
+            sentry_sdk.init(dsn=self.config["SENTRY_DSN"], integrations=[QuartIntegration()])
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):

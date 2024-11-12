@@ -10,13 +10,14 @@ from quart import json
 from quart.datastructures import FileStorage
 
 from newsroom.types import UserResourceModel, CompanyResource, UserRole, TopicResourceModel, SectionEnum
-from newsroom.utils import get_company_dict_async, get_entity_or_404, get_user_dict_async
+from newsroom.utils import get_company_dict_async, get_user_dict_async
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.notifications import NotificationsService
+from newsroom.history_async import HistoryService
 
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
-from tests.core.utils import add_company_products, create_entries_for
+from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email
 
@@ -276,12 +277,13 @@ async def test_push_binary_invalid_signature(client, app):
 
 @markers.requires_async_celery
 async def test_notify_topic_matches_for_new_item(client, app, mocker):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -322,14 +324,13 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
 
     key = b"something random"
     app.config["PUSH_KEY"] = key
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_notification")
 
     data = {"guid": "foo", "type": "text", "headline": "this is a test"}
     headers = get_signature_headers(json.dumps(data), key)
     resp = await client.post("/push", json=data, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
@@ -344,7 +345,7 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
@@ -357,25 +358,21 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": True,
         "receive_app_notifications": True,
         "company": company_ids[0],
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "bar",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "bar", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
         section="wire",
     )
 
@@ -383,12 +380,11 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         key = b"something random"
         app.config["PUSH_KEY"] = key
         data = {"guid": "bar", "type": "text", "headline": "this is a test"}
-        push_mock = mocker.patch("newsroom.notifications.push_notification")
+        push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
@@ -429,7 +425,7 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
-    company_ids = app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
@@ -442,25 +438,22 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": False,  # should still get email
         "receive_app_notifications": True,
         "company": company_ids[0],
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "bar",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "bar", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     key = b"something random"
@@ -474,14 +467,13 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
         "body_html": "Killed story",
         "pubstatus": "canceled",
     }
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(json.dumps(data), key)
 
     with app.mail.record_messages() as outbox:
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
@@ -498,6 +490,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "is_approved": True,
         "receive_email": True,
@@ -505,10 +498,10 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         "company": COMPANY_1_ID,
     }
 
-    user_ids = app.data.insert("users", [user])
+    user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -523,14 +516,14 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
                 "_id": "bar",
                 "headline": "testing",
                 "service": [{"code": "a", "name": "Service A"}],
-                "products": [{"code": 1, "name": "product-1"}],
+                "products": [{"code": "product-1", "name": "product-1"}],
             }
         ],
     )
@@ -550,12 +543,11 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         key = b"something random"
         app.config["PUSH_KEY"] = key
         data = {"guid": "bar", "type": "text", "headline": "this is a test"}
-        push_mock = mocker.patch("newsroom.notifications.push_notification")
+        push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
@@ -571,26 +563,26 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
 
 @markers.requires_async_celery
 async def test_do_not_notify_disabled_user(client, app, mocker):
-    app.data.insert(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
-                "_id": 1,
                 "name": "Press 2 co.",
                 "is_enabled": True,
             }
         ],
     )
 
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": 1,
+                "company": company_ids[0],
             }
         ],
     )
@@ -600,31 +592,30 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
         session["user"] = user
     resp = await client.post(
         "users/%s/topics" % user,
-        json={"label": "bar", "query": "test", "notifications": True},
+        json={"label": "bar", "topic_type": "wire", "query": "test", "notifications": True},
     )
-    assert 201 == resp.status_code
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # disable user
-    user = app.data.find_one("users", req=None, _id=user_ids[0])
-    app.data.update("users", user_ids[0], {"is_enabled": False}, user)
+    user = await find_one_by_id("users", user_ids[0])
+    await update_entries_for("users", user_ids[0], {"is_enabled": False}, user)
     # clean cache
     app.cache.delete(str(user_ids[0]))
 
     key = b"something random"
     app.config["PUSH_KEY"] = key
     data = {"guid": "foo", "type": "text", "headline": "this is a test"}
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_notification")
     headers = get_signature_headers(json.dumps(data), key)
     resp = await client.post("/push", json=data, headers=headers)
     assert 200 == resp.status_code
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["_items"][0]["_id"] == "foo"
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_checks_service_subscriptions(client, app, mocker):
     company_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "companies",
         [
             {
@@ -635,7 +626,7 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
         ],
     )
 
-    user_ids = app.data.insert(
+    user_ids = await create_entries_for(
         "auth_user",
         [
             {
@@ -679,12 +670,13 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
 @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_notification_emails(client, app):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -692,7 +684,7 @@ async def test_send_notification_emails(client, app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
@@ -733,7 +725,6 @@ async def test_send_notification_emails(client, app):
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "http://localhost:5050/wire?item=foo" in outbox[0].body
 
@@ -810,13 +801,13 @@ async def test_matching_topics(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(item["guid"], topics, users, companies)
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(item["guid"], topics, users, companies)
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
 
 
 async def test_matching_topics_for_public_user(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -885,7 +876,7 @@ async def test_matching_topics_for_public_user(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
@@ -893,7 +884,7 @@ async def test_matching_topics_for_public_user(client, app):
 
 async def test_matching_topics_for_user_with_inactive_company(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -961,7 +952,7 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
             )
         ),
     ]
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["created_from_future"], topic_ids["query"]} == matching
@@ -969,7 +960,7 @@ async def test_matching_topics_for_user_with_inactive_company(client, app):
 
 async def test_push_parsed_item(client, app):
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "wire_search")
+    parsed = await find_one_by_id("items", item["guid"])
     assert isinstance(parsed["firstcreated"], datetime)
     assert 2 == parsed["wordcount"]
     assert 7 == parsed["charcount"]
@@ -979,7 +970,7 @@ async def test_push_parsed_dates(client, app):
     payload = item.copy()
     payload["embargoed"] = "2019-01-31T00:01:00+00:00"
     await client.post("/push", json=payload)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert isinstance(parsed["firstcreated"], datetime)
     assert isinstance(parsed["versioncreated"], datetime)
     assert isinstance(parsed["embargoed"], datetime)
@@ -987,7 +978,7 @@ async def test_push_parsed_dates(client, app):
 
 async def test_push_event_coverage_info(client, app):
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert parsed["event_id"] == "urn:event/1"
     assert parsed["coverage_id"] == "urn:coverage/1"
 
@@ -995,7 +986,7 @@ async def test_push_event_coverage_info(client, app):
 async def test_push_wire_subject_whitelist(client, app):
     app.config["WIRE_SUBJECT_SCHEME_WHITELIST"] = ["b"]
     await client.post("/push", json=item)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     assert 1 == len(parsed["subject"])
     assert "b" == parsed["subject"][0]["name"]
 
@@ -1005,14 +996,14 @@ async def test_push_custom_expiry(client, app):
     updated = item.copy()
     updated["source"] = "foo"
     await client.post("/push", json=updated)
-    parsed = get_entity_or_404(item["guid"], "items")
+    parsed = await find_one_by_id("items", item["guid"])
     now = datetime.utcnow().replace(second=0, microsecond=0)
     expiry: datetime = parsed["expiry"].replace(tzinfo=None)
     assert now + timedelta(days=49) < expiry < now + timedelta(days=51)
 
 
 async def test_matching_topics_with_mallformed_query(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -1058,14 +1049,14 @@ async def test_matching_topics_with_mallformed_query(client, app):
         ),
     ]
 
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert {topic_ids["good"]} == matching
 
 
 async def test_matching_topics_when_disabling_section(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -1109,7 +1100,44 @@ async def test_matching_topics_when_disabling_section(client, app):
         ),
     ]
     users[TEST_USER_ID].sections = {"wire": False, "agenda": True}
-    matching = await WireSearchServiceAsync().get_mathing_topics_for_item(
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
         item["guid"], topics, list(users.values()), companies
     )
     assert set() == matching
+
+
+# CPCN-967
+async def test_global_topic_after_deleting_user(client, app):
+    await add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "All",
+                "query": "*:*",
+                "is_enabled": True,
+                "product_type": "wire",
+            }
+        ],
+    )
+
+    await client.post("/push", json=item)
+
+    users = await get_user_dict_async(use_globals=False)
+    companies = await get_company_dict_async(use_globals=False)
+    topic_id = ObjectId()
+    topic = TopicResourceModel.from_dict(
+        dict(
+            _id=topic_id,
+            _created=None,
+            label="All Wire",
+            query="*:*",
+            user=None,
+            topic_type=SectionEnum.WIRE,
+            subscribers=[{"user_id": TEST_USER_ID, "notification_type": "real-time"}],
+        )
+    )
+    matching = await WireSearchServiceAsync().get_matching_topics_for_item(
+        item["guid"], [topic], list(users.values()), companies
+    )
+    assert matching == {topic_id}

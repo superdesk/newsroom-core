@@ -84,7 +84,7 @@ async def bookmark():
     """
     data = await get_json_or_400()
     assert data.get("items")
-    update_action_list(data.get("items"), "bookmarks", item_type="items")
+    await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification(
         "saved_items",
         count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.AM_NEWS),
@@ -97,7 +97,7 @@ async def bookmark():
 async def copy(_id):
     item_type = get_type()
     get_entity_or_404(_id, item_type)
-    update_action_list([_id], "copies", item_type=item_type)
+    await update_action_list([_id], "copies", item_type=item_type)
     return jsonify(), 200
 
 
@@ -125,7 +125,7 @@ async def item(_id):
     previous_versions = get_previous_versions(item)
     if "print" in request.args:
         template = "wire_item_print.html"
-        update_action_list([_id], "prints", force_insert=True)
+        await update_action_list([_id], "prints", force_insert=True)
     else:
         template = "wire_item.html"
     return await render_template(

@@ -1,18 +1,17 @@
-import click
+from typing import AsyncGenerator
 import logging
-
-from typing import List, Set, Dict, Any, Generator
 from datetime import datetime, timedelta
-from eve.utils import ParsedRequest, date_to_str
 
-from superdesk.core import json, get_app_config
+import click
+
+from superdesk.core import get_app_config
+from superdesk.core.utils import date_to_str
 from superdesk.resource_fields import ID_FIELD
-from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 from superdesk.utc import utcnow
 
-from newsroom.utils import parse_date_str
-from newsroom.agenda.utils import get_item_type, AGENDA_ITEM_TYPE
+from newsroom.types import AgendaItem, AgendaItemType
+from newsroom.agenda import AgendaItemService
 from .cli import newsroom_cli
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @newsroom_cli.command("remove_expired_agenda")
 @click.option("-m", "--expiry", "expiry_days", required=False, help="Number of days to determine expiry")
-def remove_expired_agenda(expiry_days=None):
+async def remove_expired_agenda_command(expiry_days=None):
     """Remove expired Agenda items
 
     By default, no Agenda items expire, you can change this with the ``AGENDA_EXPIRY_DAYS`` config.
@@ -32,8 +31,11 @@ def remove_expired_agenda(expiry_days=None):
         $ python manage.py remove_expired_agenda -m 60
         $ python manage.py remove_expired_agenda --expiry 60
     """
+    await remove_expired_agenda(expiry_days=expiry_days)
 
-    num_of_days = int(expiry_days) if expiry_days is not None else get_app_config("AGENDA_EXPIRY_DAYS", 0)
+
+async def remove_expired_agenda(expiry_days=None):
+    num_of_days = int(expiry_days) if expiry_days is not None else int(get_app_config("AGENDA_EXPIRY_DAYS", 0))
 
     if num_of_days == 0:
         logger.info("Expiry days is set to 0, therefor no items will be removed")
@@ -45,7 +47,7 @@ def remove_expired_agenda(expiry_days=None):
         return
 
     try:
-        num_items_removed = _remove_expired_items(utcnow(), num_of_days)
+        num_items_removed = await _remove_expired_items(utcnow(), num_of_days)
     finally:
         unlock(lock_name)
 
@@ -55,90 +57,81 @@ def remove_expired_agenda(expiry_days=None):
         logger.info(f"Completed removing {num_items_removed} expired agenda items")
 
 
-def _remove_expired_items(now: datetime, expiry_days: int):
+async def _remove_expired_items(now: datetime, expiry_days: int):
     """Remove expired Event and/or Planning items from the Agenda collection"""
 
     logger.info("Starting to remove expired items")
-    # TODO-ASYNC: revisit once `agenda` module has been migrate to async
-    agenda_service = get_resource_service("agenda")
+    agenda_service = AgendaItemService()
     expiry_datetime = now - timedelta(days=expiry_days)
     num_items_removed = 0
-    for expired_items in _get_expired_items(expiry_datetime):
-        items_to_remove: Set[str] = set()
+    async for expired_items in _get_expired_items(expiry_datetime):
+        items_to_remove: set[str] = set()
 
         for item in expired_items:
-            item_id = item[ID_FIELD]
-            logger.info(f"Processing expired item {item_id}")
-            for child_id in _get_expired_chain_ids(item, expiry_datetime):
-                items_to_remove.add(child_id)
+            logger.info(f"Processing expired item {item.id}")
+            items_to_remove |= await _get_expired_chain_ids(item, expiry_datetime)
 
         if len(items_to_remove):
             logger.info(f"Deleting items: {items_to_remove}")
             num_items_removed += len(items_to_remove)
-            agenda_service.delete_action(lookup={ID_FIELD: {"$in": list(items_to_remove)}})
+            await agenda_service.delete_many({ID_FIELD: {"$in": list(items_to_remove)}})
 
     logger.info("Finished removing expired items from agenda collection")
     return num_items_removed
 
 
-def _get_expired_items(
-    expiry_datetime: datetime,
-) -> Generator[List[Dict[str, Any]], datetime, None]:
+async def _get_expired_items(expiry_datetime: datetime) -> AsyncGenerator[list[AgendaItem], None]:
     """Get the expired items, based on ``expiry_datetime``"""
 
-    agenda_service = get_resource_service("agenda")
+    agenda_service = AgendaItemService()
+    expiry_datetime_str = date_to_str(expiry_datetime)
     max_loops = get_app_config("MAX_EXPIRY_LOOPS", 50)
-    for i in range(max_loops):  # avoid blocking forever just in case
-        req = ParsedRequest()
-        expiry_datetime_str = date_to_str(expiry_datetime)
 
-        # Filters out Planning items with coverages that have not yet expired
-        coverage_scheduled_query = {
-            "nested": {
-                "path": "coverages",
-                "query": {"range": {"coverages.scheduled": {"gt": expiry_datetime_str}}},
-            },
-        }
-        req.args = {
-            "source": json.dumps(
-                {
-                    "query": {
+    # Filters out Planning items with coverages that have not yet expired
+    coverage_scheduled_query = {
+        "nested": {
+            "path": "coverages",
+            "query": {"range": {"coverages.scheduled": {"gt": expiry_datetime_str}}},
+        },
+    }
+    query = {
+        "query": {
+            "bool": {
+                "filter": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
+                "should": [
+                    # Match Events directly (stored from v2.3+)
+                    # No more filters required, as we'll query & check planning items separately
+                    {"term": {"item_type": "event"}},
+                    # Match Planning directly with no associated Event (stored from v2.3+)
+                    {
                         "bool": {
-                            "filter": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
-                            "should": [
-                                # Match Events directly (stored from v2.3+)
-                                # No more filters required, as we'll query & check planning items separately
-                                {"term": {"item_type": "event"}},
-                                # Match Planning directly with no associated Event (stored from v2.3+)
-                                {
-                                    "bool": {
-                                        "filter": [{"term": {"item_type": "planning"}}],
-                                        "must_not": [
-                                            {"exists": {"field": "event_id"}},
-                                            coverage_scheduled_query,
-                                        ],
-                                    }
-                                },
-                                # Match Event and/or Planning items (stored before v2.3 changes to storage)
-                                {
-                                    "bool": {
-                                        "must_not": [
-                                            {"exists": {"field": "item_type"}},
-                                            coverage_scheduled_query,
-                                        ],
-                                    }
-                                },
+                            "filter": [{"term": {"item_type": "planning"}}],
+                            "must_not": [
+                                {"exists": {"field": "event_id"}},
+                                coverage_scheduled_query,
                             ],
-                            "minimum_should_match": 1,
-                        },
+                        }
                     },
-                    "sort": [{"dates.start": "asc"}],
-                    "size": get_app_config("MAX_EXPIRY_QUERY_LIMIT", 100),
-                }
-            ),
-        }
+                    # Match Event and/or Planning items (stored before v2.3 changes to storage)
+                    {
+                        "bool": {
+                            "must_not": [
+                                {"exists": {"field": "item_type"}},
+                                coverage_scheduled_query,
+                            ],
+                        }
+                    },
+                ],
+                "minimum_should_match": 1,
+            },
+        },
+        "sort": [{"dates.start": "asc"}],
+        "size": get_app_config("MAX_EXPIRY_QUERY_LIMIT", 100),
+    }
 
-        items = list(agenda_service.internal_get(req=req, lookup=None))
+    for i in range(max_loops):  # avoid blocking forever just in case
+        cursor = await agenda_service.search(query)
+        items = await cursor.to_list()
 
         if not len(items):
             break
@@ -148,36 +141,32 @@ def _get_expired_items(
         logger.warning(f"_get_expired_items did not finish in {max_loops} loops")
 
 
-def has_plan_expired(item: Dict[str, Any], expiry_datetime: datetime) -> bool:
+def has_plan_expired(item: AgendaItem, expiry_datetime: datetime) -> bool:
     """Returns ``True`` if the maximum planning/coverage time is before or equal to ``expiry_datetime``"""
 
-    max_schedule_datetime = max(
-        [parse_date_str(coverage["scheduled"]) for coverage in (item.get("coverages") or [])]
-        + [parse_date_str(item["dates"]["end"])]
-    )
+    max_schedule_datetime = max([coverage.scheduled for coverage in (item.coverages or [])] + [item.dates.end])
     return max_schedule_datetime <= expiry_datetime
 
 
-def _get_expired_chain_ids(parent: Dict[str, Any], expiry_datetime: datetime) -> List[str]:
+async def _get_expired_chain_ids(parent: AgendaItem, expiry_datetime: datetime) -> set[str]:
     """Returns the list of IDs to expire from ``parent`` and it's associated planning items
 
     If any one item in the chain has not expired, then this function returns an empty array,
     otherwise the list of IDs from the parent and any associated items are returned for purging.
     """
 
-    item_type = get_item_type(parent)
-    plan_ids = [plan.get(ID_FIELD) for plan in (parent.get("planning_items") or [])]
+    plan_ids = [plan._id for plan in (parent.planning_items or [])]
 
-    if item_type == AGENDA_ITEM_TYPE.PLANNING:
-        return [] if not has_plan_expired(parent, expiry_datetime) else [parent[ID_FIELD]]
+    if parent.item_type == AgendaItemType.PLANNING:
+        return set() if not has_plan_expired(parent, expiry_datetime) else {parent.id}
     elif not len(plan_ids):
-        return [parent[ID_FIELD]]
+        return {parent.id}
 
-    agenda_service = get_resource_service("agenda")
-    items: List[str] = [parent[ID_FIELD]]
-    for plan in agenda_service.find(where={ID_FIELD: {"$in": plan_ids}}):
+    cursor = await AgendaItemService().search({ID_FIELD: {"$in": plan_ids}}, use_mongo=True)
+    items: set[str] = {parent.id}
+    async for plan in cursor:
         if not has_plan_expired(plan, expiry_datetime):
-            return []
-        items.append(plan[ID_FIELD])
+            return set()
+        items.add(plan.id)
 
     return items

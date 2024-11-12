@@ -8,14 +8,21 @@ from urllib import parse
 from bson import ObjectId
 
 from superdesk.core import json
+from superdesk.cache import cache
 
-from newsroom.types import Product
+from newsroom.types import ProductResourceModel, SectionEnum
 from newsroom.companies import CompanyServiceAsync
 from newsroom.search.types import NewshubSearchRequest
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.wire.filters import WireSearchRequestArgs, apply_date_filters, apply_date_range
 
-from tests.core.utils import add_company_products, create_entries_for
+from tests.core.utils import (
+    add_company_products,
+    create_entries_for,
+    delete_entries_for,
+    update_entries_for,
+    find_one_by_id,
+)
 from ..fixtures import (  # noqa: F401
     items,
     init_items,
@@ -57,14 +64,14 @@ async def setup_products(app):
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
             {
                 "_id": PROD_1,
                 "name": "product test",
-                "sd_product_id": 1,
+                "sd_product_id": "1",
                 "navigations": [NAV_1],
                 "product_type": "wire",
                 "is_enabled": True,
@@ -72,7 +79,7 @@ async def setup_products(app):
             {
                 "_id": PROD_2,
                 "name": "product test 2",
-                "sd_product_id": 2,
+                "sd_product_id": "2",
                 "navigations": [NAV_2],
                 "product_type": "wire",
                 "is_enabled": True,
@@ -96,8 +103,8 @@ async def test_item_json(client):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_items(client, app):
-    user_ids = app.data.insert(
-        "users",
+    user_ids = await create_entries_for(
+        "auth_user",
         [
             {
                 "email": "foo2@bar.com",
@@ -165,7 +172,7 @@ async def test_bookmarks(client, app):
 
 
 async def test_bookmarks_by_section(client, app):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -229,7 +236,7 @@ async def test_search_filters_items_with_updates(client, app):
 
 
 async def test_search_includes_killed_items(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items", [{"_id": "foo", "pubstatus": "canceled", "headline": "killed", "versioncreated": datetime.utcnow()}]
     )
     resp = await client.get("/wire/search?q=headline:killed")
@@ -238,7 +245,7 @@ async def test_search_includes_killed_items(client, app):
 
 
 async def test_search_by_products_id(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -308,13 +315,13 @@ async def test_administrator_gets_all_results(client, app):
 
 
 async def test_search_filtered_by_users_products(client, app, public_user):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
             {
                 "name": "product test",
-                "sd_product_id": 1,
+                "sd_product_id": "1",
                 "is_enabled": True,
                 "product_type": "wire",
             }
@@ -369,7 +376,7 @@ async def test_search_filtered_by_query_product(client, app, public_user):
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -454,7 +461,7 @@ async def test_item_detail_access(client, app, public_user):
     assert not data.get("body_html")
 
     # add product
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -492,7 +499,7 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -513,7 +520,9 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
         ],
     )
 
+    # Remove cached data
     g.pop("cached:navigations", None)
+    cache.clean()
 
     await login(client, public_user)
     resp = await client.get("/wire/search")
@@ -525,11 +534,10 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
 
-    app.data.insert(
+    await create_entries_for(
         "section_filters",
         [
             {
-                "_id": ObjectId(),
                 "name": "product test 2",
                 "query": "headline:Weather",
                 "is_enabled": True,
@@ -538,8 +546,9 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
         ],
     )
 
-    g.section_filters = None
+    # Remove cached data
     g.pop("cached:section_filters", None)
+    cache.clean()
 
     resp = await client.get("/wire/search")
     data = json.loads(await resp.get_data())
@@ -556,7 +565,7 @@ async def test_search_using_section_filter_for_public_user(client, app, public_u
 
 async def test_administrator_gets_results_based_on_section_filter(client, app):
     await login(client, {"email": ADMIN_USER_EMAIL})
-    app.data.insert(
+    await create_entries_for(
         "section_filters",
         [
             {
@@ -575,7 +584,7 @@ async def test_administrator_gets_results_based_on_section_filter(client, app):
 
 
 async def test_time_limited_access(client, app, public_user):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -606,15 +615,15 @@ async def test_time_limited_access(client, app, public_user):
     assert 2 == len(data["_items"])
 
     g.settings["wire_time_limit_days"]["value"] = 1
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
-    app.data.update("companies", COMPANY_1_ID, {"archive_access": True}, company)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
+    await update_entries_for("companies", COMPANY_1_ID, {"archive_access": True}, company)
     resp = await client.get("/wire/search")
     data = json.loads(await resp.get_data())
     assert 2 == len(data["_items"])
 
 
 async def test_company_type_filter(client, app, public_user):
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -636,8 +645,8 @@ async def test_company_type_filter(client, app, public_user):
         dict(id="test", wire_must={"term": {"service.code": "b"}}),
     ]
 
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
-    app.data.update("companies", COMPANY_1_ID, {"company_type": "test"}, company)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
+    await update_entries_for("companies", COMPANY_1_ID, {"company_type": "test"}, company)
 
     resp = await client.get("/wire/search")
     data = json.loads(await resp.get_data())
@@ -656,14 +665,14 @@ async def test_company_type_filter(client, app, public_user):
 
 async def test_search_by_products_and_filtered_by_embargoe(app, public_user):
     product_id = ObjectId()
-    product = Product(
-        _id=product_id,
+    product = ProductResourceModel(
+        id=product_id,
         name="product test",
         query="headline:china",
         is_enabled=True,
-        product_type="wire",
+        product_type=SectionEnum.WIRE,
     )
-    add_company_products(app, COMPANY_1_ID, [product])
+    await add_company_products(app, COMPANY_1_ID, [product.to_dict()])
 
     # embargoed item is not fetched
     await create_entries_for(
@@ -694,7 +703,7 @@ async def test_search_by_products_and_filtered_by_embargoe(app, public_user):
         assert 0 == len(items)
 
         # ex-embargoed item is fetched
-        app.data.insert(
+        await create_entries_for(
             "items",
             [
                 {
@@ -731,7 +740,7 @@ async def test_wire_delete(client, app):
 
 
 async def test_highlighting(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -770,7 +779,7 @@ async def test_highlighting(client, app):
 
 
 async def test_highlighting_with_advanced_search(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -803,7 +812,7 @@ async def test_highlighting_with_advanced_search(client, app):
 
 
 async def test_french_accents_search(client, app):
-    app.data.insert(
+    await create_entries_for(
         "items", [{"_id": "foo", "body_html": "Story that involves élection", "versioncreated": datetime.utcnow()}]
     )
     resp = await client.get("/wire/search?q=election")
@@ -813,14 +822,14 @@ async def test_french_accents_search(client, app):
 
 
 async def test_navigation_for_public_users(client, app, setup_products):
-    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
     assert user
 
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company
 
     # add products to user
-    app.data.update(
+    await update_entries_for(
         "users",
         PUBLIC_USER_ID,
         {"products": [{"section": "wire", "_id": PROD_1}, {"section": "wire", "_id": PROD_2}]},
@@ -828,7 +837,7 @@ async def test_navigation_for_public_users(client, app, setup_products):
     )
 
     # and remove those from company
-    app.data.update(
+    await update_entries_for(
         "companies",
         COMPANY_1_ID,
         {"products": [{"section": "wire", "_id": PROD_1, "seats": 1}, {"section": "wire", "_id": PROD_2, "seats": 1}]},
@@ -840,6 +849,7 @@ async def test_navigation_for_public_users(client, app, setup_products):
     # make sure user gets the products
     resp = await client.get("/wire/search")
     data = json.loads(await resp.get_data())
+    print(data)
     assert 2 == len(data["_items"])
 
     # test navigation
@@ -850,10 +860,10 @@ async def test_navigation_for_public_users(client, app, setup_products):
 
 async def test_date_filters(client, app):
     # remove all other's item
-    app.data.remove("items")
+    await delete_entries_for("items")
     now = datetime.utcnow()
     app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {

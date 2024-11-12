@@ -1,4 +1,5 @@
 import pathlib
+from copy import deepcopy
 
 from quart import render_template_string, json, url_for
 from jinja2 import TemplateNotFound
@@ -14,10 +15,11 @@ from newsroom.email import (
 from unittest import mock
 from datetime import datetime
 
-from newsroom.types import User
+from newsroom.types import User, UserResourceModel, UserRole
 from newsroom.email import send_user_email
 from tests.fixtures import agenda_items
 from newsroom.tests import markers
+from tests.core.utils import create_entries_for
 
 
 async def test_item_notification_template(client, app, mocker):
@@ -45,6 +47,7 @@ async def test_item_notification_template(client, app, mocker):
 
     sub.assert_called_with(
         to=[user["email"]],
+        cc=None,
         subject="New story for followed topic: Topic",
         sender_name=None,
         text_body=await render_template_string(
@@ -127,7 +130,7 @@ def mock_get_template_include_fr_ca(template_name_or_list):
 
 @mock.patch("flask.current_app.jinja_env.get_or_select_template", mock_get_template_always_pass)
 async def test_map_email_recipients_by_language(client, app):
-    app.data.insert("users", MOCK_USERS)
+    await create_entries_for("users", MOCK_USERS)
 
     async with app.app_context():
         email_groups = map_email_recipients_by_language(EMAILS, "test_template")
@@ -159,7 +162,7 @@ async def test_map_email_recipients_by_language(client, app):
     mock_get_template_include_fr_ca,
 )
 async def test_map_email_recipients_by_language_fallback(client, app):
-    app.data.insert("users", MOCK_USERS)
+    await create_entries_for("users", MOCK_USERS)
 
     async with app.app_context():
         email_groups = map_email_recipients_by_language(EMAILS, "test_template")
@@ -184,7 +187,7 @@ async def test_email_avoid_long_lines(client, app, mocker):
     async with app.app_context():
         html = "<p>foo</p>" * 10000
         text = "a" * 500 + " " + "b" * 500 + " " + "c" * 500 + "d"
-        send_email(html_body=html, text_body=text, to="to", subject="subject")
+        await send_email(html_body=html, text_body=text, to="to", subject="subject")
     assert len(sub.mock_calls)
     call = sub.mock_calls[0]
     check_lines_length(call.kwargs["kwargs"]["html_body"])
@@ -249,9 +252,11 @@ async def test_send_user_email(app):
 
 @markers.requires_async_celery
 async def test_item_killed_notification_email(app):
-    user = User(
+    user = UserResourceModel(
+        first_name="Foo",
+        last_name="Bar",
         email="foo@example.com",
-        user_type="user",
+        user_type=UserRole.PUBLIC,
     )
 
     item = {
@@ -276,7 +281,10 @@ async def test_item_killed_notification_email(app):
 
 
 async def test_send_user_email_on_locale_changed():
-    event_item = agenda_items[0]
+    event_item = deepcopy(agenda_items[0])
+    event_item["coverages"] = deepcopy(agenda_items[1]["coverages"])
+    event_item["planning_items"] = deepcopy(agenda_items[1]["planning_items"])
+    # event_item = agenda_items[1]
 
     user = User(
         email="foo@example.com",
@@ -289,14 +297,15 @@ async def test_send_user_email_on_locale_changed():
 
     user["locale"] = "fr_CA"
     with mock.patch("newsroom.email.send_email") as send_email_mock:
-        template_kwargs = dict(item=agenda_items[0], planning_item=agenda_items[0]["planning_items"][0])
+        template_kwargs = dict(item=event_item, planning_item=event_item["planning_items"][0])
         await send_user_email(user, "test_template", template_kwargs=template_kwargs)
+        print(send_email_mock.call_args[1]["text_body"])
         assert "Event status : Planifiée" in send_email_mock.call_args[1]["text_body"]
         assert "Coverage status: Planifiée" in send_email_mock.call_args[1]["text_body"]
 
     user["locale"] = "en"
     with mock.patch("newsroom.email.send_email") as send_email_mock:
-        template_kwargs = dict(item=agenda_items[0], planning_item=agenda_items[0]["planning_items"][0])
+        template_kwargs = dict(item=event_item, planning_item=event_item["planning_items"][0])
         await send_user_email(user, "test_template", template_kwargs=template_kwargs)
         assert "Event status : Planned" in send_email_mock.call_args[1]["text_body"]
         assert "Coverage status: Planned" in send_email_mock.call_args[1]["text_body"]

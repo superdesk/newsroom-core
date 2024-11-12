@@ -1,6 +1,6 @@
 from babel import core
-from quart_babel import Babel, format_datetime, get_domain
-from quart_babel.typing import ASGIRequest
+from quart_babel import Babel, format_datetime
+from quart_babel.domain import get_domain
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.flask import request, session
@@ -9,7 +9,7 @@ from newsroom.types import User
 
 
 def get_client_translations(domain="client"):
-    translations = get_domain().translations
+    translations = get_domain().get_translations()
     return {key: val for key, val in translations._catalog.items() if key and val}
 
 
@@ -27,7 +27,7 @@ def get_client_locales():
     return client_locales
 
 
-async def get_session_locale(_req: ASGIRequest | None = None):
+def get_session_locale():
     from newsroom.auth.utils import get_user_or_none_from_request
 
     try:
@@ -61,7 +61,7 @@ def get_user_timezone(user: User) -> str:
     return get_app_config("BABEL_DEFAULT_TIMEZONE") or get_app_config("DEFAULT_TIMEZONE")
 
 
-async def get_session_timezone(_req: ASGIRequest | None = None):
+def get_session_timezone() -> str:
     from newsroom.auth.utils import get_user_or_none_from_request
 
     try:

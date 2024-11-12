@@ -16,7 +16,7 @@ from newsroom.types import (
     UserResourceModel,
     CompanyResource,
     SectionEnum,
-    Product,
+    ProductResourceModel,
     TopicResourceModel,
     AdvancedSearchParams,
 )
@@ -164,13 +164,15 @@ class BaseSearchRequestArgs(BaseModel):
     user_id: ObjectId | None = Field(validation_alias=AliasChoices("user_id", "user"), default=None)
 
     #: Filter items from this date onwards (an alias for ``created_from``)
-    start_date: str | None = Field(validation_alias=AliasChoices("start_date", "created_from"), default=None)
+    start_date: str | None = Field(
+        validation_alias=AliasChoices("start_date", "created_from", "date_from"), default=None
+    )
 
     #: Start time to use with the ``start_date`` argument (defaults to ``00.00:00``)
     start_time: str = Field(validation_alias=AliasChoices("start_time", "created_from_time"), default="00:00:00")
 
     #: Filter items up to this date (an alias for ``created_to``)
-    end_date: str | None = Field(validation_alias=AliasChoices("end_date", "created_to"), default=None)
+    end_date: str | None = Field(validation_alias=AliasChoices("end_date", "created_to", "date_to"), default=None)
 
     #: End time to use with the ``end_date`` argument (defaults to ``23:59:59``)
     end_time: str = Field(validation_alias=AliasChoices("end_time", "created_to_time"), default="23:59:59")
@@ -191,7 +193,7 @@ class BaseSearchRequestArgs(BaseModel):
     filter: dict[str, Any] | None = None
 
     #: List of item IDs to search for
-    ids: list[str] = Field(default_factory=list)
+    ids: list[str] = Field(validation_alias=AliasChoices("ids", "id"), default_factory=list)
 
     #: The timezone offest, used when constructing the date queries
     timezone_offset: int | None = None
@@ -230,7 +232,7 @@ class BaseSearchRequestArgs(BaseModel):
         except (ValueError, TypeError):
             raise BadParameterValueError(gettext("Incorrect type supplied for filter parameter"))
 
-    @field_validator("product_ids", "bookmarks", "navigation_ids", mode="before")
+    @field_validator("product_ids", "bookmarks", "navigation_ids", "ids", mode="before")
     def parse_list_ids(cls, value: list[str] | list[ObjectId] | str | ObjectId | None) -> list[str]:
         """If value is not a list, then convert it to a list here
 
@@ -342,9 +344,8 @@ class NewshubSearchRequest(Generic[SearchArgsType]):
 
     search: ESQuery = field(default_factory=ESQuery)
 
-    # TODO-ASYNC: Convert to Async resource model when it's available
     #: The list of pre-filled products to use when constructing the elasticsearch query
-    products: list[Product] = field(default_factory=list)
+    products: list[ProductResourceModel] = field(default_factory=list)
 
     #: The list of topics to use when constructing the elasticsearch query
     topic: TopicResourceModel | None = None

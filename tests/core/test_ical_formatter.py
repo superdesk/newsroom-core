@@ -6,9 +6,9 @@ import icalendar
 from quart import json
 
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
-from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import iCalFormatter
 from .test_push_events import test_event
+from tests.core.utils import find_one_by_id
 
 event = copy.deepcopy(test_event)
 event["ednote"] = "ed note"
@@ -24,7 +24,7 @@ event["dates"]["recurring_rule"] = {
 
 async def test_ical_formatter_item(client, app, mocker):
     await client.post("/push", json=event)
-    parsed = get_entity_or_404(event["guid"], "agenda")
+    parsed = await find_one_by_id("agenda", event["guid"])
     formatter = iCalFormatter()
 
     assert formatter.format_filename(parsed).endswith("new-press-conference.ical")
