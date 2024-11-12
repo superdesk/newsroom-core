@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, cast, TypedDict
 from copy import deepcopy
 
 from quart_babel import gettext
@@ -94,7 +94,13 @@ async def get_items(args):
         yield [item.to_dict() for item in items]
 
 
-async def get_aggregations(args, ids):
+class ItemAggregation(TypedDict):
+    total: int
+    actions: dict[str, int]
+    companies: list[str]
+
+
+async def get_aggregations(args: dict[str, Any], ids: list[str]) -> dict[str, ItemAggregation]:
     """Get action and company aggregations for the items provided"""
 
     if not args.get("section"):
