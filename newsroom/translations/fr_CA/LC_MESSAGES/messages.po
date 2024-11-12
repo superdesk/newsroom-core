@@ -10,25 +10,25 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2024
 # Sabina <sabina.gergel@thecanadianpress.com>, 2024
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2024
-# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
-# Nefertiti Patell, 2024
-# Paemiga Sararithi, 2024
 # Simon Peacock <simon.peacock@gmail.com>, 2024
 # Petr Jašek <petr.jasek@sourcefabric.org>, 2024
+# Nefertiti Patell, 2024
+# Paemiga Sararithi, 2024
+# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-13 11:56+0200\n"
+"POT-Creation-Date: 2024-10-21 11:35+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2024\n"
+"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -54,7 +54,7 @@ msgstr "Le gabarit de courriel '%(name)s' n'a pas été trouvé"
 msgid "Activity History: Inavlid request"
 msgstr "Historique d'activité: demande invalide"
 
-#: newsroom/push.py:115
+#: newsroom/push.py:119
 msgid "Unknown type {}"
 msgstr "Type inconnu {}"
 
@@ -139,59 +139,59 @@ msgstr ""
 "Permettre aux administrateurs de changer les autorisations de leurs "
 "utilisateurs pour les sections et les produits"
 
-#: newsroom/template_filters.py:139
+#: newsroom/template_filters.py:142
 msgid "Date: {start} to {end} ({tz}) (Time to be confirmed)"
 msgstr "Date : du {start} au {end} ({tz}) (Heure à confirmer)"
 
-#: newsroom/template_filters.py:144
+#: newsroom/template_filters.py:147
 msgid "Date: {start} ({tz}) (Time to be confirmed)"
 msgstr "Date : le {start} ({tz}) (Heure à confirmer)"
 
-#: newsroom/template_filters.py:147
+#: newsroom/template_filters.py:150
 msgid "Date: {start} ({tz})"
 msgstr "Date : le {start} ({tz})"
 
-#: newsroom/template_filters.py:150
+#: newsroom/template_filters.py:153
 msgid "Date: {start} to {end} ({tz})"
 msgstr "Date : du {start} au {end} ({tz})"
 
-#: newsroom/template_filters.py:152
+#: newsroom/template_filters.py:155
 msgid "Time: {start_time} to {end_time} on Date: {date} ({tz})"
 msgstr "Heure : {start_time} à {end_time} le {date} ({tz})"
 
-#: newsroom/template_filters.py:160
+#: newsroom/template_filters.py:163
 msgid "Date: {start_time} {start_date} to {end_time} {end_date} ({tz})"
 msgstr ""
 "Date : du {start_date} au {end_date} de {start_time} à {end_time} ({tz})"
 
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:213
+#: newsroom/utils.py:214
 msgid "ALL DAY"
 msgstr "TOUTE LA JOURNÉE"
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:305
-#: newsroom/utils.py:416
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:306
+#: newsroom/utils.py:417
 msgid "Account is disabled"
 msgstr "Compte désactivé"
 
-#: newsroom/utils.py:313
+#: newsroom/utils.py:314
 msgid "Account has not been approved"
 msgstr "Le compte n'a pas été approuvé"
 
 #: newsroom/auth/views.py:83 newsroom/auth/views.py:92
-#: newsroom/auth/views.py:184 newsroom/utils.py:406
+#: newsroom/auth/views.py:184 newsroom/utils.py:407
 msgid "Invalid username or password."
 msgstr "Nom d'utilisateur ou mot de passe invalide."
 
-#: newsroom/utils.py:412
+#: newsroom/utils.py:413
 msgid "Insufficient Permissions. Access denied."
 msgstr "Autorisations insuffisantes. Accès refusé."
 
-#: newsroom/auth/views.py:176 newsroom/utils.py:420
+#: newsroom/auth/views.py:176 newsroom/utils.py:421
 msgid "Company account has been disabled."
 msgstr "Le compte de l'entreprise a été désactivé."
 
-#: newsroom/auth/views.py:179 newsroom/utils.py:424
+#: newsroom/auth/views.py:179 newsroom/utils.py:425
 msgid "Company account has expired."
 msgstr "Le compte de l'entreprise a expiré."
 
@@ -408,8 +408,8 @@ msgstr "J'accepte"
 #: assets/user-profile/components/profile/UserProfile.tsx:104
 #: assets/users/components/EditUser.tsx:236
 #: assets/users/components/UsersList.tsx:33 newsroom/auth/forms.py:39
-#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:62
-#: newsroom/users/forms.py:46
+#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:63
+#: newsroom/users/forms.py:48
 msgid "Email"
 msgstr "Courriel"
 
@@ -421,19 +421,19 @@ msgstr "Mot de passe"
 msgid "Remember Me"
 msgstr "Se souvenir de moi"
 
-#: newsroom/auth/forms.py:53
+#: newsroom/auth/forms.py:54
 msgid "Passwords must match."
 msgstr "Les mots de passe doivent être identiques."
 
-#: newsroom/auth/forms.py:56
+#: newsroom/auth/forms.py:57
 msgid "Current password"
 msgstr "Mot de passe actuel"
 
-#: newsroom/auth/forms.py:59
+#: newsroom/auth/forms.py:60
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: newsroom/auth/forms.py:60
+#: newsroom/auth/forms.py:61
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
@@ -470,7 +470,7 @@ msgstr "L'entreprise a expiré"
 msgid "Invalid login type, Oauth not enabled for your user"
 msgstr "Votre compte ne vous permet pas d'utiliser ce type de connexion."
 
-#: newsroom/auth/saml.py:137
+#: newsroom/auth/saml.py:145
 msgid "There was an error when using SSO"
 msgstr "Une erreur est survenue en utilisant l'authentification unique"
 
@@ -492,45 +492,45 @@ msgstr ""
 msgid "Exceeded number of allowed login attempts"
 msgstr "Nombre de tentatives de connexion autorisées dépassé"
 
-#: newsroom/auth/views.py:227
+#: newsroom/auth/views.py:230
 msgid "Account already exists."
 msgstr "Ce compte existe déjà."
 
-#: newsroom/auth/views.py:296
+#: newsroom/auth/views.py:299
 msgid "Your account has been validated."
 msgstr "Votre compte a été validé."
 
-#: newsroom/auth/views.py:299
+#: newsroom/auth/views.py:302
 msgid "Token has expired. Please create a new token"
 msgstr "Le jeton a expiré. S'il vous plaît créez un nouveau jeton."
 
-#: newsroom/auth/views.py:318
+#: newsroom/auth/views.py:321
 msgid "Your password has been changed. Please login again."
 msgstr "Votre mot de passe a été changé. Veuillez vous reconnecter."
 
-#: newsroom/auth/views.py:344
+#: newsroom/auth/views.py:347
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 "Un jeton de réinitialisation du mot de passe a été envoyé à votre adresse de"
 " courriel."
 
-#: newsroom/auth/views.py:405 newsroom/auth/views.py:418
+#: newsroom/auth/views.py:408 newsroom/auth/views.py:421
 msgid "Your password has been changed."
 msgstr "Votre mot de passe a été modifié."
 
-#: newsroom/auth/views.py:407 newsroom/auth/views.py:414
+#: newsroom/auth/views.py:410 newsroom/auth/views.py:417
 msgid "Current password invalid."
 msgstr "Mot de passe incorrect"
 
-#: newsroom/auth/views.py:421
+#: newsroom/auth/views.py:424
 msgid "Change password is not available."
 msgstr "L'option de réinitialisation du mot de passe n'est pas disponible"
 
-#: newsroom/auth/views.py:441
+#: newsroom/auth/views.py:444
 msgid "User token is not valid"
 msgstr "Le jeton d'utilisateur n'est pas valable."
 
-#: newsroom/auth/views.py:452
+#: newsroom/auth/views.py:455
 msgid "Could not change your password. Please contact us for assistance."
 msgstr ""
 "La réinitialisation du mot de passe a échoué. Veuillez nous contacter pour "
@@ -695,7 +695,7 @@ msgstr "Type de format"
 #: assets/users/components/EditUser.tsx:273
 #: assets/users/components/EditUser.tsx:282
 #: assets/users/components/UsersList.tsx:38 newsroom/monitoring/forms.py:24
-#: newsroom/reports/reports.py:188 newsroom/users/forms.py:51
+#: newsroom/reports/reports.py:188 newsroom/users/forms.py:53
 msgid "Company"
 msgstr "Entreprise"
 
@@ -777,7 +777,7 @@ msgstr "Client non trouvé"
 #: assets/company-reports/components/Company.tsx:24
 #: assets/navigations/components/EditNavigation.tsx:26
 #: assets/users/components/EditUser.tsx:354 newsroom/products/__init__.py:15
-#: newsroom/users/forms.py:63
+#: newsroom/users/forms.py:65
 msgid "Products"
 msgstr "Produits"
 
@@ -880,7 +880,7 @@ msgid "API retrieval"
 msgstr "Récupération d'API"
 
 #: assets/company-reports/components/CompanyReportsApp.tsx:39
-#: newsroom/reports/content_activity.py:283
+#: newsroom/reports/content_activity.py:285
 msgid "Content activity"
 msgstr "Activité du contenu"
 
@@ -1032,8 +1032,7 @@ msgstr "Barre de navigation principale"
 #: assets/public/components/PublicApp.tsx:79
 #: newsroom/templates/base_layout.html:62
 #: newsroom/templates/login_client.html:4
-#: newsroom/templates/login_form.html:24
-#: newsroom/templates/login_layout.html:19
+#: newsroom/templates/login_layout.html:52
 msgid "Login"
 msgstr "Ouvrir une session"
 
@@ -1050,7 +1049,7 @@ msgstr "Navigation latérale"
 #: newsroom/templates/base_layout.html:104
 #: newsroom/templates/base_layout.html:111
 #: newsroom/templates/company_admin_index.html:3
-#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:40
+#: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:42
 msgid "Company Admin"
 msgstr "Administrateur client"
 
@@ -1071,22 +1070,21 @@ msgstr "Paramètres"
 
 #: newsroom/templates/change_password.html:13
 #: newsroom/templates/change_password.html:44
-#: newsroom/templates/reset_password.html:37
+#: newsroom/templates/reset_password.html:36
 msgid "Change Password"
 msgstr "Changer le mot de passe"
 
 #: newsroom/templates/change_password.html:36
-#: newsroom/templates/reset_password.html:30
+#: newsroom/templates/reset_password.html:29
 msgid "Please use 8 or more characters."
 msgstr "Veuillez utiliser 8 caractères ou plus."
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
+#: newsroom/templates/login_layout.html:46
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
 #: newsroom/templates/password_reset_link_expiry.html:8
 msgid "Click here to reset."
 msgstr "Cliquez ici pour réinitialiser."
@@ -1117,7 +1115,7 @@ msgid "Stop impersonation"
 msgstr "Mettre fin à l'emprunt du compte"
 
 #: newsroom/templates/login_client.html:9
-#: newsroom/templates/login_layout.html:33
+#: newsroom/templates/login_layout.html:72
 msgid "Login using Single Sign On"
 msgstr "Connexion avec l'authentification unique"
 
@@ -1127,21 +1125,38 @@ msgstr ""
 "Si vous avez des difficultés à vous connecter, veuillez contacter votre "
 "service informatique."
 
-#: newsroom/templates/login_form.html:30
+#: newsroom/templates/login_layout.html:13
+msgid "Login to Newshub"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:47
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: newsroom/templates/login_layout.html:47
+msgid "Click here to reset"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:59
 msgid "Log In with Google"
 msgstr "Se connecter avec Google"
 
-#: newsroom/templates/login_layout.html:41
-msgid "Or you can"
-msgstr "Ou vous pouvez"
+#: newsroom/templates/login_layout.html:69
+msgid "Or"
+msgstr ""
 
-#: newsroom/templates/login_layout.html:41
-msgid "click here to register."
-msgstr "cliquez ici pour vous inscrire."
+#: newsroom/templates/login_layout.html:81
+msgid "Don't have an account?"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:13
+#: newsroom/templates/signup_form.html:61
+msgid "Sign up"
+msgstr "S'inscrire"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:235
 #: assets/users/components/EditUser.tsx:308
-#: newsroom/templates/login_layout.html:50
+#: newsroom/templates/login_layout.html:92
 #: newsroom/templates/login_locale_dropdown.html:5
 msgid "Language"
 msgstr "Langue"
@@ -1181,19 +1196,16 @@ msgstr ""
 "Le lien dans le courriel a déjà expiré. Veuillez s'il vous plaît demander de"
 " nouveau de réinitialiser votre mot de passe. "
 
+#: assets/users/components/EditUser.tsx:476
 #: newsroom/templates/request_token.html:4
-msgid "Password Reset"
-msgstr "Réinitialisation du mot de passe"
+#: newsroom/templates/request_token.html:22
+#: newsroom/templates/reset_password.html:11
+msgid "Reset Password"
+msgstr "Réinitialiser le mot de passe"
 
 #: newsroom/templates/request_token.html:20
 msgid "Validate"
 msgstr "Valider"
-
-#: assets/users/components/EditUser.tsx:476
-#: newsroom/templates/request_token.html:22
-#: newsroom/templates/reset_password.html:12
-msgid "Reset Password"
-msgstr "Réinitialiser le mot de passe"
 
 #: assets/agenda/components/AgendaCoverageRequest.tsx:57
 #: assets/components/CardEditor.tsx:73 assets/components/CardEditor.tsx:75
@@ -1205,7 +1217,7 @@ msgstr "Réinitialiser le mot de passe"
 #: assets/search/components/TopicFolderEditor.jsx:39
 #: assets/user-profile/components/profile/UserProfile.tsx:251
 #: assets/wire/components/SelectedItemsBar.tsx:48
-#: newsroom/templates/reset_password.html:38
+#: newsroom/templates/reset_password.html:37
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -1213,10 +1225,6 @@ msgstr "Annuler"
 #: newsroom/templates/settings.html:17
 msgid "Settings Menu"
 msgstr "Menu des paramètres"
-
-#: newsroom/templates/signup.html:13 newsroom/templates/signup_form.html:61
-msgid "Sign up"
-msgstr "S'inscrire"
 
 #: newsroom/templates/signup_form.html:54
 msgid "the terms and conditions"
@@ -1251,6 +1259,7 @@ msgstr "Profil de l'utilisateur"
 #: assets/products/components/EditProduct.tsx:90
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
+#: assets/search/components/SearchResultsBar/index.tsx:232
 #: assets/search/components/TopicEditor.tsx:459
 #: assets/search/components/TopicFolder.tsx:100
 #: assets/section-filters/components/EditSectionFilter.tsx:27
@@ -1312,105 +1321,105 @@ msgid "User Management"
 msgstr "Gestion des utilisateurs"
 
 #: assets/monitoring/utils.ts:4 assets/users/utils.ts:8
-#: newsroom/users/forms.py:36
+#: newsroom/users/forms.py:38
 msgid "Administrator"
 msgstr "Administrateur"
 
 #: assets/monitoring/utils.ts:6 assets/users/utils.ts:10
-#: newsroom/users/forms.py:37
+#: newsroom/users/forms.py:39
 msgid "Public"
 msgstr "Public"
 
 #: assets/companies/components/CompanyListItem.tsx:25
 #: assets/companies/components/EditCompanyDetails.tsx:187
 #: assets/monitoring/utils.ts:5 assets/users/utils.ts:9
-#: newsroom/users/forms.py:38
+#: newsroom/users/forms.py:40
 msgid "Internal"
 msgstr "Interne"
 
 #: assets/monitoring/utils.ts:7 assets/users/utils.ts:11
-#: newsroom/users/forms.py:39
+#: newsroom/users/forms.py:41
 msgid "Account Management"
 msgstr "Gestion de compte"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:86
 #: assets/users/components/EditUser.tsx:222
 #: assets/users/components/filters/UserListSortFilter.tsx:23
-#: newsroom/users/forms.py:44
+#: newsroom/users/forms.py:46
 msgid "First Name"
 msgstr "Prénom"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:95
 #: assets/users/components/EditUser.tsx:229
 #: assets/users/components/filters/UserListSortFilter.tsx:26
-#: newsroom/users/forms.py:45
+#: newsroom/users/forms.py:47
 msgid "Last Name"
 msgstr "Nom de famille"
 
 #: assets/companies/components/CompanyList.tsx:41
 #: assets/companies/components/EditCompanyDetails.tsx:126
-#: newsroom/users/forms.py:47
+#: newsroom/users/forms.py:49
 msgid "Telephone"
 msgstr "Téléphone"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:135
-#: assets/users/components/EditUser.tsx:250 newsroom/users/forms.py:48
+#: assets/users/components/EditUser.tsx:250 newsroom/users/forms.py:50
 msgid "Mobile"
 msgstr "Cellulaire"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:144
 #: assets/users/components/EditUser.tsx:257
-#: assets/users/components/UsersList.tsx:36 newsroom/users/forms.py:49
+#: assets/users/components/UsersList.tsx:36 newsroom/users/forms.py:51
 msgid "Role"
 msgstr "Poste"
 
 #: assets/users/components/EditUser.tsx:263
 #: assets/users/components/UsersList.tsx:37
 #: assets/users/components/filters/UserListSortFilter.tsx:35
-#: newsroom/users/forms.py:50
+#: newsroom/users/forms.py:52
 msgid "User Type"
 msgstr "Type d'utilisateur"
 
-#: newsroom/users/forms.py:52
+#: newsroom/users/forms.py:54
 msgid "Sign Up Details"
 msgstr "Détails d'inscription"
 
-#: newsroom/users/forms.py:53
+#: newsroom/users/forms.py:55
 msgid "Email Validated"
 msgstr "Courriel validé"
 
-#: newsroom/users/forms.py:54
+#: newsroom/users/forms.py:56
 msgid "Account Enabled"
 msgstr "Compte activé"
 
-#: newsroom/users/forms.py:55
+#: newsroom/users/forms.py:57
 msgid "Account Approved"
 msgstr "Compte approuvé"
 
-#: assets/users/components/EditUser.tsx:452 newsroom/users/forms.py:56
+#: assets/users/components/EditUser.tsx:452 newsroom/users/forms.py:58
 msgid "Company Expiry Alert"
 msgstr "Alerte d'expiration"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:162
-#: newsroom/users/forms.py:57
+#: newsroom/users/forms.py:59
 msgid "Receive Email Notifications"
 msgstr "Recevoir des notifications par courriel"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:153
-#: newsroom/users/forms.py:58
+#: newsroom/users/forms.py:60
 msgid "Receive App Notifications"
 msgstr "Recevoir des notifications dans l'application"
 
-#: newsroom/users/forms.py:59
+#: newsroom/users/forms.py:61
 msgid "Locale"
 msgstr "Endroit"
 
-#: assets/users/components/EditUser.tsx:462 newsroom/users/forms.py:60
+#: assets/users/components/EditUser.tsx:462 newsroom/users/forms.py:62
 msgid "Manage Company Topics"
 msgstr "Gérer les sujets partagés"
 
 #: assets/companies/components/CompanyPermissions.tsx:74
-#: assets/users/components/EditUser.tsx:320 newsroom/users/forms.py:62
+#: assets/users/components/EditUser.tsx:320 newsroom/users/forms.py:64
 msgid "Sections"
 msgstr "Sections"
 
@@ -1498,27 +1507,27 @@ msgstr "Non décidée / au mérite"
 msgid "Not Intended / Cancelled"
 msgstr "Non prévue / annulée"
 
-#: newsroom/web/default_settings.py:635
+#: newsroom/web/default_settings.py:637
 msgid "Home"
 msgstr "Accueil"
 
-#: newsroom/web/default_settings.py:640
+#: newsroom/web/default_settings.py:642
 msgid "Wire"
 msgstr "Fil de presse"
 
-#: newsroom/web/default_settings.py:645
+#: newsroom/web/default_settings.py:647
 msgid "Agenda"
 msgstr "Calendrier"
 
-#: newsroom/web/default_settings.py:650
+#: newsroom/web/default_settings.py:652
 msgid "Monitoring"
 msgstr "Suivi"
 
-#: newsroom/web/default_settings.py:655
+#: newsroom/web/default_settings.py:657
 msgid "Saved / Watched"
 msgstr "Ma liste"
 
-#: newsroom/web/default_settings.py:693
+#: newsroom/web/default_settings.py:695
 msgid "Newshub"
 msgstr "NouvellesPro"
 
@@ -1526,24 +1535,24 @@ msgstr "NouvellesPro"
 #: assets/agenda/components/AgendaList.tsx:329
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
-#: assets/components/ExpiryDateInput.tsx:93
-#: newsroom/web/default_settings.py:816 newsroom/web/default_settings.py:842
+#: assets/components/ExpiryDateInput.tsx:94
+#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:844
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: newsroom/web/default_settings.py:818
+#: newsroom/web/default_settings.py:820
 msgid "Last Week"
 msgstr "La semaine dernière"
 
-#: newsroom/web/default_settings.py:824
+#: newsroom/web/default_settings.py:826
 msgid "Last 30 days"
 msgstr "Les 30 derniers jours"
 
-#: newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:846
 msgid "This Week"
 msgstr "Cette semaine"
 
-#: newsroom/web/default_settings.py:848
+#: newsroom/web/default_settings.py:850
 msgid "This Month"
 msgstr "Ce mois-ci"
 
@@ -1632,7 +1641,7 @@ msgstr "Expiration des produits du fil (en jours)"
 msgid "New navigation"
 msgstr "Nouvelle navigation"
 
-#: assets/utils.tsx:519
+#: assets/utils.tsx:520
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin"
@@ -1640,23 +1649,23 @@ msgstr ""
 "Aucun produit n'est associé à votre utilisateur. Veuillez contacter votre "
 "administrateur. "
 
-#: assets/utils.tsx:523
+#: assets/utils.tsx:524
 msgid "Resource was updated in the meantime, please refresh."
 msgstr "La ressource a été mise à jour entre-temps, veuillez la rafraîchir."
 
-#: assets/utils.tsx:525
+#: assets/utils.tsx:526
 msgid "Failed to process request!"
 msgstr "La requête n'a pas pu être exécutée!"
 
-#: assets/utils.tsx:713
+#: assets/utils.tsx:714
 msgid "Item copied successfully."
 msgstr "Élément copié avec succès."
 
-#: assets/utils.tsx:717
+#: assets/utils.tsx:718
 msgid "Sorry, Copy is not supported."
 msgstr "Désolé, la copie n'est pas prise en charge."
 
-#: assets/utils.tsx:748
+#: assets/utils.tsx:749
 msgid "Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}"
 msgstr ""
 "Tous les jours à {{ time1 }}, {{ time2 }} et {{ time3 }} {{ timezone }}"
@@ -1880,7 +1889,7 @@ msgid "Oldest updates"
 msgstr "Première modification"
 
 #: assets/agenda/components/AgendaApp.tsx:259
-#: assets/search/components/SearchResultsBar/index.tsx:63
+#: assets/search/components/SearchResultsBar/index.tsx:67
 msgid "Relevance"
 msgstr "Pertinence"
 
@@ -2073,7 +2082,7 @@ msgstr "Afficher"
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: assets/agenda/components/AgendaList.tsx:462
+#: assets/agenda/components/AgendaList.tsx:466
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
@@ -2129,11 +2138,11 @@ msgstr "Couvertures précédentes:"
 msgid "Associated Event"
 msgstr "Événement associé"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:24
+#: assets/agenda/components/AgendaPreviewImage.tsx:28
 msgid "Show Map"
 msgstr "Afficher la carte"
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:25
+#: assets/agenda/components/AgendaPreviewImage.tsx:29
 msgid "Hide Map"
 msgstr "Masquer la carte"
 
@@ -2936,31 +2945,31 @@ msgstr "Tout désélectionner"
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: assets/components/ExpiryDateInput.tsx:22
+#: assets/components/ExpiryDateInput.tsx:23
 msgid "on"
 msgstr "le"
 
-#: assets/components/ExpiryDateInput.tsx:23
+#: assets/components/ExpiryDateInput.tsx:24
 msgid "in 1 week"
 msgstr "dans 1 semaine"
 
-#: assets/components/ExpiryDateInput.tsx:24
+#: assets/components/ExpiryDateInput.tsx:25
 msgid "in 2 weeks"
 msgstr "dans 2 semaines"
 
-#: assets/components/ExpiryDateInput.tsx:25
+#: assets/components/ExpiryDateInput.tsx:26
 msgid "in 1 month"
 msgstr "dans 1 mois"
 
-#: assets/components/ExpiryDateInput.tsx:26
+#: assets/components/ExpiryDateInput.tsx:27
 msgid "in 6 months"
 msgstr "dans 6 mois"
 
-#: assets/components/ExpiryDateInput.tsx:27
+#: assets/components/ExpiryDateInput.tsx:28
 msgid "in 1 year"
 msgstr "dans 1 an"
 
-#: assets/components/ExpiryDateInput.tsx:28
+#: assets/components/ExpiryDateInput.tsx:29
 #: assets/news-api/components/EditAPIToken.tsx:195
 msgid "Never"
 msgstr "Jamais"
@@ -3005,7 +3014,7 @@ msgstr "Aucune nouvelle notification !"
 
 #: assets/components/NotificationPopup.tsx:72
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:235
+#: assets/search/components/SearchResultsBar/index.tsx:293
 msgid "Clear All"
 msgstr "Tout effacer"
 
@@ -3126,6 +3135,10 @@ msgstr "4 tuiles texte"
 msgid "2x2-events"
 msgstr "2x2 tuiles événements"
 
+#: assets/components/cards/utils.ts:173
+msgid "Wire list"
+msgstr "Wire list"
+
 #: assets/components/cards/utils.ts:180
 msgid "6 Navigation Tiles Per Row"
 msgstr "6 tuiles de navigation par rangée"
@@ -3184,7 +3197,7 @@ msgid "All"
 msgstr "Tout"
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:194
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:195
 #: assets/user-profile/components/PauseNotificationModal.tsx:126
 #: assets/wire/components/filters/NavCreatedPicker.tsx:74
 msgid "To"
@@ -3252,7 +3265,7 @@ msgstr "Filtres"
 msgid "Custom View"
 msgstr "Vue personnalisée"
 
-#: assets/maps/components/static.tsx:37
+#: assets/maps/components/static.tsx:43
 msgid "Map"
 msgstr "Carte"
 
@@ -3685,11 +3698,11 @@ msgstr "Cela nécessite de vous connecter à votre compte !"
 msgid "Register"
 msgstr "Enregistrer"
 
-#: assets/search/actions.ts:296
+#: assets/search/actions.ts:298
 msgid "Items were shared successfully."
 msgstr "Les éléments ont été partagés avec succès."
 
-#: assets/search/actions.ts:298
+#: assets/search/actions.ts:300
 msgid "Item was shared successfully."
 msgstr "L'élément a été partagé avec succès."
 
@@ -3983,17 +3996,17 @@ msgid "inside"
 msgstr "dans"
 
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:176
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:177
 #: assets/user-profile/components/PauseNotificationModal.tsx:111
 #: assets/wire/components/filters/NavCreatedPicker.tsx:62
 msgid "From"
 msgstr "De"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:261
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:262
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:269
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:270
 msgid "Filters applied"
 msgstr "Filtres appliqués"
 
@@ -4017,30 +4030,44 @@ msgstr "Enregistrer en tant que nouveau sujet"
 msgid "Save new topic"
 msgstr "Enregistrer un nouveau sujet "
 
-#: assets/search/components/SearchResultsBar/index.tsx:55
+#: assets/search/components/SearchResultsBar/index.tsx:59
 msgid "Newest first"
 msgstr "Le plus récent en premier"
 
-#: assets/search/components/SearchResultsBar/index.tsx:59
+#: assets/search/components/SearchResultsBar/index.tsx:63
 msgid "Oldest first"
 msgstr "Le plus ancien en premier"
 
-#: assets/search/components/SearchResultsBar/index.tsx:198
+#: assets/search/components/SearchResultsBar/index.tsx:208
 msgid "1 result"
 msgstr "1 résultat"
 
-#: assets/search/components/SearchResultsBar/index.tsx:200
+#: assets/search/components/SearchResultsBar/index.tsx:210
 msgid "{{ count }} results"
 msgstr "{{ count }} résultats"
 
-#: assets/search/components/SearchResultsBar/index.tsx:208
+#: assets/search/components/SearchResultsBar/index.tsx:240
+msgid ""
+"The initial search is limited to the {{dateFilterName}}. Please find "
+"different date ranges in the filter panel using the burger menu."
+msgstr ""
+
+#: assets/search/components/SearchResultsBar/index.tsx:266
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr "Trier par : "
 
-#: assets/search/components/SearchResultsBar/index.tsx:211
+#: assets/search/components/SearchResultsBar/index.tsx:269
 msgid "Sort results by"
 msgstr "Trier par"
+
+#: assets/search/components/SearchResultsBar/index.tsx:299
+msgid "Hide search terms"
+msgstr "Masquer les termes de recherche"
+
+#: assets/search/components/SearchResultsBar/index.tsx:300
+msgid "Show search terms"
+msgstr "Afficher les termes de recherche"
 
 #: assets/section-filters/actions.ts:72
 msgid "Section Filter updated successfully"
@@ -4356,19 +4383,19 @@ msgstr "Les éléments ont été retirés avec succès"
 msgid "Item was removed successfully"
 msgstr "L'élément a été retiré avec succès"
 
-#: assets/wire/utils.ts:396
+#: assets/wire/utils.ts:395
 msgid "segments"
 msgstr "segments"
 
-#: assets/wire/utils.ts:396
+#: assets/wire/utils.ts:395
 msgid "segment"
 msgstr "segment"
 
-#: assets/wire/utils.ts:399
+#: assets/wire/utils.ts:398
 msgid "versions"
 msgstr "versions"
 
-#: assets/wire/utils.ts:399
+#: assets/wire/utils.ts:398
 msgid "version"
 msgstr "version"
 

@@ -471,8 +471,9 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-MAX_EXPIRY_QUERY_LIMIT = os.environ.get("MAX_EXPIRY_QUERY_LIMIT", 100)
-CONTENT_API_EXPIRY_DAYS = os.environ.get("CONTENT_API_EXPIRY_DAYS", 180)
+MAX_EXPIRY_QUERY_LIMIT = int(os.environ.get("MAX_EXPIRY_QUERY_LIMIT", 100))
+CONTENT_API_EXPIRY_DAYS = int(os.environ.get("CONTENT_API_EXPIRY_DAYS", 180))
+CONTENT_API_EXPIRY_QUERY_LIMIT = int(os.environ.get("CONTENT_API_EXPIRY_QUERY_LIMIT", 1000))
 
 NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 
@@ -850,3 +851,9 @@ AGENDA_TIME_FILTERS = [
         "query": "now/M",
     },
 ]
+
+#: Include Current User In Mail CC for Coverage Inquiry
+#:
+#: .. versionadded:: 2.8
+#:
+COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False

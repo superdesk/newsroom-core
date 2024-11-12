@@ -74,6 +74,13 @@ items = [
         "versioncreated": datetime.now() - timedelta(days=10),
         "service": [{"code": "c", "name": "Service C"}],
     },
+    {
+        "_id": "tag:out-of-default-range",
+        "type": "text",
+        "version": 1,
+        "versioncreated": datetime.now() - timedelta(days=365),
+        "service": [{"code": "c", "name": "Service C"}],
+    },
 ]
 
 agenda_items = [

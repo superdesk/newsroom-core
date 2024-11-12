@@ -56,7 +56,7 @@ def test_ical_formatter_item(client, app, mocker):
     assert vevent["rrule"].to_ical() == b"FREQ=DAILY;COUNT=3;INTERVAL=1"
 
 
-def test_ical_formatter_failing(client, app):
+def test_ical_formatter_failing():
     with open(
         os.path.join(os.path.dirname(__file__), "../fixtures", "agenda_fixture.json"),
         "r",
@@ -64,3 +64,33 @@ def test_ical_formatter_failing(client, app):
         item = json.load(fixture)
     formatter = iCalFormatter()
     formatter.format_item(item, item_type="agenda")
+
+
+def test_onclusive_all_day():
+    event = {
+        "name": "test",
+        "dates": {
+            "start": "2024-01-01T00:00:00",
+            "end": "2024-01-03T00:00:00",
+            "all_day": True,
+        },
+    }
+    formatter = iCalFormatter()
+    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    assert "DTSTART;VALUE=DATE:20240101" in output
+    assert "DTEND;VALUE=DATE:20240103" in output
+
+
+def test_onclusive_no_end_time():
+    event = {
+        "name": "test",
+        "dates": {
+            "start": "2024-01-01T10:00:00",
+            "end": "2024-01-03T00:00:00",
+            "no_end_time": True,
+        },
+    }
+    formatter = iCalFormatter()
+    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    assert "DTSTART;VALUE=DATE-TIME:20240101T100000Z" in output
+    assert "DTEND;VALUE=DATE:20240103" in output

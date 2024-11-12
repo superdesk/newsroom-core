@@ -889,8 +889,8 @@ class BaseSearchService(Service):
                 continue
             queried_topics = []
             for topic in topics:
-                user_id = str(topic["user"])
-                if not user_id or str(user["_id"]) != user_id:
+                topic_subscribers = {subscriber["user_id"] for subscriber in topic.get("subscribers") or []}
+                if user["_id"] not in topic_subscribers and str(topic.get("user")) != str(user["_id"]):
                     continue
                 if topic["_id"] in topics_checked:
                     continue
@@ -923,7 +923,7 @@ class BaseSearchService(Service):
                     "Error in get_matching_topics",
                     extra=dict(
                         query=source,
-                        user=user_id,
+                        user=user["_id"],
                     ),
                 )
                 continue

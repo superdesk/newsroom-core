@@ -57,15 +57,17 @@ class iCalFormatter(BaseFormatter):
             event.add("priority", item["priority"])
 
         # calendar as category
-        for calendar in item.get("calendars", []):
+        for calendar in item.get("calendars") or []:
             if calendar.get("name"):
                 event.add("categories", [calendar["name"]])
 
         # dates
         dates = item.get("dates", {})
-        event.add("dtstart", datetime(dates["start"]))
+        start = datetime(dates["start"])
+        event.add("dtstart", start.date() if dates.get("all_day") else start)
         if dates.get("end"):
-            event.add("dtend", datetime(dates["end"]))
+            end = datetime(dates["end"])
+            event.add("dtend", end.date() if dates.get("no_end_time") or dates.get("all_day") else end)
         try:
             rrule = item["event"]["dates"]["recurring_rule"]
             event.add("rrule", get_rrule_kwargs(rrule))

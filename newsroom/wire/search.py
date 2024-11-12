@@ -341,7 +341,7 @@ class WireSearchService(BaseSearchService):
             date_range_query = self.get_date_range_query(date_filter)
         else:
             default_time_filter: Optional[TimeFilter] = next((f for f in self.get_time_filters() if f["default"]), None)
-            if default_time_filter:
+            if default_time_filter and not search.args.get("bookmarks"):
                 date_range_query = default_time_filter["query"]
                 date_range_query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
 

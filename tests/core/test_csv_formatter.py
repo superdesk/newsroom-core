@@ -50,7 +50,7 @@ formatter = CSVFormatter()
 
 def read_csv(data):
     csv_data = formatter.format_item(data, item_type="agenda")
-    csv_string = csv_data.decode("utf-8")
+    csv_string = csv_data.decode("utf-8-sig")
     csv_lines = csv_string.split("\n")
     csv_reader = csv.reader(csv_lines)
     header = next(csv_reader)

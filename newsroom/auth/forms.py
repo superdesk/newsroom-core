@@ -44,6 +44,7 @@ class LoginForm(FlaskForm):
 
 class TokenForm(FlaskForm):
     email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
+    firebase_status = StringField("firebase_status", validators=[])  # for firebase status code
 
 
 class ResetPasswordForm(FlaskForm):
