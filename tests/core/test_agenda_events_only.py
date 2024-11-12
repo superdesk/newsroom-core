@@ -153,7 +153,8 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
 
     await login_public(client)
 
-    await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    response = await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    assert response.status_code == 200, await response.get_data(as_text=True)
 
     # update comes in
     event["state"] = "rescheduled"
@@ -163,12 +164,11 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
         "tz": "Australia/Sydney",
     }
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
     notifications = await get_user_notifications(PUBLIC_USER_ID)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - updated" in str(outbox[0])
 
@@ -198,12 +198,11 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
     event["pubstatus"] = "cancelled"
     event["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
     notifications = await get_user_notifications(PUBLIC_USER_ID)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - updated" in str(outbox[0])
 
@@ -230,7 +229,7 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
     # planning comes in
     planning = deepcopy(test_planning)
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(PUBLIC_USER_ID)
@@ -256,7 +255,7 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
     planning["pubstatus"] = "cancelled"
     planning["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(PUBLIC_USER_ID)
@@ -300,7 +299,7 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
         }
     )
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(PUBLIC_USER_ID)

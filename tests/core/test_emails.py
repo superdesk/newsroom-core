@@ -15,7 +15,7 @@ from newsroom.email import (
 from unittest import mock
 from datetime import datetime
 
-from newsroom.types import User
+from newsroom.types import User, UserResourceModel, UserRole
 from newsroom.email import send_user_email
 from tests.fixtures import agenda_items
 from newsroom.tests import markers
@@ -252,9 +252,11 @@ async def test_send_user_email(app):
 
 @markers.requires_async_celery
 async def test_item_killed_notification_email(app):
-    user = User(
+    user = UserResourceModel(
+        first_name="Foo",
+        last_name="Bar",
         email="foo@example.com",
-        user_type="user",
+        user_type=UserRole.PUBLIC,
     )
 
     item = {

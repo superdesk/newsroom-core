@@ -173,7 +173,6 @@ async def test_login_fails_for_not_approved_user(app, client):
     assert "Account has not been approved" in await response.get_data(as_text=True)
 
 
-# TODO-ASYNC-AUTH: This one fails
 async def test_login_fails_for_many_times_gets_limited(client, app):
     for i in range(1, 100):
         response = await client.post(
