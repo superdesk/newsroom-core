@@ -89,7 +89,13 @@ def apply_item_type_filter(request: NewshubSearchRequest) -> None:
     """Applies item type filter(s) based on the request args"""
 
     request.search.query.must_not.append({"term": {"type": "composite"}})
-    if not request.args.ignore_latest:
+    try:
+        ignore_latest = request.args.ignore_latest
+    except AttributeError:
+        # This can happen when ``BaseSearchRequestArgs`` is used for search args
+        ignore_latest = False
+
+    if not ignore_latest:
         request.search.query.must_not.append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
 
 

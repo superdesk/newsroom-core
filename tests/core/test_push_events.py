@@ -8,7 +8,6 @@ from typing import Dict, Any
 
 from quart import json
 from quart.datastructures import FileStorage
-from superdesk import get_resource_service
 
 import newsroom.signals
 
@@ -16,6 +15,7 @@ from newsroom.tests.users import (
     ADMIN_USER_ID,
 )  # noqa - Fix cyclic import when running single test file
 from newsroom.notifications import get_user_notifications
+from newsroom.history_async import HistoryService
 from newsroom.tests import markers
 
 from .test_push import get_signature_headers
@@ -435,6 +435,7 @@ async def test_notify_topic_matches_for_new_event_item(client, app, mocker):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -459,12 +460,11 @@ async def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     key = b"something random"
     app.config["PUSH_KEY"] = key
     event["dates"]["start"] = "2018-05-29T04:00:00+0000"
-    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_agenda_item_notification")
     headers = get_signature_headers(json.dumps(event), key)
     resp = await client.post("/push", json=event, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
@@ -481,6 +481,7 @@ async def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -509,12 +510,11 @@ async def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     planning["guid"] = "bar2"
     planning["event_item"] = "foo"
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_agenda_item_notification")
     headers = get_signature_headers(data, key)
     resp = await client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
@@ -534,6 +534,7 @@ async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -560,12 +561,11 @@ async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker
 
     # resend the planning item
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_agenda_item_notification")
     headers = get_signature_headers(data, key)
     resp = await client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["item"]["_id"] == "bar3"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
@@ -586,6 +586,7 @@ async def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, moc
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": True,
         "receive_app_notifications": True,
@@ -595,17 +596,12 @@ async def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, moc
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with the proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "bar3",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "bar3", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     # remove event link from planning item
@@ -617,16 +613,15 @@ async def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, moc
     app.config["PUSH_KEY"] = key
 
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(data, key)
     resp = await client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
-    notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
+    notification = (await get_user_notifications(user_ids[0]))[0]
     assert notification["action"] == "history_match"
     assert notification["item"] == "bar3"
     assert notification["resource"] == "agenda"
@@ -649,6 +644,7 @@ async def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": True,
         "receive_app_notifications": True,
@@ -658,33 +654,27 @@ async def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with the proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "foo",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "foo", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     key = b"something random"
     app.config["PUSH_KEY"] = key
     event = deepcopy(test_event)
     data = json.dumps(event)
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(data, key)
     resp = await client.post("/push", json=event, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
-    notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
+    notification = (await get_user_notifications(user_ids[0]))[0]
     assert notification["action"] == "history_match"
     assert notification["item"] == "foo"
     assert notification["resource"] == "agenda"
@@ -710,6 +700,7 @@ async def test_notify_user_matches_for_new_planning_in_history(client, app, mock
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": True,
         "receive_app_notifications": True,
@@ -719,17 +710,12 @@ async def test_notify_user_matches_for_new_planning_in_history(client, app, mock
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with the proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "foo",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "foo", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     key = b"something random"
@@ -739,16 +725,15 @@ async def test_notify_user_matches_for_new_planning_in_history(client, app, mock
     planning["guid"] = "bar2"
     planning["event_item"] = "foo"
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(data, key)
     resp = await client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
-    notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
+    notification = (await get_user_notifications(user_ids[0]))[0]
     assert notification["action"] == "history_match"
     assert notification["item"] == "foo"
     assert notification["resource"] == "agenda"
@@ -774,6 +759,7 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": False,  # should still get email
         "receive_app_notifications": True,
@@ -783,17 +769,12 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with the proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "foo",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "foo", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     key = b"something random"
@@ -801,18 +782,18 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     event["pubstatus"] = "cancelled"
     event["state"] = "cancelled"
     data = json.dumps(event)
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(data, key)
 
     with app.mail.record_messages() as outbox:
         resp = await client.post("/push", json=event, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
-    notification = get_resource_service("notifications").find_one(req=None, user=user_ids[0])
+
+    notification = (await get_user_notifications(user_ids[0]))[0]
     assert notification["action"] == "history_match"
     assert notification["item"] == "foo"
     assert notification["resource"] == "agenda"
@@ -908,12 +889,11 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
         "tz": "Australia/Sydney",
     }
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
     notifications = await get_user_notifications(user_id)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - updated" in str(outbox[0])
     assert "The event you have been following has been rescheduled" in str(outbox[0])
@@ -943,12 +923,11 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
     event["pubstatus"] = "cancelled"
     event["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", event)
     notifications = await get_user_notifications(user_id)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - Coverage updated" in str(outbox[0])
     assert "The event you have been following has been cancelled" in str(outbox[0])
@@ -975,12 +954,11 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
     # planning comes in
     planning = deepcopy(test_planning)
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(user_id)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - Coverage updated" in str(outbox[0])
     assert "The event you have been following has new coverage(s)" in str(outbox[0])
@@ -1012,12 +990,11 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
     planning["pubstatus"] = "cancelled"
     planning["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(user_id)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - Coverage updated" in str(outbox[0])
     assert "! Text coverage 'Vivid Text Explainer' has been cancelled.\r\nNote: ed note here" in str(outbox[0])
@@ -1055,7 +1032,7 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
                 "ednote": "ed note here",
                 "scheduled": "2018-05-29T10:51:52+0000",
             },
-            "coverage_status": {
+            "news_coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int",
@@ -1066,12 +1043,11 @@ async def test_watched_event_sends_notification_for_added_coverage(client, app, 
         }
     )
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
         await post_json(client, "/push", planning)
     notifications = await get_user_notifications(user_id)
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - Coverage updated" in str(outbox[0])
     assert "! Video coverage 'Vivid planning item' due" in str(outbox[0])

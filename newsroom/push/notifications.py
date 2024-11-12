@@ -240,7 +240,7 @@ class NotificationManager:
                     dict(
                         user=user_id,
                         item=item["_id"],
-                        resource=item.get("type"),
+                        resource=item.get("type") or item.get("_type"),
                         action="history_match",
                         data=None,
                     )
@@ -291,7 +291,7 @@ class NotificationManager:
         users_dict: dict[str, User] = {str(user.id): user.to_dict() for user in users.values()}
         topic_matches |= set(
             [
-                topic
+                topic["_id"]
                 for topic in await get_agenda_notification_topics_for_query_by_id(item, users_dict)
                 if topic.get("_id") not in topic_matches
             ]

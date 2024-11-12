@@ -13,6 +13,7 @@ from newsroom.types import UserResourceModel, CompanyResource, UserRole, TopicRe
 from newsroom.utils import get_company_dict_async, get_user_dict_async
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.notifications import NotificationsService
+from newsroom.history_async import HistoryService
 
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
@@ -282,6 +283,7 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -322,14 +324,13 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
 
     key = b"something random"
     app.config["PUSH_KEY"] = key
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_notification")
 
     data = {"guid": "foo", "type": "text", "headline": "this is a test"}
     headers = get_signature_headers(json.dumps(data), key)
     resp = await client.post("/push", json=data, headers=headers)
     assert 200 == resp.status_code
 
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
@@ -357,6 +358,7 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": True,
         "receive_app_notifications": True,
@@ -366,17 +368,11 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "bar",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "bar", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
         section="wire",
     )
 
@@ -384,12 +380,11 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         key = b"something random"
         app.config["PUSH_KEY"] = key
         data = {"guid": "bar", "type": "text", "headline": "this is a test"}
-        push_mock = mocker.patch("newsroom.notifications.push_notification")
+        push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
@@ -443,6 +438,7 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "receive_email": False,  # should still get email
         "receive_app_notifications": True,
@@ -452,17 +448,12 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
     user_ids = await create_entries_for("auth_user", [user])
     user["_id"] = user_ids[0]
 
-    # TODO-ASYNC-AGENDA: Replace this with proper function call
-    app.data.insert(
-        "history",
-        docs=[
-            {
-                "version": "1",
-                "_id": "bar",
-            }
-        ],
+    await HistoryService().create_history_record(
+        docs=[{"_id": "bar", "version": "1"}],
         action="download",
-        user=user,
+        user_id=user_ids[0],
+        company_id=company_ids[0],
+        section="wire",
     )
 
     key = b"something random"
@@ -476,14 +467,13 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
         "body_html": "Killed story",
         "pubstatus": "canceled",
     }
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     headers = get_signature_headers(json.dumps(data), key)
 
     with app.mail.record_messages() as outbox:
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
@@ -500,6 +490,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
     user = {
         "email": "foo2@bar.com",
         "first_name": "Foo",
+        "last_name": "Bar",
         "is_enabled": True,
         "is_approved": True,
         "receive_email": True,
@@ -532,7 +523,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
                 "_id": "bar",
                 "headline": "testing",
                 "service": [{"code": "a", "name": "Service A"}],
-                "products": [{"code": 1, "name": "product-1"}],
+                "products": [{"code": "product-1", "name": "product-1"}],
             }
         ],
     )
@@ -552,12 +543,11 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         key = b"something random"
         app.config["PUSH_KEY"] = key
         data = {"guid": "bar", "type": "text", "headline": "this is a test"}
-        push_mock = mocker.patch("newsroom.notifications.push_notification")
+        push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
         headers = get_signature_headers(json.dumps(data), key)
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-        # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
         assert push_mock.call_args[0][0] == "new_notifications"
         assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
@@ -573,11 +563,10 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
 
 @markers.requires_async_celery
 async def test_do_not_notify_disabled_user(client, app, mocker):
-    await create_entries_for(
+    company_ids = await create_entries_for(
         "companies",
         [
             {
-                "_id": 1,
                 "name": "Press 2 co.",
                 "is_enabled": True,
             }
@@ -590,9 +579,10 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": 1,
+                "company": company_ids[0],
             }
         ],
     )
@@ -602,9 +592,9 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
         session["user"] = user
     resp = await client.post(
         "users/%s/topics" % user,
-        json={"label": "bar", "query": "test", "notifications": True},
+        json={"label": "bar", "topic_type": "wire", "query": "test", "notifications": True},
     )
-    assert 201 == resp.status_code
+    assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # disable user
     user = await find_one_by_id("users", user_ids[0])
@@ -615,11 +605,10 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
     key = b"something random"
     app.config["PUSH_KEY"] = key
     data = {"guid": "foo", "type": "text", "headline": "this is a test"}
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.notifications.push_notification")
     headers = get_signature_headers(json.dumps(data), key)
     resp = await client.post("/push", json=data, headers=headers)
     assert 200 == resp.status_code
-    # TODO-ASYNC: TypeError: 'NoneType' object is not subscriptable
     assert push_mock.call_args[1]["_items"][0]["_id"] == "foo"
 
 
@@ -687,6 +676,7 @@ async def test_send_notification_emails(client, app):
             {
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
+                "last_name": "Bar",
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
@@ -735,7 +725,6 @@ async def test_send_notification_emails(client, app):
         resp = await client.post("/push", json=data, headers=headers)
         assert 200 == resp.status_code
 
-    # TODO-ASYNC: len(outbox) is 0
     assert len(outbox) == 1
     assert "http://localhost:5050/wire?item=foo" in outbox[0].body
 

@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, cast, TypedDict
 from copy import deepcopy
 
 from quart_babel import gettext
@@ -15,6 +15,7 @@ from newsroom.wire.filters import apply_item_type_filter as apply_wire_type_filt
 from newsroom.wire import WireItemService
 from newsroom.agenda.filters import get_date_filters, apply_item_type_filter as apply_agenda_type_filter
 from newsroom.agenda import AgendaItemService
+from newsroom.history_async import HistoryService
 
 from newsroom.utils import query_resource, MAX_TERMS_SIZE
 
@@ -23,7 +24,7 @@ CHUNK_SIZE = 100
 
 
 async def get_query_source(args: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
-    search_request = NewshubSearchRequest[BaseSearchRequestArgs](section=args["section"])
+    search_request = NewshubSearchRequest[BaseSearchRequestArgs](section=SectionEnum(args["section"]))
     query = search_request.search.query
 
     if args.get("genre"):
@@ -84,16 +85,22 @@ async def get_items(args):
 
     while True:
         cursor = await service.search(source)
-        items = await cursor.to_list_raw()
+        items = await cursor.to_list()
 
         if not len(items):
             break
 
         source["from"] += CHUNK_SIZE
-        yield items
+        yield [item.to_dict() for item in items]
 
 
-def get_aggregations(args, ids):
+class ItemAggregation(TypedDict):
+    total: int
+    actions: dict[str, int]
+    companies: list[str]
+
+
+async def get_aggregations(args: dict[str, Any], ids: list[str]) -> dict[str, ItemAggregation]:
     """Get action and company aggregations for the items provided"""
 
     if not args.get("section"):
@@ -122,8 +129,8 @@ def get_aggregations(args, ids):
         },
     }
 
-    results = get_resource_service("history").fetch_history(source)
-    aggs = (results.get("hits") or {}).get("aggregations") or {}
+    results = cast(ElasticsearchResourceCursorAsync, await HistoryService().search(source))
+    aggs = (results.hits or {}).get("aggregations") or {}
     buckets = (aggs.get("items") or {}).get("buckets") or []
 
     return {
@@ -302,7 +309,7 @@ async def get_content_activity_report():
 
     async for items in get_items(args):
         item_ids = [item.get("_id") for item in items]
-        aggs = get_aggregations(args, item_ids)
+        aggs = await get_aggregations(args, item_ids)
 
         for item in items:
             item_id = item["_id"]

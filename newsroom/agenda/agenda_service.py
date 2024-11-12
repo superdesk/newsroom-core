@@ -301,7 +301,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
             wire_items = await WireSearchServiceAsync().get_items_by_id(text_delivery_ids)
             if await wire_items.count():
                 async for item in wire_items:
-                    coverage = [c for c in completed_coverages if c.get("delivery_id") == item.get("_id")][0]
+                    coverage = [c for c in completed_coverages if c.get("delivery_id") == item.id][0]
                     coverage["publish_time"] = item.publish_schedule or item.firstpublished
 
     async def set_delivery(self, wire_item: dict[str, Any]) -> list[dict[str, Any]]:

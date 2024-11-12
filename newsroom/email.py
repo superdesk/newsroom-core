@@ -111,7 +111,9 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
+async def send_email(
+    to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None
+):
     """
     Sends the email
     :param to: List of recipients
@@ -132,7 +134,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
         "sender_name": sender_name or get_app_config("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
-    _send_email.apply_async(kwargs=kwargs)
+    await _send_email.apply_async(kwargs=kwargs)
 
 
 async def send_new_signup_email(company: Company, user: User, is_new_company: bool):
@@ -286,7 +288,7 @@ async def _send_localized_email(
         text_body = await render_template(text_template, **template_kwargs)
         html_body = await render_template(html_template, **template_kwargs)
 
-        send_email(
+        await send_email(
             to=to,
             cc=cc,
             subject=subject,
@@ -518,7 +520,7 @@ async def _send_wire_killed_notification_email(user: UserResourceModel, item: di
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    await send_email(to=recipients, subject=subject, text_body=text_body)
 
 
 async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
@@ -527,7 +529,7 @@ async def _send_agenda_killed_notification_email(user: UserResourceModel, item: 
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    await send_email(to=recipients, subject=subject, text_body=text_body)
 
 
 def to_text(output: Union[str, bytes]) -> str:
