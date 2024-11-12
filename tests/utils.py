@@ -69,7 +69,7 @@ def get_admin_user_id(app):
     return (get_resource_service("users").find_one(req=None, _id=ADMIN_USER_ID) or {}).get("_id")
 
 
-def mock_send_email(
+async def mock_send_email(
     to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=[]
 ):
     if sender is None:

@@ -15,7 +15,7 @@ from newsroom.email import (
 from unittest import mock
 from datetime import datetime
 
-from newsroom.types import User
+from newsroom.types import User, UserResourceModel, UserRole
 from newsroom.email import send_user_email
 from tests.fixtures import agenda_items
 from newsroom.tests import markers
@@ -187,7 +187,7 @@ async def test_email_avoid_long_lines(client, app, mocker):
     async with app.app_context():
         html = "<p>foo</p>" * 10000
         text = "a" * 500 + " " + "b" * 500 + " " + "c" * 500 + "d"
-        send_email(html_body=html, text_body=text, to="to", subject="subject")
+        await send_email(html_body=html, text_body=text, to="to", subject="subject")
     assert len(sub.mock_calls)
     call = sub.mock_calls[0]
     check_lines_length(call.kwargs["kwargs"]["html_body"])
@@ -252,9 +252,11 @@ async def test_send_user_email(app):
 
 @markers.requires_async_celery
 async def test_item_killed_notification_email(app):
-    user = User(
+    user = UserResourceModel(
+        first_name="Foo",
+        last_name="Bar",
         email="foo@example.com",
-        user_type="user",
+        user_type=UserRole.PUBLIC,
     )
 
     item = {

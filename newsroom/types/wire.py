@@ -1,4 +1,5 @@
 from typing import Annotated
+from datetime import datetime
 
 from pydantic import Field
 
@@ -14,6 +15,7 @@ class PublishedProduct:
 
 class WireItem(ContentAPIItem):
     products: Annotated[list[PublishedProduct], Field(default_factory=list)]
+    publish_schedule: datetime | None = None
 
     bookmarks: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
     downloads: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]

@@ -201,4 +201,4 @@ class AgendaManager:
                     "coverage_id": coverage.get("coverage_id"),
                 },
             )
-            notify_new_wire_item.delay(item.id, check_topics=False)
+            await notify_new_wire_item.delay(item.id, check_topics=False)
