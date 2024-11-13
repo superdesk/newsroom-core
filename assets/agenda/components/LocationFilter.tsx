@@ -315,8 +315,7 @@ export class LocationFilter extends React.Component<any, any> {
      */
     renderRegionSearchResult(item: any, index: any) {
         const {selectedIndex} = this.state;
-        const enabledOptions = get(this.props, 'locationEnabledOptions');
-        if (item.type === LOCATION_TYPE.CITY && enabledOptions.city) {
+        if (item.type === LOCATION_TYPE.CITY) {
             return(
                 <button
                     key={`city.${item.name}[${index}]`}
@@ -336,8 +335,7 @@ export class LocationFilter extends React.Component<any, any> {
                     })}
                 </button>
             );
-        } else if (item.type === LOCATION_TYPE.STATE && enabledOptions.state) {
-            const stateLabel = getConfig('location_state_display_label');
+        } else if (item.type === LOCATION_TYPE.STATE) {
             return (
                 <button
                     key={`state.${item.name}[${index}]`}
@@ -350,14 +348,13 @@ export class LocationFilter extends React.Component<any, any> {
                     )}
                     onClick={() => this.onChange(item)}
                 >
-                    {gettext('{{ name }} ({{ label }}, {{ country }})', {
+                    {gettext('{{ name }} (State/Province, {{ country }})', {
                         name: item.name,
-                        label: stateLabel,
                         country: item.country,
                     })}
                 </button>
             );
-        } else if (item.type === LOCATION_TYPE.COUNTRY && enabledOptions.country) {
+        } else if (item.type === LOCATION_TYPE.COUNTRY) {
             return (
                 <button
                     key={`country.${item.name}[${index}]`}
@@ -373,7 +370,7 @@ export class LocationFilter extends React.Component<any, any> {
                     {gettext('{{ name }} (Country)', {name: item.name})}
                 </button>
             );
-        } else if (enabledOptions.place && !['city', 'state', 'country'].includes(item.type)) {
+        } else {
             const results = this.state.results;
 
             return (
@@ -391,8 +388,6 @@ export class LocationFilter extends React.Component<any, any> {
                     {item}
                 </button>
             );
-        } else {
-            return null;
         }
     }
 
@@ -436,7 +431,7 @@ export class LocationFilter extends React.Component<any, any> {
     render() {
         const activeFilter = get(this.props, 'activeFilter.location') || {};
         const isActive = activeFilter.type != null;
-        const isPlaceEnabled = get(this.props, 'locationEnabledOptions').place;
+        const isPlaceEnabled = this.props.locationEnabledOptions?.place;
         return (
             <div
                 key="location"

@@ -399,7 +399,6 @@ CLIENT_CONFIG = {
     },
     "agenda_sort_events_with_coverage_on_top": False,
     "collapsed_search_by_default": False,
-    "location_state_display_label": "State",
 }
 
 # Enable rendering of the date in the base view
@@ -861,7 +860,7 @@ COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
 
 #: Calendar Location Filter options config
 #:
-#: .. versionadded: 2.8
+#: .. versionadded: 2.9
 #:
 
 CALENDAR_LOCATIONS_FILTER_OPTIONS = {
