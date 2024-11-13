@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, debounce} from 'lodash';
 
-import {gettext, getConfig} from 'utils';
+import {gettext} from 'utils';
 import server from 'server';
 import {KEYS} from 'common';
 
@@ -315,8 +315,9 @@ export class LocationFilter extends React.Component<any, any> {
      */
     renderRegionSearchResult(item: any, index: any) {
         const {selectedIndex} = this.state;
+
         if (item.type === LOCATION_TYPE.CITY) {
-            return(
+            return (
                 <button
                     key={`city.${item.name}[${index}]`}
                     data-item-index={index}
