@@ -314,6 +314,7 @@ export interface IAgendaState {
     errors?: {[field: string]: Array<string>};
     loadingAggregations?: boolean;
     dateFilters?: IDateFilters;
+    locationsFiltersOptions?:{[key: string]: boolean};
 }
 
 export type AgendaGetState = () => IAgendaState;

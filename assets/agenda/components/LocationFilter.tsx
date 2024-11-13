@@ -315,7 +315,7 @@ export class LocationFilter extends React.Component<any, any> {
      */
     renderRegionSearchResult(item: any, index: any) {
         const {selectedIndex} = this.state;
-        const enabledOptions = getConfig('calendar_location_filter_options');
+        const enabledOptions = get(this.props, 'locationEnabledOptions');
         if (item.type === LOCATION_TYPE.CITY && enabledOptions.city) {
             return(
                 <button
@@ -373,7 +373,7 @@ export class LocationFilter extends React.Component<any, any> {
                     {gettext('{{ name }} (Country)', {name: item.name})}
                 </button>
             );
-        } else if (enabledOptions.places && !['city', 'state', 'country'].includes(item.type)) {
+        } else if (enabledOptions.place && !['city', 'state', 'country'].includes(item.type)) {
             const results = this.state.results;
 
             return (
@@ -436,8 +436,7 @@ export class LocationFilter extends React.Component<any, any> {
     render() {
         const activeFilter = get(this.props, 'activeFilter.location') || {};
         const isActive = activeFilter.type != null;
-        const isPlaceEnabled = getConfig('calendar_location_filter_options').places;
-
+        const isPlaceEnabled = get(this.props, 'locationEnabledOptions').place;
         return (
             <div
                 key="location"
@@ -556,4 +555,5 @@ export class LocationFilter extends React.Component<any, any> {
 LocationFilter.propTypes = {
     activeFilter: PropTypes.object,
     toggleFilter: PropTypes.func,
+    locationEnabledOptions: PropTypes.object,
 };

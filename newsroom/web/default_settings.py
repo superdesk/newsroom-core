@@ -399,12 +399,6 @@ CLIENT_CONFIG = {
     },
     "agenda_sort_events_with_coverage_on_top": False,
     "collapsed_search_by_default": False,
-    "calendar_location_filter_options": {
-        "city": True,
-        "state": True,
-        "country": True,
-        "place": True,
-    },
     "location_state_display_label": "State",
 }
 
@@ -864,3 +858,15 @@ AGENDA_TIME_FILTERS = [
 #: .. versionadded:: 2.8
 #:
 COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
+
+#: Calendar Location Filter options config
+#:
+#: .. versionadded: 2.8
+#:
+
+CALENDAR_LOCATIONS_FILTER_OPTIONS = {
+    "city": True,
+    "state": True,
+    "country": True,
+    "place": True,
+}
