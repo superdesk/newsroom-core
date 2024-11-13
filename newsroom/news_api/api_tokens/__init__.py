@@ -23,6 +23,7 @@ blueprint = Blueprint("news_api_tokens", __name__)
 from . import views  # noqa
 
 
+# TODO-ASYNC: Remove altogether once all the modules from news_api are async
 class CompanyTokenAuth(TokenAuth):
     def check_auth(self, token_id, allowed_roles, resource, method):
         """Try to find auth token and if valid put subscriber id into ``g.company_id``."""

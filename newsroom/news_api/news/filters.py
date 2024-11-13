@@ -1,0 +1,116 @@
+import json
+import pprint
+from quart_babel import gettext
+
+from newsroom.search.utils import query_string
+from superdesk.core import get_app_config
+from content_api.errors import BadParameterValueError
+
+from newsroom.products.service import ProductsService
+from newsroom.products.utils import get_products_by_company_async
+from newsroom.auth.utils import get_company_or_none_from_request
+
+from .types import NewsApiSearchRequest
+from .filters_utils import create_date_range_filter, get_date_range
+
+
+async def prefill_company(request: NewsApiSearchRequest):
+    """
+    Gets company from web_request and prefills it into request.
+    If not company is found, it raises an exception.
+    """
+    if request.company is not None:
+        return
+    request.company = get_company_or_none_from_request(request.web_request)
+
+    if request.company is None:
+        raise BadParameterValueError(gettext("Invalid search request, company not found"))
+
+
+async def prefill_products(request: NewsApiSearchRequest):
+    """Prefill the search products"""
+
+    products_service = ProductsService()
+
+    if request.args.product_ids:
+        cursor = await products_service.find(
+            {"is_enabled": True, "companies": request.company.id, "_id": {"$in": request.args.product_ids}},
+        )
+        request.products = await cursor.to_list()
+    else:
+        request.products = await get_products_by_company_async(request.company, product_type=request.section)
+
+
+def validate_page(request: NewsApiSearchRequest):
+    """Validate the page params"""
+    query_max_page_size = get_app_config("QUERY_MAX_PAGE_SIZE")
+
+    if request.args.page_size > query_max_page_size:
+        raise BadParameterValueError(
+            "Requested maximum number of results exceeds {max}".format(max=query_max_page_size)
+        )
+    elif (request.args.page - 1) * request.args.page_size >= 1000:
+        # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+        raise BadParameterValueError("Page limit exceeded")
+
+
+def apply_filter_fields(request: NewsApiSearchRequest):
+    """Generate the field filters"""
+
+    # filter fields and elasticsearch keys
+    argument_fields = {
+        "service": "service.code",
+        "subject": "subject.code",
+        "urgency": "urgency",
+        "priority": "priority",
+        "genre": "genre.code",
+        "item_source": "source",
+    }
+
+    filters = []
+    for argument_name, field_name in argument_fields.items():
+        filter_value = getattr(request.args, argument_name)
+
+        if filter_value is None:
+            continue
+
+        try:
+            filter_value = json.loads(filter_value)
+        except Exception:
+            pass
+
+        if not filter_value:
+            raise BadParameterValueError(f"Bad parameter value for Parameter {argument_name}")
+
+        if not isinstance(filter_value, list):
+            filter_value = [filter_value]
+
+        filters.append({"terms": {field_name: filter_value}})
+
+    if filters:
+        request.search.query.filter.extend(filters)
+
+
+def apply_date_filter(request: NewsApiSearchRequest):
+    """Generate and apply date filters"""
+
+    start_date, end_date = get_date_range(request.args)
+    date_filter = create_date_range_filter(start_date, end_date)
+
+    if date_filter:
+        request.search.query.filter.append(date_filter)
+
+
+def apply_request_filter(request: NewsApiSearchRequest):
+    """Generate the filters from request args"""
+
+    if request.args.q:
+        request.search.query.filter.append(query_string(request.args.q, request.args.default_operator or "AND"))
+
+
+def apply_projection(request: NewsApiSearchRequest):
+    """Create a projection object that explicitly includes particular content fields from results."""
+
+    # TODO-ASYNC: commented for now until figure out what's happening with the _source field in elastic search
+    # request.args.projection = request.args.include_fields or {}
+    pass

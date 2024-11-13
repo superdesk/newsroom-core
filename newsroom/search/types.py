@@ -195,7 +195,7 @@ class BaseSearchRequestArgs(BaseModel):
     #: List of item IDs to search for
     ids: list[str] = Field(validation_alias=AliasChoices("ids", "id"), default_factory=list)
 
-    #: The timezone offest, used when constructing the date queries
+    #: The timezone offset, used when constructing the date queries
     timezone_offset: int | None = None
 
     #: List of Product IDs to use when filtering

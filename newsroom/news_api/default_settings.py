@@ -42,8 +42,10 @@ MODULES = [
     # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
     "newsroom.wire.module",
+    "newsroom.section_filters",
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
+    "newsroom.news_api.news.search",
     "newsroom.products",
 ]
 
@@ -68,3 +70,5 @@ ELASTICSEARCH_FIX_QUERY = False
 # Disable upload endpoint from ``newsroom.assets.module``,
 # as NewsAPI will implement a custom one
 ASSETS_REGISTER_UPLOAD_ENDPOINT = False
+
+ASYNC_AUTH_CLASS = "newsroom.news_api.api_tokens.auth:CompanyTokenAuth"
