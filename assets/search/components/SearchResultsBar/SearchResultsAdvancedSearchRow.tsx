@@ -162,7 +162,7 @@ export function SearchResultsAdvancedSearchRow({
                 secondary={true}
                 title={gettext('inside')}
             >
-                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
+                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--compact">
                     {(Object.keys(fieldNameToLabel) as Array<keyof typeof fieldNameToLabel>)
                         .filter((fieldName) => availableFields.includes(fieldName))
                         .map((fieldName) => (
