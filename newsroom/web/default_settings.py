@@ -857,3 +857,15 @@ AGENDA_TIME_FILTERS = [
 #: .. versionadded:: 2.8
 #:
 COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
+
+#: Calendar Location Filter options config
+#:
+#: .. versionadded: 2.9
+#:
+
+CALENDAR_LOCATIONS_FILTER_OPTIONS = {
+    "city": True,
+    "state": True,
+    "country": True,
+    "place": True,
+}
