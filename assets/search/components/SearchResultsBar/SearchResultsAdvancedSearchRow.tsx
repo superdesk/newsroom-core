@@ -150,42 +150,48 @@ export function SearchResultsAdvancedSearchRow({
         body_html: gettext('Body'),
     };
 
+    const fieldSearchTags = (
+        <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose" data-test-id='search-results--advanced-fields'>
+            <span
+                key="tag-separator--clear"
+                className="tag-list__separator tag-list__separator--blanc"
+            />
+            <span className="search-result__tags-list-row-helper-text">inside</span>
+            <span
+                key="tag-separator--clear"
+                className="tag-list__separator tag-list__separator--blanc"
+            />
+            {(Object.keys(fieldNameToLabel) as Array<keyof typeof fieldNameToLabel>)
+                .filter((fieldName) => availableFields.includes(fieldName))
+                .map((fieldName) => (
+                    <button
+                        disabled={readonly}
+                        key={fieldName}
+                        data-test-id={`toggle-${fieldName}-button`}
+                        className={classNames(
+                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
+                            {'toggle-button--active': fields.includes(fieldName)}
+                        )}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            toggleAdvancedSearchField(fieldName);
+                            refresh?.();
+                        }}
+                    >
+                        {fieldNameToLabel[fieldName]}
+                    </button>
+                ))
+            }
+        </div>
+    );
+
     return (
         <React.Fragment>
             <SearchResultTagList
                 testId="search-results--advanced-keywords"
                 title={gettext('Search for')}
-                tags={advancedSearchTags}
+                tags={[...advancedSearchTags, fieldSearchTags]}
             />
-            <SearchResultTagList
-                testId="search-results--advanced-fields"
-                secondary={true}
-                title={gettext('inside')}
-            >
-                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
-                    {(Object.keys(fieldNameToLabel) as Array<keyof typeof fieldNameToLabel>)
-                        .filter((fieldName) => availableFields.includes(fieldName))
-                        .map((fieldName) => (
-                            <button
-                                disabled={readonly}
-                                key={fieldName}
-                                data-test-id={`toggle-${fieldName}-button`}
-                                className={classNames(
-                                    'toggle-button toggle-button--no-txt-transform toggle-button--small',
-                                    {'toggle-button--active': fields.includes(fieldName)}
-                                )}
-                                onClick={(event) => {
-                                    event.preventDefault();
-                                    toggleAdvancedSearchField(fieldName);
-                                    refresh?.();
-                                }}
-                            >
-                                {fieldNameToLabel[fieldName]}
-                            </button>
-                        ))
-                    }
-                </div>
-            </SearchResultTagList>
         </React.Fragment>
     );
 }
