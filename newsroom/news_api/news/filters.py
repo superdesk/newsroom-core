@@ -1,5 +1,4 @@
 import json
-import pprint
 from quart_babel import gettext
 
 from newsroom.search.utils import query_string
