@@ -130,7 +130,7 @@ export function SearchResultsAdvancedSearchRow({
         advancedSearchTags.push(
             <button
                 key="tag-clear-button"
-                className='nh-button nh-button--tertiary nh-button--small'
+                className='nh-button nh-button--tertiary nh-button--small me-2'
                 onClick={(event) => {
                     event.preventDefault();
                     clearAdvancedSearchParams();
@@ -151,16 +151,8 @@ export function SearchResultsAdvancedSearchRow({
     };
 
     const fieldSearchTags = (
-        <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose" data-test-id='search-results--advanced-fields'>
-            <span
-                key="tag-separator--clear"
-                className="tag-list__separator tag-list__separator--blanc"
-            />
-            <span className="search-result__tags-list-row-helper-text">inside</span>
-            <span
-                key="tag-separator--clear"
-                className="tag-list__separator tag-list__separator--blanc"
-            />
+        <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--compact" data-test-id='search-results--advanced-fields'>
+            <span className="search-result__tags-list-row-helper-text me-1">inside</span>
             {(Object.keys(fieldNameToLabel) as Array<keyof typeof fieldNameToLabel>)
                 .filter((fieldName) => availableFields.includes(fieldName))
                 .map((fieldName) => (
