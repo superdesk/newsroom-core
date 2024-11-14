@@ -7,6 +7,7 @@ import NewsOnlyControl from './NewsOnlyControl';
 import SearchAllVersionsControl from './SearchAllVersionsControl';
 import ListViewOptions from '../../components/ListViewOptions';
 import {ListSearchOptions} from './ListSearchOptions';
+import NewItemsIcon from 'search/components/NewItemsIcon';
 
 function ListViewControls({
     activeView,
@@ -18,10 +19,20 @@ function ListViewControls({
     hideSearchAllVersions,
     searchAllVersions,
     toggleSearchAllVersions,
+    newItems,
+    fetchItems,
 }: any) {
     return(
         <div className="navbar navbar--flex navbar--small navbar--list-controls">
-            <div className="navbar__inner navbar__inner--end">
+            {!(newItems || []).length ? null : (
+                <div className="navbar__inner navbar__inner--icon">
+                    <NewItemsIcon
+                        newItems={newItems}
+                        refresh={fetchItems}
+                    />
+                </div>
+            )}
+            <div className="navbar__inner navbar__inner--end navbar__inner--buttons">
                 {hideSearchAllVersions ? null : (
                     <SearchAllVersionsControl
                         activeNavigation={activeNavigation}
@@ -63,6 +74,8 @@ ListViewControls.propTypes = {
     hideSearchAllVersions: PropTypes.bool,
     searchAllVersions: PropTypes.bool,
     toggleSearchAllVersions: PropTypes.func,
+    newItems: PropTypes.array,
+    fetchItems: PropTypes.func,
 };
 
 export default ListViewControls;

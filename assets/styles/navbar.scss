@@ -575,3 +575,11 @@ nav.search {
         }
     }
 }
+
+.navbar--list-controls:has(.navbar__inner--icon) {
+    display: flex;
+
+    .navbar__inner--buttons {
+        display: none;
+    }
+}
