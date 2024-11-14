@@ -28,7 +28,7 @@ default_allowed_include_fields = {
     "associations",
 }
 
-# set of fields that are allowed to be excluded in the exlude_fields parameter
+# set of fields that are allowed to be excluded in the exclude_fields parameter
 default_allowed_exclude_fields = {
     "version",
     "versioncreated",
@@ -36,20 +36,6 @@ default_allowed_exclude_fields = {
     "headline",
     "byline",
     "slugline",
-}
-
-default_fields = {
-    "_id",
-    "uri",
-    "embargoed",
-    "pubstatus",
-    "ednote",
-    "signal",
-    "copyrightnotice",
-    "copyrightholder",
-    "versioncreated",
-    "evolvedfrom",
-    "original_id",
 }
 
 
@@ -63,7 +49,6 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     include_fields: list[str] | None = Field(
         default=None,
         description="Comma-separated list of fields to include",
-        validate_default=True,
     )
 
     exclude_fields: list[str] | None = Field(
@@ -84,18 +69,7 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     @field_validator("include_fields", mode="before")
     @classmethod
     def validate_include_fields(cls, value: str | None) -> list[str]:
-        """
-        Validates the include_fields coming from the request. If none is provided, it returns
-        the default set of fields to be rendered
-        """
-
-        validated_fields = cls.validate_values_in_list(value, cls.allowed_include_fields, "include_fields")
-        if validated_fields is not None:
-            return default_fields.union(validated_fields or [])
-
-        include_fields = default_fields.union(default_allowed_exclude_fields)
-        print("pass here??????", include_fields)
-        return include_fields
+        return cls.validate_values_in_list(value, cls.allowed_include_fields, "include_fields")
 
     @field_validator("exclude_fields", mode="before")
     @classmethod

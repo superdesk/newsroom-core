@@ -9,7 +9,7 @@ from newsroom.products.service import ProductsService
 from newsroom.products.utils import get_products_by_company_async
 from newsroom.auth.utils import get_company_or_none_from_request
 
-from .types import NewsApiSearchRequest
+from .types import NewsApiSearchRequest, default_allowed_exclude_fields
 from .filters_utils import create_date_range_filter, get_date_range
 
 
@@ -110,6 +110,29 @@ def apply_request_filter(request: NewsApiSearchRequest):
 def apply_projection(request: NewsApiSearchRequest):
     """Create a projection object that explicitly includes particular content fields from results."""
 
-    # TODO-ASYNC: commented for now until figure out what's happening with the _source field in elastic search
-    # request.args.projection = request.args.include_fields or {}
-    pass
+    default_fields = {
+        "_id",
+        "uri",
+        "embargoed",
+        "pubstatus",
+        "ednote",
+        "signal",
+        "copyrightnotice",
+        "copyrightholder",
+        "versioncreated",
+        "evolvedfrom",
+        "original_id",
+    }
+
+    include_fields = default_fields.union(default_allowed_exclude_fields)
+
+    # provided in request, then let's join them with default_fields instead
+    if request.args.include_fields:
+        include_fields = default_fields.union(request.args.include_fields)
+
+    # given include and exclude are mutually exclusive in the ESQuery and in request
+    # we need to remove the exclude_fields from include_fields here
+    for field in request.args.exclude_fields or []:
+        include_fields.remove(field)
+
+    request.search.include_fields = include_fields
