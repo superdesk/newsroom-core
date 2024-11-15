@@ -6,6 +6,7 @@ from eve.methods.get import get_internal
 from lxml import etree, html as lxml_html
 from lxml.etree import SubElement
 
+
 import superdesk
 from superdesk.core.web import EndpointGroup
 from superdesk.core.types import Request
@@ -18,6 +19,7 @@ from newsroom.core import get_current_wsgi_app
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products import get_products_by_company
+from newsroom.news_api.news.search_service_async import NewsApiSearchServiceAsync
 
 logger = logging.getLogger(__name__)
 atom_endpoints = EndpointGroup("atom", __name__)
@@ -61,12 +63,11 @@ async def get_atom(request: Request):
         attrib={"href": url_for("atom.get_atom", _external=True), "rel": "self"},
     )
 
-    # TODO-ASYNC: replace once the service is ready
-    response = await get_internal("news/search")
+    response = await NewsApiSearchServiceAsync().process_web_request(request)
     company = get_company_or_none_from_request(None)
     products = await get_products_by_company(company.to_dict(context={"use_objectid": True}) if company else None)
 
-    for item in response[0].get("_items"):
+    for item in response.body.get("_items"):
         try:
             # TODO-ASYNC: revisit when items are made async
             complete_item = superdesk.get_resource_service("items").find_one(req=None, _id=item.get("_id"))
@@ -131,7 +132,7 @@ async def get_atom(request: Request):
             # If there are any image embeds then reset the source to a Newshub asset
             html_updated = False
             regex = r" EMBED START Image {id: \"editor_([0-9]+)"
-            root_elem = lxml_html.fromstring(complete_item.get("body_html", "<html></html>"))
+            root_elem = lxml_html.fromstring(complete_item.get("body_html") or "<html></html>")
             comments = root_elem.xpath("//comment()")
 
             for comment in comments:

@@ -23,7 +23,7 @@ from .filters import (
     prefill_products,
     validate_page,
 )
-from .types import NewsApiSearchRequest, NewsApiSearchRequestArgs
+from .types import NewsApiSearchRequestArgs
 
 
 default_search_filters = [

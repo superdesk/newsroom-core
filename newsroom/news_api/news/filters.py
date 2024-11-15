@@ -123,6 +123,7 @@ def apply_projection(request: NewsApiSearchRequest):
         "versioncreated",
         "evolvedfrom",
         "original_id",
+        "body_html",
     }
 
     include_fields = default_fields.union(default_allowed_exclude_fields)
