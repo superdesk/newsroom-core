@@ -90,8 +90,7 @@ async def get_view_data():
     }
 
     if get_app_config("ENABLE_MONITORING"):
-        # TODO-ASYNC: update when monitoring app is moved to async
-        view_data["monitoring_list"] = get_monitoring_for_company(user_as_dict)
+        view_data["monitoring_list"] = await get_monitoring_for_company(user)
 
     view_data.update(await get_company_sections_monitoring_data(company, user))
 
