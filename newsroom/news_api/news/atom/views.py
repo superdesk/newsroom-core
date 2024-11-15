@@ -2,7 +2,6 @@ import datetime
 import logging
 import re
 
-from eve.methods.get import get_internal
 from lxml import etree, html as lxml_html
 from lxml.etree import SubElement
 

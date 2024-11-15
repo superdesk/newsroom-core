@@ -80,7 +80,7 @@ def apply_filter_fields(request: NewsApiSearchRequest):
             pass
 
         if not filter_value:
-            raise BadParameterValueError(f"Bad parameter value for Parameter {argument_name}")
+            raise BadParameterValueError(f"Bad parameter value for Parameter ({argument_name})")
 
         if not isinstance(filter_value, list):
             filter_value = [filter_value]

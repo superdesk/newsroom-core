@@ -38,7 +38,7 @@ async def valid_IP_if_required_rule(request: Request) -> None:
                 valid_network = True
 
         if not valid_network:
-            raise AuthorizationError(403, gettext("IP Address not allowed."))
+            raise AuthorizationError(401, gettext("IP Address not allowed."))
 
     return None
 
@@ -128,7 +128,7 @@ class CompanyTokenAuth(UserAuthProtocol):
             updates["rate_limit_expiry"] = now + timedelta(seconds=rate_limit_period)
 
         if updates:
-            tokens_service.patch(token.get("_id"), updates)
+            tokens_service.patch(token.get("token"), updates)
 
             # TODO-ASYNC: check if we should use request.storage instead
             g.rate_limit_requests = updates["rate_limit_requests"]
