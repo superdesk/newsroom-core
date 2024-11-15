@@ -2,8 +2,8 @@ import base64
 import email.policy as email_policy
 
 from lxml import etree
-from typing_extensions import TypedDict
-from typing import List, Optional, Dict, Any, Union
+from typing_extensions import Unpack
+from typing import List, Optional, Dict, Any, Union, TypedDict
 
 from quart_babel import gettext
 from flask_mail import Attachment, Message
@@ -229,7 +229,18 @@ def get_language_template_name(template_name: str, language: str, extension: str
     return fallback_template_name
 
 
-EmailKwargs = Dict[str, Any]
+class EmailAttachment(TypedDict):
+    file: Any
+    file_name: str
+    content_type: str
+    file_desc: str
+
+
+class EmailKwargs(TypedDict, total=False):
+    sender: str | tuple[str, str] | None
+    attachments_info: list[EmailAttachment] | None
+
+
 TemplateKwargs = Dict[str, Any]
 
 
@@ -239,7 +250,7 @@ async def send_user_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
-    **kwargs: EmailKwargs,
+    **kwargs: Unpack[EmailKwargs],
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
@@ -259,7 +270,7 @@ async def send_template_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     cc: Optional[List[str]] = None,
-    **kwargs: EmailKwargs,
+    **kwargs: Unpack[EmailKwargs],
 ) -> None:
     """Send email to list of recipients using default locale."""
     language = get_app_config("DEFAULT_LANGUAGE")
