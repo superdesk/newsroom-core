@@ -1,7 +1,7 @@
 import re
 import pytz
 
-from typing import Any, Tuple
+from typing import Any, Tuple, cast
 from datetime import datetime
 from dateutil import parser
 
@@ -67,10 +67,10 @@ def get_date_range(request_args: NewsApiSearchRequestArgs) -> Tuple[datetime | N
     today = utcnow()
 
     if (start_date is not None) and not relative_start and (start_date > today):
-        raise BadParameterValueError(desc=err_msg.format("Start", start_date.isoformat(), today.isoformat()))
+        raise BadParameterValueError(desc=err_msg.format("Start", start_date, today))
 
     if (end_date is not None) and not relative_end and (end_date > today):
-        raise BadParameterValueError(desc=err_msg.format("End", end_date.isoformat(), today.isoformat()))
+        raise BadParameterValueError(desc=err_msg.format("End", end_date, today))
 
     # make sure that the date range limits make sense...
     if (
@@ -82,10 +82,10 @@ def get_date_range(request_args: NewsApiSearchRequestArgs) -> Tuple[datetime | N
         # NOTE: we allow start_date == end_date (for specific date queries)
         raise BadParameterValueError(desc="Start date must not be greater than end date")
 
-    return start_date, end_date
+    return cast(datetime, start_date), cast(datetime, end_date)
 
 
-def create_date_range_filter(start_date: str | None, end_date: str | None) -> dict[str, Any]:
+def create_date_range_filter(start_date: datetime | str | None, end_date: datetime | str | None) -> dict[str, Any]:
     """Create a MongoDB date range query filter from the given dates.
 
     If both the start date and the end date are None, an empty filter is

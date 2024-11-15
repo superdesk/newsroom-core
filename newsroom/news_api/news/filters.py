@@ -1,16 +1,16 @@
 import json
-from quart_babel import gettext
 
-from newsroom.search.utils import query_string
-from superdesk.core import get_app_config
 from content_api.errors import BadParameterValueError
+from quart_babel import gettext
+from superdesk.core import get_app_config
 
+from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.products.service import ProductsService
 from newsroom.products.utils import get_products_by_company_async
-from newsroom.auth.utils import get_company_or_none_from_request
+from newsroom.search.utils import query_string
 
-from .types import NewsApiSearchRequest, default_allowed_exclude_fields
 from .filters_utils import create_date_range_filter, get_date_range
+from .types import NewsApiSearchRequest, default_allowed_exclude_fields
 
 
 async def prefill_company(request: NewsApiSearchRequest):
@@ -30,6 +30,7 @@ async def prefill_products(request: NewsApiSearchRequest):
     """Prefill the search products"""
 
     products_service = ProductsService()
+    assert request.company is not None
 
     if request.args.product_ids:
         cursor = await products_service.find(
@@ -104,7 +105,7 @@ def apply_request_filter(request: NewsApiSearchRequest):
     """Generate the filters from request args"""
 
     if request.args.q:
-        request.search.query.filter.append(query_string(request.args.q, request.args.default_operator or "AND"))
+        request.search.query.filter.append(query_string(request.args.q, request.args.default_operator))
 
 
 def apply_projection(request: NewsApiSearchRequest):

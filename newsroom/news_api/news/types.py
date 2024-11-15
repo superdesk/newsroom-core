@@ -68,16 +68,16 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
 
     @field_validator("include_fields", mode="before")
     @classmethod
-    def validate_include_fields(cls, value: str | None) -> list[str]:
+    def validate_include_fields(cls, value: str | None) -> list[str] | None:
         return cls.validate_values_in_list(value, cls.allowed_include_fields, "include_fields")
 
     @field_validator("exclude_fields", mode="before")
     @classmethod
-    def validate_exclude_fields(cls, value: str | None) -> list[str]:
+    def validate_exclude_fields(cls, value: str | None) -> list[str] | None:
         return cls.validate_values_in_list(value, cls.allowed_exclude_fields, "exclude_fields")
 
     @classmethod
-    def validate_values_in_list(cls, value: str | None, allowed_list: set[str], field_name: str) -> list[str]:
+    def validate_values_in_list(cls, value: str | None, allowed_list: set[str], field_name: str) -> list[str] | None:
         """
         Validates that all values in a comma-separated list are allowed.
 
@@ -96,10 +96,10 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
             return None
 
         strip_items = functools.partial(map, lambda s: s.strip())
-        remove_empty = functools.partial(filter, None)
+        remove_empty = functools.partial(filter, None)  # type: ignore[var-annotated]
 
         fields = value.split(",")
-        fields = set(remove_empty(strip_items(fields)))
+        fields = set(remove_empty(strip_items(fields)))  # type: ignore[assignment]
 
         invalid_fields = [field for field in fields if field not in allowed_list]
         if invalid_fields:
