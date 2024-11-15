@@ -149,6 +149,7 @@ class Publisher:
 
             # Retrieve all current Planning items and add them into this Event
             agenda.setdefault("planning_items", [])
+            agenda.setdefault("planning_ids", [])
             for plan in await (await service.search({"_id": {"$in": plan_ids}}, use_mongo=True)).to_list_raw():
                 planning_item = plan["planning_items"][0]
                 agenda["planning_items"].append(planning_item)
@@ -245,54 +246,66 @@ class Publisher:
             return agenda["_id"]
 
     async def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
-        if not planning.get("event_item"):
+        if not planning.get("event_item") and not planning.get("related_events"):
             return None
 
         service = AgendaItemService()
+        related_events = planning.get("related_events", [])
 
-        event_id = planning["event_item"]
-        plan_id = planning["guid"]
+        agenda = None
 
-        orig_agenda: dict[str, Any] | None = None
-        event = await service.find_by_id(event_id)
-        if event:
-            orig_agenda = event.to_dict()
+        if related_events:
+            for event in related_events:
+                event_data = await service.find_by_id(event["_id"])
+                if event_data:
+                    orig_agenda = event_data.to_dict()
+                    agenda = deepcopy(orig_agenda)
+                    if event["_id"] not in agenda["planning_ids"]:
+                        agenda["planning_ids"].append(str(event["_id"]))
+                    if event.get("link_type") == "secondary":
+                        coverages, coverage_changes = await agenda_manager.get_coverages(
+                            [planning], (orig_agenda or {}).get("coverages") or [], planning
+                        )
+                        if coverage_changes:
+                            agenda["coverages"] = coverages
         else:
-            # Item not found using ``event_item`` attribute
-            # Try again using ``guid`` attribute
-            plan = await service.find_by_id(plan_id)
-            if plan:
-                orig_agenda = plan.to_dict()
+            event_id = planning.get("event_item")
+            plan_id = planning["guid"]
 
-        if orig_agenda is None or (orig_agenda or {}).get("item_type") != "event":
-            # event id exists in planning item but event is not in the system
-            logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
+            orig_agenda = None
+            event = await service.find_by_id(event_id)
+            if event:
+                orig_agenda = event.to_dict()
+            else:
+                plan = await service.find_by_id(plan_id)
+                if plan:
+                    orig_agenda = plan.to_dict()
+
+            if orig_agenda is None or orig_agenda.get("item_type") != "event":
+                logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
+                return None
+
+            agenda = deepcopy(orig_agenda)
+
+            if (
+                planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
+                or planning.get("pubstatus") == "cancelled"
+            ):
+                await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
+                await service.update(agenda["_id"], agenda)
+                return None
+
+            _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
+            await agenda_manager.set_agenda_planning_items(
+                agenda, orig_agenda, planning, action="add" if new_plan else "update"
+            )
+
+        if not agenda:
             return None
-
-        agenda = deepcopy(orig_agenda)
-
-        if (
-            planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
-            or planning.get("pubstatus") == "cancelled"
-        ):
-            # Remove the Planning item from the list
-            await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
-            await service.update(agenda["_id"], agenda)
-            return None
-
-        # Update agenda metadata
-        _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
-        # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
-
-        # Add the Planning item to the list
-        await agenda_manager.set_agenda_planning_items(
-            agenda, orig_agenda, planning, action="add" if new_plan else "update"
-        )
 
         if not agenda.get("_id"):
-            # setting _id of agenda to be equal to planning if there's no event id
-            agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
-            agenda.setdefault("guid", planning.get("event_item", planning["guid"]) or planning["guid"])
+            agenda["_id"] = planning.get("event_item", planning["guid"])
+            agenda["guid"] = agenda["_id"]
             return (await service.create([agenda]))[0]
         else:
             # Replace the original document
