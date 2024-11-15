@@ -116,7 +116,6 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.news_api.api_tokens",
-    "newsroom.monitoring",
 ]
 
 CORE_APPS = [
@@ -174,6 +173,7 @@ MODULES = [
     "newsroom.design",
     "newsroom.auth_server.client",
     "newsroom.reports",
+    "newsroom.monitoring.module",
 ]
 
 SITE_NAME = "Newshub"
