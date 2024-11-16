@@ -245,60 +245,49 @@ class Publisher:
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
 
-    async def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
-        if not planning.get("event_item") and not planning.get("related_events"):
+    async def publish_planning_into_event(
+        self, planning: dict[str, Any], related_event_id: Optional[str] = None
+    ) -> Optional[str]:
+        if not planning.get("event_item") and not related_event_id:
             return None
 
         service = AgendaItemService()
-        related_events = planning.get("related_events", [])
 
         agenda = None
 
-        if related_events:
-            for event in related_events:
-                event_data = await service.find_by_id(event["_id"])
-                if event_data:
-                    orig_agenda = event_data.to_dict()
-                    agenda = deepcopy(orig_agenda)
-                    if event["_id"] not in agenda["planning_ids"]:
-                        agenda["planning_ids"].append(str(event["_id"]))
-                    if event.get("link_type") == "secondary":
-                        coverages, coverage_changes = await agenda_manager.get_coverages(
-                            [planning], (orig_agenda or {}).get("coverages") or [], planning
-                        )
-                        if coverage_changes:
-                            agenda["coverages"] = coverages
+        event_id = planning.get("event_item") if not related_event_id else related_event_id
+        plan_id = planning["guid"]
+
+        orig_agenda = None
+        event = await service.find_by_id(event_id)
+        if event:
+            orig_agenda = event.to_dict()
         else:
-            event_id = planning.get("event_item")
-            plan_id = planning["guid"]
+            plan = await service.find_by_id(plan_id)
+            if plan:
+                orig_agenda = plan.to_dict()
 
-            orig_agenda = None
-            event = await service.find_by_id(event_id)
-            if event:
-                orig_agenda = event.to_dict()
-            else:
-                plan = await service.find_by_id(plan_id)
-                if plan:
-                    orig_agenda = plan.to_dict()
+        if orig_agenda is None or orig_agenda.get("item_type") != "event":
+            logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
+            return None
 
-            if orig_agenda is None or orig_agenda.get("item_type") != "event":
-                logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
-                return None
+        agenda = deepcopy(orig_agenda)
 
-            agenda = deepcopy(orig_agenda)
+        if agenda.get("item_type") == "event" and planning["_id"] not in agenda["planning_ids"]:
+            agenda["planning_ids"].append(planning["_id"])
 
-            if (
-                planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
-                or planning.get("pubstatus") == "cancelled"
-            ):
-                await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
-                await service.update(agenda["_id"], agenda)
-                return None
+        if (
+            planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
+            or planning.get("pubstatus") == "cancelled"
+        ):
+            await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
+            await service.update(agenda["_id"], agenda)
+            return None
 
-            _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
-            await agenda_manager.set_agenda_planning_items(
-                agenda, orig_agenda, planning, action="add" if new_plan else "update"
-            )
+        _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
+        await agenda_manager.set_agenda_planning_items(
+            agenda, orig_agenda, planning, action="add" if new_plan else "update"
+        )
 
         if not agenda:
             return None
