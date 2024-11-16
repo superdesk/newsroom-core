@@ -258,16 +258,19 @@ class Publisher:
         event_id = planning.get("event_item") if not related_event_id else related_event_id
         plan_id = planning["guid"]
 
-        orig_agenda = None
+        orig_agenda: dict[str, Any] | None = None
         event = await service.find_by_id(event_id)
         if event:
             orig_agenda = event.to_dict()
         else:
+            # Item not found using ``event_item`` attribute
+            # Try again using ``guid`` attribute
             plan = await service.find_by_id(plan_id)
             if plan:
                 orig_agenda = plan.to_dict()
 
-        if orig_agenda is None or orig_agenda.get("item_type") != "event":
+        if orig_agenda is None or (orig_agenda or {}).get("item_type") != "event":
+            # event id exists in planning item but event is not in the system
             logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
             return None
 
@@ -280,11 +283,16 @@ class Publisher:
             planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
             or planning.get("pubstatus") == "cancelled"
         ):
+            # Remove the Planning item from the list
             await agenda_manager.set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
             await service.update(agenda["_id"], agenda)
             return None
 
+        # Update agenda metadata
         _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
+        # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
+
+        # Add the Planning item to the list
         await agenda_manager.set_agenda_planning_items(
             agenda, orig_agenda, planning, action="add" if new_plan else "update"
         )
@@ -293,8 +301,9 @@ class Publisher:
             return None
 
         if not agenda.get("_id"):
-            agenda["_id"] = planning.get("event_item", planning["guid"])
-            agenda["guid"] = agenda["_id"]
+            # setting _id of agenda to be equal to planning if there's no event id
+            agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
+            agenda.setdefault("guid", planning.get("event_item", planning["guid"]) or planning["guid"])
             return (await service.create([agenda]))[0]
         else:
             # Replace the original document
