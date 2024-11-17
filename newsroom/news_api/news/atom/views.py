@@ -18,7 +18,7 @@ from newsroom.core import get_current_wsgi_app
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products import get_products_by_company
-from newsroom.news_api.news.search_service_async import NewsApiSearchServiceAsync
+from newsroom.news_api.news.search_service import NewsApiSearchServiceAsync
 
 logger = logging.getLogger(__name__)
 atom_endpoints = EndpointGroup("atom", __name__)

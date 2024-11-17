@@ -10,7 +10,7 @@ from superdesk.core.resources.fields import Field
 
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.news_api.news.types import NewsApiSearchRequestArgs
-from newsroom.news_api.news.search_service_async import NewsApiSearchServiceAsync, default_search_filters
+from newsroom.news_api.news.search_service import NewsApiSearchServiceAsync, default_search_filters
 
 
 allowed_exclude_fields = {

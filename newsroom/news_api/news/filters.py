@@ -1,8 +1,8 @@
 import json
 
-from content_api.errors import BadParameterValueError
 from quart_babel import gettext
 from superdesk.core import get_app_config
+from content_api.errors import BadParameterValueError
 
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.products.service import ProductsService

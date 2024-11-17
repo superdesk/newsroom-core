@@ -1,7 +1,7 @@
 from superdesk.core.web import EndpointGroup
 from superdesk.core.types import Request
 
-from ..search_service_async import NewsApiSearchServiceAsync
+from ..search_service import NewsApiSearchServiceAsync
 
 news_api_search_endpoints = EndpointGroup("news_api_search", __name__)
 
