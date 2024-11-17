@@ -66,6 +66,16 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     genre: str | None = None
     item_source: str | None = None
 
+    def to_dict(self, flatten_lists: bool = False, **kwargs):
+        data = super().to_dict()
+
+        # convert list attributes to comma-separated strings
+        if flatten_lists:
+            for key, value in data.items():
+                if isinstance(value, list):
+                    data[key] = ",".join(value)
+        return data
+
     @field_validator("include_fields", mode="before")
     @classmethod
     def validate_include_fields(cls, value: str | None) -> list[str] | None:

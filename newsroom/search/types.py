@@ -178,7 +178,7 @@ class BaseSearchRequestArgs(BaseModel):
     end_time: str = Field(validation_alias=AliasChoices("end_time", "created_to_time"), default="23:59:59")
 
     #: Pagination, the number of items to return per page
-    page_size: int = Field(validation_alias=AliasChoices("page_size", "size"), default=25)
+    page_size: int = Field(validation_alias=AliasChoices("page_size", "size", "max_results"), default=25)
 
     #: Pagination, the page number to return
     page: int = Field(validation_alias=AliasChoices("page", "from"), default=0)
@@ -224,6 +224,7 @@ class BaseSearchRequestArgs(BaseModel):
     bookmarks: list[ObjectId] = Field(default_factory=list)
 
     @field_validator("filter", mode="before")
+    @classmethod
     def parse_filter(cls, value: dict[str, Any] | str | None) -> dict[str, Any] | None:
         """Attempts to convert the filter argument from a string into a dictionary"""
 
@@ -233,6 +234,7 @@ class BaseSearchRequestArgs(BaseModel):
             raise BadParameterValueError(gettext("Incorrect type supplied for filter parameter"))
 
     @field_validator("product_ids", "bookmarks", "navigation_ids", "ids", mode="before")
+    @classmethod
     def parse_list_ids(cls, value: list[str] | list[ObjectId] | str | ObjectId | None) -> list[str]:
         """If value is not a list, then convert it to a list here
 
@@ -247,6 +249,7 @@ class BaseSearchRequestArgs(BaseModel):
         return value
 
     @field_validator("advanced", mode="before")
+    @classmethod
     def parse_advanced(cls, value: AdvancedSearchParams | str | None) -> AdvancedSearchParams | None:
         """Attempts to convert the advanced argument from a string into a AdvancedSearchParams instance"""
 
@@ -256,6 +259,7 @@ class BaseSearchRequestArgs(BaseModel):
             raise BadParameterValueError(gettext("Incorrect type supplied for advanced search params"))
 
     @field_validator("sort", mode="before")
+    @classmethod
     def parse_sort(cls, value: SortListParam | str) -> SortListParam:
         """Tries to extract the sort params from the supplied string:
 
@@ -305,6 +309,7 @@ class BaseSearchRequestArgs(BaseModel):
         return list(filter(None, [parse_field(field.strip()) for field in values]))
 
     @field_validator("projection", mode="before")
+    @classmethod
     def parse_projection(cls, value: ProjectedFieldArg | str | None) -> ProjectedFieldArg | None:
         """Attempts to convert the projection argument from a string to a ProjectedFieldArg instance"""
 

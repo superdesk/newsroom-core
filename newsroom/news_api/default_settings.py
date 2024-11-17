@@ -28,8 +28,6 @@ CORE_APPS = [
     "newsroom.news_api.formatters",
     "newsroom.news_api.news",
     "newsroom.news_api.news.item.item",
-    "newsroom.news_api.news.search",
-    "newsroom.news_api.news.feed",
     "newsroom.news_api.api_audit",
     "newsroom.history",
 ]
@@ -45,6 +43,7 @@ MODULES = [
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
     "newsroom.news_api.news.search",
+    "newsroom.news_api.news.feed",
     "newsroom.products",
 ]
 

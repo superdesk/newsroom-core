@@ -64,7 +64,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
 
     async def process_response_enhancements(self, request: Request, response: Response):
         search_req = self.get_search_request_instance(request)
-        self._build_hateoas(request, response, search_req)
+        self.build_hateoas(request, response, search_req)
 
         company = get_company_or_none_from_request(request)
         assert company is not None
@@ -85,7 +85,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         else:
             remove_internal_renditions(doc)
 
-    def _build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
+    def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
         base_url = req.path.strip("/")
         query_params = search_req.args.to_dict()
 

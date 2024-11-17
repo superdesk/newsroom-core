@@ -27,6 +27,10 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    if "skip" in scenario.tags:
+        scenario.skip("Marked with @skip")
+        return
+
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(before_scenario_async(context, scenario))

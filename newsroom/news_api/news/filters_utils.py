@@ -44,7 +44,7 @@ def get_date_range(request_args: NewsApiSearchRequestArgs) -> Tuple[datetime | N
             start_date = request_args.start_date
             relative_start = True
         else:
-            start_date = parse_iso_date(request_args.start_date, request_args.timezone)
+            start_date = parse_iso_date(request_args.start_date, request_args.timezone)  # type: ignore[assignment]
     except BadParameterValueError:
         raise
     except ValueError:
@@ -56,7 +56,7 @@ def get_date_range(request_args: NewsApiSearchRequestArgs) -> Tuple[datetime | N
                 end_date = request_args.end_date
                 relative_end = True
             else:
-                end_date = parse_iso_date(request_args.end_date, request_args.timezone)
+                end_date = parse_iso_date(request_args.end_date, request_args.timezone)  # type: ignore[assignment]
         else:
             end_date = None
     except ValueError:
@@ -115,7 +115,7 @@ def create_date_range_filter(start_date: datetime | str | None, end_date: dateti
     }
 
 
-def parse_iso_date(date_str, timezone=None):
+def parse_iso_date(date_str: str | None, timezone=None) -> datetime | None:
     """Create a date object from the given string in ISO 8601 format.
 
     :param date_str:
@@ -128,16 +128,16 @@ def parse_iso_date(date_str, timezone=None):
     """
     if date_str is None:
         return None
-    else:
-        dt = parser.parse(date_str)
-        if dt.tzinfo is None:
-            if timezone:
-                if timezone not in pytz.all_timezones:
-                    raise BadParameterValueError("Bad parameter value for Parameter (timezone)")
-                dt = local_to_utc(timezone, dt)
-            else:
-                dt = pytz.timezone("UTC").localize(dt)
-        return dt
+
+    dt = parser.parse(date_str)
+    if dt.tzinfo is None:
+        if timezone:
+            if timezone not in pytz.all_timezones:
+                raise BadParameterValueError("Bad parameter value for Parameter (timezone)")
+            dt = local_to_utc(timezone, dt)
+        else:
+            dt = pytz.timezone("UTC").localize(dt)
+    return dt
 
 
 def format_date(date):
