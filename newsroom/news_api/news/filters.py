@@ -1,19 +1,22 @@
 import json
 
 from quart_babel import gettext
+
 from superdesk.core import get_app_config
 from content_api.errors import BadParameterValueError
 
-from newsroom.auth.utils import get_company_or_none_from_request
-from newsroom.products.service import ProductsService
-from newsroom.products.utils import get_products_by_company_async
+
 from newsroom.search.utils import query_string
+from newsroom.products.service import ProductsService
+from newsroom.search.types import NewshubSearchRequest
+from newsroom.products.utils import get_products_by_company_async
+from newsroom.auth.utils import get_company_or_none_from_request
 
 from .filters_utils import create_date_range_filter, get_date_range
-from .types import NewsApiSearchRequest, default_allowed_exclude_fields
+from .types import NewsApiSearchRequestArgs, default_allowed_exclude_fields
 
 
-async def prefill_company(request: NewsApiSearchRequest):
+async def prefill_company(request: NewshubSearchRequest[NewsApiSearchRequestArgs]) -> None:
     """
     Gets company from web_request and prefills it into request.
     If not company is found, it raises an exception.
@@ -26,7 +29,7 @@ async def prefill_company(request: NewsApiSearchRequest):
         raise BadParameterValueError(gettext("Invalid search request, company not found"))
 
 
-async def prefill_products(request: NewsApiSearchRequest):
+async def prefill_products(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Prefill the search products"""
 
     products_service = ProductsService()
@@ -41,7 +44,7 @@ async def prefill_products(request: NewsApiSearchRequest):
         request.products = await get_products_by_company_async(request.company, product_type=request.section)
 
 
-def validate_page(request: NewsApiSearchRequest):
+def validate_page(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Validate the page params"""
     query_max_page_size = get_app_config("QUERY_MAX_PAGE_SIZE")
 
@@ -54,7 +57,7 @@ def validate_page(request: NewsApiSearchRequest):
         raise BadParameterValueError("Page limit exceeded")
 
 
-def apply_filter_fields(request: NewsApiSearchRequest):
+def apply_filter_fields(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Generate the field filters"""
 
     # filter fields and elasticsearch keys
@@ -91,7 +94,7 @@ def apply_filter_fields(request: NewsApiSearchRequest):
         request.search.query.filter.extend(filters)
 
 
-def apply_date_filter(request: NewsApiSearchRequest):
+def apply_date_filter(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Generate and apply date filters"""
 
     start_date, end_date = get_date_range(request.args)
@@ -101,14 +104,14 @@ def apply_date_filter(request: NewsApiSearchRequest):
         request.search.query.filter.append(date_filter)
 
 
-def apply_request_filter(request: NewsApiSearchRequest):
+def apply_request_filter(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Generate the filters from request args"""
 
     if request.args.q:
         request.search.query.filter.append(query_string(request.args.q, request.args.default_operator))
 
 
-def apply_projection(request: NewsApiSearchRequest):
+def apply_projection(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
     """Create a projection object that explicitly includes particular content fields from results."""
 
     default_fields = {

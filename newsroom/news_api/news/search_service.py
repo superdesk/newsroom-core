@@ -1,6 +1,9 @@
-from typing import Any, cast
+from typing import Any
 from urllib.parse import urlencode
 
+from werkzeug.datastructures import ImmutableMultiDict
+
+from content_api.errors import UnexpectedParameterError
 from superdesk.flask import request as flask_request
 from superdesk.core.types.web import Request, Response
 
@@ -26,7 +29,7 @@ from .filters import (
 from .types import NewsApiSearchRequestArgs
 
 
-default_search_filters = [
+default_search_filters: list[SearchFilterFunction] = [
     prefill_company,
     prefill_products,
     apply_section_filter,
@@ -42,7 +45,7 @@ default_search_filters = [
 
 class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArgs, WireItem]):
     search_args_class = NewsApiSearchRequestArgs
-    filters = cast(list[SearchFilterFunction], default_search_filters)
+    filters = default_search_filters
     section = SectionEnum.NEWS_API
     default_sort = [{"versioncreated", 1}]
     default_page_size = 25
@@ -50,13 +53,33 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
     def __init__(self):
         self.service = WireItemService()
 
-    async def process_web_request(self, request):
+    async def process_web_request(self, request: Request):
+        self._validate_unknown_fields()
         resp = await super().process_web_request(request)
 
         await self.process_post_api_audit(resp)
         await self.process_response_enhancements(request, resp)
 
         return resp
+
+    def _validate_unknown_fields(self):
+        """
+        Since we construct the search request using `from_url_args` we cannot get all the arguments
+        provided in the url, therefore we validate here all the model fields (allowed ones) against
+        those coming from the request. If any unknown found, it raises an error
+        """
+        model = self.search_args_class()
+        url_args: ImmutableMultiDict = flask_request.args
+        allowed_fields = set(model.model_fields.keys())
+
+        for field in model.model_fields.values():
+            if field.validation_alias:
+                for alias in field.validation_alias.choices:
+                    allowed_fields.add(alias)
+
+        unknown_fields = set(url_args.keys()) - allowed_fields
+        if unknown_fields:
+            raise UnexpectedParameterError(desc=f"Unexpected parameter(s): {', '.join(unknown_fields)}")
 
     async def process_post_api_audit(self, response: Response):
         # TODO-ASYNC: adjust once post_audit is async
@@ -87,7 +110,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
 
     def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
         base_url = req.path.strip("/")
-        query_params = search_req.args.to_dict()
+        query_params = search_req.args.to_dict(flatten_lists=True)
 
         resp.body.setdefault("_links", {})
         resp.body["_links"]["parent"] = {"title": "Home", "href": "/"}

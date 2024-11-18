@@ -1,12 +1,12 @@
 import ipaddress
-from datetime import timedelta
 from typing import Any
+from datetime import timedelta
 from quart_babel import gettext
 
 from superdesk.utc import utcnow
 from superdesk.core.types import Request
 from superdesk.core.app import UserAuthProtocol
-from superdesk.flask import g, request as flask_request
+from superdesk.flask import request as flask_request
 from superdesk import get_resource_service, get_app_config
 
 from newsroom.exceptions import AuthorizationError
@@ -86,9 +86,7 @@ class CompanyTokenAuth(UserAuthProtocol):
         # TODO-ASYNC: replace token with actual token resource model once api_tokens is async
         request.storage.request.set("company_auth_token", token)
         request.storage.request.set("company_instance", company)
-
-        # TODO-ASYNC: check if we need this here or refactor it with request.storage
-        g.company_id = str(company.id)
+        request.storage.request.set("company_id", str(company.id))
 
     async def check_token_validity(self, request: Request, token: dict[str, Any]):
         """
@@ -129,11 +127,11 @@ class CompanyTokenAuth(UserAuthProtocol):
 
         if updates:
             tokens_service.patch(token.get("token"), updates)
+            storage = request.storage.request
 
-            # TODO-ASYNC: check if we should use request.storage instead
-            g.rate_limit_requests = updates["rate_limit_requests"]
+            storage.set("rate_limit_requests", updates["rate_limit_requests"])
             if updates.get("rate_limit_expiry"):
-                g.rate_limit_expiry = updates["rate_limit_expiry"]
+                storage.set("rate_limit_expiry", updates["rate_limit_expiry"])
 
     def get_current_user(self, _r: Request):
         return None

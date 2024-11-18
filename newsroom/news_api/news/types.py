@@ -2,8 +2,9 @@ import functools
 from typing import Any, ClassVar
 from typing_extensions import Self
 from pydantic import Field, field_validator, model_validator
+
 from content_api.errors import BadParameterValueError
-from newsroom.search.types import BaseSearchRequestArgs, NewshubSearchRequest
+from newsroom.search.types import BaseSearchRequestArgs
 
 
 # set of fields that can be specified in the include_fields parameter
@@ -40,8 +41,6 @@ default_allowed_exclude_fields = {
 
 
 class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
-    # TODO-ASYNC: check if we need to raise exception on unknown fields
-
     allowed_include_fields: ClassVar[set[str]] = default_allowed_include_fields
 
     allowed_exclude_fields: ClassVar[set[str]] = default_allowed_exclude_fields
@@ -67,12 +66,13 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     item_source: str | None = None
 
     def to_dict(self, flatten_lists: bool = False, **kwargs):
-        data = super().to_dict()
+        data = super().to_dict(**kwargs)
 
         # convert list attributes to comma-separated strings
         if flatten_lists:
             for key, value in data.items():
                 if isinstance(value, list):
+                    value = [str(v) for v in value]
                     data[key] = ",".join(value)
         return data
 
@@ -130,9 +130,3 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
             raise BadParameterValueError("Only one of `include_fields` or `exclude_fields` can be provided, not both.")
 
         return values
-
-
-class NewsApiSearchRequest(NewshubSearchRequest[NewsApiSearchRequestArgs]):
-    """This class is just intented to have proper types in the filter methods below"""
-
-    pass
