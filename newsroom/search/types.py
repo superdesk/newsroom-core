@@ -181,7 +181,7 @@ class BaseSearchRequestArgs(BaseModel):
     page_size: int = Field(validation_alias=AliasChoices("page_size", "size", "max_results"), default=25)
 
     #: Pagination, the page number to return
-    page: int = Field(validation_alias=AliasChoices("page", "from"), default=1)
+    page: int = Field(validation_alias=AliasChoices("page", "from"), default=0)
 
     #: An elasticsearch query_string to be added to the filter
     q: str | None = None
