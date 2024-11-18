@@ -49,7 +49,7 @@ async def handle_publish_planning(item):
 
     if item.get("related_events"):
         for events in item["related_events"]:
-            event_id = await publisher.publish_planning_into_event(item, events["_id"])
+            event_id = await publisher.publish_planning_related_events(item, events)
 
     # Prefer parent Event when sending notificaitons
     _id = event_id or plan_id

@@ -150,6 +150,7 @@ class Publisher:
             # Retrieve all current Planning items and add them into this Event
             agenda.setdefault("planning_items", [])
             agenda.setdefault("planning_ids", [])
+            agenda.setdefault("event_ids", [])
             for plan in await (await service.search({"_id": {"$in": plan_ids}}, use_mongo=True)).to_list_raw():
                 planning_item = plan["planning_items"][0]
                 agenda["planning_items"].append(planning_item)
@@ -245,17 +246,13 @@ class Publisher:
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
 
-    async def publish_planning_into_event(
-        self, planning: dict[str, Any], related_event_id: Optional[str] = None
-    ) -> Optional[str]:
-        if not planning.get("event_item") and not related_event_id:
+    async def publish_planning_into_event(self, planning: dict[str, Any]) -> Optional[str]:
+        if not planning.get("event_item"):
             return None
 
         service = AgendaItemService()
 
-        agenda = None
-
-        event_id = planning.get("event_item") if not related_event_id else related_event_id
+        event_id = planning["event_item"]
         plan_id = planning["guid"]
 
         orig_agenda: dict[str, Any] | None = None
@@ -276,9 +273,6 @@ class Publisher:
 
         agenda = deepcopy(orig_agenda)
 
-        if agenda.get("item_type") == "event" and planning["_id"] not in agenda["planning_ids"]:
-            agenda["planning_ids"].append(planning["_id"])
-
         if (
             planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
             or planning.get("pubstatus") == "cancelled"
@@ -297,9 +291,6 @@ class Publisher:
             agenda, orig_agenda, planning, action="add" if new_plan else "update"
         )
 
-        if not agenda:
-            return None
-
         if not agenda.get("_id"):
             # setting _id of agenda to be equal to planning if there's no event id
             agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
@@ -309,3 +300,27 @@ class Publisher:
             # Replace the original document
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
+
+    async def publish_planning_related_events(self, planning: dict[str, Any], related_event: dict[str, Any]):
+        if not related_event.get("link_type") == "secondary":
+            return None
+
+        service = AgendaItemService()
+        event_id = related_event.get("_id")
+
+        event = await service.find_by_id(event_id)
+        agenda = event.to_dict()
+
+        if agenda.get("item_type") == "event" and planning and planning.get("guid") not in agenda["planning_ids"]:
+            agenda["planning_ids"].append(planning["guid"])
+
+        if event_id not in agenda["event_ids"]:
+            agenda["event_ids"].append(event_id)
+
+        planning_item = await service.find_by_id(planning["guid"])
+        if planning_item:
+            agenda["coverages"] = planning_item.coverages
+
+        await service.update(agenda["_id"], agenda)
+        event = await service.find_by_id(event_id)
+        return agenda["_id"]
