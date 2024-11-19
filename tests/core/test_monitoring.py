@@ -10,7 +10,8 @@ from unittest import mock
 from tests.utils import mock_send_email, post_json, login_public
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
-from superdesk import get_resource_service
+
+from newsroom.monitoring import MonitoringProfileService
 
 
 company_id = "5c3eb6975f627db90c84093c"
@@ -611,7 +612,7 @@ async def test_send_alerts_respects_last_run_time(client, app):
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_disabled_profile_wont_send_immediate_alerts(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"is_enabled": False})
+    await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"is_enabled": False})
     await create_entries_for(
         "items",
         [
@@ -668,7 +669,7 @@ async def test_disabled_profile_wont_send_scheduled_alerts(client, app):
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_always_send_immediate_alerts_wiont_send_default_email(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": True})
+    await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"always_send": True})
     await create_entries_for(
         "items",
         [
@@ -739,7 +740,7 @@ async def test_disable_always_send_schedule_alerts(client, app):
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_always_send_immediate_alerts(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": False})
+    await MonitoringProfileService().update(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": False})
     await create_entries_for(
         "items",
         [
