@@ -542,7 +542,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
 
     item_type = get_type()
     service = AgendaItemService() if item_type == "agenda" else WireItemService()
-    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()
+    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()  # type: ignore[attr-defined]
 
     if not item_to_copy:
         await request.abort(404)

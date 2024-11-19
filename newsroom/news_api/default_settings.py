@@ -7,7 +7,6 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     CLIENT_URL,
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
-    ASYNC_AUTH_CLASS,
 )
 
 NEWSAPI_URL = env("NEWSAPI_URL", "http://localhost:5400")
@@ -29,8 +28,6 @@ CORE_APPS = [
     "newsroom.news_api.formatters",
     "newsroom.news_api.news",
     "newsroom.news_api.news.item.item",
-    "newsroom.news_api.news.search",
-    "newsroom.news_api.news.feed",
     "newsroom.news_api.api_audit",
     "newsroom.history",
 ]
@@ -42,8 +39,11 @@ MODULES = [
     # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
     "newsroom.wire.module",
+    "newsroom.section_filters",
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
+    "newsroom.news_api.news.search",
+    "newsroom.news_api.news.feed",
     "newsroom.products",
 ]
 
@@ -68,3 +68,5 @@ ELASTICSEARCH_FIX_QUERY = False
 # Disable upload endpoint from ``newsroom.assets.module``,
 # as NewsAPI will implement a custom one
 ASSETS_REGISTER_UPLOAD_ENDPOINT = False
+
+ASYNC_AUTH_CLASS = "newsroom.news_api.api_tokens.auth:CompanyTokenAuth"

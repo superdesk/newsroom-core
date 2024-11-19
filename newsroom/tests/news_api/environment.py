@@ -27,6 +27,10 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    if "skip" in scenario.tags:
+        scenario.skip("Marked with @skip")
+        return
+
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(before_scenario_async(context, scenario))
@@ -48,6 +52,7 @@ async def before_scenario_async(context, scenario):
         "NEWS_API_TIME_LIMIT_DAYS": 100,
         "SITE_NAME": "Newsroom",
         "CACHE_TYPE": "null",
+        "ASYNC_AUTH_CLASS": "newsroom.news_api.api_tokens.auth:CompanyTokenAuth",
     }
 
     if "rate_limit" in scenario.tags:
