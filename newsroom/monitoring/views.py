@@ -4,13 +4,14 @@ from pydantic import field_validator
 from quart_babel import gettext
 from werkzeug.exceptions import NotFound
 
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.core.types import BaseModel, Request, Response
 from superdesk.core.resources.fields import ObjectId
 from superdesk.flask import send_file, render_template
 from superdesk.logging import logger
 
 from newsroom.types import SectionEnum, UserResourceModel
+from newsroom.core import get_current_wsgi_app
 from newsroom.auth import auth_rules
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
 
@@ -51,7 +52,7 @@ async def get_view_data():
         "saved_items": await MonitoringSearchService().get_current_user_bookmarks_count(),
         "formats": [
             {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
+            for f in get_current_wsgi_app().download_formatters.values()
             if "monitoring" in f["types"]
         ],
         "secondary_formats": [{"format": f[0], "name": f[1]} for f in alert_types],
@@ -86,17 +87,19 @@ async def get_monitoring_for_company(user: UserResourceModel | None):
 
 
 class MonitoringIdUrlArg(BaseModel):
-    id: ObjectId
+    profile_id: ObjectId
 
 
-@monitoring_endpoints.endpoint("/monitoring/<id>/users", methods=["POST"], auth=[auth_rules.account_manager_only])
+@monitoring_endpoints.endpoint(
+    "/monitoring/<string:profile_id>/users", methods=["POST"], auth=[auth_rules.account_manager_only]
+)
 async def update_users(args: MonitoringIdUrlArg, params: None, request: Request) -> Response:
     updates = await request.get_json()
     if "users" not in updates:
         return Response({"error": gettext("Users data not provided")}, 403)
 
     updates["users"] = [user_id for user_id in updates["users"]]
-    await MonitoringProfileService().update(args.id, updates)
+    await MonitoringProfileService().update(args.profile_id, updates)
     return Response({"success": True})
 
 
@@ -112,10 +115,12 @@ async def monitoring_companies() -> Response:
     return Response(companies)
 
 
-@monitoring_endpoints.endpoint("/monitoring/<id>/schedule", methods=["POST"], auth=[auth_rules.account_manager_only])
+@monitoring_endpoints.endpoint(
+    "/monitoring/<string:profile_id>/schedule", methods=["POST"], auth=[auth_rules.account_manager_only]
+)
 async def update_schedule(args: MonitoringIdUrlArg, params: None, request: Request) -> Response:
     updates = await request.get_json()
-    await MonitoringProfileService().update(args.id, updates=updates)
+    await MonitoringProfileService().update(args.profile_id, updates=updates)
     return Response({"success": True})
 
 
@@ -157,7 +162,7 @@ class EditMonitoringUrlParams(WireItemUrlParams):
         return True if value == "" else value
 
 
-@monitoring_endpoints.endpoint("/monitoring/<item_id>", methods=["GET", "POST"])
+@monitoring_endpoints.endpoint("/monitoring/<string:item_id>", methods=["GET", "POST"])
 async def edit(args: WireItemRouteArgs, params: EditMonitoringUrlParams, request: Request) -> Response | str:
     if params.context == SectionEnum.WIRE:
         items = await WireSearchServiceAsync().get_items_for_action([args.item_id])
@@ -216,11 +221,11 @@ async def edit(args: WireItemRouteArgs, params: EditMonitoringUrlParams, request
     return Response(profile)
 
 
-@monitoring_endpoints.endpoint("/monitoring/<_id>", methods=["DELETE"], auth=[auth_rules.admin_only])
+@monitoring_endpoints.endpoint("/monitoring/<string:profile_id>", methods=["DELETE"], auth=[auth_rules.admin_only])
 async def delete(args: MonitoringIdUrlArg, params: None, request: Request) -> Response:
     """Deletes the monitoring profile by given id"""
     service = MonitoringProfileService()
-    monitoring = await service.find_by_id(args.id)
+    monitoring = await service.find_by_id(args.profile_id)
     if not monitoring:
         return Response({"error": gettext("Item not found")}, 404)
     await MonitoringProfileService().delete(monitoring)
@@ -250,13 +255,13 @@ class ExportMonitoringUrlParams(BaseModel):
     secondary_format: str | None = None
 
 
-@monitoring_endpoints.endpoint("/monitoring/export/<_ids>")
+@monitoring_endpoints.endpoint("/monitoring/export/<string:ids>")
 async def export(args: ExportMonitoringUrlArgs, params: ExportMonitoringUrlParams, request: Request) -> Response:
     user = get_user_from_request(request)
     if not params.format:
         return Response({"message": gettext("No format specified")}, 400)
 
-    formatter = get_current_app().as_any().download_formatters[params.format]["formatter"]
+    formatter = get_current_wsgi_app().download_formatters[params.format]["formatter"]
 
     monitoring_profile = await MonitoringProfileService().find_by_id(params.monitoring_profile)
     if not monitoring_profile:
@@ -314,7 +319,7 @@ async def share(request: Request) -> Response:
             "message": data.get("message"),
             "item_name": "Monitoring Report",
         }
-        formatter = get_current_app().as_any().download_formatters["monitoring_pdf"]["formatter"]
+        formatter = get_current_wsgi_app().download_formatters["monitoring_pdf"]["formatter"]
         monitoring_profile["format_type"] = "monitoring_pdf"
         monitoring_file = await get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(monitoring_file.read())
