@@ -145,6 +145,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
             agenda["state_reason"] = planning_item.get("state_reason")
             agenda["language"] = planning_item.get("language")
             agenda["source"] = planning_item.get("source")
+            agenda["event_ids"] = [link["_id"] for link in (planning_item.get("related_events") or [])]
 
             agenda["state"] = planning_item.get("state") or AgendaWorkflowState.CANCELLED.SCHEDULED
             if planning_item.get("pubstatus") == "cancelled":
@@ -194,7 +195,6 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
         plan["language"] = planning_item.get("language")
         plan["source"] = planning_item.get("source")
-        plan["event_ids"] = [link["_id"] for link in (planning_item.get("related_events") or [])]
 
         if new_plan:
             agenda["planning_items"].append(plan)

@@ -169,7 +169,6 @@ class AgendaPlanningItem:
     place: list[Place] = Field(default_factory=list)
     state_reason: str | None = None
     products: list[CVItemWithCode] = Field(default_factory=list)
-    event_ids: list[fields.Keyword] | None = None
 
     # Field validators
     _parse_time_to_be_confirmed = field_validator("time_to_be_confirmed", mode="before")(convert_value_to_bool)
@@ -249,6 +248,7 @@ class AgendaItem(ResourceModel, ModelWithVersions):
         list[AgendaPlanningItem], fields.nested_list(include_in_parent=True), Field(default_factory=list)
     ]
     planning_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
+    event_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
 
     # Field/Model validators
     _parse_datetime_fields = field_validator("firstcreated", "versioncreated", mode="before")(convert_none_to_utcnow)
