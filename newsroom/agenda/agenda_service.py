@@ -194,6 +194,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
         plan["language"] = planning_item.get("language")
         plan["source"] = planning_item.get("source")
+        plan["event_ids"] = [link["_id"] for link in (planning_item.get("related_events") or [])]
 
         if new_plan:
             agenda["planning_items"].append(plan)

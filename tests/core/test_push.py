@@ -1269,7 +1269,9 @@ async def test_planning_to_many_events(client, app):
     assert eitem1["_id"] == "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c169"
     assert eitem1["item_type"] == "event"
     assert eitem1["planning_ids"] == []
-    assert eitem1["event_ids"] == []
+    assert eitem1["planning_items"][0]["event_ids"] == [
+        "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c168"
+    ]
     assert len(eitem1["coverages"]) == 1
 
     # secondary link event with coverages
@@ -1281,7 +1283,248 @@ async def test_planning_to_many_events(client, app):
         eitem2["planning_ids"][0]
         == "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b9ad"
     )
+    assert eitem2["planning_items"] == []
+
+
+async def test_planning_to_many_events_duplicate_coverages(client, app):
+    event = {
+        "_id": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+        "type": "event",
+        "occur_status": {
+            "qcode": "eocstat:eos5",
+            "name": "Planned, occurs certainly",
+            "label": "Planned, occurs certainly",
+        },
+        "dates": {"start": "2024-11-14T18:30:00+0000", "end": "2024-11-15T18:29:59+0000", "tz": "Asia/Calcutta"},
+        "calendars": [{"name": "Sport", "qcode": "sport"}],
+        "state": "scheduled",
+        "language": "en",
+        "languages": ["en"],
+        "place": [],
+        "name": "Event1",
+        "_updated": "2024-11-15T09:51:44+0000",
+        "_created": "2024-11-15T09:50:57+0000",
+        "guid": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+        "firstcreated": "2024-11-15T09:50:57+0000",
+        "versioncreated": "2024-11-15T09:51:44+0000",
+        "actioned_date": "None",
+        "pubstatus": "usable",
+        "state_reason": "None",
+        "version_creator": "66e13583bf2361cacc440666",
+        "item_id": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+        "plans": [],
+        "event_contact_info": [],
+        "products": [{"code": "6715cb9a62f7204f57cc0ea5", "name": "news"}],
+    }
+
+    await client.post("/push", json=event)
+
+    planning_item_1 = {
+        "_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b985",
+        "agendas": [],
+        "item_class": "plinat:newscoverage",
+        "state": "scheduled",
+        "type": "planning",
+        "planning_date": "2024-11-14T18:30:00+0000",
+        "related_events": [
+            {
+                "_id": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "link_type": "secondary",
+            }
+        ],
+        "coverages": [
+            {
+                "firstcreated": "2024-11-15T09:51:44+0000",
+                "versioncreated": "2024-11-15T09:51:44+0000",
+                "news_coverage_status": {"qcode": "ncostat:int", "name": "coverage intended", "label": "Planned"},
+                "workflow_status": "draft",
+                "planning": {"language": "nl", "g2_content_type": "text", "scheduled": "2024-11-15T10:30:00+0000"},
+                "coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e76",
+                "original_coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e76",
+                "scheduled_updates": [],
+                "assigned_user": {"first_name": "None", "last_name": "None", "display_name": "1admin"},
+                "assigned_desk": {"name": "Sports Desk"},
+                "coverage_provider": {"name": "Stringer_one"},
+                "deliveries": [],
+            }
+        ],
+        "name": "Planning many One",
+        "guid": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b985",
+        "language": "en",
+        "firstcreated": "2024-11-15T09:51:44+0000",
+        "versioncreated": "2024-11-15T09:52:20+0000",
+        "_created": "2024-11-15T09:51:44+0000",
+        "_updated": "2024-11-15T09:52:20+0000",
+        "pubstatus": "usable",
+        "versionposted": "2024-11-15T09:52:20+0000",
+        "state_reason": "None",
+        "item_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b985",
+        "products": [{"code": "6715cb9a62f7204f57cc0ea5", "name": "news"}],
+        "events": [
+            {
+                "rel": "secondary",
+                "uri": "urn:event:urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "literal": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "name": "Event1",
+            }
+        ],
+    }
+
+    await client.post("/push", json=planning_item_1)
+
+    planning_item_2 = {
+        "_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "agendas": [],
+        "item_class": "plinat:newscoverage",
+        "state": "scheduled",
+        "type": "planning",
+        "planning_date": "2024-11-14T18:30:00+0000",
+        "related_events": [
+            {
+                "_id": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "link_type": "secondary",
+            }
+        ],
+        "coverages": [
+            {
+                "firstcreated": "2024-11-15T09:51:44+0000",
+                "versioncreated": "2024-11-15T09:51:44+0000",
+                "news_coverage_status": {"qcode": "ncostat:int", "name": "coverage intended", "label": "Planned"},
+                "workflow_status": "draft",
+                "planning": {"language": "nl", "g2_content_type": "text", "scheduled": "2024-11-15T10:30:00+0000"},
+                "coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78",
+                "original_coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78",
+                "scheduled_updates": [],
+                "assigned_user": {"first_name": "None", "last_name": "None", "display_name": "1admin"},
+                "assigned_desk": {"name": "Sports Desk"},
+                "coverage_provider": {"name": "Stringer_Two"},
+                "deliveries": [],
+            }
+        ],
+        "name": "Planning many One",
+        "guid": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "language": "en",
+        "firstcreated": "2024-11-15T09:51:44+0000",
+        "versioncreated": "2024-11-15T09:52:20+0000",
+        "_created": "2024-11-15T09:51:44+0000",
+        "_updated": "2024-11-15T09:52:20+0000",
+        "pubstatus": "usable",
+        "versionposted": "2024-11-15T09:52:20+0000",
+        "state_reason": "None",
+        "item_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "products": [{"code": "6715cb9a62f7204f57cc0ea5", "name": "news"}],
+        "events": [
+            {
+                "rel": "secondary",
+                "uri": "urn:event:urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "literal": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "name": "Event1",
+            }
+        ],
+    }
+
+    await client.post("/push", json=planning_item_2)
+
+    events = await get_json(client, "/agenda/search")
+
+    assert events["_items"][3]["planning_ids"] == [
+        "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b985",
+        "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+    ]
+    assert len(events["_items"][3]["coverages"]) == 2
     assert (
-        eitem2["event_ids"][0]
-        == "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c168"
+        events["_items"][3]["coverages"][0]["coverage_id"]
+        == "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e76"
+    )
+    assert (
+        events["_items"][3]["coverages"][1]["coverage_id"]
+        == "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78"
+    )
+
+    # add coverage in existing planning_item
+    planning_item_2 = {
+        "_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "agendas": [],
+        "item_class": "plinat:newscoverage",
+        "state": "scheduled",
+        "type": "planning",
+        "planning_date": "2024-11-14T18:30:00+0000",
+        "related_events": [
+            {
+                "_id": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "link_type": "secondary",
+            }
+        ],
+        "coverages": [
+            {
+                "firstcreated": "2024-11-15T09:51:44+0000",
+                "versioncreated": "2024-11-15T09:51:44+0000",
+                "news_coverage_status": {"qcode": "ncostat:int", "name": "coverage intended", "label": "Planned"},
+                "workflow_status": "draft",
+                "planning": {"language": "nl", "g2_content_type": "text", "scheduled": "2024-11-15T10:30:00+0000"},
+                "coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78",
+                "original_coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78",
+                "scheduled_updates": [],
+                "assigned_user": {"first_name": "None", "last_name": "None", "display_name": "1admin"},
+                "assigned_desk": {"name": "Sports Desk"},
+                "coverage_provider": {"name": "Stringer_Two"},
+                "deliveries": [],
+            },
+            {
+                "firstcreated": "2024-11-15T09:51:44+0000",
+                "versioncreated": "2024-11-15T09:51:44+0000",
+                "news_coverage_status": {"qcode": "ncostat:int", "name": "coverage intended", "label": "Planned"},
+                "workflow_status": "draft",
+                "planning": {"language": "nl", "g2_content_type": "text", "scheduled": "2024-11-15T10:30:00+0000"},
+                "coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e70",
+                "original_coverage_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e70",
+                "scheduled_updates": [],
+                "assigned_user": {"first_name": "None", "last_name": "None", "display_name": "1admin"},
+                "assigned_desk": {"name": "Sports Desk"},
+                "coverage_provider": {"name": "Stringer_Two_updated"},
+                "deliveries": [],
+            },
+        ],
+        "name": "Planning many One",
+        "guid": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "language": "en",
+        "firstcreated": "2024-11-15T09:51:44+0000",
+        "versioncreated": "2024-11-15T09:52:20+0000",
+        "_created": "2024-11-15T09:51:44+0000",
+        "_updated": "2024-11-15T09:52:20+0000",
+        "pubstatus": "usable",
+        "versionposted": "2024-11-15T09:55:20+0000",
+        "state_reason": "None",
+        "item_id": "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+        "products": [{"code": "6715cb9a62f7204f57cc0ea5", "name": "news"}],
+        "events": [
+            {
+                "rel": "secondary",
+                "uri": "urn:event:urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "literal": "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c170",
+                "name": "Event1",
+            }
+        ],
+    }
+
+    await client.post("/push", json=planning_item_2)
+
+    events = await get_json(client, "/agenda/search")
+
+    assert events["_items"][3]["planning_ids"] == [
+        "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b985",
+        "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b986",
+    ]
+    assert len(events["_items"][3]["coverages"]) == 3
+    assert (
+        events["_items"][3]["coverages"][0]["coverage_id"]
+        == "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e76"
+    )
+    assert (
+        events["_items"][3]["coverages"][1]["coverage_id"]
+        == "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e78"
+    )
+    assert (
+        events["_items"][3]["coverages"][2]["coverage_id"]
+        == "urn:newsml:localhost:5000:2024-11-15T15:21:44.625299:4ebaa306-a03e-4cd7-8454-ad65cc9c6e70"
     )
