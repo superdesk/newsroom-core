@@ -542,7 +542,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
 
     item_type = get_type()
     service = AgendaItemService() if item_type == "agenda" else WireItemService()
-    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()
+    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()  # type: ignore[attr-defined]
 
     if not item_to_copy:
         await request.abort(404)
@@ -591,7 +591,7 @@ class WireItemUrlParams(BaseModel):
 
 
 @wire_endpoints.endpoint("/wire/<item_id>")
-async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Request) -> Response | str:
+async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Request, **kwargs) -> Response | str:
     wire_service = WireSearchServiceAsync()
 
     wire_item = await wire_service.service.find_by_id(args.item_id)
@@ -616,8 +616,7 @@ async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Requ
     data = {"item": wire_item.to_dict()}
     if params.print:
         if params.monitoring_profile:
-            # TODO-ASYNC: Figure out what these args are actually, and where are they used (in the template?)
-            # data.update(request.view_args)
+            data.update(kwargs)
             template = "monitoring_export.html"
         else:
             template = "wire_item_print.html"

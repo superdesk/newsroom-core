@@ -1,5 +1,7 @@
 from typing import Generic, Any, ClassVar, TypeVar
 
+from bson import ObjectId
+
 from superdesk.core.resources.service import AsyncResourceService
 
 from newsroom.core import get_current_wsgi_app
@@ -43,7 +45,7 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
             app = get_current_wsgi_app()
             app.cache.delete(str(doc.id))
 
-    async def find_items_by_ids(self, ids: list[str]) -> list[NewshubResourceModelType]:
+    async def find_items_by_ids(self, ids: list[str] | list[ObjectId]) -> list[NewshubResourceModelType]:
         """
         Fetches and returns the entries from database for the given list of IDs
         """

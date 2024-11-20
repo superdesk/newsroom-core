@@ -19,7 +19,7 @@ from tests.core.utils import create_entries_for
 async def expect_status_in(response, codes):
     assert response.status_code in [
         int(code) for code in codes
-    ], "exptected on of {expected}, got {code}, reason={reason}".format(
+    ], "expected on of {expected}, got {code}, reason={reason}".format(
         code=response.status_code,
         expected=codes,
         reason=(await response.get_data()).decode("utf-8"),

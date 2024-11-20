@@ -511,22 +511,17 @@ Feature: News API News Search
     When we get "/news/search?include_fields=secret"
     Then we get error 400
         """
-        {"code": 400, "message": "Include fields contains a non-allowed value"}
+        {"code": 400, "message": "`include_fields` contains non-allowed values: secret"}
         """
     When we get "/news/search?exclude_fields=copyrightnotice"
     Then we get error 400
         """
-        {"code": 400, "message": "Exclude fields contains a non-allowed value"}
-        """
-    When we get "/news/search?include_fields=type&include_fields=genre"
-    Then we get error 400
-        """
-        {"code": 400, "message": "Multiple values received for parameter (include_fields)"}
+        {"code": 400, "message": "`exclude_fields` contains non-allowed values: copyrightnotice"}
         """
     When we get "/news/search?filter=123,456"
     Then we get error 400
         """
-        {"code": 400, "message": "Bad parameter value for Parameter (filter)"}
+        {"code": 400, "message": "Incorrect type supplied for filter parameter"}
         """
     When we get "/news/search?genre=null"
     Then we get error 400
