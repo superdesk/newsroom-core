@@ -53,7 +53,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
         return (item.item_type === 'planning' || restrictCoverageInfo) ? (
             <React.Fragment>
                 {displayCoverages.current.length > 0 && (
-                    <PreviewBox label={gettext('Coverages:')}>
+                    <PreviewBox label={gettext('Coverages')}>
                         <AgendaCoverages
                             item={item}
                             coverages={displayCoverages.current}
@@ -66,7 +66,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
                 )}
 
                 {displayCoverages.previous.length > 0 && (
-                    <PreviewBox label={gettext('Previous Coverages:')}>
+                    <PreviewBox label={gettext('Previous Coverages')}>
                         <AgendaCoverages
                             item={item}
                             coverages={displayCoverages.previous}

@@ -55,7 +55,7 @@ function AgendaPreviewPlanningComponent({
     return (
         <React.Fragment>
             {!plan ? null : (
-                <div className="agenda-planning__container info-box">
+                <div className="agenda-planning__container">
                     <div className="info-box__content">
                         <span className="info-box__label">
                             {gettext('Planning Item')}
@@ -74,7 +74,7 @@ function AgendaPreviewPlanningComponent({
                 </div>
             )}
             {!otherPlanningItems.length ? null : (
-                <div className="agenda-planning__container info-box">
+                <div className="agenda-planning__container">
                     <div className="info-box__content">
                         <span className="info-box__label">
                             {plan == null ? gettext('Planning Items') : gettext('Other Planning Items')}

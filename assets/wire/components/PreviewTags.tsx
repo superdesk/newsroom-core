@@ -30,7 +30,7 @@ function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLab
     );
 
     return (
-        <InfoBox label={isItemDetail ? gettext('Metadata') : null} top={!isItemDetail}>
+        <InfoBox label={gettext('Metadata')} top={!isItemDetail}>
             {isDisplayed('slugline', displayConfig) && (
                 <PreviewTagsBlock label={gettext('Slugline')}>
                     <ArticleSlugline item={item}/>
