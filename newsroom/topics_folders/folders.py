@@ -1,3 +1,9 @@
+from typing import Sequence, Any
+
+from pymongo.errors import DuplicateKeyError
+from bson import ObjectId
+from quart_babel import gettext
+
 # from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources import (
     ResourceConfig,
@@ -10,13 +16,25 @@ from superdesk.core.resources import (
 from newsroom import MONGO_PREFIX
 from newsroom.types import TopicFolderResourceModel, UserTopicFoldersResourceModel, CompanyTopicFoldersResourceModel
 from newsroom.auth import auth_rules
-from newsroom.core.resources import NewshubAsyncResourceService
+from newsroom.core.resources import NewshubAsyncResourceService, raise_custom_validation_error
 from newsroom.topics.topics_async import TopicService
 
 # from newsroom.signals import user_deleted
 
 
 class FolderResourceService(NewshubAsyncResourceService[TopicFolderResourceModel]):
+    async def create(self, docs: Sequence[TopicFolderResourceModel | dict[str, Any]]) -> list[str]:
+        try:
+            return await super().create(docs)
+        except DuplicateKeyError:
+            raise_custom_validation_error(TopicFolderResourceModel.__name__, "name", gettext("Name must be unique"), "")
+
+    async def update(self, item_id: str | ObjectId, updates: dict[str, Any], etag: str | None = None) -> None:
+        try:
+            await super().update(item_id, updates, etag)
+        except DuplicateKeyError:
+            raise_custom_validation_error(TopicFolderResourceModel.__name__, "name", gettext("Name must be unique"), "")
+
     async def on_deleted(self, doc):
         await self.delete_many(lookup={"parent": doc.id})
         await TopicService().delete_many(lookup={"folder": doc.id})

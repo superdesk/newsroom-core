@@ -4,7 +4,6 @@ from quart import json
 from unittest import mock
 from copy import deepcopy
 from bson import ObjectId
-import pymongo
 
 from newsroom.types import UserResourceModel, TopicResourceModel, SectionEnum
 from newsroom.topics.views import get_topic_url
@@ -314,47 +313,29 @@ async def test_topic_folders_unique_validation(client):
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second one should raise DuplicateKeyError
-    try:
-        resp = await client.post(user_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        # assert that the DuplicateKeyError occurred as expected
-        print("DuplicateKeyError for user topic folder as expected")
-    else:
-        # If no exception is raised, fail the test
-        assert False, "Expected DuplicateKeyError for user topic folder, but got success"
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # create company topic with same name
-    print("URL=")
-    print(company_topic_folders_url)
     resp = await client.post(company_topic_folders_url, json=folder)
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second one should raise DuplicateKeyError for company topic
-    try:
-        resp = await client.post(company_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        # assert that the DuplicateKeyError occurred as expected
-        print("DuplicateKeyError for company topic folder as expected")
-    else:
-        # If no exception is raised, fail the test
-        assert False, "Expected DuplicateKeyError for company topic folder, but got success"
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # check case-insensitive uniqueness for user topic
     folder["name"] = "Test"
-    try:
-        resp = await client.post(user_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        print("DuplicateKeyError for case-insensitive user topic folder as expected")
-    else:
-        assert False, "Expected DuplicateKeyError for case-insensitive user topic folder, but got success"
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # check case-insensitive uniqueness for company topic
-    try:
-        resp = await client.post(company_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        print("DuplicateKeyError for case-insensitive company topic folder as expected")
-    else:
-        assert False, "Expected DuplicateKeyError for case-insensitive company topic folder, but got success"
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
 
 async def test_topic_subscriber_auto_enable_user_emails(app, client, navigation_items):
