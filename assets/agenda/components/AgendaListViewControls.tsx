@@ -1,28 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AgendaFeaturedStoriesToogle from './AgendaFeaturedStoriesToogle';
-import {DISPLAY_AGENDA_FEATURED_STORIES_ONLY} from 'utils';
+import {DISPLAY_AGENDA_FEATURED_STORIES_ONLY, isMobilePhoneScreen} from 'utils';
 import ListViewOptions from 'components/ListViewOptions';
 import NewItemsIcon from 'search/components/NewItemsIcon';
+import {ResizeObserverComponent} from '@superdesk/common';
 
 function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems, newItems, fetchItems}: any) {
-    return (
-        <div className="navbar navbar--flex navbar--small navbar--list-controls">
-            {!(newItems || []).length ? null : (
+    const Wrapper = ({children}: any) => {
+        if (children == null) {
+            return null;
+        }
+        return (
+            <div className="navbar navbar--flex navbar--small navbar--list-controls">
+                {children}
+            </div>
+        );
+    };
+
+    const renderRefreshButton = () => {
+        return (newItems || []).length
+            ? (
                 <div className="navbar__inner navbar__inner--icon">
                     <NewItemsIcon
                         newItems={newItems}
                         refresh={fetchItems}
                     />
                 </div>
+            )
+            : null;
+    };
+
+    return (
+        <ResizeObserverComponent>
+            {(dimensions) => (
+                isMobilePhoneScreen(dimensions.width)
+                    ? (
+                        <Wrapper>{renderRefreshButton()}</Wrapper>
+                    )
+                    : (
+                        <Wrapper>
+                            {renderRefreshButton()}
+                            <div className="navbar__inner navbar__inner--end navbar__inner--buttons">
+                                {!hideFeaturedToggle && hasAgendaFeaturedItems  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY &&
+                                    <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>
+                                }
+                                <ListViewOptions setView={setView} activeView={activeView} />
+                            </div>
+                        </Wrapper>
+                    )
             )}
-            <div className="navbar__inner navbar__inner--end navbar__inner--buttons">
-                {!hideFeaturedToggle && hasAgendaFeaturedItems  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY &&
-                    <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>
-                }
-                <ListViewOptions setView={setView} activeView={activeView} />
-            </div>
-        </div>
+        </ResizeObserverComponent>
     );
 }
 

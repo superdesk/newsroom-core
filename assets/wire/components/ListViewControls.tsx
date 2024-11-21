@@ -8,6 +8,8 @@ import SearchAllVersionsControl from './SearchAllVersionsControl';
 import ListViewOptions from '../../components/ListViewOptions';
 import {ListSearchOptions} from './ListSearchOptions';
 import NewItemsIcon from 'search/components/NewItemsIcon';
+import {isMobilePhoneScreen} from 'utils';
+import {ResizeObserverComponent} from '@superdesk/common';
 
 function ListViewControls({
     activeView,
@@ -22,45 +24,72 @@ function ListViewControls({
     newItems,
     fetchItems,
 }: any) {
-    return(
-        <div className="navbar navbar--flex navbar--small navbar--list-controls">
-            {!(newItems || []).length ? null : (
+    const Wrapper = ({children}: any) => {
+        if (children == null) {
+            return null;
+        }
+        return (
+            <div className="navbar navbar--flex navbar--small navbar--list-controls">
+                {children}
+            </div>
+        );
+    };
+
+    const renderRefreshButton = () => {
+        return (newItems || []).length
+            ? (
                 <div className="navbar__inner navbar__inner--icon">
                     <NewItemsIcon
                         newItems={newItems}
                         refresh={fetchItems}
                     />
                 </div>
+            )
+            : null;
+    };
+
+    return (
+        <ResizeObserverComponent>
+            {(dimensions) => (
+                isMobilePhoneScreen(dimensions.width)
+                    ? (
+                        <Wrapper>{renderRefreshButton()}</Wrapper>
+                    )
+                    : (
+                        <Wrapper>
+                            {renderRefreshButton()}
+                            <div className="navbar__inner navbar__inner--end navbar__inner--buttons">
+                                {hideSearchAllVersions ? null : (
+                                    <SearchAllVersionsControl
+                                        activeNavigation={activeNavigation}
+                                        searchAllVersions={searchAllVersions}
+                                        toggleSearchAllVersions={toggleSearchAllVersions}
+                                    />
+                                )}
+                                {!hideNewsOnly && <NewsOnlyControl
+                                    activeNavigation={activeNavigation}
+                                    newsOnly={newsOnly}
+                                    toggleNews={toggleNews}
+                                />}
+                                <span className="navbar__divider"></span>
+                                <ListViewOptions setView={setView} activeView={activeView} />
+                                {(!noNavigationSelected(activeNavigation) || (hideSearchAllVersions && hideNewsOnly)) ? null : (
+                                    <div className="content-bar__right--mobile">
+                                        <ListSearchOptions
+                                            hideSearchAllVersions={hideSearchAllVersions}
+                                            searchAllVersions={searchAllVersions}
+                                            toggleSearchAllVersions={toggleSearchAllVersions}
+                                            hideNewsOnly={hideNewsOnly}
+                                            newsOnly={newsOnly}
+                                            toggleNews={toggleNews}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </Wrapper>
+                    )
             )}
-            <div className="navbar__inner navbar__inner--end navbar__inner--buttons">
-                {hideSearchAllVersions ? null : (
-                    <SearchAllVersionsControl
-                        activeNavigation={activeNavigation}
-                        searchAllVersions={searchAllVersions}
-                        toggleSearchAllVersions={toggleSearchAllVersions}
-                    />
-                )}
-                {!hideNewsOnly && <NewsOnlyControl
-                    activeNavigation={activeNavigation}
-                    newsOnly={newsOnly}
-                    toggleNews={toggleNews}
-                />}
-                <span className="navbar__divider"></span>
-                <ListViewOptions setView={setView} activeView={activeView} />
-                {(!noNavigationSelected(activeNavigation) || (hideSearchAllVersions && hideNewsOnly)) ? null : (
-                    <div className="content-bar__right--mobile">
-                        <ListSearchOptions
-                            hideSearchAllVersions={hideSearchAllVersions}
-                            searchAllVersions={searchAllVersions}
-                            toggleSearchAllVersions={toggleSearchAllVersions}
-                            hideNewsOnly={hideNewsOnly}
-                            newsOnly={newsOnly}
-                            toggleNews={toggleNews}
-                        />
-                    </div>
-                )}
-            </div>
-        </div>
+        </ResizeObserverComponent>
     );
 }
 

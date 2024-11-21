@@ -565,6 +565,10 @@ export function isMobilePhone() {
     return isTouchDevice() && screen.width < 768;
 }
 
+export function isMobilePhoneScreen(dimensions: number) {
+    return dimensions < 575;
+}
+
 /**
  * Checks if wire context
  * @returns {boolean}
