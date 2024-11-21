@@ -281,6 +281,9 @@ class Publisher:
             await service.update(agenda["_id"], agenda)
             return None
 
+        if planning and planning.get("guid") not in event.planning_ids:
+            agenda["planning_ids"] = event.planning_ids + [planning["guid"]]
+
         # Update agenda metadata
         _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
         # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)

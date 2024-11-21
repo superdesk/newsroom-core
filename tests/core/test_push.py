@@ -1250,7 +1250,9 @@ async def test_planning_to_many_events(client, app):
     eitem1 = events["_items"][1]
     assert eitem1["_id"] == "urn:newsml:localhost:5000:2024-11-15T15:20:57.904056:bcf346bd-3f59-4b28-87c1-4a5bb324c169"
     assert eitem1["item_type"] == "event"
-    assert eitem1["planning_ids"] == []
+    assert eitem1["planning_ids"] == [
+        "urn:newsml:localhost:5000:2024-11-15T15:21:44.624942:c734e329-c43b-4acd-991b-a53e1769b9ad"
+    ]
     assert len(eitem1["coverages"]) == 1
 
     # secondary link event with coverages
