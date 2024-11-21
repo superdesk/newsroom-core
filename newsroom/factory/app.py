@@ -299,13 +299,7 @@ class BaseNewsroomApp(SuperdeskEve):
             # specific integrations can be disabled https://github.com/getsentry/sentry-python/releases/tag/2.11.0
             sentry_sdk.integrations._processed_integrations.add("flask")
 
-            sentry_sdk.init(
-                dsn=self.config["SENTRY_DSN"],
-                integrations=[
-                    QuartIntegration(),
-                    AsyncioIntegration()
-                ]
-            )
+            sentry_sdk.init(dsn=self.config["SENTRY_DSN"], integrations=[QuartIntegration(), AsyncioIntegration()])
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
