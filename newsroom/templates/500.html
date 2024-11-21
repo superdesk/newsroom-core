@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="content">
+    <div class="jumbotron">
+        <h1>{{ gettext("500. Internal server error.") }}</h1>
+        <p class="lead">{{ gettext('An internal server error was raised. Please consult your system administrator for assistance.', url=request.path) }}</p>
+    </div>
+</section>
+{% endblock %}

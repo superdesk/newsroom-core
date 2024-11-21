@@ -28,6 +28,7 @@ from superdesk.cache import cache_backend
 from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.factory.app import SuperdeskEve
 
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
 from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
@@ -225,12 +226,20 @@ class BaseNewsroomApp(SuperdeskEve):
             errors = parse_validation_error(error)
             return jsonify(errors), 400
 
+        async def handle_any_exception(error: Exception):
+            self.logger.exception("An unhandled exception was raised", exc_info=error)
+            if request and is_json_request(request):
+                return jsonify({"error": str(error), "code": 500}), 500
+            else:
+                return await render_template("500.html"), 500
+
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
         self.register_error_handler(AuthorizationError, authorization_error)
         self.register_error_handler(ValidationError, handle_validation_error)
+        self.register_error_handler(Exception, handle_any_exception)
 
     def general_setting(
         self,
@@ -290,7 +299,13 @@ class BaseNewsroomApp(SuperdeskEve):
             # specific integrations can be disabled https://github.com/getsentry/sentry-python/releases/tag/2.11.0
             sentry_sdk.integrations._processed_integrations.add("flask")
 
-            sentry_sdk.init(dsn=self.config["SENTRY_DSN"], integrations=[QuartIntegration()])
+            sentry_sdk.init(
+                dsn=self.config["SENTRY_DSN"],
+                integrations=[
+                    QuartIntegration(),
+                    AsyncioIntegration()
+                ]
+            )
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
