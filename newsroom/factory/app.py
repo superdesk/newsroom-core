@@ -223,6 +223,7 @@ class BaseNewsroomApp(SuperdeskEve):
             Gets the ValidationException error raised from Core framework's models/services, parses and returns it
             to the client in a valid json format.
             """
+            self.logger.exception("Validation Error", exc_info=error)
             errors = parse_validation_error(error)
             return jsonify(errors), 400
 
