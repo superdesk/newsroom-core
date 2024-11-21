@@ -15,7 +15,7 @@ from planning.common import WORKFLOW_STATE
 
 from newsroom import signals
 from newsroom.core import get_current_wsgi_app
-from newsroom.types import WireItem
+from newsroom.types import WireItem, AgendaItemType
 from newsroom.utils import parse_date_str
 from newsroom.wire import WireSearchServiceAsync
 from newsroom.agenda import AgendaItemService
@@ -149,6 +149,7 @@ class Publisher:
 
             # Retrieve all current Planning items and add them into this Event
             agenda.setdefault("planning_items", [])
+            agenda.setdefault("planning_ids", [])
             for plan in await (await service.search({"_id": {"$in": plan_ids}}, use_mongo=True)).to_list_raw():
                 planning_item = plan["planning_items"][0]
                 agenda["planning_items"].append(planning_item)
@@ -280,6 +281,9 @@ class Publisher:
             await service.update(agenda["_id"], agenda)
             return None
 
+        if planning and planning.get("guid") not in event.planning_ids:
+            agenda["planning_ids"] = event.planning_ids + [planning["guid"]]
+
         # Update agenda metadata
         _, new_plan = await service.convert_planning_to_agenda_dict(agenda, planning)
         # new_plan = agenda_manager.set_metadata_from_planning(agenda, planning)
@@ -298,3 +302,27 @@ class Publisher:
             # Replace the original document
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
+
+    async def publish_planning_related_events(self, planning: dict[str, Any], related_event: dict[str, Any]):
+        if not related_event.get("link_type") == "secondary":
+            return None
+
+        service = AgendaItemService()
+        event_id = related_event.get("_id")
+
+        event = await service.find_by_id(event_id)
+        updates: dict[str, Any] = {}
+
+        if event.item_type == AgendaItemType.EVENT and planning and planning.get("guid") not in event.planning_ids:
+            updates["planning_ids"] = event.planning_ids + [planning["guid"]]
+
+        planning_item = await service.find_by_id(planning["guid"])
+        if planning_item and planning_item.coverages:
+            existing_coverages = {c.coverage_id: c for c in event.coverages}
+            new_coverages = {c.coverage_id: c for c in planning_item.coverages}
+
+            merged_coverages = {**existing_coverages, **new_coverages}.values()
+
+            updates["coverages"] = list(merged_coverages)
+
+        await service.update(event_id, updates)

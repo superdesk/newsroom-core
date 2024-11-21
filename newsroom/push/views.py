@@ -47,6 +47,10 @@ async def handle_publish_planning(item):
     plan_id = await publisher.publish_planning_item(item, orig.to_dict() if orig else {})
     event_id = await publisher.publish_planning_into_event(item)
 
+    if item.get("related_events"):
+        for events in item["related_events"]:
+            await publisher.publish_planning_related_events(item, events)
+
     # Prefer parent Event when sending notificaitons
     _id = event_id or plan_id
     await notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)

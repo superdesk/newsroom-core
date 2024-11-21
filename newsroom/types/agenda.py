@@ -247,6 +247,8 @@ class AgendaItem(ResourceModel, ModelWithVersions):
     planning_items: Annotated[
         list[AgendaPlanningItem], fields.nested_list(include_in_parent=True), Field(default_factory=list)
     ]
+    planning_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
+    event_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
 
     # Field/Model validators
     _parse_datetime_fields = field_validator("firstcreated", "versioncreated", mode="before")(convert_none_to_utcnow)
@@ -267,6 +269,7 @@ class AgendaItem(ResourceModel, ModelWithVersions):
         "watches",
         "products",
         "planning_items",
+        "planning_ids",
         mode="before",
     )(convert_none_to_list)
 
