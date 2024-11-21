@@ -112,7 +112,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
         cursor = await self.search(
             NewshubSearchRequest(
                 section=section or self.section,
-                args=WireSearchRequestArgs(bookmarks=[user.id], page_size=0),
+                args=self.search_args_class(bookmarks=[user.id], page_size=0),
             )
         )
         return await cursor.count()
@@ -126,7 +126,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
         :returns: The list of WIre items
         """
 
-        cursor = await self.get_items_by_id(item_ids, args=WireSearchRequestArgs(ignore_latest=True))
+        cursor = await self.get_items_by_id(item_ids, args=self.search_args_class(ignore_latest=True))
         items = await cursor.to_list_raw()
         for item in items:
             if item.get("slugline") and item.get("anpa_take_key"):
@@ -328,7 +328,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
             request.products = [product]
 
         cursor = await self.search(
-            WireSearchRequestArgs(
+            self.search_args_class(
                 product_ids=[product.id],
                 page_size=size,
                 exclude_embargoed=not get_app_config("DASHBOARD_EMBARGOED") or exclude_embargoed,
@@ -367,7 +367,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
         search_request = NewshubSearchRequest(
             section=self.section,
             web_request=None,
-            args=WireSearchRequestArgs(ids=item_ids, ignore_latest=True),
+            args=self.search_args_class(ids=item_ids, ignore_latest=True),
             search=ESQuery(),
         )
         filters: list[SearchFilterFunction] = [
@@ -454,7 +454,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
             NewshubSearchRequest(
                 section=cast(SectionEnum | None, product.product_type) or self.section or SectionEnum.WIRE,
                 products=[product],
-                args=WireSearchRequestArgs(page_size=0),
+                args=self.search_args_class(page_size=0),
                 search=ESQuery(aggs=aggs),
             ),
             filters=[
