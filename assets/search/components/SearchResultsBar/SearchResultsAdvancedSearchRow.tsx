@@ -152,7 +152,7 @@ export function SearchResultsAdvancedSearchRow({
 
     const fieldSearchTags = (
         <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--compact" data-test-id='search-results--advanced-fields'>
-            <span className="search-result__tags-list-row-helper-text me-1">inside</span>
+            <span className="search-result__tags-list-row-helper-text me-1">{gettext('inside')}</span>
             {(Object.keys(fieldNameToLabel) as Array<keyof typeof fieldNameToLabel>)
                 .filter((fieldName) => availableFields.includes(fieldName))
                 .map((fieldName) => (
