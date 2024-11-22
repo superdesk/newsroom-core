@@ -37,7 +37,7 @@ function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGro
 
     return (
         <InfoBox
-            label={isItemDetail ? gettext('Metadata') : null}
+            label={gettext('Metadata')}
             top={!isItemDetail}
         >
             {!services ? null : (
