@@ -1,42 +1,49 @@
 from bson import ObjectId
-from quart_babel import gettext
 
-import superdesk
 from superdesk.core import get_current_app
-from superdesk.flask import abort, g, Blueprint, request
+from superdesk.core.types import BaseModel, Request, Response
+from superdesk.core.module import Module
+from superdesk.core.web import EndpointGroup
 from superdesk import get_resource_service
 from newsroom.news_api.utils import post_api_audit
 from newsroom.history_async import HistoryService
 
 
-blueprint = Blueprint("news/item", __name__)
+news_item_endpoints = EndpointGroup("news/item", __name__)
 
 
-def init_app(app):
-    superdesk.blueprint(blueprint, app)
+class RouteArguments(BaseModel):
+    item_id: str
 
 
-@blueprint.route("/news/item/<path:item_id>", methods=["GET"])
-async def get_item(item_id):
+class RouteParams(BaseModel):
+    format: str = "NINJSFormatter"
+    version: str | None = None
+
+
+@news_item_endpoints.endpoint("news/item/<path:item_id>", methods=["GET"])
+async def get_item(args: RouteArguments, params: RouteParams, request: Request) -> Response:
     app = get_current_app()
-    auth = app.auth
-    if not auth.authorized([], None, request.method):
-        return abort(401, gettext("Invalid token"))
-
-    _format = request.args.get("format", "NINJSFormatter")
-    _version = request.args.get("version")
     service = get_resource_service("formatters")
-    formatted = await service.get_version(item_id, _version, _format)
+    formatted = await service.get_version(args.item_id, params.version, params.format)
     mimetype = formatted.get("mimetype")
     response = app.response_class(response=formatted.get("formatted_item"), status=200, mimetype=mimetype)
 
-    post_api_audit({"_items": [{"_id": item_id}]})
+    await post_api_audit(request, [args.item_id])
+
     # Record the retrieval of the item in the history collection
+    company_id = request.storage.request.get("company_id")
     await HistoryService().create_history_record(
-        [{"_id": item_id, "version": formatted.get("version")}],
+        [{"_id": args.item_id, "version": formatted.get("version")}],
         "api",
         None,
-        ObjectId(g.company_id),
+        ObjectId(company_id) if company_id else None,
         "news_api",
     )
     return response
+
+
+module = Module(
+    "newsroom.news_api.news.item",
+    endpoints=[news_item_endpoints],
+)

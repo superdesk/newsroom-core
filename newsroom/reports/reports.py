@@ -1,3 +1,4 @@
+from typing import cast
 import io
 import csv
 from collections import defaultdict
@@ -5,14 +6,15 @@ from copy import deepcopy
 
 from bson import ObjectId
 from quart_babel import gettext
-from eve.utils import ParsedRequest
 from werkzeug.utils import secure_filename
 
-from superdesk.core import json, get_current_app
+from superdesk.core import get_current_app
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 from superdesk.flask import abort, request, send_file
 import superdesk
 from superdesk.utc import utcnow
 
+from newsroom.types import CompanyResource, NewsApiAuditResourceModel
 from newsroom.auth.utils import get_company_from_request
 from newsroom.utils import (
     query_resource,
@@ -347,32 +349,42 @@ async def get_company_api_usage():
     if not date_range.get("gt") and date_range.get("lt"):
         abort(400, "No date range specified.")
 
-    source = {}
-    must_terms = [{"range": {"created": date_range}}]
-    source["query"] = {"bool": {"filter": must_terms}}
-    source["sort"] = [{"created": "desc"}]
-    source["size"] = 200
-    source["from"] = int(args.get("from", 0))
-    source["aggs"] = {
-        "items": {
-            "aggs": {"endpoints": {"terms": {"size": 0, "field": "endpoint"}}},
-            "terms": {"size": 0, "field": "subscriber"},
-        }
-    }
-    # TODO-ASYNC: Change this when CompanyTokenAuth is upgraded to async
-    company_ids = [t["company"] for t in query_resource(API_TOKENS)]
-    source["query"]["bool"]["filter"].append({"terms": {"subscriber": company_ids}})
-    companies = get_entity_dict(query_resource("companies", lookup={"_id": {"$in": company_ids}}), str_id=True)
-    req = ParsedRequest()
-    req.args = {"source": json.dumps(source)}
-
-    if source["from"] >= 1000:
+    page_from = int(args.get("from", 0))
+    if page_from >= 1000:
         # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
         return abort(400)
 
+    # TODO-ASYNC: Change this when CompanyTokenAuth is upgraded to async
+    company_ids = [t["company"] for t in query_resource(API_TOKENS)]
+    companies = {str(company.id): company for company in await CompanyResource.get_service().find_by_ids(company_ids)}
+
+    cursor = cast(
+        ElasticsearchResourceCursorAsync[NewsApiAuditResourceModel],
+        await NewsApiAuditResourceModel.get_service().search(
+            {
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"range": {"created": date_range.get("gt")}},
+                            {"terms": {"subscriber": company_ids}},
+                        ],
+                    },
+                },
+                "sort": [{"created": "desc"}],
+                "size": 200,
+                "from": page_from,
+                "aggs": {
+                    "items": {
+                        "aggs": {"endpoints": {"terms": {"size": 0, "field": "endpoint"}}},
+                        "terms": {"size": 0, "field": "subscriber"},
+                    },
+                },
+            }
+        ),
+    )
+
     unique_endpoints = []
-    search_result = superdesk.get_resource_service("api_audit").get(req, None)
-    results = format_report_results(search_result, unique_endpoints, companies)
+    results = format_report_results(cursor, unique_endpoints, companies)
 
     results = {
         "results": results,
