@@ -32,7 +32,7 @@ class MonitoringProfileResourceModel(NewshubResourceModel):
     alert_type: str | None = None
     is_enabled: bool = True
     users: list[ObjectId] | None = None
-    schedule: MonitoringSchedule
+    schedule: MonitoringSchedule | None = None
     keywords: list[str] | None = None
     last_run_time: datetime | None = None
     format_type: str | None = None
