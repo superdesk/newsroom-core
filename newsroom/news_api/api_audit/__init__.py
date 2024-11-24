@@ -14,12 +14,12 @@ news_api_audit_resource_config = ResourceConfig(
 
 
 def init_app(app: SuperdeskAsyncApp) -> None:
-    if app.wsgi.config.get("NEWS_API_ENABLED") and news_api_audit_resource_config not in module.resources:
-        module.resources.append(news_api_audit_resource_config)
+    if app.wsgi.config.get("NEWS_API_ENABLED"):
+        # Manually register the resource, as ``Module.init`` runs after ``Module.resources`` registration
+        app.resources.register(news_api_audit_resource_config)
 
 
 module = Module(
     "newsroom.news_api.api_audit",
-    resources=[],
     init=init_app,
 )
