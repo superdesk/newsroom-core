@@ -1,12 +1,12 @@
 from eve.render import send_response
 from eve.methods.get import get_internal
 
-from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 from superdesk import get_resource_service
 
 from newsroom.types import Navigation, CompanyResource, UserResourceModel, SectionEnum
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.decorator import login_required, section
 from newsroom.topics import get_user_topics
@@ -49,11 +49,7 @@ async def get_view_data():
         "company": str(company.id) if company else None,
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],
         "navigations": navigations,
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "wire" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.WIRE),
         "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
         "context": SECTION_ID,
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),

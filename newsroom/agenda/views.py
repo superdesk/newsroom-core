@@ -5,7 +5,7 @@ from bson import ObjectId
 from pydantic import Field, field_validator
 from quart_babel import gettext
 
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.core.types import ESQuery, BaseModel, Request, Response, RestGetResponse
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 from superdesk.flask import render_template
@@ -18,6 +18,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.users import get_user_profile_data
 from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics_async
@@ -208,11 +209,7 @@ async def get_view_data() -> dict:
         "user": user_dict or {},
         "company": company.id if company else None,
         "topics": [t.to_dict() for t in topics if t.topic_type == "agenda"],
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "agenda" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.AGENDA),
         "navigations": navigations,
         "saved_items": saved_items,
         "events_only": company.events_only if company else False,

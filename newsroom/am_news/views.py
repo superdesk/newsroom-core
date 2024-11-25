@@ -3,11 +3,11 @@ import logging
 from eve.render import send_response
 from eve.methods.get import get_internal
 
-from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 
 from newsroom.types import SectionEnum
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.am_news import blueprint
 from newsroom.decorator import login_required, section
 from newsroom.navigations import get_navigations_by_company
@@ -38,11 +38,7 @@ async def get_view_data():
             company.to_dict() if company else None,
             product_type="am_news",
         ),
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "wire" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.WIRE),
         "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.AM_NEWS),
         "context": "am_news",
         "ui_config": await ui_config_service.get_section_config("am_news"),

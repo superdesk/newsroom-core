@@ -63,7 +63,7 @@ class NewsroomWebApp(BaseNewsroomApp):
     INSTANCE_CONFIG = "settings.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
-        self.download_formatters = {}
+        # self.download_formatters = {}
         self.sections = []
         self.sidenavs = []
         self.settings_apps = []
@@ -185,22 +185,22 @@ class NewsroomWebApp(BaseNewsroomApp):
             view_func=self.send_theme_file,
         )
 
-    def download_formatter(self, _format, formatter, name, types, assets=None):
-        """Register new download formatter.
-
-        :param _format: format id
-        :param formatter: formatter class, extending :class:`newsroom.formatter.BaseFormatter` class.
-        :param name: human readable name
-        :param types: list of supported types, eg. ``['wire', 'agenda']``
-        :param types: list of supported assets, eg. ``['picture']``
-        """
-        self.download_formatters[_format] = {
-            "format": _format,
-            "formatter": formatter,
-            "name": name,
-            "types": types,
-            "assets": assets,
-        }
+    # def download_formatter(self, _format, formatter, name, types, assets=None):
+    #     """Register new download formatter.
+    #
+    #     :param _format: format id
+    #     :param formatter: formatter class, extending :class:`newsroom.formatter.BaseFormatter` class.
+    #     :param name: human readable name
+    #     :param types: list of supported types, eg. ``['wire', 'agenda']``
+    #     :param types: list of supported assets, eg. ``['picture']``
+    #     """
+    #     self.download_formatters[_format] = {
+    #         "format": _format,
+    #         "formatter": formatter,
+    #         "name": name,
+    #         "types": types,
+    #         "assets": assets,
+    #     }
 
     async def send_theme_file(self, filename):
         if os.path.exists(os.path.join(self.theme_folder, filename)):

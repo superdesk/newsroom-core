@@ -1,7 +1,6 @@
 from typing import Any, TypedDict
 import io
 import zipfile
-from inspect import iscoroutinefunction
 
 from bson import ObjectId
 from pydantic import BaseModel, field_validator, Field, AliasChoices
@@ -33,6 +32,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.auth import auth_rules
+from newsroom.formatters import get_formatters_id_and_names, get_formatter
 from newsroom.users.service import UsersService
 from newsroom.cards import get_card_size, get_card_type, CardsResourceService
 from newsroom.navigations import get_navigations
@@ -65,13 +65,14 @@ from newsroom.public.views import (
     PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
 )
 
-from newsroom.assets import ASSETS_RESOURCE, get_upload
+from newsroom.assets import get_upload, get_media_file
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
 from newsroom.history_async import HistoryService
 
 from .items import get_items_for_dashboard
 from .service import WireSearchServiceAsync, WireItemService
+from .formatters.picture import PictureFormatter
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -124,11 +125,7 @@ async def get_view_data() -> dict:
         "user": user_dict,
         "company": str(company.id) if company else None,
         "topics": [topic.to_dict() for topic in topics if topic.topic_type == "wire"],
-        "formats": [
-            {"format": f["format"], "name": f["name"], "assets": f["assets"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "wire" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.WIRE),
         "navigations": await get_navigations(user_dict, company_dict, "wire"),
         "products": products,
         "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(),
@@ -240,15 +237,7 @@ async def get_home_data():
         "userType": user.user_type,
         "company": company.id if company else None,
         "companyProducts": company_dict.get("products") if company else [],
-        "formats": [
-            {
-                "format": f["format"],
-                "name": f["name"],
-                "types": f["types"],
-                "assets": f["assets"],
-            }
-            for f in get_current_app().as_any().download_formatters.values()
-        ],
+        "formats": get_formatters_id_and_names(None),
         "context": "wire",
         "topics": [topic.to_dict() for topic in topics],
         "ui_config": await ui_config_service.get_section_config("wire"),
@@ -349,65 +338,52 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
         items = await WireSearchServiceAsync().get_items_for_action(data["items"])
 
     _file = io.BytesIO()
-    formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
+    formatter = get_formatter(_format)
     mimetype = None
     attachment_filename = "%s-newsroom.zip" % utcnow().strftime("%Y%m%d%H%M")
-    if formatter.get_mediatype() == "picture":
+    if isinstance(formatter, PictureFormatter):
         if len(items) == 1:
             try:
-                picture = formatter.format_item(items[0], item_type=item_type)
-                return (
-                    await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
-                ) or await request.abort(404)
+                media_id, file_extension = formatter.get_picture_rendition(items[0], item_type=item_type)
+                return (await get_upload(media_id, filename=f"baseimage{file_extension}")) or await request.abort(404)
             except ValueError:
                 return await request.abort(404)
         else:
             with zipfile.ZipFile(_file, mode="w") as zf:
                 for item in items:
                     try:
-                        picture = formatter.format_item(item, item_type=item_type)
-                        file = get_current_app().media.get(picture["media"], ASSETS_RESOURCE)
-                        zf.writestr("baseimage%s" % picture["file_extension"], file.read())
+                        media_id, file_extension = formatter.get_picture_rendition(item, item_type=item_type)
+                        file = await get_media_file(media_id)
+                        zf.writestr(f"baseimage{file_extension}", file.read())
                     except ValueError:
                         pass
             _file.seek(0)
-    elif len(items) == 1 or _format == "monitoring":
-        item = items[0]
-        args_item = item if _format != "monitoring" else items
-        parse_dates(item)  # fix for old items
+    elif len(items) == 1:
+        parse_dates(items[0])  # fix for old items
 
-        if iscoroutinefunction(formatter.format_item):
-            _file.write(await formatter.format_item(args_item, item_type=item_type))
-        else:
-            _file.write(formatter.format_item(args_item, item_type=item_type))
+        _file.write(await formatter.format_item(items[0], item_type=item_type))
         _file.seek(0)
-        mimetype = formatter.get_mimetype(item)
-        attachment_filename = secure_filename(formatter.format_filename(item))
-    elif formatter.MULTI and len(items) != 1:
+        mimetype = formatter.MIMETYPE
+        if mimetype == "application/json":
+            mimetype = "text/plain"
+        attachment_filename = secure_filename(formatter.format_filename(items[0]))
+    elif len(items) > 1:
         # if we have multiple items, so in this case we stored their data in one csv file.
-        csv_data, attachment_filename = formatter.format_events(items, item_type=item_type)
-        _file.write(csv_data)
-        _file.seek(0)
-    else:
-        with zipfile.ZipFile(_file, mode="w") as zf:
-            for item in items:
-                if iscoroutinefunction(formatter.format_item):
-                    formatted_data = await formatter.format_item(item, item_type=item_type)
-                else:
-                    formatted_data = formatter.format_item(item, item_type=item_type)
-
-                parse_dates(item)  # fix for old items
-                zf.writestr(
-                    secure_filename(formatter.format_filename(item)),
-                    formatted_data,
-                )
-        _file.seek(0)
+        file_data, filename = await formatter.format_items(items, item_type=item_type)
+        if isinstance(file_data, io.BytesIO):
+            _file = file_data
+        else:
+            _file.write(file_data)
+            _file.seek(0)
+        mimetype = "application/zip"
+        if filename is not None:
+            attachment_filename = filename
 
     await update_action_list(data["items"], "downloads", force_insert=True)
     await HistoryService().create_history_record(items, "download", user.id, user.company, params.type.value)
     return await send_file(
         _file,
-        mimetype=mimetype,
+        mimetype=mimetype or "text/plain",
         attachment_filename=attachment_filename,
         as_attachment=True,
     )
