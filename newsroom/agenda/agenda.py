@@ -993,7 +993,7 @@ class AgendaService(BaseSearchService):
                     },
                 }
             )
-            _remove_fields(search.source, ["planning_items", "display_dates"])
+            _remove_fields(search.source, ["display_dates"])
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["filter"].append(
