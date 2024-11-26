@@ -157,7 +157,7 @@ Feature: News API Item
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
