@@ -11,15 +11,15 @@ from superdesk import get_resource_service, get_app_config
 
 from newsroom.exceptions import AuthorizationError
 from newsroom.companies.companies_async import CompanyService
+from newsroom.news_api.utils import get_company_from_newsapi_request
 
 API_TOKENS = "news_api_tokens"
 
 
 async def company_required_auth_rule(request: Request) -> None:
-    company = request.storage.request.get("company_instance")
-    if company is None or (company and not company.is_enabled):
-        raise AuthorizationError(403, gettext("Company not found or not enabled."))
-
+    # AuthorizationError(403) error is raised in the following util
+    # so we use that for the auth rule
+    get_company_from_newsapi_request(request)
     return None
 
 
@@ -51,8 +51,10 @@ class CompanyTokenAuth(UserAuthProtocol):
         """
 
         auth = (request.get_header("Authorization") or "").strip()
-        if auth.lower().startswith(("token", "bearer")):
-            return auth.split(" ")[1] if " " in auth else None
+        if len(auth):
+            if auth.lower().startswith(("token", "bearer")):
+                return auth.split(" ")[1] if " " in auth else None
+            return auth
 
         return None
 
@@ -65,7 +67,7 @@ class CompanyTokenAuth(UserAuthProtocol):
         """
         tokens_service = get_resource_service(API_TOKENS)
         token_missing_exception = AuthorizationError(
-            403, gettext("Authorization token missing."), title=gettext("403. Forbidden")
+            401, gettext("Authorization token missing."), title=gettext("401. Forbidden")
         )
         token_id = self.get_token_from_request(request)
         if token_id is None:
