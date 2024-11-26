@@ -93,3 +93,42 @@ Feature: Agenda Push
             }]
         }
         """
+
+    @auth @admin @notification
+    Scenario: Websocket notifications sent on agenda topic matches
+        When we post json to "users/#CONTEXT_USER_ID#/topics"
+        """
+        {
+            "label": "Weather",
+            "subscribers": [{"user_id": "#CONTEXT_USER_ID#", "notification_type": "real-time"}],
+            "is_global": false,
+            "topic_type": "agenda",
+            "query": "weather"
+        }
+        """
+        Then we get OK response
+        And we store "TOPIC_ID" with item id
+        When we post json to "/push"
+        """
+        {
+            "guid": "event1", "type": "event", "state": "scheduled", "pubstatus": "usable",
+            "slugline": "weather",
+            "name": "The weather is happening somewhere",
+            "dates": {
+                "start": "2050-05-28T03:00:00+0000",
+                "end": "2050-05-28T04:00:00+0000",
+                "tz": "Australia/Sydney"
+            }
+        }
+        """
+        Then we get OK response
+        And we get notifications
+        """
+        [{
+            "event": "topic_matches",
+            "extra": {
+                "item": {"_id": "event1"},
+                "topics": ["#TOPIC_ID#"]
+            }
+        }]
+        """

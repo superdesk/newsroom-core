@@ -3,9 +3,11 @@ import asyncio
 import logging
 
 from superdesk.flask import Config
+from superdesk.tests import setup_notification, set_placeholder
 from superdesk.tests.steps import get_prefixed_url
-from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 
+from newsroom.types import UserAuthResourceModel, CompanyResource
+from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 from newsroom.web.factory import get_app
 from newsroom.web.default_settings import CORE_APPS, BLUEPRINTS
 from newsroom.agenda.filters import aggregations as agenda_aggs
@@ -56,6 +58,7 @@ async def before_scenario_async(context, scenario):
             "MONGO_DBNAME": "newsroom_behave",
             "CONTENTAPI_MONGO_DBNAME": "newsroom_behave",
             "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
+            "CELERY_TASK_ALWAYS_EAGER": True,
             "AGENDA_GROUPS": [
                 {
                     "field": "sttdepartment",
@@ -101,6 +104,9 @@ async def before_scenario_async(context, scenario):
     context.client = context.app.test_client()
 
     if scenario.status != "skipped":
+        if "notification" in scenario.tags:
+            setup_notification(context)
+
         if "auth" in scenario.tags:
             await setup_users(context)
             await login_user(context, scenario)
@@ -108,8 +114,8 @@ async def before_scenario_async(context, scenario):
 
 async def setup_users(context):
     async with context.app.test_request_context("/login"):
-        context.app.data.insert("companies", COMPANIES)
-        context.app.data.insert("users", USERS)
+        await CompanyResource.get_service().create(COMPANIES)
+        await UserAuthResourceModel.get_service().create(USERS)
 
 
 async def login_user(context, scenario):
@@ -130,3 +136,7 @@ async def login_user(context, scenario):
             headers=context.headers,
         )
         assert response.status_code == 302, response.status_code
+
+        # Get the logged-in user and add its ID to ``CONTEXT_USER_ID`` for use in behave tests
+        user = await UserAuthResourceModel.get_service().find_one(email=data["email"])
+        set_placeholder(context, "CONTEXT_USER_ID", str(user.id))
