@@ -11,10 +11,9 @@ from superdesk.flask import send_file, render_template
 from superdesk.logging import logger
 
 from newsroom.types import SectionEnum, UserResourceModel
-from newsroom.core import get_current_wsgi_app
 from newsroom.auth import auth_rules
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
-
+from newsroom.formatters import get_formatters_id_and_names, get_formatter
 from newsroom.email import send_user_email
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print, WireItemRouteArgs, WireItemUrlParams
@@ -50,11 +49,7 @@ async def get_view_data():
         "groups": get_app_config("MONITORING_GROUPS") or get_app_config("WIRE_GROUPS", []),
         "ui_config": await ui_config_service.get_section_config("monitoring"),
         "saved_items": await MonitoringSearchService().get_current_user_bookmarks_count(),
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_wsgi_app().download_formatters.values()
-            if "monitoring" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.MONITORING),
         "secondary_formats": [{"format": f[0], "name": f[1]} for f in alert_types],
     }
 
@@ -261,8 +256,7 @@ async def export(args: ExportMonitoringUrlArgs, params: ExportMonitoringUrlParam
     if not params.format:
         return Response({"message": gettext("No format specified")}, 400)
 
-    formatter = get_current_wsgi_app().download_formatters[params.format]["formatter"]
-
+    formatter = get_formatter(params.format)
     monitoring_profile = await MonitoringProfileService().find_by_id(params.monitoring_profile)
     if not monitoring_profile:
         return Response({"message": gettext("Monitoring profile not found")}, 404)
@@ -284,7 +278,7 @@ async def export(args: ExportMonitoringUrlArgs, params: ExportMonitoringUrlParam
 
             return await send_file(
                 monitoring_file,
-                mimetype=formatter.get_mimetype(None),
+                mimetype=formatter.MIMETYPE,
                 attachment_filename=formatter.format_filename(None),
                 as_attachment=True,
             )
@@ -319,7 +313,7 @@ async def share(request: Request) -> Response:
             "message": data.get("message"),
             "item_name": "Monitoring Report",
         }
-        formatter = get_current_wsgi_app().download_formatters["monitoring_pdf"]["formatter"]
+        formatter = get_formatter("monitoring_pdf")
         monitoring_profile["format_type"] = "monitoring_pdf"
         monitoring_file = await get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(monitoring_file.read())

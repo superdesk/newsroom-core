@@ -24,7 +24,6 @@ CORE_APPS = [
     "newsroom.news_api.items",
     "content_api.items_versions",
     "newsroom.news_api.section_filters",
-    "newsroom.news_api.formatters",
     "newsroom.news_api.news",
     "newsroom.history",
 ]

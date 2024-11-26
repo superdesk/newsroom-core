@@ -21,6 +21,7 @@ from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
 from newsroom.types import MonitoringProfileResourceModel
+from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
 from newsroom.email import send_user_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
@@ -273,6 +274,11 @@ class MonitoringEmailAlerts:
                 # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
                 continue
 
+            if monitoring_data.format_type is None:
+                # If for some reason this Monitoring Profile does not have a ``format_type`` set
+                # then we default it to ``monitoring_pdf``
+                monitoring_data.format_type = "monitoring_pdf"
+
             if monitoring_data.users and len(monitoring_data.users):
                 users = await users_service.find_items_by_ids(monitoring_data.users)
                 company = (
@@ -307,9 +313,7 @@ class MonitoringEmailAlerts:
                         truncate_article_body(items, monitoring_data)
                         monitoring_file = await get_monitoring_file(monitoring_data, items)
                         attachment = base64.b64encode(monitoring_file.read())
-                        formatter = (
-                            get_current_app().as_any().download_formatters[monitoring_data.format_type]["formatter"]
-                        )
+                        formatter = get_formatter(monitoring_data.format_type)
 
                         for user in users:
                             await send_user_email(

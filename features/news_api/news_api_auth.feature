@@ -27,7 +27,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -67,7 +67,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -111,7 +111,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -155,7 +155,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],

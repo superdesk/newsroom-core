@@ -21,7 +21,7 @@ Feature: News API Products
     Given "products"
         """
         [{"name": "Sample Product",
-        "decsription": "a description",
+        "description": "a description",
         "product_type": "news_api",
         "companies" : [
         "5ab03a87bdd78169bb6d0783",
@@ -30,7 +30,7 @@ Feature: News API Products
         ]
         },
         {"name": "Sample Product 2",
-        "decsription": "another description",
+        "description": "another description",
         "product_type": "news_api",
         "companies" : [
         "5ab03a87bdd78169bb6d0783",
@@ -51,7 +51,7 @@ Feature: News API Products
         """
         [{
             "name": "Sample Product X",
-            "decsription": "a description",
+            "description": "a description",
             "navigations" : ["5aa5e94ebdd7810884f66ed3"],
             "sd_product_id" : null
         }]
@@ -83,7 +83,7 @@ Feature: News API Products
         """
         [{
             "name": "Sample Product X",
-            "decsription": "a description",
+            "description": "a description",
             "navigations" : ["5aa5e94ebdd7810884f66ed3"],
             "sd_product_id" : null
         }]
