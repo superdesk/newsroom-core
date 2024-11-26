@@ -186,6 +186,11 @@ class MonitoringEmailAlerts:
         yesterday: datetime,
         last_week: datetime,
     ):
+        if profile.schedule is None:
+            # This should not happen, as we're filtering specifically for monitoring profiles with a schedule
+            # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
+            return
+
         last_run_time = parse_date_str(profile.last_run_time) if profile.last_run_time else None
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
         if last_run_time:
@@ -264,6 +269,11 @@ class MonitoringEmailAlerts:
         companies_service = CompanyServiceAsync()
 
         for monitoring_data in monitoring_list:
+            if monitoring_data.schedule is None:
+                # This should not happen, as we're filtering specifically for monitoring profiles with a schedule
+                # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
+                continue
+
             if monitoring_data.format_type is None:
                 # If for some reason this Monitoring Profile does not have a ``format_type`` set
                 # then we default it to ``monitoring_pdf``
