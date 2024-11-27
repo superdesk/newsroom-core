@@ -559,6 +559,7 @@ class WireItemUrlParams(BaseModel):
     print: bool = False
     monitoring_profile: str | None = None
     type: SectionEnum = SectionEnum.WIRE
+    format: str | None = None
 
     @field_validator("print", mode="before")
     def parse_print(cls, value: str | bool | None) -> bool | str | None:

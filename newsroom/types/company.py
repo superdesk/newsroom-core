@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from datetime import datetime
 from dataclasses import asdict
 
-from superdesk.core.resources import dataclass
+from superdesk.core.resources import dataclass, Dataclass
 from superdesk.core.resources.validators import validate_data_relation_async, validate_iunique_value_async
 from superdesk.core.resources.fields import ObjectId, Field
 
@@ -12,7 +12,7 @@ from .common import SectionEnum
 
 
 @dataclass
-class CompanyProduct:
+class CompanyProduct(Dataclass):
     _id: Annotated[ObjectId, validate_data_relation_async("products")]
     section: SectionEnum
     seats: int = 0
