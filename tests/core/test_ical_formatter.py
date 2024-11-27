@@ -107,6 +107,5 @@ def test_onclusive_multiday():
     }
     formatter = iCalFormatter()
     output = formatter.format_item(event, item_type="agenda").decode("utf-8")
-    print(output)
     assert "DTSTART;VALUE=DATE:20241118" in output
     assert "DTEND;VALUE=DATE:20241121" in output
