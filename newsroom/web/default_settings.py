@@ -862,7 +862,6 @@ COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
 #:
 #: .. versionadded: 2.9
 #:
-
 CALENDAR_LOCATIONS_FILTER_OPTIONS = {
     "city": True,
     "state": True,

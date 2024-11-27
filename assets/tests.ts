@@ -94,6 +94,7 @@ window.newsroom = {
         },
         system_alert_recipients: '',
         wire_time_limit_days: 0,
+        agenda_default_filter_hide_planning: false,
     },
 };
 
