@@ -15,7 +15,7 @@ from newsroom.utils import get_json_or_400_async
 from newsroom.products.service import ProductsService
 from newsroom.navigations import get_navigations_as_list
 from newsroom.companies.companies_async import CompanyService
-from newsroom.types.company import CompanyProduct, CompanyResource
+from newsroom.types.company import CompanyResource
 
 products_endpoints = EndpointGroup("products_views", __name__)
 
