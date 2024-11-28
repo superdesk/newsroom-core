@@ -132,3 +132,105 @@ Feature: Agenda Push
             }
         }]
         """
+
+    @auth @admin
+    Scenario: Support unknown fields on push agenda
+        When we post json to "/push"
+        """
+        {
+            "_id": "8642dfc8-0772-447f-9433-ee757dc065de",
+            "type": "event",
+            "occur_status": {
+                "qcode": "eocstat:eos5",
+                "name": "Planned, occurs certainly",
+                "label": "Planned, occurs certainly"
+            },
+            "dates": {
+                "start": "2024-11-25T05:00:00+0000",
+                "end": "2024-11-26T04:59:59+0000",
+                "tz": "America/Toronto"
+            },
+            "calendars": [],
+            "state": "scheduled",
+            "language": "nl",
+            "languages": ["nl"],
+            "place": [],
+            "_time_to_be_confirmed": false,
+            "translations": [{"field": "name", "language": "nl", "value": "eve2"}],
+            "name": "eve2",
+            "anpa_category": [
+                {
+                    "name": "FIXME1",
+                    "qcode": "f1",
+                    "subject": "",
+                    "translations": {"name": {"fr": "FIXME1-fr", "es": "FIXME1-es"}}
+                },
+                {
+                    "name": "FIXME2",
+                    "qcode": "f2",
+                    "subject": "",
+                    "translations": {"name": {"fr": "FIXME2-fr", "es": "FIXME2-es"}}
+                }
+            ],
+            "_updated": "2024-11-26T01:51:07+0000",
+            "_created": "2024-11-26T01:51:05+0000",
+            "guid": "8642dfc8-0772-447f-9433-ee757dc065de",
+            "firstcreated": "2024-11-26T01:51:05+0000",
+            "versioncreated": "2024-11-26T01:51:07+0000",
+            "pubstatus": "usable",
+            "state_reason": null,
+            "actioned_date": null,
+            "item_id": "8642dfc8-0772-447f-9433-ee757dc065de",
+            "plans": [],
+            "event_contact_info": [],
+            "products": [{"code": "65fb3b7c884e530196d08512", "name": "prod_all_events"}]
+        }
+        """
+        When we get "/agenda/8642dfc8-0772-447f-9433-ee757dc065de?format=json"
+        Then we get existing resource
+        """
+        {
+            "_id": "8642dfc8-0772-447f-9433-ee757dc065de",
+            "item_type": "event",
+            "dates": {
+                "start": "2024-11-25T05:00:00+0000",
+                "end": "2024-11-26T04:59:59+0000",
+                "tz": "America/Toronto",
+                "all_day": false,
+                "no_end_time": false
+            },
+            "products": [{"code": "65fb3b7c884e530196d08512", "name": "prod_all_events"}],
+            "service": [
+                {
+                    "name": "FIXME1",
+                    "qcode": "f1",
+                    "subject": "",
+                    "translations": {"name": {"fr": "FIXME1-fr", "es": "FIXME1-es"}}
+                },
+                {
+                    "name": "FIXME2",
+                    "qcode": "f2",
+                    "subject": "",
+                    "translations": {"name": {"fr": "FIXME2-fr", "es": "FIXME2-es"}}
+                }
+            ],
+            "event": {
+                "_id": "8642dfc8-0772-447f-9433-ee757dc065de",
+                "translations": [{"field": "name", "language": "nl", "value": "eve2"}],
+                "anpa_category": [
+                    {
+                        "name": "FIXME1",
+                        "qcode": "f1",
+                        "subject": "",
+                        "translations": {"name": {"fr": "FIXME1-fr", "es": "FIXME1-es"}}
+                    },
+                    {
+                        "name": "FIXME2",
+                        "qcode": "f2",
+                        "subject": "",
+                        "translations": {"name": {"fr": "FIXME2-fr", "es": "FIXME2-es"}}
+                    }
+                ]
+            }
+        }
+        """

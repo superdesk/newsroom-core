@@ -74,7 +74,9 @@ async def create_entries_for(resource: str, items: list[Any]) -> list[ObjectId |
         return ids
 
 
-async def update_entries_for(resource: str, item_id: str | ObjectId, updates: dict[str, Any], original: Any):
+async def update_entries_for(
+    resource: str, item_id: str | ObjectId, updates: dict[str, Any], original: Any | None = None
+):
     """
     Attempts to update existing resource entries. First tries with async, otherwise it falls back to
     sync resources.

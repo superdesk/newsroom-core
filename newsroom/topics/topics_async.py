@@ -59,7 +59,7 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             updated_dashboards = []
 
             for dashboard in updates["dashboards"]:
-                dashboard_dict = dashboard.to_dict()
+                dashboard_dict = dashboard.to_dict(context={"use_objectid": True})
                 # Remove the deleted topic id from topic_ids
                 dashboard_dict["topic_ids"] = [
                     topic_id for topic_id in dashboard_dict["topic_ids"] if topic_id != doc.id

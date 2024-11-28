@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from pydantic import Field
 
-from superdesk.core.resources import ResourceModel, dataclass
+from superdesk.core.resources import ResourceModel, dataclass, Dataclass
 from superdesk.core.resources.fields import ObjectId
 from superdesk.core.resources.validators import validate_data_relation_async
 
@@ -22,7 +22,7 @@ class Notification(ResourceModel):
 
 
 @dataclass
-class NotificationTopic:
+class NotificationTopic(Dataclass):
     topic_id: Annotated[ObjectId, validate_data_relation_async("topics")]
     last_item_arrived: datetime
     section: str
