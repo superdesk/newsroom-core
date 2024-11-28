@@ -31,7 +31,7 @@ class DashboardCardType(str, Enum):
 class DashboardCardConfig(TypedDict, total=False):
     product: str
     size: int
-    events: dict
+    events: list[dict]
     sources: list[dict]
 
 
