@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, cast
+from typing import Tuple
 
 from bson import ObjectId, errors
 from pydantic import BaseModel
@@ -10,7 +10,7 @@ from superdesk.core.types import Request, Response
 
 from newsroom.auth import auth_rules
 from newsroom.core import get_current_wsgi_app
-from newsroom.types import Product, ProductRef
+from newsroom.types import ProductResourceModel, CompanyProduct
 from newsroom.utils import get_json_or_400_async
 from newsroom.products.service import ProductsService
 from newsroom.navigations import get_navigations_as_list
@@ -30,13 +30,12 @@ async def get_settings_data():
     }
 
 
-def get_product_ref(product: Product, seats=0) -> ProductRef:
-    assert "_id" in product
-    return {
-        "_id": product["_id"],
-        "section": product.get("product_type") or "wire",
-        "seats": seats or 0,
-    }
+def get_product_ref(product: ProductResourceModel, seats=0) -> CompanyProduct:
+    return CompanyProduct(
+        _id=product.id,
+        section=product.product_type,
+        seats=seats,
+    )
 
 
 class SearchParams(BaseModel):
@@ -104,8 +103,8 @@ async def edit(args: ProductsArgs, _p: None, request: Request):
 
 
 async def update_company_products(
-    company: CompanyResource, product_id: ObjectId, selected_companies: list[ObjectId], product_ref: ProductRef
-) -> Tuple[list[ProductRef], bool]:
+    company: CompanyResource, product_id: ObjectId, selected_companies: list[ObjectId], product_ref: CompanyProduct
+) -> Tuple[list[CompanyProduct], bool]:
     """
     Updates the company's product list by either adding or removing a product reference.
 
@@ -121,16 +120,16 @@ async def update_company_products(
 
 
 def add_product_to_company(
-    company: CompanyResource, product_id: ObjectId, product_ref: ProductRef
-) -> Tuple[list[ProductRef], bool]:
+    company: CompanyResource, product_id: ObjectId, product_ref: CompanyProduct
+) -> Tuple[list[CompanyProduct], bool]:
     """
     Adds a product to the company's product list if it doesn't already exist.
     """
     if not product_in_company(company, product_id):
-        company_products: list[ProductRef] = (cast(list[ProductRef], company.products)).copy()
+        company_products = company.products.copy()
         company_products.append(product_ref)
         return company_products, True
-    return cast(list[ProductRef], company.products), False
+    return company.products, False
 
 
 def product_in_company(company: CompanyResource, product_id: ObjectId) -> bool:
@@ -138,12 +137,12 @@ def product_in_company(company: CompanyResource, product_id: ObjectId) -> bool:
     Checks if a product is already in a given Company products list.
     """
     for product in company.products:
-        if str(product._id) == str(product_id):
+        if product._id == product_id:
             return True
     return False
 
 
-def remove_product_from_company(company: CompanyResource, product_id: ObjectId) -> Tuple[list[ProductRef], bool]:
+def remove_product_from_company(company: CompanyResource, product_id: ObjectId) -> Tuple[list[CompanyProduct], bool]:
     """
     Removes a product from the company's product list if it exists.
 
@@ -151,16 +150,16 @@ def remove_product_from_company(company: CompanyResource, product_id: ObjectId) 
         A tuple with the list of products of the company and a boolean to indicate if an update is
         required or not.
     """
-    company_products = [p for p in company.products if str(p._id) != str(product_id)]
+    company_products = [product for product in company.products if product._id != product_id]
     is_update_required = len(company_products) != len(company.products)
 
-    return cast(list[ProductRef], company_products), is_update_required
+    return company_products, is_update_required
 
 
-def update_company_sections(company: CompanyResource, company_products: list[ProductRef]) -> dict[str, bool]:
+def update_company_sections(company: CompanyResource, company_products: list[CompanyProduct]) -> dict[str, bool]:
     sections = company.sections
     for product in company_products:
-        sections.setdefault(product["section"], True)
+        sections.setdefault(product.section, True)
     return sections
 
 
@@ -174,7 +173,7 @@ async def update_companies(args: ProductsArgs, _p: None, request: Request):
 
     updates = await request.get_json()
     selected_companies = [await parse_objectid_or_abort(request, x) for x in updates.get("companies", [])]
-    product_ref = get_product_ref(product.to_dict())
+    product_ref = get_product_ref(product)
 
     async for company in CompanyService().get_all():
         company_products, update_required = await update_company_products(
