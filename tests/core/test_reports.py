@@ -119,7 +119,7 @@ def test_company_products(client):
     resp = client.get("reports/company-products")
     report = json.loads(resp.get_data())
     assert report["name"] == "Products per company"
-    assert len(report["results"]) == 4
+    assert len(report["results"]) == 5
     assert report["results"][0]["name"] == "Example 2 Company"
     assert len(report["results"][0]["products"]) == 1
     assert report["results"][1]["name"] == "Example Company"
@@ -165,10 +165,11 @@ def test_companies(client):
     resp = client.get("reports/company")
     report = json.loads(resp.get_data())
     assert report["name"] == "Company"
-    assert len(report["results"]) == 4
+    assert len(report["results"]) == 5
     assert report["results"][0]["name"] == "Example 2 Company"
     assert report["results"][1]["name"] == "Example Company"
-    assert report["results"][2]["name"] == "Paper Co."
+    assert report["results"][2]["name"] == "News Co."
+    assert report["results"][3]["name"] == "Paper Co."
 
 
 def test_content_activity_csv(client):

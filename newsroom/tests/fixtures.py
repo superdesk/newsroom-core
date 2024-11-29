@@ -294,7 +294,7 @@ def setup_user_company(app):
                 "email": "restrict@user.com",
                 "first_name": "Restrict",
                 "last_name": "User",
-                "company": COMPANY_1_ID,
+                "company": COMPANY_3_ID,
                 "is_enabled": True,
                 "is_approved": True,
                 "_created": utcnow(),
