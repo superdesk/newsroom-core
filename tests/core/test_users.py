@@ -486,7 +486,6 @@ async def test_signals(client, app):
     updated_listener = mock.Mock(return_value=None)
     deleted_listener = mock.Mock(return_value=None)
 
-    # use weak to fix issue with weak ref and mock
     user_created.connect(created_listener)
     user_updated.connect(updated_listener)
     user_deleted.connect(deleted_listener)
