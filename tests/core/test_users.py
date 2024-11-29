@@ -487,9 +487,9 @@ async def test_signals(client, app):
     deleted_listener = mock.Mock(return_value=None)
 
     # use weak to fix issue with weak ref and mock
-    user_created.connect(created_listener, weak=False)
-    user_updated.connect(updated_listener, weak=False)
-    user_deleted.connect(deleted_listener, weak=False)
+    user_created.connect(created_listener)
+    user_updated.connect(updated_listener)
+    user_deleted.connect(deleted_listener)
 
     company_ids = await create_entries_for("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
 
@@ -508,13 +508,13 @@ async def test_signals(client, app):
     assert resp.status_code == 201, await resp.get_data(as_text=True)
 
     created_listener.assert_called_once()
-    created_user = created_listener.call_args.kwargs["user"].model_dump(by_alias=True)
-    assert "_id" in created_user
-    assert user["email"] == created_user["email"]
+    created_user = created_listener.call_args[0][0]
+    assert created_user.id
+    assert user["email"] == created_user.email
 
     user["email"] = "foo@example.com"
     user["is_enabled"] = True
-    user_id = created_user["_id"]
+    user_id = created_user.id
     resp = await client.post(
         f"/users/{user_id}",
         form=user,
@@ -522,9 +522,9 @@ async def test_signals(client, app):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     updated_listener.assert_called_once()
-    updated_user = updated_listener.call_args.kwargs["user"].model_dump(by_alias=True)
-    assert user_id == updated_user["_id"]
-    assert user["email"] == updated_user["email"]
+    updated_user = updated_listener.call_args[0][0]
+    assert user_id == updated_user.id
+    assert user["email"] == updated_user.email
     updated_listener.reset_mock()
 
     token = (await find_one_by_id("auth_user", user_id))["token"]
@@ -553,8 +553,9 @@ async def test_signals(client, app):
     assert resp.status_code == 200, await resp.get_data(as_text=True)
 
     deleted_listener.assert_called_once()
-    assert user_id == deleted_listener.call_args.kwargs["user"]["_id"]
-    assert user["email"] == deleted_listener.call_args.kwargs["user"]["email"]
+    deleted_user = deleted_listener.call_args[0][0]
+    assert user_id == deleted_user.id
+    assert user["email"] == deleted_user.email
 
 
 async def test_user_can_update_notification_schedule(app, client):

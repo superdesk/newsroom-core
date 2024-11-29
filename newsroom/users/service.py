@@ -62,7 +62,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
     async def on_created(self, docs):
         await super().on_created(docs)
         for doc in docs:
-            user_created.send(self, user=doc)
+            await user_created.send(doc)
 
     async def on_update(self, updates, original):
         await super().on_update(updates, original)
@@ -97,11 +97,11 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
                     current_request.storage.session.set("locale", updated_user.locale)
 
         updated = original.model_copy(update=updates)
-        user_updated.send(self, user=updated, updates=updates)
+        await user_updated.send(updated, updates)
 
     async def on_deleted(self, doc):
         get_current_wsgi_app().cache.delete(str(doc.id))
-        user_deleted.send(self, user=doc.to_dict())
+        await user_deleted.send(doc)
 
     async def on_delete(self, doc):
         if doc.id == get_user_id_from_request(None):
@@ -205,7 +205,7 @@ class UsersAuthService(NewshubAsyncResourceService[UserAuthResourceModel]):
     async def on_created(self, docs):
         await super().on_created(docs)
         for doc in docs:
-            user_created.send(self, user=doc)
+            await user_created.send(doc)
 
     async def on_update(self, updates: dict[str, Any], original: UserAuthResourceModel) -> None:
         await super().on_update(updates, original)
@@ -218,11 +218,11 @@ class UsersAuthService(NewshubAsyncResourceService[UserAuthResourceModel]):
 
     async def on_updated(self, updates: dict[str, Any], original: UserAuthResourceModel):
         updated = original.model_copy(update=updates)
-        user_updated.send(self, user=updated, updates=updates)
+        await user_updated.send(updated, updates)
 
     async def on_deleted(self, doc):
         get_current_wsgi_app().cache.delete(str(doc.id))
-        user_deleted.send(self, user=doc.to_dict())
+        await user_deleted.send(doc)
 
     def _get_password_hash(self, password):
         return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))

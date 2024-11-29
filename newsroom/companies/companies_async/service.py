@@ -17,7 +17,7 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
     async def on_create(self, docs: List[CompanyResource]) -> None:
         await super().on_create(docs)
         for company in docs:
-            company_create.send(self, company=company.to_dict())
+            await company_create.send(company)
 
     def _get_products(self, updates: Dict[str, Any], original: CompanyResource) -> Iterable[dict[str, Any]]:
         """

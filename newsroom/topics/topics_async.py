@@ -1,22 +1,20 @@
 from bson import ObjectId
 from typing import Optional, List, Dict, Any, Union
 
+from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
+from superdesk.core.web import EndpointGroup
 
 from newsroom import MONGO_PREFIX
 from newsroom.types import TopicResourceModel, UserResourceModel, NotificationType
 from newsroom.exceptions import AuthorizationError
 from newsroom.auth.utils import get_user_from_request
 
-# from newsroom.signals import user_deleted
+from newsroom.signals import user_deleted
 
 from newsroom.users.service import UsersService
 from newsroom.core.resources.service import NewshubAsyncResourceService
-from newsroom.types import User, Topic
-
-from superdesk.core.web import EndpointGroup
-
-# from superdesk.core.module import SuperdeskAsyncApp
+from newsroom.types import Topic
 
 
 class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
@@ -69,36 +67,35 @@ class TopicService(NewshubAsyncResourceService[TopicResourceModel]):
             updates["dashboards"] = updated_dashboards
             await UsersService().system_update(user.id, updates=updates)
 
-    async def on_user_deleted(self, sender, user: User, **kwargs):
-        """
-        Handle the cleanup of user-related topics when a user is deleted.
 
-        This function is tbriggered by the `user_deleted` signal
+async def update_topics_on_user_deleted(user: UserResourceModel) -> None:
+    """
+    Handle the cleanup of user-related topics when a user is deleted.
 
-        """
-        # delete user private topics
-        await self.delete_many(lookup={"is_global": False, "user": user["_id"]})
+    This function is triggered by the `user_deleted` signal
 
-        # remove user topic subscriptions from existing topics
+    """
 
-        topics = await self.search(lookup={"subscribers.user_id": user["_id"]})
+    # delete user private topics
+    service = TopicService()
+    await service.delete_many({"is_global": False, "user": user.id})
 
-        user_object_id = ObjectId(user["_id"])
+    # remove user topic subscriptions from existing topics
+    topics = await service.search({"subscribers.user_id": user.id})
+    async for topic in topics:
+        updates: dict[str, Any] = dict(
+            subscribers=[s.to_dict() for s in topic.subscribers if s.user_id != user.id],
+        )
 
-        async for topic in topics:
-            updates = dict(
-                subscribers=[s for s in topic.subscribers if s["user_id"] != user_object_id],
-            )
+        if topic.user == user.id:
+            updates["user"] = None
 
-            if topic.user == user_object_id:
-                topic.user = None
+        await service.update(topic.id, updates)
 
-            await self.update(topic.id, updates)
-
-        # remove user as a topic creator for the rest
-        user_topics = await self.search(lookup={"user": user["_id"]})
-        async for topic in user_topics:
-            await self.update(topic.id, {"user": None})
+    # remove user as a topic creator for the rest
+    user_topics = await service.search({"user": user.id})
+    async for topic in user_topics:
+        await service.update(topic.id, {"user": None})
 
 
 async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
@@ -229,10 +226,8 @@ async def auto_enable_user_emails(
     await UsersService().update(user.id, updates={"receive_email": True})
 
 
-# TODO-ASYNC, need to wait for SDESK-7376
-
-# async def init(app: SuperdeskAsyncApp):
-#     user_deleted.connect(await TopicService().on_user_deleted)  # type: ignore
+def init_module(_app: SuperdeskAsyncApp):
+    user_deleted.connect(update_topics_on_user_deleted)
 
 
 topic_resource_config = ResourceConfig(
