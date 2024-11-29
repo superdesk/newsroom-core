@@ -56,8 +56,6 @@ from newsroom.public.views import (
 from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
-from newsroom.companies.utils import restrict_coverage_info
-from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -458,9 +456,13 @@ def bookmark():
 @blueprint.route("/wire/<_id>/copy", methods=["POST"])
 @login_required
 def copy(_id):
+    # Import here to prevent circular imports
+    from newsroom.companies.utils import restrict_coverage_info
+    from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
+
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
-    user = get_user()
+    user = get_user(True)
     company = get_company(user)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
