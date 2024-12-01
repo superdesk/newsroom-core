@@ -103,7 +103,7 @@ class Publisher:
                 if subject.get("scheme") in get_app_config("WIRE_SUBJECT_SCHEME_WHITELIST")
             ]
 
-        signals.publish_item.send(app, item=doc, is_new=original is None)
+        await signals.publish_item.send(doc, original is None)
 
         doc_id = await self.publish_doc_to_content_api(doc)
         if "evolvedfrom" in doc and parent_item:
@@ -161,7 +161,7 @@ class Publisher:
                     # This can happen when pushing a Planning item before linking to an Event
                     await service.system_update(plan["_id"], {"event_id": agenda_id})
 
-            signals.publish_event.send(app.as_any(), item=agenda, is_new=True)
+            await signals.publish_event.send(agenda, None, None, True)
             agenda_id = (await service.create([agenda]))[0]
         else:
             # replace the original document
@@ -214,7 +214,7 @@ class Publisher:
             if updates:
                 updated = orig.copy()
                 updated.update(updates)
-                signals.publish_event.send(app.as_any(), item=updated, updates=updates, orig=orig, is_new=False)
+                await signals.publish_event.send(updated, updates, orig, False)
                 await service.update(orig["_id"], updates)
                 updates["_id"] = orig["_id"]
                 await notify_agenda_update(updates, orig)
@@ -230,17 +230,16 @@ class Publisher:
 
         # Add the planning item to the list
         await agenda_manager.set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
-        app = get_current_wsgi_app()
 
         if not orig.get("_id"):
             # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
             agenda.setdefault("_id", planning["guid"])
             agenda.setdefault("guid", planning["guid"])
-            signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
+            await signals.publish_planning.send(agenda, new_plan)
             return (await service.create([agenda]))[0]
         else:
             # Replace the original
-            signals.publish_planning.send(app.as_any(), item=agenda, is_new=new_plan)
+            await signals.publish_planning.send(agenda, new_plan)
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
 

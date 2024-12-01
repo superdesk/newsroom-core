@@ -8,7 +8,6 @@ from superdesk import get_resource_service
 import newsroom
 
 from newsroom.types import SectionEnum
-from newsroom.signals import company_create
 
 from .utils import get_company_section_names, get_company_product_ids
 
@@ -108,7 +107,6 @@ class CompaniesService(newsroom.Service):
         super().on_create(docs)
         for doc in docs:
             self.validate_auth_provider(doc)
-            company_create.send(self, company=doc)
 
     def on_update(self, updates, original):
         self.validate_auth_provider(updates)

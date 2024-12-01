@@ -1399,7 +1399,7 @@ async def test_push_plan_with_date_before_event_start(client, app):
 
 
 async def test_push_planning_signal(client, app):
-    def on_push_planning(sender, item, is_new, **kwargs):
+    def on_push_planning(item, is_new):
         item["dates"]["all_day"] = True
         assert is_new
 
@@ -1413,7 +1413,7 @@ async def test_push_planning_signal(client, app):
 
 
 async def test_push_events_signal(client, app):
-    def on_push_event(sender, item, is_new, **kwargs):
+    def on_push_event(item, _updates, _original, is_new):
         item["dates"]["all_day"] = True
         assert is_new
 
