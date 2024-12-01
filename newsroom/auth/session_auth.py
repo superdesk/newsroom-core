@@ -27,7 +27,6 @@ class NewshubSessionAuth(UserAuthProtocol):
         if not request.user:
             user_id = request.storage.session.get("user", "")
             if not user_id:
-                await flash(gettext("Invalid username or password."), "danger")
                 return await self.clear_session_and_redirect_to_login(request)
 
             try:
