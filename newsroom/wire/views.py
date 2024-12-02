@@ -545,7 +545,9 @@ def item(_id):
 @login_required
 def items(_ids):
     item_ids = _ids.split(",")
-    items = superdesk.get_resource_service("wire_search").get_items(item_ids)
+    items = superdesk.get_resource_service("wire_search").get_items(
+        item_ids, sort_by="versioncreated", sort_order="desc"
+    )
     for item in items:
         set_permissions(
             item,
@@ -553,7 +555,4 @@ def items(_ids):
             False if flask.request.args.get("ignoreLatest") == "false" else True,
         )
 
-    # Sorting the list by versioncreated in descending order
-    sorted_items = sorted(items.docs, key=lambda item: item["versioncreated"], reverse=True)
-
-    return jsonify(sorted_items), 200
+    return jsonify(items.docs), 200
