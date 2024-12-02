@@ -30,10 +30,10 @@ def create_user(email, password, first_name, last_name, is_admin):
     user = get_user_by_email(email)
 
     if user:
-        sanitized_user = {k: v for k, v in new_user.items() if k != 'password'}
+        sanitized_user = {k: v for k, v in new_user.items() if k != "password"}
         print("user already exists %s" % str(sanitized_user))
     else:
-        sanitized_user = {k: v for k, v in new_user.items() if k != 'password'}
+        sanitized_user = {k: v for k, v in new_user.items() if k != "password"}
         print("creating user %s" % str(sanitized_user))
         get_resource_service("users").post([new_user])
         print("user saved %s" % (sanitized_user))
