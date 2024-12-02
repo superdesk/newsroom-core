@@ -1108,7 +1108,7 @@ msgstr ""
 
 #: newsroom/templates/login_layout.html:13
 msgid "Login to Newshub"
-msgstr "Kirjaudu Medipankkiin"
+msgstr "Kirjaudu Mediapankkiin"
 
 #: newsroom/templates/login_layout.html:47
 msgid "Reset password"
@@ -4023,8 +4023,8 @@ msgid ""
 "The initial search is limited to the {{dateFilterName}}. Please find "
 "different date ranges in the filter panel using the burger menu."
 msgstr ""
-"Alkuperäinen haku on rajattu {{dateFilterName}}. Voit muuttaa aikarajausta "
-"hampurilaisvalikon takaa suodattimista."
+"Haussa on oletuksen käytetty hakukriteeriä \"{{dateFilterName}}\". Voit "
+"muuttaa aikarajausta hampurilaisvalikon takaa suodattimista."
 
 #: assets/search/components/SearchResultsBar/index.tsx:266
 #: assets/users/components/filters/UserListSortFilter.tsx:83
@@ -4462,7 +4462,7 @@ msgstr "Artikkeli on poistettu {{ context_name }}"
 
 #: assets/wire/components/fields/Authors.tsx:14
 msgid "Authors"
-msgstr "Tekijät"
+msgstr "Luonut järjestelmään"
 
 #: assets/wire/components/fields/DurationLabel.tsx:40
 msgid "Duration"
