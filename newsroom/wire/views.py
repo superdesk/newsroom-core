@@ -553,4 +553,7 @@ def items(_ids):
             False if flask.request.args.get("ignoreLatest") == "false" else True,
         )
 
-    return jsonify(items.docs), 200
+    # Sorting the list by versioncreated in descending order
+    sorted_items = sorted(items.docs, key=lambda item: item["versioncreated"], reverse=True)
+
+    return jsonify(sorted_items), 200
