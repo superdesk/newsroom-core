@@ -112,9 +112,7 @@ class SendScheduledNotificationEmails:
                     user.notification_schedule.times = get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
 
                 company = companies.get(user.company)
-                await self.process_schedule(
-                    schedule, user, company, now_utc, user_topic_map.get(user.id) or {}, force
-                )
+                await self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user.id) or {}, force)
             except Exception as e:
                 logger.exception(e)
                 logger.error("Failed to run schedule for user %s", schedule.user)
