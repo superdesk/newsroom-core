@@ -113,7 +113,7 @@ class SendScheduledNotificationEmails:
 
                 company = companies.get(user.company)
                 await self.process_schedule(
-                    schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force
+                    schedule, user, company, now_utc, user_topic_map.get(user.id) or {}, force
                 )
             except Exception as e:
                 logger.exception(e)
