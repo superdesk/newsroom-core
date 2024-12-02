@@ -456,8 +456,14 @@ def bookmark():
 @blueprint.route("/wire/<_id>/copy", methods=["POST"])
 @login_required
 def copy(_id):
+    # Import here to prevent circular imports
+    from newsroom.companies.utils import restrict_coverage_info
+    from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
+
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
+    user = get_user(True)
+    company = get_company(user)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
     locale = (get_session_locale() or "en").lower()
@@ -465,17 +471,24 @@ def copy(_id):
 
     template_kwargs = {"item": item}
     if item_type == "agenda":
+        if not is_admin_or_internal(user):
+            remove_fields_for_public_user(item)
+
+        if restrict_coverage_info(company):
+            remove_restricted_coverage_info([item])
+
         template_kwargs.update(
             {
                 "location": "" if item_type != "agenda" else get_location_string(item),
                 "contacts": get_public_contacts(item),
                 "calendars": ", ".join([calendar.get("name") for calendar in item.get("calendars") or []]),
+                "item": item,
             }
         )
     copy_data = flask.render_template(template_name, **template_kwargs).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
-    get_resource_service("history").create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
+    get_resource_service("history").create_history_record([item], "copy", user, request.args.get("type", "wire"))
     return flask.jsonify({"data": copy_data}), 200
 
 
