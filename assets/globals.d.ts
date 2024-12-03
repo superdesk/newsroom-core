@@ -66,6 +66,7 @@ interface IClientConfig {
     multimedia_website_search_url?: string;
     show_default_time_frame_label?: boolean;
     agenda_default_filter_hide_planning: boolean;
+    show_coverage_latest_version_only?: boolean;
 }
 
 interface Window {
