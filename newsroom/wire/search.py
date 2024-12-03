@@ -128,9 +128,7 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return 0
 
-    def get_items(
-        self, item_ids, size=None, aggregations=None, apply_permissions=False, sort_by=None, sort_order="desc"
-    ):
+    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False, sort=None):
         search = SearchQuery()
 
         try:
@@ -157,8 +155,8 @@ class WireSearchService(BaseSearchService):
             if aggregations is not None:
                 search.source["aggs"] = aggregations
 
-            if sort_by:
-                search.source["sort"] = [{sort_by: {"order": sort_order}}]
+            if sort:
+                search.source["sort"] = sort
 
             req = ParsedRequest()
             req.args = {"source": json.dumps(search.source)}
