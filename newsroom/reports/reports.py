@@ -341,7 +341,7 @@ async def get_company_api_usage():
     date_range = get_date_filters(
         BaseSearchRequestArgs(
             start_date=args["date_from"],
-            end_date=args["date_from"],
+            end_date=args["date_to"],
             timezone_offset=args.get("timezone_offset"),
         )
     )
@@ -365,7 +365,7 @@ async def get_company_api_usage():
                 "query": {
                     "bool": {
                         "filter": [
-                            {"range": {"created": date_range.get("gt")}},
+                            {"range": {"created": date_range}},
                             {"terms": {"subscriber": company_ids}},
                         ],
                     },
@@ -375,8 +375,8 @@ async def get_company_api_usage():
                 "from": page_from,
                 "aggs": {
                     "items": {
-                        "aggs": {"endpoints": {"terms": {"size": 0, "field": "endpoint"}}},
-                        "terms": {"size": 0, "field": "subscriber"},
+                        "aggs": {"endpoints": {"terms": {"size": MAX_TERMS_SIZE, "field": "endpoint"}}},
+                        "terms": {"size": MAX_TERMS_SIZE, "field": "subscriber"},
                     },
                 },
             }

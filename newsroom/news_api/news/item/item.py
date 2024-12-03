@@ -31,10 +31,11 @@ async def get_item(args: RouteArguments, params: RouteParams, request: Request) 
     formatter = get_formatter_by_classname(params.format)
 
     item = await WireItem.get_service().find_by_id(args.item_id)
+    time_limit = int(get_setting("news_api_time_limit_days") or 0)
     if not item:
         return await request.abort(404)
     # Ensure that the item has not expired
-    elif utcnow() - timedelta(days=int(get_setting("news_api_time_limit_days"))) > item.versioncreated:
+    elif time_limit > 0 and utcnow() - timedelta(days=time_limit) > item.versioncreated:
         return await request.abort(404)
 
     item_dict = item.to_dict()
