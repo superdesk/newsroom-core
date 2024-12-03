@@ -1109,3 +1109,37 @@ def test_bookmark_old_items(client, public_user, company_products):
     resp = client.get("/wire/search?bookmarks={}".format(public_user["_id"]))
     assert resp.status_code == 200
     assert 2 == len(resp.json["_items"])
+
+
+def test_sorting_wire_items(app, client):
+    app.data.remove("items")
+    now = datetime.utcnow()
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "item2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=1),
+            },
+            {
+                "_id": "item3",
+                "type": "text",
+                "versioncreated": now,
+            },
+            {
+                "_id": "item1",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=5),
+            },
+        ],
+    )
+
+    resp = client.get("/wire/items/item1,item3,item2")
+    assert resp.status_code == 200
+    assert len(resp.json) == 3
+    assert resp.json[0]["_id"] == "item3"
+    assert resp.json[1]["_id"] == "item2"
+    assert resp.json[2]["_id"] == "item1"
