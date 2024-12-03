@@ -102,21 +102,21 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
     if (getConfig('debug')) {
         // activate logs actions for non production instances.
         // (this should always be the last middleware)
-        // middlewares.push(
-        //     createLogger({
-        //         duration: true,
-        //         collapsed: true,
-        //         timestamp: false,
-        //         titleFormatter: (action: any, time: any, took: any) => (
-        //             // Adds the name of the store to the console logs
-        //             // derived based on the defaultTitleFormatter from redux-logger
-        //             // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
-        //             (action && action.type) ?
-        //                 `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
-        //                 `${name} - action (in ${took.toFixed(2)} ms)`
-        //         ),
-        //     })
-        // );
+        middlewares.push(
+            createLogger({
+                duration: true,
+                collapsed: true,
+                timestamp: false,
+                titleFormatter: (action: any, time: any, took: any) => (
+                    // Adds the name of the store to the console logs
+                    // derived based on the defaultTitleFormatter from redux-logger
+                    // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
+                    (action && action.type) ?
+                        `${name} - action ${String(action.type)} (in ${took.toFixed(2)} ms)` :
+                        `${name} - action (in ${took.toFixed(2)} ms)`
+                ),
+            })
+        );
         // activate redux devtools for non production instances,
         // if it's available in the browser
         // https://github.com/zalmoxisus/redux-devtools-extension
