@@ -1032,6 +1032,7 @@ def test_date_filters(client, app):
     # Test "Last 7 days" filter
     resp = client.get("/wire/search?date_filter=last_week")
     assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 4
 
     # Test "Last 30 days" filter
     resp = client.get("/wire/search?date_filter=last_30_days")
@@ -1063,9 +1064,9 @@ def test_date_filters_query(client, app):
             return search.query["bool"]["must"]
 
     # Last week
-    assert [
-        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
-    ] == _set_search_query(ADMIN_USER_ID, {"date_filter": "last_week"})
+    assert [{"range": {"versioncreated": {"gte": "now-7d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "last_week"}
+    )
 
     # Last 30 Days
     assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
