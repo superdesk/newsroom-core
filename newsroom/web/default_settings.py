@@ -841,6 +841,7 @@ NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
 #: .. versionadded: 2.8
 #:
 AGENDA_TIME_FILTERS = [
+    {"name": lazy_gettext("Selected day"), "query": ""},
     {"name": lazy_gettext("Today"), "query": "now/d"},
     {
         "name": lazy_gettext("This Week"),
