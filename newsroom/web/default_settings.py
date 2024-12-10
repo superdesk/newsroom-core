@@ -433,6 +433,10 @@ CELERY_TASK_ROUTES = {
         "queue": celery_queue("newsroom.push"),
         "routing_key": "newsroom.push",
     },
+    "newsroom.email.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),
         "routing_key": "newsroom.task",
