@@ -134,10 +134,11 @@ class WireSearchService(BaseSearchService):
         try:
             search.query = {
                 "bool": {
+                    "must": [{"terms": {"_id": item_ids}}],
                     "must_not": [
                         {"term": {"type": "composite"}},
                     ],
-                    "filter": [{"terms": {"_id": item_ids}}],
+                    "filter": [],
                     "should": [],
                 }
             }
@@ -162,7 +163,7 @@ class WireSearchService(BaseSearchService):
 
         except Exception as exc:
             logger.error(
-                "Error in get_items for query: {}".format(json.dumps(search.source)),
+                "Error in get_items for query: {}".format(json.dumps(search.query)),
                 exc,
                 exc_info=True,
             )
