@@ -16,9 +16,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
+"Project-Id-Version: Newsroom-Core 2.8.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-21 11:35+0200\n"
+"POT-Creation-Date: 2024-12-10 10:24+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Maija Paikkala, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
@@ -29,11 +29,11 @@ msgstr ""
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: newsroom/email.py:487
+#: newsroom/email.py:501
 msgid "Kill/Takedown notice"
 msgstr "Ilmoitus poistosta"
 
-#: newsroom/email.py:496
+#: newsroom/email.py:510
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr "%(section)s peruttu"
@@ -234,43 +234,43 @@ msgstr "Prio"
 msgid "Place"
 msgstr "Paikka"
 
-#: newsroom/agenda/agenda.py:56
+#: newsroom/agenda/agenda.py:57
 msgid "An event you have been watching has been updated"
 msgstr "Seuraamaasi tapahtumaa on päivitetty"
 
-#: newsroom/agenda/agenda.py:57
+#: newsroom/agenda/agenda.py:58
 msgid "Event updated"
 msgstr "Tapahtuma päivitetty"
 
-#: newsroom/agenda/agenda.py:60
+#: newsroom/agenda/agenda.py:61
 msgid "An event you have been watching has been cancelled"
 msgstr "Seuraamasi tapahtuma on peruttu"
 
-#: newsroom/agenda/agenda.py:61
+#: newsroom/agenda/agenda.py:62
 msgid "Event cancelled"
 msgstr "Tapahtuma peruttu"
 
-#: newsroom/agenda/agenda.py:64
+#: newsroom/agenda/agenda.py:65
 msgid "An event you have been watching has a new planning"
 msgstr "Seuraamassasi tapahtumassa on uutta suunnittelutietoa"
 
-#: newsroom/agenda/agenda.py:65
+#: newsroom/agenda/agenda.py:66
 msgid "Planning added"
 msgstr "Suunnittelutietoa lisätty"
 
-#: newsroom/agenda/agenda.py:68
+#: newsroom/agenda/agenda.py:69
 msgid "An event you have been watching has a planning cancelled"
 msgstr "Seuraamaasi tapahtumaan liittyvä uutissuunnitelma on peruttu"
 
-#: newsroom/agenda/agenda.py:69
+#: newsroom/agenda/agenda.py:70
 msgid "Planning cancelled"
 msgstr "Uutissuunnittelmat peruttu"
 
-#: newsroom/agenda/agenda.py:72
+#: newsroom/agenda/agenda.py:73
 msgid "An event you have been watching has a new coverage added"
 msgstr "Seuraamassasi tapahtumassa on uutta sisältöä"
 
-#: newsroom/agenda/agenda.py:73
+#: newsroom/agenda/agenda.py:74
 msgid "Coverage added"
 msgstr "Sisältö lisätty"
 
@@ -286,7 +286,7 @@ msgstr "Peruttu"
 
 #: newsroom/agenda/utils.py:175 newsroom/agenda/utils.py:193
 msgid "Planned"
-msgstr "STT uutisoi"
+msgstr "Uutinen tulossa"
 
 #: newsroom/agenda/utils.py:177
 msgid "Not decided"
@@ -1477,7 +1477,7 @@ msgstr "Ei suunniteltu"
 
 #: newsroom/web/default_settings.py:378 newsroom/web/default_settings.py:379
 msgid "Is Planned"
-msgstr "STT uutisoi"
+msgstr "Uutinen tulossa"
 
 #: newsroom/web/default_settings.py:384 newsroom/web/default_settings.py:385
 msgid "Not Decided / On Request"
@@ -1512,27 +1512,32 @@ msgid "Newshub"
 msgstr "Mediapankki"
 
 #: assets/agenda/components/AgendaDateButtons.tsx:15
-#: assets/agenda/components/AgendaList.tsx:329
+#: assets/agenda/components/AgendaList.tsx:330
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
 #: assets/components/ExpiryDateInput.tsx:94
-#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:845
 msgid "Today"
 msgstr "Tänään"
 
+#: assets/company-reports/components/ProductStories.tsx:29
 #: newsroom/web/default_settings.py:820
-msgid "Last Week"
-msgstr "Edeltävä viikko"
+msgid "Last 7 days"
+msgstr "Edelliset 7 päivää"
 
 #: newsroom/web/default_settings.py:826
 msgid "Last 30 days"
 msgstr "Edeltävät 30 päivää"
 
-#: newsroom/web/default_settings.py:846
+#: newsroom/web/default_settings.py:844
+msgid "Selected day"
+msgstr "Valittu päivä"
+
+#: newsroom/web/default_settings.py:847
 msgid "This Week"
 msgstr "Tämä viikko"
 
-#: newsroom/web/default_settings.py:850
+#: newsroom/web/default_settings.py:851
 msgid "This Month"
 msgstr "Tämä kuukausi"
 
@@ -1710,57 +1715,57 @@ msgstr "Seuraa"
 msgid "Stop watching this coverage"
 msgstr "Lopeta seuranta"
 
-#: assets/agenda/utils.ts:61
+#: assets/agenda/utils.ts:69
 msgid "coverage updated {{ at }}"
 msgstr "Sisältö päivittynyt {{ at }}"
 
-#: assets/agenda/utils.ts:71
+#: assets/agenda/utils.ts:79
 msgid "Time to be confirmed"
 msgstr "Aika vahvistamatta"
 
-#: assets/agenda/utils.ts:81 assets/agenda/utils.ts:82
+#: assets/agenda/utils.ts:89 assets/agenda/utils.ts:90
 msgid "Coverage not planned"
 msgstr "STT ei uutisoi"
 
-#: assets/agenda/utils.ts:83 assets/agenda/utils.ts:90
+#: assets/agenda/utils.ts:91 assets/agenda/utils.ts:98
 msgid "Coverage planned"
-msgstr "STT uutisoi"
+msgstr "Uutinen tulossa"
 
-#: assets/agenda/utils.ts:84 assets/agenda/utils.ts:85
+#: assets/agenda/utils.ts:92 assets/agenda/utils.ts:93
 msgid "Coverage on merit"
 msgstr "Ehkä"
 
-#: assets/agenda/utils.ts:86
+#: assets/agenda/utils.ts:94
 msgid "Coverage on request"
 msgstr "Pyydettäessä"
 
-#: assets/agenda/utils.ts:91
+#: assets/agenda/utils.ts:99
 msgid "Coverage in progress"
 msgstr "Teossa"
 
-#: assets/agenda/utils.ts:92
+#: assets/agenda/utils.ts:100
 msgid "Coverage available"
 msgstr "Lähetetty"
 
-#: assets/agenda/utils.ts:93
+#: assets/agenda/utils.ts:101
 msgid "Coverage cancelled"
 msgstr "Peruttu"
 
-#: assets/agenda/utils.ts:987
+#: assets/agenda/utils.ts:999
 msgid "assignee: {{name}}"
 msgstr "Tekijä: {{name}}"
 
-#: assets/agenda/utils.ts:988
+#: assets/agenda/utils.ts:1000
 msgid "desk: {{name}}"
 msgstr "Deski: {{name}}"
 
-#: assets/agenda/utils.ts:997
+#: assets/agenda/utils.ts:1009
 msgid ""
 "{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}"
 msgstr ""
 "{{ type }} sisältö {{ slugline }} {{ status_text }} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1005
+#: assets/agenda/utils.ts:1017
 msgid ""
 "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} "
 "{{assignedDetails}}"
@@ -1768,7 +1773,7 @@ msgstr ""
 "Planned {{ type }} sisältö {{ slugline }}, arvioitu valmistumisaika {{date}}"
 " {{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1013
+#: assets/agenda/utils.ts:1025
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}} {{assignedDetails}}"
@@ -1776,19 +1781,19 @@ msgstr ""
 "{{ type }} sisältö {{ slugline }} työn alla, arvioitu valmistumienen "
 "{{date}} {{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1017
+#: assets/agenda/utils.ts:1029
 msgid "{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}"
 msgstr "{{ type }} sisältö {{slugline}} peruttu {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(update to come)"
 msgstr "(päivitys tulossa)"
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(updated)"
 msgstr "(päivitetty)"
 
-#: assets/agenda/utils.ts:1028
+#: assets/agenda/utils.ts:1040
 msgid ""
 "{{ type }} coverage {{ slugline }} available {{deliveryState}} "
 "{{assignedDetails}}"
@@ -1796,35 +1801,35 @@ msgstr ""
 "{{ type }} sisältö{{ slugline }} saatavilla {{deliveryState}} "
 "{{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1036
+#: assets/agenda/utils.ts:1048
 msgid "{{ type }} coverage {{assignedDetails}}"
 msgstr "{{ type }} sisältö {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1106
+#: assets/agenda/utils.ts:1118
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr "{{startDate}} - {{endDate}} (Kellonaika varmistuu myöhemmin)"
 
-#: assets/agenda/utils.ts:1112
+#: assets/agenda/utils.ts:1124
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr "{{startDate}} (Kellonaika varmistuu myöhemmin)"
 
-#: assets/agenda/utils.ts:1117
+#: assets/agenda/utils.ts:1129
 msgid "{{startDate}} to {{endDate}}"
 msgstr "{{startDate}} – {{endDate}}"
 
-#: assets/agenda/utils.ts:1126
+#: assets/agenda/utils.ts:1138
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} - {{endDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1134
+#: assets/agenda/utils.ts:1146
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1141
+#: assets/agenda/utils.ts:1153
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} - {{endTime}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1149 assets/agenda/utils.ts:1159
+#: assets/agenda/utils.ts:1161 assets/agenda/utils.ts:1171
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 "{{startDate}} klo {{startTime}} - {{endDate}} klo {{endTime}} {{timezone}}"
@@ -2059,11 +2064,11 @@ msgstr "Tapahtumat"
 msgid "Show"
 msgstr "Näytä"
 
-#: assets/agenda/components/AgendaList.tsx:333
+#: assets/agenda/components/AgendaList.tsx:334
 msgid "Tomorrow"
 msgstr "Huomenna"
 
-#: assets/agenda/components/AgendaList.tsx:466
+#: assets/agenda/components/AgendaList.tsx:467
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
@@ -2819,10 +2824,6 @@ msgstr "Edelliset 24 tuntia"
 #: assets/company-reports/components/ProductStories.tsx:28
 msgid "This week"
 msgstr "Tämä viikko"
-
-#: assets/company-reports/components/ProductStories.tsx:29
-msgid "Last 7 days"
-msgstr "Edelliset 7 päivää"
 
 #: assets/company-reports/components/ProductStories.tsx:30
 msgid "This month"
