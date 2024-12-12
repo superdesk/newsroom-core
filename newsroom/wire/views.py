@@ -67,7 +67,6 @@ from newsroom.public.views import (
 
 from newsroom.assets import get_upload, get_media_file
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
 from newsroom.history_async import HistoryService
 
 from .items import get_items_for_dashboard
@@ -262,8 +261,7 @@ async def index():
         data = await render_public_dashboard() if get_app_config("PUBLIC_DASHBOARD") else redirect_to_login()
         return data
     data = await get_home_data()
-    user_profile_data = await get_user_profile_data()
-    return await render_template("home.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("home.html", data=data)
 
 
 class MediaCardRouteArguments(BaseModel):
@@ -298,16 +296,14 @@ async def get_card_items() -> Response:
 @wire_endpoints.endpoint("/wire", auth=[auth_rules.section_required("wire")])
 async def wire() -> str:
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
-    return await render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("wire_index.html", data=data)
 
 
 @wire_endpoints.endpoint("/bookmarks_wire")
 async def bookmarks() -> str:
     data = await get_view_data()
     data["bookmarks"] = True
-    user_profile_data = await get_user_profile_data()
-    return await render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("wire_bookmarks.html", data=data)
 
 
 @wire_endpoints.endpoint("/wire/search", auth=[auth_rules.section_required("wire")])
@@ -534,7 +530,6 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
                 "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
                 "contacts": get_public_contacts(item_to_copy),
                 "calendars": ", ".join([calendar.get("name") for calendar in item_to_copy.get("calendars") or []]),
-                "user_profile_data": await get_user_profile_data(),
             }
         )
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
@@ -579,14 +574,11 @@ async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Requ
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("wire")
     display_char_count = config.get("char_count", False)
-    user_profile_data = await get_user_profile_data()
     if is_json_request(request):
         return Response(wire_item)
 
     if not wire_item.user_has_access:
-        return await render_template(
-            "wire_item_access_restricted.html", item=wire_item, user_profile_data=user_profile_data
-        )
+        return await render_template("wire_item_access_restricted.html", item=wire_item)
 
     previous_versions = await get_previous_versions(wire_item)
     template = "wire_item.html"
@@ -609,7 +601,6 @@ async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Requ
         **data,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
-        user_profile_data=user_profile_data,
     )
 
 

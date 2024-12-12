@@ -8,3 +8,7 @@
     </div>
 </section>
 {% endblock %}
+
+{% block script %}
+    {{ javascript_tag('user_profile_js') | safe }}
+{% endblock %}

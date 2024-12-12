@@ -11,7 +11,6 @@ from newsroom.auth.utils import is_valid_session
 from newsroom.types import Article, CardResourceModel
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
 from newsroom.cards import CardsResourceService
 
 PUBLIC_DASHBOARD_CONFIG_CACHE_KEY = "public-dashboard-config"
@@ -68,7 +67,6 @@ async def page(args: PageArgs, _p: None, _r: None):
 
 
 async def render_public_dashboard():
-    user_profile_data = await get_user_profile_data()
     return await render_template(
         "public_dashboard.html",
         data={
@@ -77,7 +75,6 @@ async def render_public_dashboard():
             "items_by_card": await get_public_items_by_cards(),
             "groups": get_app_config("WIRE_GROUPS", []),
         },
-        user_profile_data=user_profile_data,
     )
 
 
