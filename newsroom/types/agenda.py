@@ -4,7 +4,7 @@ from enum import Enum, unique
 
 from pydantic import Field, field_validator, model_validator
 
-from superdesk.core.resources import ResourceModel, fields, dataclass, Dataclass, ModelWithVersions
+from superdesk.core.resources import ResourceModel, fields, Dataclass, ModelWithVersions
 from superdesk.utc import utcnow
 from content_api.items.model import Place, CVItemWithCode, CVItem, PubStatusType
 
@@ -42,7 +42,6 @@ class AgendaWorkflowState(str, Enum):
     POSTPONED = "postponed"
 
 
-@dataclass
 class AgendaCVItem(Dataclass):
     code: fields.Keyword
     name: fields.Keyword
@@ -52,7 +51,6 @@ class AgendaCVItem(Dataclass):
     translations: dict[str, dict[str, str | None]] | None = None
 
 
-@dataclass
 class EventRecurringRule(Dataclass):
     frequency: str | None = None
     interval: int | None = None
@@ -62,7 +60,6 @@ class EventRecurringRule(Dataclass):
     _created_externally: bool | None = None
 
 
-@dataclass
 class AgendaDates(Dataclass):
     start: datetime
     end: datetime
@@ -75,12 +72,10 @@ class AgendaDates(Dataclass):
     _parse_no_end_time = field_validator("all_day", "no_end_time", mode="before")(convert_value_to_bool)
 
 
-@dataclass
 class AgendaDisplayDates(Dataclass):
     date: datetime
 
 
-@dataclass
 class AgendaCoverageDelivery(Dataclass):
     delivery_id: fields.Keyword | None = None
     delivery_href: fields.Keyword | None = None
@@ -89,7 +84,6 @@ class AgendaCoverageDelivery(Dataclass):
     delivery_state: fields.Keyword | None = None
 
 
-@dataclass
 class AgendaCoverage(Dataclass):
     planning_id: fields.Keyword
     coverage_id: fields.Keyword
@@ -125,7 +119,6 @@ class AgendaCoverage(Dataclass):
     )(convert_none_to_list)
 
 
-@dataclass
 class EventLocation(Dataclass):
     name: fields.TextWithKeyword
     address: Annotated[dict | None, fields.dynamic_mapping()] = None
@@ -136,13 +129,11 @@ class EventLocation(Dataclass):
     details: list[str] | None = None
 
 
-@dataclass
 class PlanningItemAgenda(Dataclass):
     _id: fields.Keyword
     name: fields.Keyword
 
 
-@dataclass
 class AgendaPlanningItem(Dataclass):
     _id: fields.Keyword
     guid: fields.Keyword
@@ -184,7 +175,6 @@ class AgendaPlanningItem(Dataclass):
     )(convert_none_to_list)
 
 
-@dataclass
 class CalendarItem(Dataclass):
     qcode: fields.Keyword
     name: fields.Keyword
