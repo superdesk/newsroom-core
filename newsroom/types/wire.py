@@ -3,11 +3,10 @@ from datetime import datetime
 
 from pydantic import Field
 
-from superdesk.core.resources import fields, dataclass, Dataclass
+from superdesk.core.resources import fields, Dataclass
 from content_api.items.model import ContentAPIItem, CVItemWithCode
 
 
-@dataclass
 class PublishedProduct(Dataclass):
     code: fields.Keyword
     name: fields.Keyword | None = None

@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum, unique
 
-from superdesk.core.resources import dataclass, Dataclass
+from superdesk.core.resources import Dataclass
 from superdesk.core.resources.fields import ObjectId
 from newsroom.core.resources import NewshubResourceModel
 
@@ -16,7 +16,6 @@ class MonitoringScheduleInterval(str, Enum):
     DAILY = "daily"
 
 
-@dataclass
 class MonitoringSchedule(Dataclass):
     interval: MonitoringScheduleInterval
     time: str | None = None
