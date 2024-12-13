@@ -1,7 +1,7 @@
 from typing import Annotated, Optional
 from datetime import datetime
 
-from superdesk.core.resources import dataclass, Dataclass
+from superdesk.core.resources import Dataclass
 from superdesk.core.resources.validators import validate_data_relation_async, validate_iunique_value_async
 from superdesk.core.resources.fields import ObjectId, Field
 
@@ -10,7 +10,6 @@ from newsroom.core.resources import NewshubResourceModel, validate_ip_address, v
 from .common import SectionEnum
 
 
-@dataclass
 class CompanyProduct(Dataclass):
     _id: Annotated[ObjectId, validate_data_relation_async("products")]
     section: SectionEnum

@@ -3,7 +3,7 @@ from pydantic import Field
 from typing import Any, Annotated
 
 
-from superdesk.core.resources import dataclass, Dataclass
+from superdesk.core.resources import Dataclass
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources.validators import validate_data_relation_async
 
@@ -20,13 +20,11 @@ class NotificationType(str, Enum):
     SCHEDULED = "scheduled"
 
 
-@dataclass
 class TopicSubscriberModel(Dataclass):
     user_id: Annotated[ObjectIdField, validate_data_relation_async("users")]
     notification_type: NotificationType = NotificationType.REAL_TIME
 
 
-@dataclass
 class TopicCreatedFilters(Dataclass):
     created_from: Annotated[str | None, Field(alias="from")] = None
     created_to: Annotated[str | None, Field(alias="to")] = None
