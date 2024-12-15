@@ -19,7 +19,6 @@ from newsroom.auth.utils import (
 )
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.formatters import get_formatters_id_and_names
-from newsroom.users import get_user_profile_data
 from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics_async
 from newsroom.topics_folders import get_company_folders, get_user_folders
@@ -56,17 +55,15 @@ from .filters import AgendaSearchRequestArgs
 
 @agenda_endpoints.endpoint("/agenda", auth=[auth_rules.section_required("agenda")])
 async def index() -> str:
-    user_profile_data = await get_user_profile_data()
     data = await get_view_data()
-    return await render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_index.html", data=data)
 
 
 @agenda_endpoints.endpoint("/bookmarks_agenda")
 async def bookmarks() -> str:
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return await render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_bookmarks.html", data=data)
 
 
 class AgendaItemViewArgs(BaseModel):
@@ -113,7 +110,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
     if is_json_request(request):
         return Response(agenda_item_dict)
 
-    user_profile_data = await get_user_profile_data()
     if params.print:
         template = "agenda_item_print.html"
         await update_action_list([args.item_id], "prints", force_insert=True)
@@ -127,7 +123,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
             contacts=get_public_contacts(agenda_item_dict),
             links=get_links(agenda_item_dict),
             is_admin=user.is_admin_or_internal(),
-            user_profile_data=user_profile_data,
         )
 
     data = await get_view_data()
@@ -136,7 +131,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
         "agenda_index.html",
         data=data,
         title=agenda_item_dict.get("name", agenda_item_dict.get("headline")),
-        user_profile_data=user_profile_data,
     )
 
 

@@ -20,7 +20,6 @@ from newsroom.wire.views import (
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +49,7 @@ async def get_view_data():
 @section("am_news")
 async def index():
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
-    return await render_template("am_news_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("am_news_index.html", data=data)
 
 
 @blueprint.route("/am_news/search")
@@ -65,9 +63,8 @@ async def search():
 @login_required
 async def bookmarks():
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return await render_template("am_news_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("am_news_bookmarks.html", data=data)
 
 
 @blueprint.route("/am_news_bookmark", methods=["POST", "DELETE"])
@@ -109,7 +106,6 @@ async def versions(_id):
 @login_required
 async def item(_id):
     item = get_entity_or_404(_id, "items")
-    user_profile_data = await get_user_profile_data()
     set_permissions(item, "am_news")
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("am_news")
@@ -117,7 +113,7 @@ async def item(_id):
     if is_json_request(request):
         return jsonify(item)
     if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
+        return await render_template("wire_item_access_restricted.html", item=item)
     previous_versions = get_previous_versions(item)
     if "print" in request.args:
         template = "wire_item_print.html"
@@ -129,5 +125,4 @@ async def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
-        user_profile_data=user_profile_data,
     )

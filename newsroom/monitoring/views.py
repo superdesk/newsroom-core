@@ -21,7 +21,7 @@ from newsroom.notifications import push_user_notification
 from newsroom.wire import WireSearchServiceAsync
 
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data, UsersService
+from newsroom.users import UsersService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.history_async import HistoryService
 
@@ -230,8 +230,7 @@ async def delete(args: MonitoringIdUrlArg, params: None, request: Request) -> Re
 @monitoring_endpoints.endpoint("/monitoring", auth=[auth_rules.section_required("monitoring")])
 async def index():
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
-    return await render_template("monitoring_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("monitoring_index.html", data=data)
 
 
 class ExportMonitoringUrlArgs(BaseModel):
@@ -360,5 +359,4 @@ async def bookmark(request: Request) -> Response:
 async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
-    user_profile_data = await get_user_profile_data()
-    return await render_template("monitoring_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("monitoring_bookmarks.html", data=data)

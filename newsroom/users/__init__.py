@@ -22,6 +22,7 @@ def init_app(app):
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
+    app.add_template_global(get_user_profile_data)
 
 
 async def get_user_profile_data():
