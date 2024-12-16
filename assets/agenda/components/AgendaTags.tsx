@@ -42,7 +42,7 @@ function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGro
             label={gettext('Metadata')}
             top={!isItemDetail}
         >
-            {metadataFields.length
+            {metadataFields.length > 0
                 ? (
                     metadataFields.map((field, index) => <React.Fragment key={index}>{field}</React.Fragment>)
                 )

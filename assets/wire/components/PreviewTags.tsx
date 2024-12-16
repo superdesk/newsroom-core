@@ -58,7 +58,7 @@ function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLab
 
     return (
         <InfoBox label={gettext('Metadata')} top={!isItemDetail}>
-            {metadataFields.length
+            {metadataFields.length > 0
                 ? (
                     metadataFields.map((field, index) => <React.Fragment key={index}>{field}</React.Fragment>)
                 )
