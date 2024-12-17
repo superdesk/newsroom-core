@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
@@ -24,9 +23,11 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
 
         this.state = {
             loading: true,
-            expanded: false,
+            expandedEvents: {},
         };
+
         this.toggleExpanded = this.toggleExpanded.bind(this);
+        this.reloadEvent = this.reloadEvent.bind(this);
     }
 
     componentDidMount() {
@@ -34,100 +35,100 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
     }
 
     componentDidUpdate(prevProps: any) {
-        if (get(prevProps.item, 'event_id') !== get(this.props.item, 'event_id')) {
+        if (get(prevProps.item, 'event_ids') !== get(this.props.item, 'event_ids')) {
             this.reloadEvent();
         }
     }
 
     reloadEvent() {
-        this.setState({loading: true}, () => {
-            this.props
-                .fetchEvent(this.props.item.event_id)
-                .finally(() => {
-                    this.setState({loading: false});
-                });
-        });
+        const {item, fetchEvent} = this.props;
+        const eventIds = item.event_ids || [];
+
+        this.setState({loading: true});
+        Promise.all(eventIds.map((id: string) => fetchEvent(id)))
+            .catch((error) => console.error('Failed to fetch events:', error))
+            .finally(() => this.setState({loading: false}));
     }
 
-    toggleExpanded() {
-        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
+    toggleExpanded(eventId: string) {
+        this.setState((prevState: any) => ({
+            expandedEvents: {
+                ...prevState.expandedEvents,
+                [eventId]: !prevState.expandedEvents[eventId],
+            },
+        }));
+    }
+
+    renderEvent(item: any) {
+        const isExpanded = this.state.expandedEvents[item.guid] || false;
+        return (
+            <div
+                key={item.id}
+                className={classNames('agenda-planning__preview', {
+                    'agenda-planning__preview--expanded': isExpanded,
+                })}
+            >
+                <div className="agenda-planning__preview-header">
+                    <a href="#" onClick={() => this.toggleExpanded(item.guid)}>
+                        <i
+                            className={classNames('icon-small--arrow-down me-1', {
+                                'rotate-90-ccw': !isExpanded,
+                            })}
+                        />
+                    </a>
+                    <h3 onClick={() => this.toggleExpanded(item.guid)}>{getName(item)}</h3>
+                </div>
+                <div className="agenda-planning__preview-date">
+                    <AgendaTime item={item}>
+                        <AgendaListItemLabels item={item} />
+                    </AgendaTime>
+                </div>
+                {!isExpanded ? null : (
+                    <div className="agenda-planning__preview-metadata">
+                        <AgendaMeta item={item} />
+                        <AgendaLongDescription item={item} />
+                        <AgendaPreviewAttachments item={item} />
+                        <AgendaTags item={item} isItemDetail={false} />
+                        <AgendaEdNote
+                            item={item}
+                            plan={{}}
+                            secondaryNoteField="state_reason"
+                        />
+                        <AgendaInternalNote
+                            internalNote={getInternalNote(item, {})}
+                            mt2={!!(item.ednote || item.state_reason)}
+                        />
+                    </div>
+                )}
+            </div>
+        );
     }
 
     render() {
-        if (!this.state.loading && this.props.event == null) {
-            // If we're not loading and there is no event,
-            // then an error has occurred (user already notified via props.fetchEvent)
-            return null;
-        }
-
         return (
             <div className="agenda-planning__container info-box">
                 <div className="info-box__content">
-                    <span className="info-box__label">
-                        {gettext('Associated Event')}
-                    </span>
-                    <div className={classNames(
-                        'agenda-planning__preview',
-                        {'agenda-planning__preview--expanded': this.state.expanded}
-                    )}>
-                        {this.state.loading ? (
-                            <div className="spinner-border text-success" />
-                        ) : (
-                            <React.Fragment>
-                                <div className="agenda-planning__preview-header">
-                                    <a href='#' onClick={this.toggleExpanded}>
-                                        <i className={classNames('icon-small--arrow-down me-1', {
-                                            'rotate-90-ccw': !this.state.expanded,
-                                        })} />
-                                    </a>
-                                    <h3 onClick={this.toggleExpanded}>{getName(this.props.event)}</h3>
-                                </div>
-                                <div className="agenda-planning__preview-date">
-                                    <AgendaTime item={this.props.event}>
-                                        <AgendaListItemLabels item={this.props.event} />
-                                    </AgendaTime>
-                                </div>
-                                {!this.state.expanded ? null : (
-                                    <div className="agenda-planning__preview-metadata">
-                                        <AgendaMeta item={this.props.event} />
-                                        <AgendaLongDescription item={this.props.event} />
-                                        <AgendaPreviewAttachments item={this.props.event} />
-                                        <AgendaTags
-                                            item={this.props.event}
-                                            isItemDetail={false}
-                                        />
-                                        <AgendaEdNote
-                                            item={this.props.event}
-                                            plan={{}}
-                                            secondaryNoteField="state_reason"
-                                        />
-                                        <AgendaInternalNote
-                                            internalNote={getInternalNote(this.props.event, {})}
-                                            mt2={!!(this.props.event.ednote || this.props.event.state_reason)}
-                                        />
-                                    </div>
-                                )}
-                            </React.Fragment>
-                        )}
-                    </div>
+                    <span className="info-box__label">{gettext('Related Events')}</span>
+                    {this.state.loading ? (
+                        <div className="spinner-border text-success" />
+                    ) : (
+                        this.props.events.map((event: any) => this.renderEvent(event))
+                    )}
                 </div>
             </div>
         );
     }
 }
 
-AgendaPreviewEventComponent.propTypes = {
-    item: PropTypes.object,
-    event: PropTypes.object,
-    fetchEvent: PropTypes.func,
+const mapStateToProps = (state: any, ownProps: any) => {
+    const eventIds = ownProps.item.event_ids || [];
+    return {
+        events: eventIds.map((eventId: string) => state.itemsById[eventId]),
+    };
 };
 
-const mapStateToProps = (state: any, ownProps: any) => ({
-    event: state.itemsById[ownProps.item.event_id],
-});
-
 const mapDispatchToProps = (dispatch: any) => ({
-    fetchEvent: (eventId: any) => dispatch(fetchItem(eventId)),
+    fetchEvent: (eventId: string) => dispatch(fetchItem(eventId)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

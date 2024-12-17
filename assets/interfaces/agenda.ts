@@ -224,6 +224,8 @@ export interface IAgendaItem extends IResourceItem {
     firstcreated: string;
     versioncreated: string;
     internal_note?: string;
+    planning_ids?: Array<IAgendaItem['_id']>;
+    event_ids?: Array<IAgendaItem['_id']>;
 }
 
 export interface IPlanningItem extends Omit<IAgendaItem, 'coverages'> {
