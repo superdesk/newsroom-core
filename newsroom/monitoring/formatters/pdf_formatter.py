@@ -3,6 +3,7 @@ from io import BytesIO
 from datetime import date
 from collections import OrderedDict
 
+from quart_babel import lazy_gettext
 from xhtml2pdf import pisa
 from werkzeug.utils import secure_filename
 
@@ -11,14 +12,18 @@ from superdesk.flask import render_template
 from superdesk.utc import utcnow, utc_to_local
 
 from newsroom.types import MonitoringProfileResourceModel
-from newsroom.wire.formatters.base import BaseFormatter
+
+from .base_monitoring_formatter import BaseMonitoringFormatter
 
 
-class MonitoringPDFFormatter(BaseFormatter):
+class MonitoringPDFFormatter(BaseMonitoringFormatter):
+    format_id = "monitoring_pdf"
+    name = lazy_gettext("PDF")
+
     FILE_EXTENSION = "pdf"
     MIMETYPE = "application/pdf"
 
-    def format_filename(self, item: dict[str, Any]) -> str:
+    def format_filename(self, item: dict[str, Any] | None) -> str:
         attachment_filename = "%s-monitoring-export.pdf" % utcnow().strftime("%Y%m%d%H%M%S")
         return secure_filename(attachment_filename)
 

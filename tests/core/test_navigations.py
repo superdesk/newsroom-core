@@ -8,7 +8,7 @@ from newsroom.products.views import get_product_ref
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations import get_navigations
-from newsroom.types import Product
+from newsroom.types import ProductResourceModel, SectionEnum
 from tests.core.utils import add_company_products, create_entries_for, find_one_by_id
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -305,24 +305,27 @@ async def test_get_navigations_for_user(public_user, public_company, app):
     assert 0 == len(navigations)
 
     products = [
-        Product(
-            _id=ObjectId(),
+        ProductResourceModel(
+            id=ObjectId(),
             name="Wire",
             navigations=[NAV_ID],
             is_enabled=True,
-            product_type="wire",
+            product_type=SectionEnum.WIRE,
         ),
-        Product(
-            _id=ObjectId(),
+        ProductResourceModel(
+            id=ObjectId(),
             name="Agenda",
             navigations=[AGENDA_NAV_ID],
             is_enabled=True,
-            product_type="agenda",
+            product_type=SectionEnum.AGENDA,
         ),
     ]
 
     await create_entries_for("products", products)
-    public_user["products"] = [get_product_ref(products[0]), get_product_ref(products[1])]
+    public_user["products"] = [
+        get_product_ref(products[0]).to_dict(context={"use_objectid": True}),
+        get_product_ref(products[1]).to_dict(context={"use_objectid": True}),
+    ]
 
     navigations = await get_navigations(public_user, public_company, "wire")
     assert 1 == len(navigations)

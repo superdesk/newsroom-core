@@ -1,10 +1,14 @@
+from typing import Any
 from copy import deepcopy
+
+from quart_babel import lazy_gettext
 
 from superdesk.core import json
 from planning.output_formatters.json_event import JsonEventFormatter
 from planning.output_formatters.utils import expand_contact_info
 
-from .base import BaseFormatter
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 
 
 agenda_json_fields = [
@@ -22,6 +26,11 @@ agenda_json_fields = [
 
 
 class JsonFormatter(BaseFormatter):
+    format_id = "json"
+    name = lazy_gettext("JSON")
+    sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
+
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"
 
@@ -41,7 +50,7 @@ class JsonFormatter(BaseFormatter):
             for field in fields:
                 coverage.pop(field, None)
 
-    def format_item(self, item, item_type="items"):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         if item_type == "wire":
             raise Exception("Undefined format for wire")
 

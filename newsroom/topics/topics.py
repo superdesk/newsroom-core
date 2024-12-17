@@ -11,7 +11,6 @@ from bson import ObjectId
 from newsroom.auth.utils import get_user_or_none_from_request
 from newsroom.types import Topic, User, UserRole
 from newsroom.utils import set_original_creator, set_version_creator
-from newsroom.signals import user_deleted
 
 
 class TopicNotificationType(enum.Enum):
@@ -71,10 +70,6 @@ class TopicsResource(newsroom.Resource):
 
 
 class TopicsService(newsroom.Service):
-    def __init__(self, datasource: Optional[str] = None, backend=None):
-        super().__init__(datasource, backend)
-        user_deleted.connect(self.on_user_deleted)
-
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:

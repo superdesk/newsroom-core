@@ -27,7 +27,9 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
         async def get_filters() -> dict[str, list[SectionFilterModel]]:
             filters: dict[str, list[SectionFilterModel]] = {}
             async for f in self.get_all_raw():
-                if not filters.get(f.get("filter_type")):
+                if not f.get("is_enabled"):
+                    continue
+                elif not filters.get(f.get("filter_type")):
                     filters[f.get("filter_type")] = []
                 filters[f.get("filter_type")].append(SectionFilterModel.from_dict(f))
             return filters
@@ -59,5 +61,5 @@ class SectionFiltersService(NewshubAsyncResourceService[SectionFilterModel], Asy
             return
 
         for f in section_filters:
-            if f.query:
+            if f.is_enabled and f.query:
                 query["bool"].setdefault("filter", []).append(query_string(str(f.query)))

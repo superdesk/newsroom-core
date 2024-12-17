@@ -87,7 +87,7 @@ class NotificationManager:
         if not topic_matches:
             return set()
 
-        push_notification("topic_matches", item=item, topics=topic_matches)
+        push_notification("topic_matches", item=item, topics=list(topic_matches))
         return await self.send_topic_notification_emails(item, topics, topic_matches, users, companies)
 
     async def send_topic_notification_emails(
@@ -300,5 +300,5 @@ class NotificationManager:
         if not topic_matches:
             return set()
 
-        await push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
+        await push_agenda_item_notification("topic_matches", item=item, topics=list(topic_matches))
         return await self.send_topic_notification_emails(item, topics, topic_matches, users, companies)
