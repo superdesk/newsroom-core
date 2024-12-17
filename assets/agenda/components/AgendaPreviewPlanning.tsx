@@ -177,7 +177,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                                         >
                                             <i
                                                 className={`icon-small--arrow-down ${
-                                                    isExpanded ? 'rotate-90-ccw' : ''
+                                                    isExpanded ? '' : 'rotate-90-ccw'
                                                 }`}
                                             />
                                             <span>{planningItem.headline || 'No Headline'}</span>
