@@ -47,8 +47,8 @@ event["anpa_category"].append({"name": "Economic News", "qcode": "b", "code": "b
 formatter = CSVFormatter()
 
 
-def read_csv(data):
-    csv_data = formatter.format_item(data, item_type="agenda")
+async def read_csv(data):
+    csv_data = await formatter.format_item(data, item_type="agenda")
     csv_string = csv_data.decode("utf-8-sig")
     csv_lines = csv_string.split("\n")
     csv_reader = csv.reader(csv_lines)
@@ -64,7 +64,7 @@ async def test_csv_formatter_item(client, app):
 
     assert formatter.format_filename(parsed).endswith("new-press-conference.csv")
 
-    header, data_fields = read_csv(parsed)
+    header, data_fields = await read_csv(parsed)
 
     expected_header_fields = [
         "Event name",
@@ -145,7 +145,7 @@ async def test_csv_formatter_item(client, app):
     assert formatter.format_filename(parsed).endswith("latest-press-conference.csv")
     # update config
     app.config.update({"AGENDA_CSV_SUBJECT_SCHEMES": ["subject_custom"]})
-    header2, data_fields2 = read_csv(parsed)
+    header2, data_fields2 = await read_csv(parsed)
     assert header2 == expected_header_fields
 
     expected_data_values2 = [

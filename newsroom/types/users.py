@@ -4,12 +4,11 @@ import pytz
 from pydantic import Field
 
 from typing import Annotated, List, Optional
-from dataclasses import asdict
 from quart_babel import lazy_gettext
 
 from superdesk.core import get_app_config
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
-from superdesk.core.resources import dataclass
+from superdesk.core.resources import Dataclass
 from superdesk.core.resources.validators import (
     validate_email,
     validate_iunique_value_async,
@@ -22,18 +21,13 @@ from .company import CompanyProduct, CompanyResource
 from .user_roles import UserRole
 
 
-@dataclass
-class DashboardModel:
+class DashboardModel(Dataclass):
     name: str
     type: str
     topic_ids: Annotated[list[ObjectIdField], validate_data_relation_async("topics")]
 
-    def to_dict(self):
-        return asdict(self)
 
-
-@dataclass
-class NotificationScheduleModel:
+class NotificationScheduleModel(Dataclass):
     timezone: str | None = None
     times: list[str] = Field(default_factory=list)
     last_run_time: Optional[datetime] = None

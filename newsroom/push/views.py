@@ -110,8 +110,7 @@ async def push(request: Request):
         await request.abort(503)
 
     try:
-        app = get_current_wsgi_app()
-        signals.push.send(app, item=item)
+        await signals.push.send(item)
 
         item_type = item.get("type")
         publish_fn = get_publish_handler(item_type)

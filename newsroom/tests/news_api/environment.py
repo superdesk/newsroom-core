@@ -3,7 +3,7 @@ from superdesk.tests import setup as setup_app
 from superdesk.tests.environment import setup_before_all
 import logging
 
-from newsroom.news_api.app import get_app
+from newsroom.news_api.factory import get_app
 from newsroom.news_api.default_settings import CORE_APPS, MODULES
 
 

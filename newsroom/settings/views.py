@@ -25,18 +25,13 @@ class SettingsAppRouteParams(BaseModel):
 
 @settings_endpoints.endpoint("/settings/<app_id>", methods=["GET"], auth=[auth_rules.account_manager_only])
 async def settings_app(args: SettingsAppRouteParams, params: None, request: Request):
-    from newsroom.users import get_user_profile_data  # noqa
-
-    user_profile_data = await get_user_profile_data()
     app = get_current_wsgi_app()
 
     for app in app.settings_apps:
         if app._id == args.app_id:
             value = app.data()
             data = await value if iscoroutine(value) else value
-            return await render_template(
-                "settings.html", setting_type=args.app_id, data=data, user_profile_data=user_profile_data
-            )
+            return await render_template("settings.html", setting_type=args.app_id, data=data)
 
     await request.abort(404)
 

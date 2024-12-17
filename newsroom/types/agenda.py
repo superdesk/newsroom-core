@@ -4,7 +4,7 @@ from enum import Enum, unique
 
 from pydantic import Field, field_validator, model_validator
 
-from superdesk.core.resources import ResourceModel, fields, dataclass, ModelWithVersions
+from superdesk.core.resources import ResourceModel, fields, Dataclass, ModelWithVersions
 from superdesk.utc import utcnow
 from content_api.items.model import Place, CVItemWithCode, CVItem, PubStatusType
 
@@ -42,8 +42,7 @@ class AgendaWorkflowState(str, Enum):
     POSTPONED = "postponed"
 
 
-@dataclass
-class AgendaCVItem:
+class AgendaCVItem(Dataclass):
     code: fields.Keyword
     name: fields.Keyword
     qcode: fields.Keyword | None = None
@@ -52,8 +51,7 @@ class AgendaCVItem:
     translations: dict[str, dict[str, str | None]] | None = None
 
 
-@dataclass
-class EventRecurringRule:
+class EventRecurringRule(Dataclass):
     frequency: str | None = None
     interval: int | None = None
     endRepeatMode: str | None = None
@@ -62,8 +60,7 @@ class EventRecurringRule:
     _created_externally: bool | None = None
 
 
-@dataclass
-class AgendaDates:
+class AgendaDates(Dataclass):
     start: datetime
     end: datetime
     tz: str | None = None
@@ -75,13 +72,11 @@ class AgendaDates:
     _parse_no_end_time = field_validator("all_day", "no_end_time", mode="before")(convert_value_to_bool)
 
 
-@dataclass
-class AgendaDisplayDates:
+class AgendaDisplayDates(Dataclass):
     date: datetime
 
 
-@dataclass
-class AgendaCoverageDelivery:
+class AgendaCoverageDelivery(Dataclass):
     delivery_id: fields.Keyword | None = None
     delivery_href: fields.Keyword | None = None
     sequence_no: Annotated[int, fields.keyword_mapping()] = 0
@@ -89,8 +84,7 @@ class AgendaCoverageDelivery:
     delivery_state: fields.Keyword | None = None
 
 
-@dataclass
-class AgendaCoverage:
+class AgendaCoverage(Dataclass):
     planning_id: fields.Keyword
     coverage_id: fields.Keyword
     scheduled: datetime
@@ -125,8 +119,7 @@ class AgendaCoverage:
     )(convert_none_to_list)
 
 
-@dataclass
-class EventLocation:
+class EventLocation(Dataclass):
     name: fields.TextWithKeyword
     address: Annotated[dict | None, fields.dynamic_mapping()] = None
     location: fields.Geopoint | None = None
@@ -136,14 +129,12 @@ class EventLocation:
     details: list[str] | None = None
 
 
-@dataclass
-class PlanningItemAgenda:
+class PlanningItemAgenda(Dataclass):
     _id: fields.Keyword
     name: fields.Keyword
 
 
-@dataclass
-class AgendaPlanningItem:
+class AgendaPlanningItem(Dataclass):
     _id: fields.Keyword
     guid: fields.Keyword
     planning_date: datetime
@@ -184,8 +175,7 @@ class AgendaPlanningItem:
     )(convert_none_to_list)
 
 
-@dataclass
-class CalendarItem:
+class CalendarItem(Dataclass):
     qcode: fields.Keyword
     name: fields.Keyword
     schema: fields.Keyword | None = None

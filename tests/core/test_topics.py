@@ -452,26 +452,25 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
-    # TODO-ASYNC:- Test cases based on signal
+    response = await client.delete(f"/users/{PUBLIC_USER_ID}")
+    assert 200 == response.status_code
 
-    # await client.delete(f"/users/{PUBLIC_USER_ID}")
+    # make sure it's NOT editable later, as user no longer exists in the system
+    resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    assert 404 == resp.status_code
 
-    # # make sure it's editable later
-    # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
-    # assert 200 == resp.status_code
+    cursor = await TopicService().search(lookup={})
+    topics = await cursor.to_list_raw()
+    assert 2 == len(topics)
+    assert "test2" == topics[0]["label"]
+    assert 1 == len(topics[0]["subscribers"])
+    assert "test3" == topics[1]["label"]
+    assert None is topics[1].get("user")
 
-    # cursor = await TopicService().search(lookup={})
-    # topics = await cursor.to_list_raw()
-    # assert 2 == len(topics)
-    # assert "test2" == topics[0]["label"]
-    # assert 1 == len(topics[0]["subscribers"])
-    # assert "test3" == topics[1]["label"]
-    # assert None is topics[1].get("user")
-
-    # cursor = await UserFoldersResourceService().search(lookup={})
-    # folders = await cursor.to_list_raw()
-    # assert 1 == len(folders)
-    # assert "skip" == folders[0]["name"]
+    cursor = await UserFoldersResourceService().search(lookup={})
+    folders = await cursor.to_list_raw()
+    assert 1 == len(folders)
+    assert "skip" == folders[0]["name"]
 
 
 async def test_created_field_in_topic_url(client):
