@@ -20,7 +20,13 @@ import newsroom
 from celery import Celery
 from celery.worker.request import Request
 
-from superdesk.celery_app import __get_redis, HybridAppContextTask, ContextAwareSerializerFactory
+from superdesk.celery_app import (
+    __get_redis,
+    IS_BEAT_PROCESS,
+    HybridAppContextTask,
+    HybridAppContextWorkerTask,
+    ContextAwareSerializerFactory,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +56,10 @@ class NewsroomRequest(Request):
         logger.warning("Failure detected for task %s", self.task.name)
 
 
-class NewsroomContextTask(HybridAppContextTask):
+BaseTaskClass: type[HybridAppContextTask] = HybridAppContextTask if IS_BEAT_PROCESS else HybridAppContextWorkerTask
+
+
+class NewsroomContextTask(BaseTaskClass):
     serializer = "newsroom/json"
     Request = NewsroomRequest
 
@@ -59,8 +68,7 @@ class NewsroomContextTask(HybridAppContextTask):
         return get_newsroom_web_app()
 
 
-celery = Celery(__name__)
-celery.Task = NewsroomContextTask
+celery = Celery(__name__, task_cls=NewsroomContextTask)
 
 
 def init_celery(app):

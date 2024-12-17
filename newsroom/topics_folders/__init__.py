@@ -8,12 +8,14 @@ from .folders import (
     topic_folders_resource_config,
     CompanyFoldersResourceService,
     UserFoldersResourceService,
+    init_module,
 )
 
 
 module = Module(
     name="newsroom.topics_folders",
     resources=[company_topic_folder_resource_config, user_topic_folders_resource_config, topic_folders_resource_config],
+    init=init_module,
 )
 
 

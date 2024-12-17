@@ -29,7 +29,6 @@ from newsroom.search.filters import (
     apply_section_filter,
     apply_company_filter,
     apply_products_filter,
-    validate_request,
     apply_ids_filter,
 )
 
@@ -345,8 +344,6 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
                 apply_item_type_filter,
                 apply_company_filter,
                 apply_products_filter,
-                # Make sure the request has been validated
-                validate_request,
             ],
         )
         return await cursor.to_list()

@@ -1,3 +1,5 @@
+from quart_babel import lazy_gettext
+
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.news_api.utils import (
     remove_internal_renditions,
@@ -11,6 +13,9 @@ class NINJSFormatter2(NINJSFormatter):
     """
     Overload the NINJSFormatter and add the associations as a field to copy
     """
+
+    format_id = "ninjs2"
+    name = lazy_gettext("Ninjs v2")
 
     def __init__(self):
         self.direct_copy_properties += ("associations",)

@@ -17,6 +17,7 @@ from newsroom.tests.users import (
 from newsroom.notifications import get_user_notifications
 from newsroom.history_async import HistoryService
 from newsroom.tests import markers
+from newsroom.utils import parse_date_str
 
 from .test_push import get_signature_headers
 from tests.utils import post_json, get_json, mock_send_email
@@ -185,7 +186,7 @@ async def test_push_parsed_event(client, app):
     parsed = await find_one_by_id("agenda", event["guid"])
     assert isinstance(parsed["firstcreated"], datetime)
     assert parsed["dates"]["tz"] == "Australia/Sydney"
-    assert parsed["dates"]["end"] == datetime.strptime("2018-05-28T05:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000")
+    assert parsed["dates"]["end"] == parse_date_str("2018-05-28T05:00:00+0000")
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
     assert 1 == len(parsed["service"])
@@ -281,8 +282,8 @@ async def test_push_parsed_planning_for_an_existing_event(client, app):
     assert parsed["definition_short"] == test_event["definition_short"]
     assert parsed["slugline"] == test_event["slugline"]
     assert parsed["definition_long"] == test_event["definition_long"]
-    assert parsed["dates"]["start"].isoformat() == test_event["dates"]["start"].replace("+0000", "")
-    assert parsed["dates"]["end"].isoformat() == test_event["dates"]["end"].replace("+0000", "")
+    assert parsed["dates"]["start"].isoformat() == test_event["dates"]["start"].replace("+0000", "+00:00")
+    assert parsed["dates"]["end"].isoformat() == test_event["dates"]["end"].replace("+0000", "+00:00")
     assert parsed["ednote"] == event["ednote"]
 
     assert 2 == len(parsed["coverages"])
@@ -331,8 +332,8 @@ async def test_push_coverages_with_different_dates_for_an_existing_event(client,
     assert parsed_planning["description_text"] == planning["description_text"]
 
     assert 2 == len(parsed["coverages"])
-    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "")
-    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "")
+    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "+00:00")
+    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "+00:00")
     assert 2 == len(parsed["display_dates"])
     assert parsed["display_dates"][0]["date"].isoformat() == planning["coverages"][0]["planning"]["scheduled"].replace(
         "0000", "00:00"
@@ -363,8 +364,8 @@ async def test_push_planning_with_different_dates_for_an_existing_event(client, 
     assert parsed["name"] == test_event["name"]
     assert parsed["definition_short"] == test_event["definition_short"]
     assert parsed["slugline"] == test_event["slugline"]
-    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "")
-    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "")
+    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "+00:00")
+    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "+00:00")
     assert 1 == len(parsed["display_dates"])
     assert parsed["display_dates"][0]["date"].isoformat() == planning["planning_date"].replace("0000", "00:00")
 
@@ -1320,8 +1321,8 @@ async def test_push_event_from_planning(client, app):
     assert "a" == parsed["service"][0]["code"]
     assert 1 == len(parsed["subject"])
     assert "06002002" == parsed["subject"][0]["code"]
-    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "")
-    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "")
+    assert parsed["dates"]["start"].isoformat() == event["dates"]["start"].replace("+0000", "+00:00")
+    assert parsed["dates"]["end"].isoformat() == event["dates"]["end"].replace("+0000", "+00:00")
 
 
 async def test_coverages_delivery_sequence_has_default(client, app):
@@ -1399,7 +1400,7 @@ async def test_push_plan_with_date_before_event_start(client, app):
 
 
 async def test_push_planning_signal(client, app):
-    def on_push_planning(sender, item, is_new, **kwargs):
+    def on_push_planning(item, is_new):
         item["dates"]["all_day"] = True
         assert is_new
 
@@ -1413,7 +1414,7 @@ async def test_push_planning_signal(client, app):
 
 
 async def test_push_events_signal(client, app):
-    def on_push_event(sender, item, is_new, **kwargs):
+    def on_push_event(item, _updates, _original, is_new):
         item["dates"]["all_day"] = True
         assert is_new
 

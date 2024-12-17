@@ -1,11 +1,16 @@
+from typing import Any
 from lxml import etree
+from quart_babel import lazy_gettext
 
 from superdesk.core import get_app_config
 from superdesk.publish.formatters.newsml_g2_formatter import (
     NewsMLG2Formatter as SuperdeskFormatter,
 )
 
-from .base import BaseFormatter, NewsroomNITFFormatter
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
+
+from .nitf import NewsroomNITFFormatter
 
 
 class NewsroomFormatter(SuperdeskFormatter):
@@ -24,6 +29,11 @@ class NewsroomFormatter(SuperdeskFormatter):
 
 
 class NewsMLG2Formatter(BaseFormatter):
+    format_id = "newsmlg2"
+    name = lazy_gettext("NewsMLG2")
+    sections = [SectionEnum.WIRE]
+    assets = [FormatterAssetType.TEXT]
+
     MIMETYPE = "application/vnd.iptc.g2.newsitem+xml"
     FILE_EXTENSION = "xml"
 
@@ -31,7 +41,7 @@ class NewsMLG2Formatter(BaseFormatter):
     formatter = NewsroomFormatter()
     nitf_formatter = NewsroomNITFFormatter()
 
-    def format_item(self, item, item_type="items"):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         item = item.copy()
         item.setdefault("guid", item["_id"])
         item.setdefault("_current_version", item["version"])

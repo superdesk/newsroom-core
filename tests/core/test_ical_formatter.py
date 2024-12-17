@@ -33,7 +33,7 @@ async def test_ical_formatter_item(client, app, mocker):
         "newsroom.agenda.formatters.ical_formatter.utcnow",
         return_value=datetime(2018, 7, 30, 11, 9, 0),
     )
-    ical = formatter.format_item(parsed, item_type="agenda")
+    ical = await formatter.format_item(parsed, item_type="agenda")
 
     cal = icalendar.cal.Calendar.from_ical(ical)
     assert cal["version"] == "2.0"
@@ -63,10 +63,10 @@ async def test_ical_formatter_failing(client, app):
     ) as fixture:
         item = json.load(fixture)
     formatter = iCalFormatter()
-    formatter.format_item(item, item_type="agenda")
+    await formatter.format_item(item, item_type="agenda")
 
 
-def test_onclusive_all_day():
+async def test_onclusive_all_day():
     event = {
         "name": "test",
         "dates": {
@@ -76,12 +76,12 @@ def test_onclusive_all_day():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART;VALUE=DATE:20240101" in output
     assert "DTEND;VALUE=DATE:20240103" in output
 
 
-def test_onclusive_no_end_time():
+async def test_onclusive_no_end_time():
     event = {
         "name": "test",
         "dates": {
@@ -91,6 +91,6 @@ def test_onclusive_no_end_time():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART:20240101T100000Z" in output
     assert "DTEND;VALUE=DATE:20240103" in output

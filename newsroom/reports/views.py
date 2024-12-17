@@ -14,7 +14,6 @@ from newsroom.auth.utils import get_user_from_request
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
-from newsroom.users import get_user_profile_data
 
 
 class RouteArguments(BaseModel):
@@ -49,7 +48,6 @@ async def print_reports(args: RouteArguments, params: None, request: Request):
 )
 async def company_reports(request: Request):
     companies = list(query_resource("companies"))
-    user_profile_data = await get_user_profile_data()
     user = get_user_from_request(request)
     data = {
         "companies": companies,
@@ -57,9 +55,7 @@ async def company_reports(request: Request):
         "api_enabled": get_app_config("NEWS_API_ENABLED", False),
         "current_user_type": user.user_type,
     }
-    return await render_template(
-        "company_reports.html", setting_type="company_reports", data=data, user_profile_data=user_profile_data
-    )
+    return await render_template("company_reports.html", setting_type="company_reports", data=data)
 
 
 @blueprint.endpoint(

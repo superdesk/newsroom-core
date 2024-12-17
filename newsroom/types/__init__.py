@@ -36,6 +36,7 @@ from .agenda import (
     AgendaWorkflowState,
 )
 from .monitoring import MonitoringSchedule, MonitoringProfileResourceModel
+from .news_api import NewsApiAuditResourceModel
 
 __all__ = [
     "SectionEnum",
@@ -76,6 +77,7 @@ __all__ = [
     "AgendaWorkflowState",
     "MonitoringSchedule",
     "MonitoringProfileResourceModel",
+    "NewsApiAuditResourceModel",
 ]
 
 

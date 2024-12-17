@@ -3,18 +3,28 @@ from io import BytesIO
 from collections import OrderedDict
 from datetime import date
 
-from superdesk.core import get_current_app
+from superdesk.errors import SuperdeskApiError
 from superdesk.text_utils import get_text
 
 from newsroom.types import MonitoringProfileResourceModel, WireItem
+from newsroom.formatters import get_formatter
 from newsroom.wire import WireItemService
+
+from .formatters.base_monitoring_formatter import BaseMonitoringFormatter
+
+
+def get_monitoring_formatter(format_id: str) -> BaseMonitoringFormatter:
+    formatter = get_formatter(format_id)
+    if not isinstance(formatter, BaseMonitoringFormatter):
+        raise SuperdeskApiError.badRequestError("Formatter is not supported in Monitoring")
+    return formatter
 
 
 async def get_monitoring_file(
     monitoring_profile: MonitoringProfileResourceModel, items: list[WireItem] | list[dict[str, Any]]
 ) -> BytesIO:
     format_type = monitoring_profile.format_type or "monitoring_pdf"
-    formatter = get_current_app().as_any().download_formatters[format_type]["formatter"]
+    formatter = get_monitoring_formatter(format_type)
     return await formatter.get_monitoring_file(get_date_items_dict(items), monitoring_profile)
 
 

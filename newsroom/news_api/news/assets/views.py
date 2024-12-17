@@ -23,8 +23,7 @@ async def get_item(args: RouteArguments, _p: None, request: Request):
     if not auth.authorized([], None, request.method):
         await request.abort(401, gettext("Invalid token"))
 
-    # TODO-ASYNC: revisit once post_audit is async
-    post_api_audit({"_items": [{"_id": args.asset_id}]})
+    await post_api_audit(request, [args.asset_id])
 
     response = await get_upload(args.asset_id)
     if not response:

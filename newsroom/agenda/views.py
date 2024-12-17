@@ -5,7 +5,7 @@ from bson import ObjectId
 from pydantic import Field, field_validator
 from quart_babel import gettext
 
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.core.types import ESQuery, BaseModel, Request, Response, RestGetResponse
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 from superdesk.flask import render_template
@@ -18,7 +18,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics_async
 from newsroom.topics_folders import get_company_folders, get_user_folders
@@ -55,17 +55,15 @@ from .filters import AgendaSearchRequestArgs
 
 @agenda_endpoints.endpoint("/agenda", auth=[auth_rules.section_required("agenda")])
 async def index() -> str:
-    user_profile_data = await get_user_profile_data()
     data = await get_view_data()
-    return await render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_index.html", data=data)
 
 
 @agenda_endpoints.endpoint("/bookmarks_agenda")
 async def bookmarks() -> str:
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return await render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_bookmarks.html", data=data)
 
 
 class AgendaItemViewArgs(BaseModel):
@@ -76,6 +74,7 @@ class AgendaItemParams(BaseModel):
     print: bool = False
     map: str | None = None
     type: str = "agenda"
+    format: str | None = None
 
     @field_validator("print", mode="before")
     def parse_print(cls, value: str | bool | None) -> bool | str | None:
@@ -111,7 +110,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
     if is_json_request(request):
         return Response(agenda_item_dict)
 
-    user_profile_data = await get_user_profile_data()
     if params.print:
         template = "agenda_item_print.html"
         await update_action_list([args.item_id], "prints", force_insert=True)
@@ -125,7 +123,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
             contacts=get_public_contacts(agenda_item_dict),
             links=get_links(agenda_item_dict),
             is_admin=user.is_admin_or_internal(),
-            user_profile_data=user_profile_data,
         )
 
     data = await get_view_data()
@@ -134,7 +131,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
         "agenda_index.html",
         data=data,
         title=agenda_item_dict.get("name", agenda_item_dict.get("headline")),
-        user_profile_data=user_profile_data,
     )
 
 
@@ -208,11 +204,7 @@ async def get_view_data() -> dict:
         "user": user_dict or {},
         "company": company.id if company else None,
         "topics": [t.to_dict() for t in topics if t.topic_type == "agenda"],
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "agenda" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.AGENDA),
         "navigations": navigations,
         "saved_items": saved_items,
         "events_only": company.events_only if company else False,
