@@ -71,10 +71,10 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                 this.setState({loading: false});
             })
             .catch((error) => {
-                console.error("Error fetching items:", error);
+                console.error('Error fetching items:', error);
                 this.setState({loading: false});
             });
-        }
+    }
 
     toggleExpanded(planningItemId: string) {
         this.setState((prevState) => ({

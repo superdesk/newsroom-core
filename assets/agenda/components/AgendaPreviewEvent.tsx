@@ -68,7 +68,7 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
                 this.setState({loading: false});
             })
             .catch((error) => {
-                console.error("Error fetching items:", error);
+                console.error('Error fetching items:', error);
                 this.setState({loading: false});
             });
     }
