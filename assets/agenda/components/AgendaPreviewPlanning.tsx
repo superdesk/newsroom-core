@@ -232,9 +232,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchItemsByIdToRedux: (ids: string[]) => dispatch(fetchItemsByIdToRedux(ids)),
 });
 
-export const AgendaPreviewPlanning = connect<
-    IReduxStateProps,
-    {},
-    IOwnProps,
-    IAgendaState
->(mapStateToProps, mapDispatchToProps)(AgendaPreviewPlanningComponent);
+export const AgendaPreviewPlanning = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewPlanningComponent);
