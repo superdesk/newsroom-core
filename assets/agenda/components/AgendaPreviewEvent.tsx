@@ -1,11 +1,10 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
-import {get} from 'lodash';
 
 import {gettext} from 'utils';
 import {getName, getInternalNote} from '../utils';
-import {fetchItem} from '../actions';
+import {fetchItemsByIdToRedux} from '../actions';
 
 import AgendaTime from './AgendaTime';
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -15,10 +14,24 @@ import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaTags from './AgendaTags';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
+import {IAgendaItem} from 'interfaces';
 
-class AgendaPreviewEventComponent extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface AgendaPreviewEventProps {
+    item: {
+        event_ids: Array<IAgendaItem['_id']>;
+    };
+    itemsById: Record<string, IAgendaItem>;
+    eventIds: string[];
+    fetchItemsByIdToRedux: (ids: string[]) => Promise<void>;
+}
+
+interface AgendaPreviewEventState {
+    loading: boolean;
+    expandedEvents: Record<string, boolean>;
+}
+
+class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProps, AgendaPreviewEventState> {
+    constructor(props: AgendaPreviewEventProps) {
         super(props);
 
         this.state = {
@@ -34,24 +47,34 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
         this.reloadEvent();
     }
 
-    componentDidUpdate(prevProps: any) {
-        if (get(prevProps.item, 'event_ids') !== get(this.props.item, 'event_ids')) {
+    componentDidUpdate(prevProps: AgendaPreviewEventProps) {
+        if (prevProps.eventIds !== this.props.eventIds) {
             this.reloadEvent();
         }
     }
 
     reloadEvent() {
-        const {item, fetchEvent} = this.props;
-        const eventIds = item.event_ids || [];
-
+        const {eventIds, fetchItemsByIdToRedux} = this.props;
+    
+        if (eventIds == null || eventIds.length == 0) {
+            return;
+        }
+        
+    
         this.setState({loading: true});
-        Promise.all(eventIds.map((id: string) => fetchEvent(id)))
-            .catch((error) => console.error('Failed to fetch events:', error))
-            .finally(() => this.setState({loading: false}));
+        
+        fetchItemsByIdToRedux(eventIds)
+            .finally(() => {
+                this.setState({loading: false});
+            })
+            .catch((error) => {
+                console.error("Error fetching items:", error);
+                this.setState({loading: false});
+            });
     }
 
     toggleExpanded(eventId: string) {
-        this.setState((prevState: any) => ({
+        this.setState((prevState) => ({
             expandedEvents: {
                 ...prevState.expandedEvents,
                 [eventId]: !prevState.expandedEvents[eventId],
@@ -59,24 +82,25 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
         }));
     }
 
-    renderEvent(item: any) {
-        const isExpanded = this.state.expandedEvents[item.guid] || false;
+    renderEvent(item: IAgendaItem) {
+        const isExpanded = this.state.expandedEvents[item._id] || false;
+
         return (
             <div
-                key={item.id}
+                key={item._id}
                 className={classNames('agenda-planning__preview', {
                     'agenda-planning__preview--expanded': isExpanded,
                 })}
             >
                 <div className="agenda-planning__preview-header">
-                    <a href="#" onClick={() => this.toggleExpanded(item.guid)}>
+                    <a href="#" onClick={() => this.toggleExpanded(item._id)}>
                         <i
                             className={classNames('icon-small--arrow-down me-1', {
                                 'rotate-90-ccw': !isExpanded,
                             })}
                         />
                     </a>
-                    <h3 onClick={() => this.toggleExpanded(item.guid)}>{getName(item)}</h3>
+                    <h3 onClick={() => this.toggleExpanded(item._id)}>{getName(item)}</h3>
                 </div>
                 <div className="agenda-planning__preview-date">
                     <AgendaTime item={item}>
@@ -105,6 +129,8 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
     }
 
     render() {
+        const {itemsById, eventIds} = this.props;
+
         return (
             <div className="agenda-planning__container info-box">
                 <div className="info-box__content">
@@ -112,7 +138,10 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
                     {this.state.loading ? (
                         <div className="spinner-border text-success" />
                     ) : (
-                        this.props.events.map((event: any) => this.renderEvent(event))
+                        eventIds
+                            .map((id) => itemsById[id])
+                            .filter((event) => event != null)
+                            .map((event) => this.renderEvent(event))
                     )}
                 </div>
             </div>
@@ -120,15 +149,13 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
     }
 }
 
-const mapStateToProps = (state: any, ownProps: any) => {
-    const eventIds = ownProps.item.event_ids || [];
-    return {
-        events: eventIds.map((eventId: string) => state.itemsById[eventId]),
-    };
-};
+const mapStateToProps = (state: any, ownProps: any) => ({
+    itemsById: state.itemsById,
+    eventIds: ownProps.item.event_ids || [],
+});
 
 const mapDispatchToProps = (dispatch: any) => ({
-    fetchEvent: (eventId: string) => dispatch(fetchItem(eventId)),
+    fetchItemsByIdToRedux: (ids: string[]) => dispatch(fetchItemsByIdToRedux(ids)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

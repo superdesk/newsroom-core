@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {isPlanningItem} from '../utils';
-import {fetchItem} from '../actions';
+import {fetchItemsByIdToRedux} from '../actions';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import {IAgendaItem, ICoverageItemAction, IUser, IAgendaPreviewConfig, IArticle, IAgendaState} from 'interfaces';
 
@@ -16,6 +16,7 @@ interface IOwnProps {
     restrictCoverageInfo?: boolean;
     previewConfig: IAgendaPreviewConfig;
     planningItems?: Array<IAgendaItem>;
+    fetchItemsByIdToRedux: (ids: string[]) => Promise<void>;
 }
 
 interface IReduxStateProps {
@@ -53,18 +54,26 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
     }
 
     fetchSecondaryPlanningItems() {
-        const {item, planningId} = this.props;
+        const {item, planningId, fetchItemsByIdToRedux} = this.props;
         const planningIds = item.planning_ids?.filter((id:string) => id !== planningId) || [];
 
         this.setState({loading: true});
-        try {
-            Promise.all(planningIds.map((id: string) => fetchItem(id)));
-        } catch (error) {
-            console.error('Failed to fetch secondary planning items:', error);
-        } finally {
-            this.setState({loading: false});
+
+        if (planningIds == null || planningIds.length == 0) {
+            return;
         }
-    }
+        
+        this.setState({loading: true});
+        
+        fetchItemsByIdToRedux(planningIds)
+            .finally(() => {
+                this.setState({loading: false});
+            })
+            .catch((error) => {
+                console.error("Error fetching items:", error);
+                this.setState({loading: false});
+            });
+        }
 
     toggleExpanded(planningItemId: string) {
         this.setState((prevState) => ({
@@ -153,7 +162,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                 <div className="agenda-planning__container info-box">
                     <div className="info-box__content">
                         <span className="info-box__label">
-                            {gettext('Secondary Planning Items')}
+                            {gettext('Related Planning Items')}
                         </span>
                         {loading ? (
                             <div className="spinner-border text-success" />
@@ -213,9 +222,13 @@ const mapStateToProps = (state: any, ownProps: any) => {
     };
 };
 
+const mapDispatchToProps = (dispatch: any) => ({
+    fetchItemsByIdToRedux: (ids: string[]) => dispatch(fetchItemsByIdToRedux(ids)),
+});
+
 export const AgendaPreviewPlanning = connect<
     IReduxStateProps,
     {},
     IOwnProps,
     IAgendaState
->(mapStateToProps)(AgendaPreviewPlanningComponent);
+>(mapStateToProps, mapDispatchToProps)(AgendaPreviewPlanningComponent);

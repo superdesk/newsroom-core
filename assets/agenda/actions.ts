@@ -399,6 +399,18 @@ export function fetchItem(id: any) {
     };
 }
 
+export function fetchItemsById(ids: Array<string>): Promise<IRestApiResponse<IAgendaItem>> {
+    return server.get(`/agenda/search?ids=${ids.join(', ')}`);
+}
+
+export function fetchItemsByIdToRedux(ids: string[]): (dispatch: any) => Promise<void> {
+    return (dispatch: any) => {
+        return fetchItemsById(ids).then((response) => {
+            dispatch(recieveItem(response));
+        });
+    };
+}
+
 export const WATCH_EVENTS = 'WATCH_EVENTS';
 export function watchEvents(ids: any) {
     return (dispatch: any, getState: any) => {
