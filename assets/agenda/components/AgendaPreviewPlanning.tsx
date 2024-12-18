@@ -21,6 +21,7 @@ interface IOwnProps {
 
 interface IReduxStateProps {
     wireItems?: Array<IArticle>;
+    items: Array<IAgendaItem>;
 }
 
 interface IState {
@@ -84,6 +85,11 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         }));
     }
 
+    getRelatedPlanningItems() {
+        const {item, items} = this.props;
+        return (item.planning_ids || []).map((id:any) => items[id]);
+    }
+
     render() {
         const {
             item,
@@ -100,6 +106,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         const planningItems = item.planning_items || [];
         const plan = planningItems.find((p) => p.guid === planningId);
         const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
+        const relatedPlanningItems = this.getRelatedPlanningItems();
 
         if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
@@ -158,7 +165,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                         </div>
                     </div>
                 )}
-                {/* Secondary Planning Items */}
+                {/* Related Planning Items */}
                 <div className="agenda-planning__container info-box">
                     <div className="info-box__content">
                         <span className="info-box__label">
@@ -167,7 +174,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                         {loading ? (
                             <div className="spinner-border text-success" />
                         ) : (
-                            this.props.planningItems?.map((planningItem: any) => {
+                            relatedPlanningItems && relatedPlanningItems.map((planningItem: any) => {
                                 const isExpanded = expandedPlanningItems[planningItem._id] || false;
                                 return (
                                     <div
@@ -215,9 +222,8 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => {
-    const planningIds = ownProps.item.planning_ids || [];
     return {
-        planningItems: planningIds.map((eventId: string) => state.itemsById[eventId]),
+        items: state.itemsById,
         wireItems: state.agenda.agendaWireItems || [],
     };
 };
