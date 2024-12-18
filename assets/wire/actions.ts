@@ -448,8 +448,17 @@ export function submitDownloadItems(items: any, params: any) {
         else{
             try {
                 const response = await server.post(url, payload);
-                const blob = await response.blob();
-                initiateDownload(blob);
+                if (typeof response === 'object' && !response.blob) {
+                    // Assume JSON response
+                    const blob = new Blob([JSON.stringify(response)], {type: 'application/json'});
+                    initiateDownload(blob);
+                } else if (typeof response.blob === 'function') {
+                    // Assume Blob-compatible response
+                    const blob = await response.blob();
+                    initiateDownload(blob);
+                } else {
+                    console.error('Unexpected response type:', response);
+                }
             } catch (error) {
                 console.error('Error downloading file:', error);
             }
