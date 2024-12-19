@@ -447,16 +447,9 @@ export function submitDownloadItems(items: any, params: any) {
         }
         else{
             try {
-                const response = await server.post(url, payload);
-                if (response instanceof Response) {
-                    // Raw response object, treat as a Blob
-                    const blob = await response.blob();
-                    initiateDownload(blob);
-                } else {
-                    // JSON response (parsed by checkStatus)
-                    const blob = new Blob([JSON.stringify(response)], {type: 'application/json'});
-                    initiateDownload(blob);
-                }
+                const response = await server.post(url, payload, undefined, true);
+                const blob = await response.blob();
+                initiateDownload(blob);
             } catch (error) {
                 console.error('Error downloading file:', error);
             }

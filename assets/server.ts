@@ -7,18 +7,28 @@ function options(custom: any = {}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
-function checkStatus(response: Response): Promise<any> {
+function checkStatus(response: Response, rawResponse = false): Promise<any> {
     if (response.status === 204) {
         return Promise.resolve({});
-    } else if (response.status >= 200 && response.status < 300) {
+    }
+
+    if (response.status >= 200 && response.status < 300) {
+        if (rawResponse) {
+            return Promise.resolve(response);
+        }
+
         const contentType = response.headers.get('Content-Type');
         if (contentType && contentType.includes('application/json')) {
             return response.json();
         }
         return Promise.resolve(response);
-    } else if (response.status === 400) {
+    }
+
+    if (response.status === 400) {
         return response.json().then((data: any) => Promise.reject({errorData: data}));
-    } else if (response.type === 'opaqueredirect') {
+    }
+
+    if (response.type === 'opaqueredirect') {
         window.location.reload();
     }
 
@@ -70,12 +80,12 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    post(url: any, data: any, etag?: string) {
+    post(url: any, data: any, etag?: string, rawResponse = false) {
         return fetch(url, options({
             method: 'POST',
             headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
-        })).then(checkStatus);
+        })).then((response) => checkStatus(response, rawResponse));
     }
 
     /**
