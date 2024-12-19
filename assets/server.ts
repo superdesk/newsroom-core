@@ -19,12 +19,8 @@ function checkStatus(response: Response, requestOptions: RequestOptions = {parse
     }
 
     if (response.status >= 200 && response.status < 300) {
-        if (!parseJson) {
-            return Promise.resolve(response);
-        }
-
         const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
+        if (parseJson && contentType && contentType.includes('application/json')) {
             return response.json();
         }
         return Promise.resolve(response);
@@ -41,6 +37,7 @@ function checkStatus(response: Response, requestOptions: RequestOptions = {parse
     console.error(response);
     return Promise.reject(response);
 }
+
 
 function getHeaders(etag: any) {
     const headers: any = {'Content-Type': 'application/json'};
