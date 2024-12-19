@@ -321,7 +321,7 @@ export function isPlanningItem(item: any) {
 }
 
 export function planHasEvent(item: any) {
-    return isPlanningItem(item) && item.event_id != null;
+    return isPlanningItem(item) && item.event_ids != null;
 }
 
 /**
