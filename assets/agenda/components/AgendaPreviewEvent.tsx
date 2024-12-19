@@ -17,12 +17,10 @@ import AgendaInternalNote from './AgendaInternalNote';
 import {IAgendaItem} from 'interfaces';
 
 interface AgendaPreviewEventProps {
-    item: {
-        event_ids: Array<IAgendaItem['_id']>;
-    };
+    item: IAgendaItem;
     itemsById: Record<string, IAgendaItem>;
-    eventIds: string[];
-    fetchItemsByIdToRedux: (ids: string[]) => Promise<void>;
+    eventIds: Array<string>;
+    fetchItemsByIdToRedux: (ids: Array<string>) => Promise<void>;
 }
 
 interface AgendaPreviewEventState {
@@ -155,7 +153,7 @@ const mapStateToProps = (state: any, ownProps: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    fetchItemsByIdToRedux: (ids: string[]) => dispatch(fetchItemsByIdToRedux(ids)),
+    fetchItemsByIdToRedux: (ids: Array<string>) => dispatch(fetchItemsByIdToRedux(ids)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

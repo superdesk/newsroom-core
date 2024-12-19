@@ -16,7 +16,7 @@ interface IOwnProps {
     restrictCoverageInfo?: boolean;
     previewConfig: IAgendaPreviewConfig;
     planningItems?: Array<IAgendaItem>;
-    fetchItemsByIdToRedux: (ids: string[]) => Promise<void>;
+    fetchItemsByIdToRedux: (ids: Array<string>) => Promise<void>;
 }
 
 interface IReduxStateProps {
@@ -229,7 +229,7 @@ const mapStateToProps = (state: any, ownProps: any) => {
 };
 
 const mapDispatchToProps = (dispatch: any) => ({
-    fetchItemsByIdToRedux: (ids: string[]) => dispatch(fetchItemsByIdToRedux(ids)),
+    fetchItemsByIdToRedux: (ids: Array<string>) => dispatch(fetchItemsByIdToRedux(ids)),
 });
 
 export const AgendaPreviewPlanning = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewPlanningComponent);
