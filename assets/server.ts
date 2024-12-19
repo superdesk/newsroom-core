@@ -3,19 +3,23 @@ const defaultOptions = {
     redirect: 'manual',
 };
 
+interface RequestOptions {
+    parseJson?: boolean;
+}
+
 function options(custom: any = {}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
-function checkStatus(response: Response, options?: { parseJson?: boolean }): Promise<any> {
-    const shouldParseJson = options?.parseJson ?? true;
+function checkStatus(response: Response, requestOptions: RequestOptions = {parseJson: true}): Promise<any> {
+    const {parseJson = true} = requestOptions;
 
     if (response.status === 204) {
         return Promise.resolve({});
     }
 
     if (response.status >= 200 && response.status < 300) {
-        if (!shouldParseJson) {
+        if (!parseJson) {
             return Promise.resolve(response);
         }
 
@@ -83,16 +87,16 @@ class Server {
      * @return {Promise}
      */
     post(
-        url: any, 
-        data: any, 
-        etag?: string, 
-        config: { parseJson?: boolean } = {parseJson: true}
+        url: any,
+        data: any,
+        etag?: string,
+        requestOptions: RequestOptions = {parseJson: true}
     ) {
         return fetch(url, options({
             method: 'POST',
             headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
-        })).then((response) => checkStatus(response, config));
+        })).then((response) => checkStatus(response, requestOptions));
     }
 
     /**
