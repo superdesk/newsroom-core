@@ -7,13 +7,15 @@ function options(custom: any = {}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
-function checkStatus(response: Response, rawResponse = false): Promise<any> {
+function checkStatus(response: Response, options?: { parseJson?: boolean }): Promise<any> {
+    const shouldParseJson = options?.parseJson ?? true;
+
     if (response.status === 204) {
         return Promise.resolve({});
     }
 
     if (response.status >= 200 && response.status < 300) {
-        if (rawResponse) {
+        if (!shouldParseJson) {
             return Promise.resolve(response);
         }
 
@@ -80,12 +82,17 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    post(url: any, data: any, etag?: string, rawResponse = false) {
+    post(
+        url: any, 
+        data: any, 
+        etag?: string, 
+        config: { parseJson?: boolean } = {parseJson: true}
+    ) {
         return fetch(url, options({
             method: 'POST',
             headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
-        })).then((response) => checkStatus(response, rawResponse));
+        })).then((response) => checkStatus(response, config));
     }
 
     /**
