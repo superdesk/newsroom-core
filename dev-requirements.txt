@@ -167,7 +167,7 @@ flask-script==2.0.6
     # via superdesk-core
 flask-webpack==0.1.0
     # via -r requirements.txt
-flask-wtf==1.2.1
+flask-wtf==1.2.2
     # via -r requirements.txt
 future==1.0.0
     # via python-twitter
