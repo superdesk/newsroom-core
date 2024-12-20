@@ -10,9 +10,9 @@ aiofiles==24.1.0
     #   quart-uploads
 aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.11.10
+aiohttp==3.11.11
     # via elasticsearch
-aiosignal==1.3.1
+aiosignal==1.3.2
     # via aiohttp
 amqp==5.3.1
     # via kombu
@@ -35,7 +35,7 @@ async-timeout==5.0.1
     # via
     #   aiohttp
     #   redis
-attrs==24.2.0
+attrs==24.3.0
     # via aiohttp
 authlib==1.3.2
     # via superdesk-core
@@ -57,9 +57,9 @@ blinker==1.8.2
     #   quart
     #   sentry-sdk
     #   superdesk-core
-boto3==1.35.79
+boto3==1.35.85
     # via superdesk-core
-botocore==1.35.79
+botocore==1.35.85
     # via
     #   boto3
     #   s3transfer
@@ -75,7 +75,7 @@ cerberus==1.3.5
     # via
     #   eve
     #   superdesk-core
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   elastic-apm
     #   elasticsearch
@@ -119,7 +119,7 @@ cryptography==44.0.0
     #   pyhanko-certvalidator
 cssselect2==0.7.0
     # via svglib
-deepdiff==8.0.1
+deepdiff==8.1.1
     # via superdesk-planning
 dnspython==2.7.0
     # via
@@ -141,8 +141,6 @@ eve @ git+https://github.com/MarkLark86/eve@use-quart
     # via superdesk-core
 eve-elastic @ git+https://github.com/MarkLark86/eve-elastic@use-quart
     # via superdesk-core
-events==0.3
-    # via eve
 exceptiongroup==1.2.2
     # via
     #   hypercorn
@@ -270,7 +268,7 @@ oauth2client==4.1.3
     # via flask-oidc-ex
 oauthlib==3.2.2
     # via requests-oauthlib
-orderly-set==5.2.2
+orderly-set==5.2.3
     # via deepdiff
 oscrypto==1.3.0
     # via pyhanko-certvalidator
@@ -317,11 +315,11 @@ pycodestyle==2.12.1
     # via flake8
 pycparser==2.22
     # via cffi
-pydantic==2.10.3
+pydantic==2.10.4
     # via
     #   -r mypy-requirements.txt
     #   superdesk-core
-pydantic-core==2.27.1
+pydantic-core==2.27.2
     # via pydantic
 pyflakes==3.2.0
     # via flake8
@@ -354,7 +352,7 @@ pytest==8.3.4
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
-pytest-asyncio==0.24.0
+pytest-asyncio==0.25.0
     # via -r dev-requirements.in
 pytest-cov==6.0.0
     # via -r dev-requirements.in
@@ -468,7 +466,7 @@ superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@asy
     # via -r requirements.txt
 svglib==1.5.1
     # via xhtml2pdf
-taskgroup==0.0.0a4
+taskgroup==0.2.1
     # via hypercorn
 tinycss2==1.4.0
     # via
@@ -527,6 +525,7 @@ typing-extensions==4.12.2
     #   pydantic-core
     #   pypdf
     #   superdesk-core
+    #   taskgroup
 tzdata==2024.2
     # via
     #   celery
