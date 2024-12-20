@@ -25,5 +25,5 @@ from .cli import commands_blueprint, newsroom_cli
 
 
 @celery.task(soft_time_limit=600)
-def async_remove_expired_agenda():
-    remove_expired_agenda()
+async def async_remove_expired_agenda():
+    await remove_expired_agenda()

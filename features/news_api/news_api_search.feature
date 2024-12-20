@@ -20,7 +20,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -45,7 +45,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -71,7 +71,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -97,7 +97,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -146,7 +146,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -174,7 +174,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -202,7 +202,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -223,7 +223,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -252,7 +252,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -318,7 +318,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -376,7 +376,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -396,7 +396,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -464,7 +464,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -488,7 +488,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -557,7 +557,7 @@ Feature: News API News Search
       Given "products"
           """
           [{"name": "A fishy Product",
-          "decsription": "a product for those interested in fish",
+          "description": "a product for those interested in fish",
           "companies" : [
             "#companies._id#"
           ],

@@ -24,11 +24,7 @@ CORE_APPS = [
     "newsroom.news_api.items",
     "content_api.items_versions",
     "newsroom.news_api.section_filters",
-    "newsroom.news_api.products",
-    "newsroom.news_api.formatters",
     "newsroom.news_api.news",
-    "newsroom.news_api.news.item.item",
-    "newsroom.news_api.api_audit",
     "newsroom.history",
 ]
 
@@ -44,7 +40,10 @@ MODULES = [
     "newsroom.news_api.news.atom",
     "newsroom.news_api.news.search",
     "newsroom.news_api.news.feed",
+    "newsroom.news_api.api_audit",
+    "newsroom.news_api.news.item.item",
     "newsroom.products",
+    "newsroom.news_api.products",
 ]
 
 INSTALLED_APPS = []

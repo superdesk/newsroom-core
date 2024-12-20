@@ -6,6 +6,7 @@ from binascii import hexlify
 from collections import OrderedDict
 from datetime import date
 
+from quart_babel import lazy_gettext
 from PyRTF.Elements import Document, Section, LINE, StyleSheet
 from PyRTF.document.paragraph import Paragraph
 from PyRTF.document.character import TEXT
@@ -19,8 +20,9 @@ from superdesk.utc import utcnow, utc_to_local
 from newsroom.types import MonitoringProfileResourceModel
 from newsroom.wire import url_for_wire
 from newsroom.monitoring.utils import get_keywords_in_text
-from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
+
+from .base_monitoring_formatter import BaseMonitoringFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -159,11 +161,14 @@ class LogoImage(Image):
         raise Exception("Invalid JPEG, end of stream reached")
 
 
-class MonitoringRTFFormatter(BaseFormatter):
+class MonitoringRTFFormatter(BaseMonitoringFormatter):
+    format_id = "monitoring_rtf"
+    name = lazy_gettext("RTF")
+
     FILE_EXTENSION = "rtf"
     MIMETYPE = "application/rtf"
 
-    def format_item(
+    def _format_item(
         self,
         item: dict[str, Any],
         styles: StyleSheet,
@@ -197,7 +202,7 @@ class MonitoringRTFFormatter(BaseFormatter):
         section.append(p2)
         section.append(p3)
 
-    def format_filename(self, item: dict[str, Any]) -> str:
+    def format_filename(self, item: dict[str, Any] | None) -> str:
         attachment_filename = "%s-monitoring-export.rtf" % utcnow().strftime("%Y%m%d%H%M%S")
         return secure_filename(attachment_filename)
 
@@ -242,7 +247,7 @@ class MonitoringRTFFormatter(BaseFormatter):
             date_p.append(LINE, d.strftime("%d/%m/%Y"))
             section.append(date_p)
             for item in date_items_dict[d]:
-                self.format_item(item, ss, monitoring_profile, section)
+                self._format_item(item, ss, monitoring_profile, section)
 
         doc.Sections.append(section)
         get_current_app().as_any().customize_rtf_file(doc)

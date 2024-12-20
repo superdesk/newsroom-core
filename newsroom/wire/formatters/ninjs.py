@@ -1,11 +1,19 @@
+from typing import Any
 import json
+from quart_babel import lazy_gettext
 
 from superdesk.utils import json_serialize_datetime_objectId
 
-from .base import BaseFormatter
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 
 
 class NINJSFormatter(BaseFormatter):
+    format_id = "ninjs"
+    name = lazy_gettext("Ninjs")
+    sections = [SectionEnum.WIRE]
+    assets = [FormatterAssetType.TEXT]
+
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"
 
@@ -43,11 +51,11 @@ class NINJSFormatter(BaseFormatter):
         "decsription_text",
     )
 
-    def format_item(self, item, item_type="items"):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         item = item.copy()
         ninjs = self._transform_to_ninjs(item)
 
-        return json.dumps(ninjs, default=json_serialize_datetime_objectId)
+        return str.encode(json.dumps(ninjs, default=json_serialize_datetime_objectId), "utf-8")
 
     def _transform_to_ninjs(self, item):
         ninjs = {

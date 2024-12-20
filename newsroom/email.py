@@ -17,6 +17,7 @@ from superdesk.flask import render_template, url_for
 
 from newsroom.gettext import get_user_timezone
 from newsroom.types import Company, User, Country, CompanyType, UserResourceModel
+from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
 from newsroom.template_loaders import template_locale
 from newsroom.utils import (
@@ -526,7 +527,7 @@ async def send_item_killed_notification_email(user: UserResourceModel, item: dic
 
 
 async def _send_wire_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
-    formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
+    formatter = get_formatter("text")
     recipients = [user.email]
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
@@ -535,7 +536,7 @@ async def _send_wire_killed_notification_email(user: UserResourceModel, item: di
 
 
 async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
-    formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
+    formatter = get_formatter("text")
     recipients = [user.email]
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))

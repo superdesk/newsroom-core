@@ -90,9 +90,9 @@ def validate_event_push(orig: dict[str, Any], updates: dict[str, Any]):
 
 def get_event_dates(event: dict[str, Any]):
     if not isinstance(event["dates"]["start"], datetime):
-        event["dates"]["start"] = datetime.strptime(event["dates"]["start"], "%Y-%m-%dT%H:%M:%S+0000")
+        event["dates"]["start"] = parse_date_str(event["dates"]["start"])
     if not isinstance(event["dates"]["end"], datetime):
-        event["dates"]["end"] = datetime.strptime(event["dates"]["end"], "%Y-%m-%dT%H:%M:%S+0000")
+        event["dates"]["end"] = parse_date_str(event["dates"]["end"])
     event["dates"].setdefault("all_day", False)
     event["dates"].setdefault("no_end_time", False)
     return event["dates"]

@@ -57,7 +57,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         self._validate_unknown_fields()
         resp = await super().process_web_request(request)
 
-        await self.process_post_api_audit(resp)
+        await self.process_post_api_audit(request, resp)
         await self.process_response_enhancements(request, resp)
 
         return resp
@@ -81,9 +81,11 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         if unknown_fields:
             raise UnexpectedParameterError(desc=f"Unexpected parameter(s): {', '.join(unknown_fields)}")
 
-    async def process_post_api_audit(self, response: Response):
-        # TODO-ASYNC: adjust once post_audit is async
-        post_api_audit(response.body)
+    async def process_post_api_audit(self, request: Request, response: Response):
+        await post_api_audit(
+            request,
+            [item["_id"] for item in response.body.get("_items") or [] if item.get("_id")],
+        )
 
     async def process_response_enhancements(self, request: Request, response: Response):
         search_req = self.get_search_request_instance(request)

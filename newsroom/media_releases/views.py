@@ -2,11 +2,11 @@ import logging
 from eve.render import send_response
 from eve.methods.get import get_internal
 
-from superdesk.core import get_current_app
 from superdesk.flask import render_template, jsonify, request
 
 from newsroom.types import SectionEnum
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.media_releases import blueprint
 from newsroom.decorator import login_required, section
 from newsroom.wire import WireSearchServiceAsync
@@ -18,7 +18,6 @@ from newsroom.wire.views import (
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +31,7 @@ async def get_view_data():
         "user": str(user.id),
         "company": str(company.id) if company else None,
         "navigations": [],
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "wire" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.WIRE),
         "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MEDIA_RELEASES),
         "context": "media_releases",
         "ui_config": await ui_config_service.get_section_config("media_releases"),
@@ -48,8 +43,7 @@ async def get_view_data():
 @section("media_releases")
 async def index():
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
-    return await render_template("media_releases_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("media_releases_index.html", data=data)
 
 
 @blueprint.route("/media_releases/search")
@@ -65,8 +59,7 @@ async def search():
 async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
-    user_profile_data = await get_user_profile_data()
-    return await render_template("media_releases_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("media_releases_bookmarks.html", data=data)
 
 
 @blueprint.route("/media_releases_bookmark", methods=["POST", "DELETE"])
@@ -111,11 +104,10 @@ async def item(_id):
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("media_releases")
     display_char_count = config.get("char_count", False)
-    user_profile_data = await get_user_profile_data()
     if is_json_request(request):
         return jsonify(item)
     if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
+        return await render_template("wire_item_access_restricted.html", item=item)
     previous_versions = get_previous_versions(item)
     if "print" in request.args:
         template = "wire_item_print.html"
@@ -127,5 +119,4 @@ async def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
-        user_profile_data=user_profile_data,
     )

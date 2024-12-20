@@ -384,7 +384,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
                 }
                 await self.system_update(item["_id"], updates)
 
-            updated_agenda = self.find_by_id(item["_id"])
+            updated_agenda = await self.find_by_id(item["_id"])
             # Notify agenda to update itself with new details of coverage
             parent_coverage["publish_time"] = wire_item.get("publish_schedule") or wire_item.get("firstpublished")
             await push_agenda_item_notification("new_item", item=item)

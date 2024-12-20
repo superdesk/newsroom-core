@@ -1,4 +1,3 @@
-from quart_babel import lazy_gettext
 from .service import MonitoringProfileService
 
 __all__ = ["MonitoringProfileService"]
@@ -6,8 +5,6 @@ __all__ = ["MonitoringProfileService"]
 
 def init_app(app):
     # Import things inside this function to reduce circular imports
-    from .formatters.pdf_formatter import MonitoringPDFFormatter
-    from .formatters.rtf_formatter import MonitoringRTFFormatter
     from .utils import get_keywords_in_text
     from .views import get_settings_data
 
@@ -28,9 +25,6 @@ def init_app(app):
         blueprint="monitoring",
         badge="saved-items-count",
     )
-
-    app.download_formatter("monitoring_pdf", MonitoringPDFFormatter(), lazy_gettext("PDF"), ["monitoring"])
-    app.download_formatter("monitoring_rtf", MonitoringRTFFormatter(), lazy_gettext("RTF"), ["monitoring"])
 
     app.add_template_global(get_keywords_in_text, "get_keywords_in_text")
 
