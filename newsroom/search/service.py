@@ -648,7 +648,7 @@ class BaseSearchService(Service):
                 abort(403, gettext("User does not belong to a company."))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
-            elif search.args.get("product") and not self.is_validate_product(search):
+            elif search.args.get("product") and not self.validate_product(search):
                 abort(403, gettext("Your product is not assigned to you or your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
@@ -660,7 +660,7 @@ class BaseSearchService(Service):
                     msg = f"User does not have access to {search.section} section"
                     abort(403, gettext(msg))
 
-    def is_validate_product(self, data):
+    def validate_product(self, data) -> bool:
         """
         Check if the product is assigned to the user or to the company with zero or unlimited seats.
 
@@ -672,11 +672,16 @@ class BaseSearchService(Service):
         company = data.company
         product = data.args.get("product")
 
+        def get_products(entity) -> List[Dict[str, Any]]:
+            return entity.get("products") or []
+
         if user and company and product:
-            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if not p.get("seats")]
-            user_specific_products = [p["_id"] for p in user.get("products", [])]
+            company_products_with_zero_seats = [p["_id"] for p in get_products(company) if not p.get("seats")]
+            user_specific_products = [p["_id"] for p in get_products(user)]
 
             return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
+
+        return False
 
     def apply_section_filter(self, search: SearchQuery, filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate the section filter

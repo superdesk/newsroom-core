@@ -55,44 +55,46 @@ export default function AgendaCoverages({
                     ))}
                 </div>
             )}
-            {coveragesWithState.map((coverage: ICoverage) => {
-                return (
-                    <div
-                        className={classNames(
-                            'coverage-item',
-                            {'coverage-item--clickable': onClick}
-                        )}
-                        key={coverage.coverage_id}
-                        onClick={onClick}
-                        title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : ''}
-                    >
-                        {coverageFieldsToRender.map((field) => {
-                            const FieldComponent = coverageFieldToComponentMap[field];
+            <div className='coverage-item__list'>
+                {coveragesWithState.map((coverage: ICoverage) => {
+                    return (
+                        <div
+                            className={classNames(
+                                'coverage-item',
+                                {'coverage-item--clickable': onClick}
+                            )}
+                            key={coverage.coverage_id}
+                            onClick={onClick}
+                            title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : ''}
+                        >
+                            {coverageFieldsToRender.map((field) => {
+                                const FieldComponent = coverageFieldToComponentMap[field];
 
-                            if (FieldComponent == null) {
-                                console.warn(`Component not registered for field ${field}`);
-                                return null;
-                            }
+                                if (FieldComponent == null) {
+                                    console.warn(`Component not registered for field ${field}`);
+                                    return null;
+                                }
 
-                            return (
-                                <FieldComponent
-                                    key={field}
-                                    agenda={item}
-                                    coverage={coverage}
-                                    wireItems={wireItems}
-                                    actions={actions}
-                                    user={user}
-                                    hideViewContentItems={hideViewContentItems}
-                                    fullCoverage={
-                                        (item.planning_items || [])
-                                            .find((planningItem) => planningItem._id === coverage.planning_id)
-                                            ?.coverages?.find((coverageItem) => coverageItem.coverage_id === coverage.coverage_id)
-                                    }
-                                />
-                            );
-                        })}
-                    </div>
-                );})}
+                                return (
+                                    <FieldComponent
+                                        key={field}
+                                        agenda={item}
+                                        coverage={coverage}
+                                        wireItems={wireItems}
+                                        actions={actions}
+                                        user={user}
+                                        hideViewContentItems={hideViewContentItems}
+                                        fullCoverage={
+                                            (item.planning_items || [])
+                                                .find((planningItem) => planningItem._id === coverage.planning_id)
+                                                ?.coverages?.find((coverageItem) => coverageItem.coverage_id === coverage.coverage_id)
+                                        }
+                                    />
+                                );
+                            })}
+                        </div>
+                    );})}
+            </div>
         </React.Fragment>
     );
 }

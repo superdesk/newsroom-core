@@ -121,7 +121,7 @@ email-validator==2.2.0
     # via wtforms
 eve==2.1.0
     # via superdesk-core
-eve-elastic==7.4.1
+eve-elastic==7.4.2
     # via
     #   -r requirements.txt
     #   superdesk-core
@@ -167,7 +167,7 @@ flask-script==2.0.6
     # via superdesk-core
 flask-webpack==0.1.0
     # via -r requirements.txt
-flask-wtf==1.2.1
+flask-wtf==1.2.2
     # via -r requirements.txt
 future==1.0.0
     # via python-twitter
@@ -324,12 +324,12 @@ pypng==0.20220715.0
     # via qrcode
 pyrtf3==0.47.5
     # via -r requirements.txt
-pytest==8.3.3
+pytest==8.3.4
     # via
     #   -r dev-requirements.in
     #   pytest-cov
     #   pytest-mock
-pytest-cov==5.0.0
+pytest-cov==6.0.0
     # via -r dev-requirements.in
 pytest-mock==3.14.0
     # via -r dev-requirements.in
@@ -435,7 +435,7 @@ tomli==2.0.1
     #   black
     #   coverage
     #   pytest
-types-python-dateutil==2.9.0.20241003
+types-python-dateutil==2.9.0.20241206
     # via arrow
 typing-extensions==4.12.2
     # via
