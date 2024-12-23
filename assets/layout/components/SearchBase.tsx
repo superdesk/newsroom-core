@@ -4,7 +4,7 @@ import {createPortal} from 'react-dom';
 import {Tooltip} from 'bootstrap';
 
 import {IArticle, IAgendaItem, IListConfig, IPreviewConfig, IItemAction, ISearchParams} from 'interfaces';
-import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
+import {isTouchDevice, gettext, isDisplayed, isTablet} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
 
@@ -46,7 +46,7 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
 
         this.state = {
             withSidebar: props.bookmarks !== true && getFilterPanelOpenState(props.context),
-            minimizeSearchResults: isMobilePhone(),
+            minimizeSearchResults: isTablet(),
             initialLoad: props.isLoading,
             isAdvancedSearchShown: false,
             isSearchTipsShown: false,
@@ -187,7 +187,7 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
         }
         else {
             this.setState({
-                minimizeSearchResults: isMobilePhone(),
+                minimizeSearchResults: isTablet(),
             });
         }
     }
