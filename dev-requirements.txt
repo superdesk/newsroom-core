@@ -121,7 +121,7 @@ email-validator==2.2.0
     # via wtforms
 eve==2.1.0
     # via superdesk-core
-eve-elastic==7.4.2
+eve-elastic==7.4.3
     # via
     #   -r requirements.txt
     #   superdesk-core
