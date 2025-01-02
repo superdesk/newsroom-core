@@ -1,15 +1,15 @@
 # Translations template for Newsroom-Core.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the Newsroom-Core
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.1\n"
+"Project-Id-Version: Newsroom-Core 2.8.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-10 10:24+0100\n"
+"POT-Creation-Date: 2025-01-02 11:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,9 +179,9 @@ msgid ""
 "for more details"
 msgstr ""
 
-#: assets/agenda/components/AgendaTags.tsx:44
+#: assets/agenda/components/AgendaTags.tsx:19
 #: assets/company-reports/components/ContentActivity.tsx:61
-#: assets/wire/components/PreviewTags.tsx:40 newsroom/agenda/__init__.py:66
+#: assets/wire/components/PreviewTags.tsx:26 newsroom/agenda/__init__.py:66
 #: newsroom/reports/content_activity.py:191
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:133
@@ -278,19 +278,19 @@ msgstr ""
 msgid "Postponed"
 msgstr ""
 
-#: newsroom/agenda/views.py:221
+#: newsroom/agenda/views.py:222
 msgid "Cannot edit coverage watch when watching parent item"
 msgstr ""
 
-#: newsroom/agenda/views.py:228
+#: newsroom/agenda/views.py:229
 msgid "Coverage not found"
 msgstr ""
 
-#: newsroom/agenda/views.py:240
+#: newsroom/agenda/views.py:241
 msgid "Error removing watch."
 msgstr ""
 
-#: newsroom/agenda/views.py:279
+#: newsroom/agenda/views.py:280
 #, python-format
 msgid "%(section)s item not found"
 msgstr ""
@@ -738,13 +738,13 @@ msgstr ""
 msgid "Must provide a section for this report"
 msgstr ""
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:134
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:150
 #: assets/company-reports/components/ContentActivity.tsx:57
 #: newsroom/reports/content_activity.py:187
 msgid "Published"
 msgstr ""
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:126
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:142
 #: assets/company-reports/components/ContentActivity.tsx:58
 #: assets/components/cards/edit/ConfigEvent.tsx:26
 #: assets/search/components/AdvancedSearchPanel.tsx:126
@@ -957,7 +957,6 @@ msgstr ""
 msgid "Editorial Note"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:56
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:134
 #: newsroom/templates/agenda_item_print.html:64
 msgid "Coverages:"
@@ -1091,7 +1090,7 @@ msgstr ""
 msgid "Don't have an account?"
 msgstr ""
 
-#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:13
+#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:7
 #: newsroom/templates/signup_form.html:61
 msgid "Sign up"
 msgstr ""
@@ -1233,14 +1232,14 @@ msgstr ""
 msgid "Source:"
 msgstr ""
 
-#: assets/agenda/components/AgendaTags.tsx:40
-#: assets/wire/components/PreviewTags.tsx:33
+#: assets/agenda/components/AgendaTags.tsx:42
+#: assets/wire/components/PreviewTags.tsx:60
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
 msgstr ""
 
-#: assets/wire/components/PreviewTags.tsx:53
+#: assets/wire/components/PreviewTags.tsx:38
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:141
 msgid "Content Type"
@@ -1445,27 +1444,27 @@ msgstr ""
 msgid "Not Intended / Cancelled"
 msgstr ""
 
-#: newsroom/web/default_settings.py:637
+#: newsroom/web/default_settings.py:641
 msgid "Home"
 msgstr ""
 
-#: newsroom/web/default_settings.py:642
+#: newsroom/web/default_settings.py:646
 msgid "Wire"
 msgstr ""
 
-#: newsroom/web/default_settings.py:647
+#: newsroom/web/default_settings.py:651
 msgid "Agenda"
 msgstr ""
 
-#: newsroom/web/default_settings.py:652
+#: newsroom/web/default_settings.py:656
 msgid "Monitoring"
 msgstr ""
 
-#: newsroom/web/default_settings.py:657
+#: newsroom/web/default_settings.py:661
 msgid "Saved / Watched"
 msgstr ""
 
-#: newsroom/web/default_settings.py:695
+#: newsroom/web/default_settings.py:699
 msgid "Newshub"
 msgstr ""
 
@@ -1474,28 +1473,28 @@ msgstr ""
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
 #: assets/components/ExpiryDateInput.tsx:94
-#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:845
+#: newsroom/web/default_settings.py:822 newsroom/web/default_settings.py:849
 msgid "Today"
 msgstr ""
 
 #: assets/company-reports/components/ProductStories.tsx:29
-#: newsroom/web/default_settings.py:820
+#: newsroom/web/default_settings.py:824
 msgid "Last 7 days"
 msgstr ""
 
-#: newsroom/web/default_settings.py:826
+#: newsroom/web/default_settings.py:830
 msgid "Last 30 days"
 msgstr ""
 
-#: newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:848
 msgid "Selected day"
 msgstr ""
 
-#: newsroom/web/default_settings.py:847
+#: newsroom/web/default_settings.py:851
 msgid "This Week"
 msgstr ""
 
-#: newsroom/web/default_settings.py:851
+#: newsroom/web/default_settings.py:855
 msgid "This Month"
 msgstr ""
 
@@ -1594,15 +1593,15 @@ msgstr ""
 msgid "Failed to process request!"
 msgstr ""
 
-#: assets/utils.tsx:714
+#: assets/utils.tsx:718
 msgid "Item copied successfully."
 msgstr ""
 
-#: assets/utils.tsx:718
+#: assets/utils.tsx:722
 msgid "Sorry, Copy is not supported."
 msgstr ""
 
-#: assets/utils.tsx:749
+#: assets/utils.tsx:753
 msgid "Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}"
 msgstr ""
 
@@ -1776,47 +1775,47 @@ msgstr ""
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:161
+#: assets/agenda/components/AgendaApp.tsx:160
 msgid "{{agenda}} Content"
 msgstr ""
 
+#: assets/agenda/components/AgendaApp.tsx:169
 #: assets/agenda/components/AgendaApp.tsx:170
-#: assets/agenda/components/AgendaApp.tsx:171
 #: assets/am-news/components/AmNewsApp.tsx:124
 #: assets/am-news/components/AmNewsApp.tsx:125
+#: assets/wire/components/WireApp.tsx:163
 #: assets/wire/components/WireApp.tsx:164
-#: assets/wire/components/WireApp.tsx:165
 msgid "Close filter panel"
 msgstr ""
 
+#: assets/agenda/components/AgendaApp.tsx:181
 #: assets/agenda/components/AgendaApp.tsx:182
-#: assets/agenda/components/AgendaApp.tsx:183
 #: assets/am-news/components/AmNewsApp.tsx:132
 #: assets/am-news/components/AmNewsApp.tsx:133
+#: assets/wire/components/WireApp.tsx:180
 #: assets/wire/components/WireApp.tsx:181
-#: assets/wire/components/WireApp.tsx:182
 msgid "Open filter panel"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:215
+#: assets/agenda/components/AgendaApp.tsx:214
 #: assets/am-news/components/AmNewsApp.tsx:151
-#: assets/wire/components/WireApp.tsx:201
+#: assets/wire/components/WireApp.tsx:200
 msgid "Side filter panel"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:256
+#: assets/agenda/components/AgendaApp.tsx:255
 msgid "Date"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:257
+#: assets/agenda/components/AgendaApp.tsx:256
 msgid "Newest updates"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:258
+#: assets/agenda/components/AgendaApp.tsx:257
 msgid "Oldest updates"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.tsx:259
+#: assets/agenda/components/AgendaApp.tsx:258
 #: assets/search/components/SearchResultsBar/index.tsx:67
 msgid "Relevance"
 msgstr ""
@@ -1839,8 +1838,8 @@ msgstr ""
 
 #: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:57
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:68
-#: assets/agenda/components/AgendaFilters.tsx:65
-#: assets/agenda/components/AgendaFilters.tsx:99
+#: assets/agenda/components/AgendaFilters.tsx:66
+#: assets/agenda/components/AgendaFilters.tsx:100
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:39
 #: assets/agenda/components/LocationFilter.tsx:498
 msgid "Clear selection"
@@ -1887,7 +1886,7 @@ msgstr ""
 msgid "Submit inquiry"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverages.tsx:67
+#: assets/agenda/components/AgendaCoverages.tsx:68
 msgid "Open {{agenda}} in a new tab"
 msgstr ""
 
@@ -1942,22 +1941,22 @@ msgstr ""
 msgid "Top Stories"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:58
-#: assets/agenda/components/AgendaFilters.tsx:64
+#: assets/agenda/components/AgendaFilters.tsx:59
+#: assets/agenda/components/AgendaFilters.tsx:65
 #: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:79
+#: assets/agenda/components/AgendaFilters.tsx:80
 msgid "Region"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:92
-#: assets/agenda/components/AgendaFilters.tsx:98
+#: assets/agenda/components/AgendaFilters.tsx:93
+#: assets/agenda/components/AgendaFilters.tsx:99
 msgid "Coverage types"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:102
+#: assets/agenda/components/AgendaFilters.tsx:103
 msgid "Coverage type"
 msgstr ""
 
@@ -2057,7 +2056,14 @@ msgstr ""
 msgid "event completed"
 msgstr ""
 
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:56
+msgid "Coverages"
+msgstr ""
+
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:69
+msgid "Previous Coverages"
+msgstr ""
+
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:147
 msgid "Previous Coverages:"
 msgstr ""
@@ -2097,15 +2103,16 @@ msgstr ""
 #: assets/agenda/components/CoverageItemStatus.tsx:105
 #: assets/agenda/components/CoverageItemStatus.tsx:125
 #: assets/agenda/components/preview/coverage/CoverageActions.tsx:27
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:83
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:84
 msgid "Open in new tab"
 msgstr ""
 
 #: assets/agenda/components/CoverageItemStatus.tsx:110
 #: assets/agenda/components/CoverageItemStatus.tsx:130
 #: assets/agenda/components/CoverageItemStatus.tsx:141
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:90
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:150
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:91
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:119
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:166
 msgid "View Content"
 msgstr ""
 
@@ -2144,7 +2151,7 @@ msgid "{{ name }} (City, {{ state }}, {{ country }})"
 msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:352
-msgid "{{ name }} (State, {{ country }})"
+msgid "{{ name }} (State/Province, {{ country }})"
 msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:371
@@ -2185,11 +2192,11 @@ msgstr ""
 msgid "No regions found"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:525
+#: assets/agenda/components/LocationFilter.tsx:527
 msgid "Places"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:534
+#: assets/agenda/components/LocationFilter.tsx:536
 msgid "No places found"
 msgstr ""
 
@@ -2197,11 +2204,11 @@ msgstr ""
 msgid "Day:"
 msgstr ""
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:111
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:127
 msgid "Hide all versions ({{count}})"
 msgstr ""
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:112
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:128
 msgid "Show all versions ({{count}})"
 msgstr ""
 
@@ -3244,7 +3251,7 @@ msgid "Keywords"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringApp.tsx:29
-#: assets/wire/components/WireApp.tsx:82
+#: assets/wire/components/WireApp.tsx:81
 msgid "{{monitoring}} Profiles"
 msgstr ""
 
@@ -3664,7 +3671,7 @@ msgstr ""
 
 #: assets/search/components/AdvancedSearchPanel.tsx:134
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:148
-#: assets/wire/components/PreviewTags.tsx:35
+#: assets/wire/components/PreviewTags.tsx:18
 msgid "Slugline"
 msgstr ""
 
@@ -3887,13 +3894,13 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:157
-#: assets/search/components/SearchResultsBar/SearchResultsQueryRow.tsx:26
-msgid "Search for"
+#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:155
+msgid "inside"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:163
-msgid "inside"
+#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:184
+#: assets/search/components/SearchResultsBar/SearchResultsQueryRow.tsx:26
+msgid "Search for"
 msgstr ""
 
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
@@ -4353,7 +4360,7 @@ msgstr ""
 msgid "{{ count }} item(s) selected"
 msgstr ""
 
-#: assets/wire/components/WireApp.tsx:155
+#: assets/wire/components/WireApp.tsx:154
 msgid "{{wire}} Content"
 msgstr ""
 
