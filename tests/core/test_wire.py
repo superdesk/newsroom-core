@@ -1032,6 +1032,7 @@ def test_date_filters(client, app):
     # Test "Last 7 days" filter
     resp = client.get("/wire/search?date_filter=last_week")
     assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 4
 
     # Test "Last 30 days" filter
     resp = client.get("/wire/search?date_filter=last_30_days")
@@ -1063,9 +1064,9 @@ def test_date_filters_query(client, app):
             return search.query["bool"]["must"]
 
     # Last week
-    assert [
-        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
-    ] == _set_search_query(ADMIN_USER_ID, {"date_filter": "last_week"})
+    assert [{"range": {"versioncreated": {"gte": "now-7d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "last_week"}
+    )
 
     # Last 30 Days
     assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
@@ -1109,3 +1110,37 @@ def test_bookmark_old_items(client, public_user, company_products):
     resp = client.get("/wire/search?bookmarks={}".format(public_user["_id"]))
     assert resp.status_code == 200
     assert 2 == len(resp.json["_items"])
+
+
+def test_sorting_wire_items(app, client):
+    app.data.remove("items")
+    now = datetime.utcnow()
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "item2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=1),
+            },
+            {
+                "_id": "item3",
+                "type": "text",
+                "versioncreated": now,
+            },
+            {
+                "_id": "item1",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=5),
+            },
+        ],
+    )
+
+    resp = client.get("/wire/items/item1,item3,item2")
+    assert resp.status_code == 200
+    assert len(resp.json) == 3
+    assert resp.json[0]["_id"] == "item3"
+    assert resp.json[1]["_id"] == "item2"
+    assert resp.json[2]["_id"] == "item1"

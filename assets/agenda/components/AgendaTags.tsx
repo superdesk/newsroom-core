@@ -2,37 +2,39 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
 import {gettext, isDisplayed} from 'utils';
 import {filterGroupsToLabelMap} from 'search/selectors';
-
 import InfoBox from 'wire/components/InfoBox';
 import PreviewTagsBlock from 'wire/components/PreviewTagsBlock';
 import {PreviewTagsLinkList} from 'wire/components/PreviewTagsLinkList';
 import {PreviewTagsSubjects} from 'wire/components/PreviewTagsSubjects';
 import {getSubjects} from '../utils';
 
-
 function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}: any) {
-    const services = !isDisplayed('services', displayConfig) ? null : (
-        <PreviewTagsLinkList
-            urlPrefix="/agenda?filter="
-            items={[...(get(item, 'service') || []), ...(get(plan, 'service') || [])]}
-            field="service"
-        />
-    );
+    const metadataFields = [];
+    const subject = [...getSubjects(item), ...getSubjects(plan)];
 
-    const subjects = (
-        <PreviewTagsSubjects
-            subjects={[...getSubjects(item), ...getSubjects(plan)]}
-            displayConfig={displayConfig}
-            urlPrefix="/agenda?filter="
-            filterGroupLabels={filterGroupLabels}
-        />
-    );
+    if ((isDisplayed('services', displayConfig) && item.service.length)) {
+        metadataFields.push(
+            <PreviewTagsBlock label={get(filterGroupLabels, 'service', gettext('Category'))}>
+                <PreviewTagsLinkList
+                    urlPrefix="/agenda?filter="
+                    items={[...(get(item, 'service') || []), ...(get(plan, 'service') || [])]}
+                    field="service"
+                />
+            </PreviewTagsBlock>
+        );
+    }
 
-    if (!subjects && !services) {
-        return null;
+    if(subject.length) {
+        metadataFields.push(
+            <PreviewTagsSubjects
+                subjects={subject}
+                displayConfig={displayConfig}
+                urlPrefix="/agenda?filter="
+                filterGroupLabels={filterGroupLabels}
+            />
+        );
     }
 
     return (
@@ -40,12 +42,16 @@ function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGro
             label={gettext('Metadata')}
             top={!isItemDetail}
         >
-            {!services ? null : (
-                <PreviewTagsBlock label={get(filterGroupLabels, 'service', gettext('Category'))}>
-                    {services}
-                </PreviewTagsBlock>
-            )}
-            {subjects}
+            {metadataFields.length > 0
+                ? (
+                    metadataFields.map((field, index) => <React.Fragment key={index}>{field}</React.Fragment>)
+                )
+                : (
+                    <div className='nh-container nh-container--highlight'>
+                        <p className='nh-container__text--small'>No available Metadata</p>
+                    </div>
+                )
+            }
         </InfoBox>
     );
 }

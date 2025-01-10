@@ -968,59 +968,68 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
             continue
 
         for subscriber in topic.get("subscribers") or []:
-            user = users.get(str(subscriber["user_id"]))
+            try:
+                user = users.get(str(subscriber["user_id"]))
 
-            if not user:
+                if not user:
+                    continue
+
+                company = companies.get(str(user.get("company")))
+
+                section = topic.get("topic_type") or "wire"
+                if user["_id"] not in users_processed:
+                    # Only send websocket notification once for each item
+                    save_user_notifications(
+                        [
+                            UserNotification(
+                                user=user["_id"],
+                                item=item["_id"],
+                                resource=section,
+                                action="topic_matches",
+                                data=None,
+                            )
+                        ]
+                    )
+                    users_processed.add(user["_id"])
+
+                if not user.get("receive_email"):
+                    continue
+                elif subscriber.get("notification_type") == "scheduled":
+                    superdesk.get_resource_service("notification_queue").add_item_to_queue(
+                        user["_id"], section, topic["_id"], item
+                    )
+                elif user["_id"] in users_with_realtime_subscription:
+                    # This user has already received a realtime notification email about this item
+                    # No need to send another
+                    continue
+                else:
+                    users_with_realtime_subscription.add(user["_id"])
+                    search_service = superdesk.get_resource_service(
+                        "wire_search" if topic["topic_type"] == "wire" else "agenda"
+                    )
+                    query = search_service.get_topic_query(
+                        topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
+                    )
+
+                    if not query:
+                        # subscriber should not get the notification
+                        continue
+
+                    items = search_service.get_items_by_query(query, size=1)
+                    highlighted_item = item
+                    if items.count():
+                        highlighted_item = items[0]
+
+                    send_new_item_notification_email(
+                        user,
+                        topic["label"],
+                        item=highlighted_item,
+                        section=section,
+                    )
+            except Exception as e:
+                logger.exception(e)
+                # when there is an error for specific topic/subscriber continue
                 continue
-
-            company = companies.get(str(user.get("company")))
-
-            section = topic.get("topic_type") or "wire"
-            if user["_id"] not in users_processed:
-                # Only send websocket notification once for each item
-                save_user_notifications(
-                    [
-                        UserNotification(
-                            user=user["_id"],
-                            item=item["_id"],
-                            resource=section,
-                            action="topic_matches",
-                            data=None,
-                        )
-                    ]
-                )
-                users_processed.add(user["_id"])
-
-            if not user.get("receive_email"):
-                continue
-            elif subscriber.get("notification_type") == "scheduled":
-                superdesk.get_resource_service("notification_queue").add_item_to_queue(
-                    user["_id"], section, topic["_id"], item
-                )
-            elif user["_id"] in users_with_realtime_subscription:
-                # This user has already received a realtime notification email about this item
-                # No need to send another
-                continue
-            else:
-                users_with_realtime_subscription.add(user["_id"])
-                search_service = superdesk.get_resource_service(
-                    "wire_search" if topic["topic_type"] == "wire" else "agenda"
-                )
-                query = search_service.get_topic_query(
-                    topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
-                )
-
-                items = search_service.get_items_by_query(query, size=1)
-                highlighted_item = item
-                if items.count():
-                    highlighted_item = items[0]
-
-                send_new_item_notification_email(
-                    user,
-                    topic["label"],
-                    item=highlighted_item,
-                    section=section,
-                )
 
     return users_with_realtime_subscription
 

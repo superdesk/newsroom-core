@@ -7,22 +7,22 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.8.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-22 11:23+0200\n"
+"POT-Creation-Date: 2024-12-10 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.16.0\n"
 
-#: newsroom/email.py:487
+#: newsroom/email.py:501
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:496
+#: newsroom/email.py:510
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr ""
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Activity History: Inavlid request"
 msgstr ""
 
-#: newsroom/push.py:115
+#: newsroom/push.py:119
 msgid "Unknown type {}"
 msgstr ""
 
@@ -112,58 +112,58 @@ msgid ""
 "users"
 msgstr ""
 
-#: newsroom/template_filters.py:139
+#: newsroom/template_filters.py:142
 msgid "Date: {start} to {end} ({tz}) (Time to be confirmed)"
 msgstr ""
 
-#: newsroom/template_filters.py:144
+#: newsroom/template_filters.py:147
 msgid "Date: {start} ({tz}) (Time to be confirmed)"
 msgstr ""
 
-#: newsroom/template_filters.py:147
+#: newsroom/template_filters.py:150
 msgid "Date: {start} ({tz})"
 msgstr ""
 
-#: newsroom/template_filters.py:150
+#: newsroom/template_filters.py:153
 msgid "Date: {start} to {end} ({tz})"
 msgstr ""
 
-#: newsroom/template_filters.py:152
+#: newsroom/template_filters.py:155
 msgid "Time: {start_time} to {end_time} on Date: {date} ({tz})"
 msgstr ""
 
-#: newsroom/template_filters.py:160
+#: newsroom/template_filters.py:163
 msgid "Date: {start_time} {start_date} to {end_time} {end_date} ({tz})"
 msgstr ""
 
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:213
+#: newsroom/utils.py:214
 msgid "ALL DAY"
 msgstr ""
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:305
-#: newsroom/utils.py:416
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:306
+#: newsroom/utils.py:417
 msgid "Account is disabled"
 msgstr ""
 
-#: newsroom/utils.py:313
+#: newsroom/utils.py:314
 msgid "Account has not been approved"
 msgstr ""
 
 #: newsroom/auth/views.py:83 newsroom/auth/views.py:92
-#: newsroom/auth/views.py:184 newsroom/utils.py:406
+#: newsroom/auth/views.py:184 newsroom/utils.py:407
 msgid "Invalid username or password."
 msgstr ""
 
-#: newsroom/utils.py:412
+#: newsroom/utils.py:413
 msgid "Insufficient Permissions. Access denied."
 msgstr ""
 
-#: newsroom/auth/views.py:176 newsroom/utils.py:420
+#: newsroom/auth/views.py:176 newsroom/utils.py:421
 msgid "Company account has been disabled."
 msgstr ""
 
-#: newsroom/auth/views.py:179 newsroom/utils.py:424
+#: newsroom/auth/views.py:179 newsroom/utils.py:425
 msgid "Company account has expired."
 msgstr ""
 
@@ -207,43 +207,43 @@ msgstr ""
 msgid "Place"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:56
+#: newsroom/agenda/agenda.py:57
 msgid "An event you have been watching has been updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:57
+#: newsroom/agenda/agenda.py:58
 msgid "Event updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:60
+#: newsroom/agenda/agenda.py:61
 msgid "An event you have been watching has been cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:61
+#: newsroom/agenda/agenda.py:62
 msgid "Event cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:64
+#: newsroom/agenda/agenda.py:65
 msgid "An event you have been watching has a new planning"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:65
+#: newsroom/agenda/agenda.py:66
 msgid "Planning added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:68
+#: newsroom/agenda/agenda.py:69
 msgid "An event you have been watching has a planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:69
+#: newsroom/agenda/agenda.py:70
 msgid "Planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:72
+#: newsroom/agenda/agenda.py:73
 msgid "An event you have been watching has a new coverage added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:73
+#: newsroom/agenda/agenda.py:74
 msgid "Coverage added"
 msgstr ""
 
@@ -372,7 +372,7 @@ msgstr ""
 #: assets/user-profile/components/profile/UserProfile.tsx:104
 #: assets/users/components/EditUser.tsx:236
 #: assets/users/components/UsersList.tsx:33 newsroom/auth/forms.py:39
-#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:62
+#: newsroom/auth/forms.py:46 newsroom/auth/forms.py:63
 #: newsroom/users/forms.py:48
 msgid "Email"
 msgstr ""
@@ -385,19 +385,19 @@ msgstr ""
 msgid "Remember Me"
 msgstr ""
 
-#: newsroom/auth/forms.py:53
+#: newsroom/auth/forms.py:54
 msgid "Passwords must match."
 msgstr ""
 
-#: newsroom/auth/forms.py:56
+#: newsroom/auth/forms.py:57
 msgid "Current password"
 msgstr ""
 
-#: newsroom/auth/forms.py:59
+#: newsroom/auth/forms.py:60
 msgid "New password"
 msgstr ""
 
-#: newsroom/auth/forms.py:60
+#: newsroom/auth/forms.py:61
 msgid "Confirm new password"
 msgstr ""
 
@@ -434,7 +434,7 @@ msgstr ""
 msgid "Invalid login type, Oauth not enabled for your user"
 msgstr ""
 
-#: newsroom/auth/saml.py:137
+#: newsroom/auth/saml.py:145
 msgid "There was an error when using SSO"
 msgstr ""
 
@@ -975,8 +975,8 @@ msgstr ""
 
 #: assets/public/components/PublicApp.tsx:79
 #: newsroom/templates/base_layout.html:62
-#: newsroom/templates/login_client.html:4 newsroom/templates/login_form.html:24
-#: newsroom/templates/login_layout.html:19
+#: newsroom/templates/login_client.html:4
+#: newsroom/templates/login_layout.html:52
 msgid "Login"
 msgstr ""
 
@@ -1014,22 +1014,21 @@ msgstr ""
 
 #: newsroom/templates/change_password.html:13
 #: newsroom/templates/change_password.html:44
-#: newsroom/templates/reset_password.html:37
+#: newsroom/templates/reset_password.html:36
 msgid "Change Password"
 msgstr ""
 
 #: newsroom/templates/change_password.html:36
-#: newsroom/templates/reset_password.html:30
+#: newsroom/templates/reset_password.html:29
 msgid "Please use 8 or more characters."
 msgstr ""
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
+#: newsroom/templates/login_layout.html:46
 msgid "Forgot your password?"
 msgstr ""
 
 #: newsroom/templates/change_password.html:47
-#: newsroom/templates/login_layout.html:40
 #: newsroom/templates/password_reset_link_expiry.html:8
 msgid "Click here to reset."
 msgstr ""
@@ -1060,7 +1059,7 @@ msgid "Stop impersonation"
 msgstr ""
 
 #: newsroom/templates/login_client.html:9
-#: newsroom/templates/login_layout.html:33
+#: newsroom/templates/login_layout.html:72
 msgid "Login using Single Sign On"
 msgstr ""
 
@@ -1068,21 +1067,38 @@ msgstr ""
 msgid "If you have trouble logging in, please contact your own IT support."
 msgstr ""
 
-#: newsroom/templates/login_form.html:30
+#: newsroom/templates/login_layout.html:13
+msgid "Login to Newshub"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:47
+msgid "Reset password"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:47
+msgid "Click here to reset"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:59
 msgid "Log In with Google"
 msgstr ""
 
-#: newsroom/templates/login_layout.html:41
-msgid "Or you can"
+#: newsroom/templates/login_layout.html:69
+msgid "Or"
 msgstr ""
 
-#: newsroom/templates/login_layout.html:41
-msgid "click here to register."
+#: newsroom/templates/login_layout.html:81
+msgid "Don't have an account?"
+msgstr ""
+
+#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:13
+#: newsroom/templates/signup_form.html:61
+msgid "Sign up"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.tsx:235
 #: assets/users/components/EditUser.tsx:308
-#: newsroom/templates/login_layout.html:50
+#: newsroom/templates/login_layout.html:92
 #: newsroom/templates/login_locale_dropdown.html:5
 msgid "Language"
 msgstr ""
@@ -1118,18 +1134,15 @@ msgid ""
 "password again."
 msgstr ""
 
+#: assets/users/components/EditUser.tsx:476
 #: newsroom/templates/request_token.html:4
-msgid "Password Reset"
+#: newsroom/templates/request_token.html:22
+#: newsroom/templates/reset_password.html:11
+msgid "Reset Password"
 msgstr ""
 
 #: newsroom/templates/request_token.html:20
 msgid "Validate"
-msgstr ""
-
-#: assets/users/components/EditUser.tsx:476
-#: newsroom/templates/request_token.html:22
-#: newsroom/templates/reset_password.html:12
-msgid "Reset Password"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverageRequest.tsx:57
@@ -1142,17 +1155,13 @@ msgstr ""
 #: assets/search/components/TopicFolderEditor.jsx:39
 #: assets/user-profile/components/profile/UserProfile.tsx:251
 #: assets/wire/components/SelectedItemsBar.tsx:48
-#: newsroom/templates/reset_password.html:38
+#: newsroom/templates/reset_password.html:37
 msgid "Cancel"
 msgstr ""
 
 #: assets/company-admin/components/CompanyAdminSideNav.tsx:8
 #: newsroom/templates/settings.html:17
 msgid "Settings Menu"
-msgstr ""
-
-#: newsroom/templates/signup.html:13 newsroom/templates/signup_form.html:61
-msgid "Sign up"
 msgstr ""
 
 #: newsroom/templates/signup_form.html:54
@@ -1188,6 +1197,7 @@ msgstr ""
 #: assets/products/components/EditProduct.tsx:90
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
+#: assets/search/components/SearchResultsBar/index.tsx:232
 #: assets/search/components/TopicEditor.tsx:459
 #: assets/search/components/TopicFolder.tsx:100
 #: assets/section-filters/components/EditSectionFilter.tsx:27
@@ -1435,52 +1445,57 @@ msgstr ""
 msgid "Not Intended / Cancelled"
 msgstr ""
 
-#: newsroom/web/default_settings.py:636
+#: newsroom/web/default_settings.py:637
 msgid "Home"
 msgstr ""
 
-#: newsroom/web/default_settings.py:641
+#: newsroom/web/default_settings.py:642
 msgid "Wire"
 msgstr ""
 
-#: newsroom/web/default_settings.py:646
+#: newsroom/web/default_settings.py:647
 msgid "Agenda"
 msgstr ""
 
-#: newsroom/web/default_settings.py:651
+#: newsroom/web/default_settings.py:652
 msgid "Monitoring"
 msgstr ""
 
-#: newsroom/web/default_settings.py:656
+#: newsroom/web/default_settings.py:657
 msgid "Saved / Watched"
 msgstr ""
 
-#: newsroom/web/default_settings.py:694
+#: newsroom/web/default_settings.py:695
 msgid "Newshub"
 msgstr ""
 
 #: assets/agenda/components/AgendaDateButtons.tsx:15
-#: assets/agenda/components/AgendaList.tsx:329
+#: assets/agenda/components/AgendaList.tsx:330
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
 #: assets/components/ExpiryDateInput.tsx:94
-#: newsroom/web/default_settings.py:817 newsroom/web/default_settings.py:843
+#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:845
 msgid "Today"
 msgstr ""
 
-#: newsroom/web/default_settings.py:819
-msgid "Last Week"
+#: assets/company-reports/components/ProductStories.tsx:29
+#: newsroom/web/default_settings.py:820
+msgid "Last 7 days"
 msgstr ""
 
-#: newsroom/web/default_settings.py:825
+#: newsroom/web/default_settings.py:826
 msgid "Last 30 days"
 msgstr ""
 
-#: newsroom/web/default_settings.py:845
+#: newsroom/web/default_settings.py:844
+msgid "Selected day"
+msgstr ""
+
+#: newsroom/web/default_settings.py:847
 msgid "This Week"
 msgstr ""
 
-#: newsroom/web/default_settings.py:849
+#: newsroom/web/default_settings.py:851
 msgid "This Month"
 msgstr ""
 
@@ -1651,113 +1666,113 @@ msgstr ""
 msgid "Stop watching this coverage"
 msgstr ""
 
-#: assets/agenda/utils.ts:61
+#: assets/agenda/utils.ts:69
 msgid "coverage updated {{ at }}"
 msgstr ""
 
-#: assets/agenda/utils.ts:71
+#: assets/agenda/utils.ts:79
 msgid "Time to be confirmed"
 msgstr ""
 
-#: assets/agenda/utils.ts:81 assets/agenda/utils.ts:82
+#: assets/agenda/utils.ts:89 assets/agenda/utils.ts:90
 msgid "Coverage not planned"
 msgstr ""
 
-#: assets/agenda/utils.ts:83 assets/agenda/utils.ts:90
+#: assets/agenda/utils.ts:91 assets/agenda/utils.ts:98
 msgid "Coverage planned"
 msgstr ""
 
-#: assets/agenda/utils.ts:84 assets/agenda/utils.ts:85
+#: assets/agenda/utils.ts:92 assets/agenda/utils.ts:93
 msgid "Coverage on merit"
 msgstr ""
 
-#: assets/agenda/utils.ts:86
+#: assets/agenda/utils.ts:94
 msgid "Coverage on request"
 msgstr ""
 
-#: assets/agenda/utils.ts:91
+#: assets/agenda/utils.ts:99
 msgid "Coverage in progress"
 msgstr ""
 
-#: assets/agenda/utils.ts:92
+#: assets/agenda/utils.ts:100
 msgid "Coverage available"
 msgstr ""
 
-#: assets/agenda/utils.ts:93
+#: assets/agenda/utils.ts:101
 msgid "Coverage cancelled"
 msgstr ""
 
-#: assets/agenda/utils.ts:987
+#: assets/agenda/utils.ts:999
 msgid "assignee: {{name}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:988
+#: assets/agenda/utils.ts:1000
 msgid "desk: {{name}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:997
+#: assets/agenda/utils.ts:1009
 msgid "{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1005
+#: assets/agenda/utils.ts:1017
 msgid ""
 "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
 " {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1013
+#: assets/agenda/utils.ts:1025
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}} {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1017
+#: assets/agenda/utils.ts:1029
 msgid "{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(update to come)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(updated)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1028
+#: assets/agenda/utils.ts:1040
 msgid ""
 "{{ type }} coverage {{ slugline }} available {{deliveryState}} "
 "{{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1036
+#: assets/agenda/utils.ts:1048
 msgid "{{ type }} coverage {{assignedDetails}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1106
+#: assets/agenda/utils.ts:1118
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1112
+#: assets/agenda/utils.ts:1124
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/agenda/utils.ts:1117
+#: assets/agenda/utils.ts:1129
 msgid "{{startDate}} to {{endDate}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1126
+#: assets/agenda/utils.ts:1138
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1134
+#: assets/agenda/utils.ts:1146
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1141
+#: assets/agenda/utils.ts:1153
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/agenda/utils.ts:1149 assets/agenda/utils.ts:1159
+#: assets/agenda/utils.ts:1161 assets/agenda/utils.ts:1171
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 
@@ -1802,7 +1817,7 @@ msgid "Oldest updates"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.tsx:259
-#: assets/search/components/SearchResultsBar/index.tsx:65
+#: assets/search/components/SearchResultsBar/index.tsx:67
 msgid "Relevance"
 msgstr ""
 
@@ -1991,11 +2006,11 @@ msgstr ""
 msgid "Show"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.tsx:333
+#: assets/agenda/components/AgendaList.tsx:334
 msgid "Tomorrow"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.tsx:466
+#: assets/agenda/components/AgendaList.tsx:467
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
@@ -2051,11 +2066,11 @@ msgstr ""
 msgid "Associated Event"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:24
+#: assets/agenda/components/AgendaPreviewImage.tsx:28
 msgid "Show Map"
 msgstr ""
 
-#: assets/agenda/components/AgendaPreviewImage.tsx:25
+#: assets/agenda/components/AgendaPreviewImage.tsx:29
 msgid "Hide Map"
 msgstr ""
 
@@ -2749,10 +2764,6 @@ msgstr ""
 msgid "This week"
 msgstr ""
 
-#: assets/company-reports/components/ProductStories.tsx:29
-msgid "Last 7 days"
-msgstr ""
-
 #: assets/company-reports/components/ProductStories.tsx:30
 msgid "This month"
 msgstr ""
@@ -2921,7 +2932,7 @@ msgstr ""
 
 #: assets/components/NotificationPopup.tsx:72
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:238
+#: assets/search/components/SearchResultsBar/index.tsx:293
 msgid "Clear All"
 msgstr ""
 
@@ -3166,7 +3177,7 @@ msgstr ""
 msgid "Custom View"
 msgstr ""
 
-#: assets/maps/components/static.tsx:37
+#: assets/maps/components/static.tsx:43
 msgid "Map"
 msgstr ""
 
@@ -3920,36 +3931,42 @@ msgstr ""
 msgid "Save new topic"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:57
+#: assets/search/components/SearchResultsBar/index.tsx:59
 msgid "Newest first"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:61
+#: assets/search/components/SearchResultsBar/index.tsx:63
 msgid "Oldest first"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:201
+#: assets/search/components/SearchResultsBar/index.tsx:208
 msgid "1 result"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:203
+#: assets/search/components/SearchResultsBar/index.tsx:210
 msgid "{{ count }} results"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:211
+#: assets/search/components/SearchResultsBar/index.tsx:240
+msgid ""
+"The initial search is limited to the {{dateFilterName}}. Please find "
+"different date ranges in the filter panel using the burger menu."
+msgstr ""
+
+#: assets/search/components/SearchResultsBar/index.tsx:266
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:214
+#: assets/search/components/SearchResultsBar/index.tsx:269
 msgid "Sort results by"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:244
+#: assets/search/components/SearchResultsBar/index.tsx:299
 msgid "Hide search terms"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/index.tsx:245
+#: assets/search/components/SearchResultsBar/index.tsx:300
 msgid "Show search terms"
 msgstr ""
 

@@ -298,3 +298,15 @@ def test_send_user_email_on_locale_changed():
         send_user_email(user, "test_template", template_kwargs=template_kwargs)
         assert "Event status : Planned" in send_email_mock.call_args[1]["text_body"]
         assert "Coverage status: Planned" in send_email_mock.call_args[1]["text_body"]
+
+
+def test_email_subject_validation(client, app, mocker):
+    sub = mocker.patch("newsroom.email._send_email.apply_async")
+    with app.test_request_context():
+        html = "<p>foo</p>"
+        text = "foo"
+        subject = "foo\nbar"
+        send_email(html_body=html, text_body=text, to="to", subject=subject)
+    assert len(sub.mock_calls)
+    call = sub.mock_calls[0]
+    assert "foo" == call.kwargs["kwargs"]["subject"]
