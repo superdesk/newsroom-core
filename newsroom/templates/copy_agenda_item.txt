@@ -50,3 +50,26 @@ Description: {{ plan.description_text | plain_text }}
 {%- endfor -%}
 {%- endfor -%}
 {%- endif -%}
+
+{%- if related_events %}
+    <div>Related Events:</div>
+    {%- for event in related_events %}
+        <div>
+            {%- if event.name %}
+                <div>{{ event.name }}</div>
+            {%- endif %}
+            {%- if event.slugline %}
+                <div>Slugline: {{ event.slugline }}</div>
+            {%- endif %}
+            {%- if event.headline %}
+                <div>Headline: {{ event.headline }}</div>
+            {%- endif %}
+            {%- if event.definition_long %}
+                <div>Definition: {{ event.definition_long }}</div>
+            {%- endif %}
+            <div>{{ event | format_event_datetime }}</div>
+        </div>
+    {%- endfor %}
+{%- endif %}
+</article>
+{% endblock %}

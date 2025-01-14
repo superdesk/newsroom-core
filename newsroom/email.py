@@ -444,7 +444,7 @@ async def _send_new_agenda_notification_email(user: User | UserResourceModel, to
     from newsroom.agenda.utils import get_related_events
 
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
-    related_events = get_related_events(item)
+    related_events = await get_related_events(item)
     _remove_restricted_coverage_info(item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
