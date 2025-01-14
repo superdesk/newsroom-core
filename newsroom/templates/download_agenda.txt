@@ -24,3 +24,19 @@
 {% endif -%}
   Coverage Status: {{ coverage.coverage_status }}
 {%- endfor %}{% endif %}
+
+{%- if related_events %}
+Related_Events:
+{%- for event in related_events %}
+
+{% if event.name %}{{ event.name }}
+{% endif %}
+{%- if event.slugline %}Slugline: {{ event.slugline }}
+{% endif %}
+{%- if event.headline %}Headline: {{ event.headline }}
+{% endif %}
+{%- if event.definition_long %}Definition: {{ event.definition_long }}
+{% endif -%}
+{{ event | format_event_datetime }}
+{%- endfor %}
+{% endif %}

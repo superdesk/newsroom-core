@@ -18,7 +18,12 @@ class TextFormatter(BaseFormatter):
     MIMETYPE = "text/plain"
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
+        from newsroom.agenda.utils import get_related_events  # noqa
+
         if item_type == "items":
             return str.encode(await render_template("download_item.txt", item=item), "utf-8")
         else:
-            return str.encode(await render_template("download_agenda.txt", item=item), "utf-8")
+            return str.encode(
+                await render_template("download_agenda.txt", item=item, related_events=await get_related_events(item)),
+                "utf-8",
+            )
