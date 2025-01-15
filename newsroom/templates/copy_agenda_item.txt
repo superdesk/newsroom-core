@@ -50,6 +50,7 @@ Description: {{ plan.description_text | plain_text }}
 {%- endfor -%}
 {%- endfor -%}
 {%- endif -%}
+
 {%- if related_events %}
 Related_Events:
 {%- for event in related_events %}
