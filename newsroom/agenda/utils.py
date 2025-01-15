@@ -307,3 +307,16 @@ def get_filtered_subject(
     if not schemas:
         return subject
     return [subj for subj in subject if subj.get("scheme") in schemas]
+
+
+async def get_related_events(item: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Get related events for an agenda item
+    param item: Agenda item
+    """
+    from .agenda_search import AgendaSearchServiceAsync  # noqa
+
+    related_events = []
+    if item.get("event_ids"):
+        related_events = await AgendaSearchServiceAsync().get_items_for_action(item["event_ids"])
+    return related_events

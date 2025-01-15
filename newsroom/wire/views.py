@@ -511,6 +511,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
     """Endpoint to copy Wire OR Agenda item(s)"""
 
     from newsroom.agenda import AgendaItemService
+    from newsroom.agenda.utils import get_related_events
 
     item_type = get_type()
     service = AgendaItemService() if item_type == "agenda" else WireItemService()
@@ -530,6 +531,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
                 "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
                 "contacts": get_public_contacts(item_to_copy),
                 "calendars": ", ".join([calendar.get("name") for calendar in item_to_copy.get("calendars") or []]),
+                "related_events": await get_related_events(item_to_copy),
             }
         )
     copy_data = (await render_template(template_name, **template_kwargs)).strip()

@@ -440,8 +440,11 @@ def _remove_restricted_coverage_info(item):
 
 # TODO-ASYNC: change this to use newsroom.users.model.UserResourceModel only
 async def _send_new_agenda_notification_email(user: User | UserResourceModel, topic_name: str, item: dict[str, Any]):
-    user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
+    # Import here to prevent circular imports
+    from newsroom.agenda.utils import get_related_events
 
+    user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
+    related_events = await get_related_events(item)
     _remove_restricted_coverage_info(item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
@@ -458,6 +461,7 @@ async def _send_new_agenda_notification_email(user: User | UserResourceModel, to
         links=get_links(item),
         is_admin=is_admin_or_internal(user),
         section="agenda",
+        related_events=related_events,
     )
     await send_user_email(
         user=user,
