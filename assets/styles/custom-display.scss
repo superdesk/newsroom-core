@@ -29,6 +29,10 @@
     .d-phone-none {display: none;}
     .d-phone-block {display: block;}
 }
+@include large_phone {
+    .d-phone-none {display: none;}
+    .d-phone-block {display: block;}
+}
 
 @include tablet {
     .d-tablet-none {display: none;}

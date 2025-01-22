@@ -1,11 +1,16 @@
+from typing import Any
+from datetime import timedelta
+
 import arrow
 import icalendar
+from quart_babel import lazy_gettext
 
 from superdesk.flask import url_for
 from superdesk.utc import utcnow
 
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
-from newsroom.formatter import BaseFormatter
 
 
 def datetime(value):
@@ -30,12 +35,16 @@ def guid(item):
 
 
 class iCalFormatter(BaseFormatter):
+    format_id = "ical"
+    name = lazy_gettext("iCalendar")
+    sections = [SectionEnum.AGENDA]
+
     VERSION = "2.0"
     PRODID = "Newshub"
     FILE_EXTENSION = "ical"
     MIMETYPE = "text/calendar"
 
-    def format_item(self, item, item_type=None):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
         cal = icalendar.Calendar()
         cal["version"] = self.VERSION
         cal["prodid"] = self.PRODID
@@ -67,7 +76,9 @@ class iCalFormatter(BaseFormatter):
         event.add("dtstart", start.date() if dates.get("all_day") else start)
         if dates.get("end"):
             end = datetime(dates["end"])
-            event.add("dtend", end.date() if dates.get("no_end_time") or dates.get("all_day") else end)
+            event.add(
+                "dtend", end.date() + timedelta(days=1) if dates.get("no_end_time") or dates.get("all_day") else end
+            )
         try:
             rrule = item["event"]["dates"]["recurring_rule"]
             event.add("rrule", get_rrule_kwargs(rrule))

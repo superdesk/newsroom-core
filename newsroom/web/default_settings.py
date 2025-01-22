@@ -116,7 +116,6 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.news_api.api_tokens",
-    "newsroom.monitoring",
 ]
 
 CORE_APPS = [
@@ -139,7 +138,6 @@ CORE_APPS = [
     "newsroom.media_utils",
     "newsroom.news_api",
     "newsroom.news_api.api_tokens",
-    "newsroom.news_api.api_audit",
     "newsroom.monitoring",
     "newsroom.company_expiry_alerts",
     "newsroom.oauth_clients",
@@ -174,6 +172,8 @@ MODULES = [
     "newsroom.design",
     "newsroom.auth_server.client",
     "newsroom.reports",
+    "newsroom.monitoring.module",
+    "newsroom.news_api.api_audit",
 ]
 
 SITE_NAME = "Newshub"
@@ -426,6 +426,10 @@ CELERY_TASK_QUEUES = (
 
 CELERY_TASK_ROUTES = {
     "newsroom.push.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
+    "newsroom.email.*": {
         "queue": celery_queue("newsroom.push"),
         "routing_key": "newsroom.push",
     },
@@ -813,10 +817,10 @@ AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
 WIRE_TIME_FILTERS = [
     {"name": lazy_gettext("Today"), "filter": "today", "default": False, "query": {"gte": "now/d"}},
     {
-        "name": lazy_gettext("Last Week"),
+        "name": lazy_gettext("Last 7 days"),
         "filter": "last_week",
         "default": False,
-        "query": {"gte": "now-1w/w", "lt": "now/w"},
+        "query": {"gte": "now-7d/d"},
     },
     {
         "name": lazy_gettext("Last 30 days"),
@@ -853,3 +857,14 @@ AGENDA_TIME_FILTERS = [
 #: .. versionadded:: 2.8
 #:
 COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
+
+#: Calendar Location Filter options config
+#:
+#: .. versionadded: 2.9
+#:
+CALENDAR_LOCATIONS_FILTER_OPTIONS = {
+    "city": True,
+    "state": True,
+    "country": True,
+    "place": True,
+}

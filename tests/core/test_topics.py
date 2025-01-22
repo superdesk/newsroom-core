@@ -4,7 +4,6 @@ from quart import json
 from unittest import mock
 from copy import deepcopy
 from bson import ObjectId
-import pymongo
 
 from newsroom.types import UserResourceModel, TopicResourceModel, SectionEnum
 from newsroom.topics.views import get_topic_url
@@ -314,47 +313,29 @@ async def test_topic_folders_unique_validation(client):
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second one should raise DuplicateKeyError
-    try:
-        resp = await client.post(user_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        # assert that the DuplicateKeyError occurred as expected
-        print("DuplicateKeyError for user topic folder as expected")
-    else:
-        # If no exception is raised, fail the test
-        assert False, "Expected DuplicateKeyError for user topic folder, but got success"
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # create company topic with same name
-    print("URL=")
-    print(company_topic_folders_url)
     resp = await client.post(company_topic_folders_url, json=folder)
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # second one should raise DuplicateKeyError for company topic
-    try:
-        resp = await client.post(company_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        # assert that the DuplicateKeyError occurred as expected
-        print("DuplicateKeyError for company topic folder as expected")
-    else:
-        # If no exception is raised, fail the test
-        assert False, "Expected DuplicateKeyError for company topic folder, but got success"
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # check case-insensitive uniqueness for user topic
     folder["name"] = "Test"
-    try:
-        resp = await client.post(user_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        print("DuplicateKeyError for case-insensitive user topic folder as expected")
-    else:
-        assert False, "Expected DuplicateKeyError for case-insensitive user topic folder, but got success"
+    resp = await client.post(user_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
     # check case-insensitive uniqueness for company topic
-    try:
-        resp = await client.post(company_topic_folders_url, json=folder)
-    except pymongo.errors.DuplicateKeyError:
-        print("DuplicateKeyError for case-insensitive company topic folder as expected")
-    else:
-        assert False, "Expected DuplicateKeyError for case-insensitive company topic folder, but got success"
+    resp = await client.post(company_topic_folders_url, json=folder)
+    assert resp.status_code == 400, await resp.get_data(as_text=True)
+    assert await resp.get_json() == {"name": "Name must be unique"}
 
 
 async def test_topic_subscriber_auto_enable_user_emails(app, client, navigation_items):
@@ -471,26 +452,25 @@ async def test_remove_user_topics_on_user_delete(client, app):
     folders = await cursor.to_list_raw()
     assert 2 == len(folders)
 
-    # TODO-ASYNC:- Test cases based on signal
+    response = await client.delete(f"/users/{PUBLIC_USER_ID}")
+    assert 200 == response.status_code
 
-    # await client.delete(f"/users/{PUBLIC_USER_ID}")
+    # make sure it's NOT editable later, as user no longer exists in the system
+    resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    assert 404 == resp.status_code
 
-    # # make sure it's editable later
-    # resp = await client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
-    # assert 200 == resp.status_code
+    cursor = await TopicService().search(lookup={})
+    topics = await cursor.to_list_raw()
+    assert 2 == len(topics)
+    assert "test2" == topics[0]["label"]
+    assert 1 == len(topics[0]["subscribers"])
+    assert "test3" == topics[1]["label"]
+    assert None is topics[1].get("user")
 
-    # cursor = await TopicService().search(lookup={})
-    # topics = await cursor.to_list_raw()
-    # assert 2 == len(topics)
-    # assert "test2" == topics[0]["label"]
-    # assert 1 == len(topics[0]["subscribers"])
-    # assert "test3" == topics[1]["label"]
-    # assert None is topics[1].get("user")
-
-    # cursor = await UserFoldersResourceService().search(lookup={})
-    # folders = await cursor.to_list_raw()
-    # assert 1 == len(folders)
-    # assert "skip" == folders[0]["name"]
+    cursor = await UserFoldersResourceService().search(lookup={})
+    folders = await cursor.to_list_raw()
+    assert 1 == len(folders)
+    assert "skip" == folders[0]["name"]
 
 
 async def test_created_field_in_topic_url(client):

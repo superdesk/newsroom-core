@@ -4,11 +4,13 @@ from superdesk.core.web import EndpointGroup
 
 from newsroom.types import FeaturedResourceModel, AgendaItem
 from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
+from newsroom.formatters import register_formatter
 from newsroom.search.config import init_nested_aggregation
 
 from .agenda_search import AgendaItemService, AgendaSearchServiceAsync
 from .filters import PRIVATE_FIELDS, aggregations
 from .featured_service import FeaturedService
+from .formatters import iCalFormatter, CSVFormatter
 
 
 agenda_endpoints = EndpointGroup("agenda", __name__)
@@ -39,7 +41,14 @@ def init_module(app: SuperdeskAsyncApp):
     if app.wsgi.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
         PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])
 
+    app.wsgi.config["CLIENT_CONFIG"]["agenda_default_filter_hide_planning"] = app.wsgi.config.get(
+        "AGENDA_DEFAULT_FILTER_HIDE_PLANNING", False
+    )
+
     init_nested_aggregation("agenda", ["subject"], app.wsgi.config.get("AGENDA_GROUPS", []), aggregations)
+
+    register_formatter(iCalFormatter)
+    register_formatter(CSVFormatter)
 
 
 module = Module(

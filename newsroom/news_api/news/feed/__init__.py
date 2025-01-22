@@ -1,8 +1,4 @@
-import superdesk
+from superdesk.core.module import Module
+from .views import news_api_feed_endpoints
 
-from .resource import NewsAPIFeedResource
-from .service import NewsAPIFeedService
-
-
-def init_app(app):
-    superdesk.register_resource("news/feed", NewsAPIFeedResource, NewsAPIFeedService, _app=app)
+module = Module(name="newsroom.news_api.feed", endpoints=[news_api_feed_endpoints])

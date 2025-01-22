@@ -9,38 +9,47 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import base64
-import datetime
+from datetime import datetime, timedelta
 import logging
 from urllib.parse import urlparse
+from dataclasses import dataclass
 
-from eve.utils import ParsedRequest
-
-from superdesk.core import get_app_config, get_current_app
-from superdesk import get_resource_service, Command
+from superdesk.core import get_app_config, get_current_app, get_current_async_app
+from superdesk.core.resources.cursor import ResourceCursorAsync
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
+from newsroom.types import MonitoringProfileResourceModel
+from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
 from newsroom.email import send_user_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.utils import parse_date_str
+from newsroom.search.types import NewshubSearchRequest
 
+from .service import MonitoringProfileService
+from .search import MonitoringSearchService, MonitoringSearchRequestArgs
 from .utils import get_monitoring_file, truncate_article_body
 
 
 logger = logging.getLogger(__name__)
 
 
-class MonitoringEmailAlerts(Command):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+@dataclass
+class AlertMonitoringDataEntry:
+    w_lists: list[MonitoringProfileResourceModel]
+    created_from: str
+    created_from_time: str
+
+
+class MonitoringEmailAlerts:
+    def __init__(self):
         self.log_msg = f"Monitoring Scheduled Alerts: {utcnow()}"
 
-    async def run(self, immediate=False):
+    async def run(self, immediate: bool = False) -> None:
         try:
-            # TODO-ASYNC: update this below when monitoring is migrated to async
-            get_resource_service("monitoring")
+            get_current_async_app().resources.get_resource_service("monitoring")
         except KeyError:
             logger.info(f"{self.log_msg} Monitoring app is not enabled! Not sending email alerts")
             return
@@ -74,39 +83,41 @@ class MonitoringEmailAlerts(Command):
 
         logger.info("{} Completed sending Monitoring Scheduled Alerts.".format(self.log_msg))
 
-    async def immediate_worker(self, now):
-        last_minute = now - datetime.timedelta(minutes=1)
+    async def immediate_worker(self, now: datetime) -> None:
+        last_minute = now - timedelta(minutes=1)
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
         await self.send_alerts(
-            self.get_immediate_monitoring_list(),
+            await self.get_immediate_monitoring_list(),
             local_to_utc(default_timezone, last_minute).strftime("%Y-%m-%d"),
             local_to_utc(default_timezone, last_minute).strftime("%H:%M:%S"),
             now,
         )
 
-    def get_scheduled_monitoring_list(self):
-        return list(
-            get_resource_service("monitoring").find(
-                where={
-                    "schedule.interval": {"$in": ["one_hour", "two_hour", "four_hour", "weekly", "daily"]},
-                    "is_enabled": True,
-                }
-            )
+    async def get_scheduled_monitoring_list(self) -> ResourceCursorAsync[MonitoringProfileResourceModel]:
+        return await MonitoringProfileService().search(
+            {
+                "schedule.interval": {"$in": ["one_hour", "two_hour", "four_hour", "weekly", "daily"]},
+                "is_enabled": True,
+            }
         )
 
-    def get_immediate_monitoring_list(self):
-        return list(
-            get_resource_service("monitoring").find(where={"schedule.interval": "immediate", "is_enabled": True})
+    async def get_immediate_monitoring_list(self) -> list[MonitoringProfileResourceModel]:
+        cursor = await MonitoringProfileService().search(
+            {
+                "schedule.interval": "immediate",
+                "is_enabled": True,
+            }
         )
+        return await cursor.to_list()
 
-    async def scheduled_worker(self, now):
-        monitoring_list = self.get_scheduled_monitoring_list()
+    async def scheduled_worker(self, now: datetime) -> None:
+        monitoring_list = await self.get_scheduled_monitoring_list()
 
-        one_hour_ago = now - datetime.timedelta(hours=1)
-        two_hours_ago = now - datetime.timedelta(hours=2)
-        four_hours_ago = now - datetime.timedelta(hours=4)
-        yesterday = now - datetime.timedelta(days=1)
-        last_week = now - datetime.timedelta(days=7)
+        one_hour_ago = now - timedelta(hours=1)
+        two_hours_ago = now - timedelta(hours=2)
+        four_hours_ago = now - timedelta(hours=4)
+        yesterday = now - timedelta(days=1)
+        last_week = now - timedelta(days=7)
 
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
         one_hours_ago_utc = local_to_utc(default_timezone, one_hour_ago)
@@ -115,38 +126,38 @@ class MonitoringEmailAlerts(Command):
         yesterday_utc = local_to_utc(default_timezone, yesterday)
         last_week_utc = local_to_utc(default_timezone, last_week)
 
-        alert_monitoring = {
-            "one": {
-                "w_lists": [],
-                "created_from": one_hours_ago_utc.strftime("%Y-%m-%d"),
-                "created_from_time": one_hours_ago_utc.strftime("%H:%M:%S"),
-            },
-            "two": {
-                "w_lists": [],
-                "created_from": two_hours_ago_utc.strftime("%Y-%m-%d"),
-                "created_from_time": two_hours_ago_utc.strftime("%H:%M:%S"),
-            },
-            "four": {
-                "w_lists": [],
-                "created_from": four_hours_ago_utc.strftime("%Y-%m-%d"),
-                "created_from_time": four_hours_ago_utc.strftime("%H:%M:%S"),
-            },
-            "daily": {
-                "w_lists": [],
-                "created_from": yesterday_utc.strftime("%Y-%m-%d"),
-                "created_from_time": yesterday_utc.strftime("%H:%M:%S"),
-            },
-            "weekly": {
-                "w_lists": [],
-                "created_from": last_week_utc.strftime("%Y-%m-%d"),
-                "created_from_time": last_week_utc.strftime("%H:%M:%S"),
-            },
-        }
+        alert_monitoring: dict[str, AlertMonitoringDataEntry] = dict(
+            one=AlertMonitoringDataEntry(
+                w_lists=[],
+                created_from=one_hours_ago_utc.strftime("%Y-%m-%d"),
+                created_from_time=one_hours_ago_utc.strftime("%H:%M:%S"),
+            ),
+            two=AlertMonitoringDataEntry(
+                w_lists=[],
+                created_from=two_hours_ago_utc.strftime("%Y-%m-%d"),
+                created_from_time=two_hours_ago_utc.strftime("%H:%M:%S"),
+            ),
+            four=AlertMonitoringDataEntry(
+                w_lists=[],
+                created_from=four_hours_ago_utc.strftime("%Y-%m-%d"),
+                created_from_time=four_hours_ago_utc.strftime("%H:%M:%S"),
+            ),
+            daily=AlertMonitoringDataEntry(
+                w_lists=[],
+                created_from=yesterday_utc.strftime("%Y-%m-%d"),
+                created_from_time=yesterday_utc.strftime("%H:%M:%S"),
+            ),
+            weekly=AlertMonitoringDataEntry(
+                w_lists=[],
+                created_from=last_week_utc.strftime("%Y-%m-%d"),
+                created_from_time=last_week_utc.strftime("%H:%M:%S"),
+            ),
+        )
 
-        for m in monitoring_list:
+        async for monitoring_profile in monitoring_list:
             self.add_to_send_list(
                 alert_monitoring,
-                m,
+                monitoring_profile,
                 now,
                 one_hour_ago,
                 two_hours_ago,
@@ -156,84 +167,95 @@ class MonitoringEmailAlerts(Command):
             )
 
         for key, value in alert_monitoring.items():
-            await self.send_alerts(value["w_lists"], value["created_from"], value["created_from_time"], now)
+            await self.send_alerts(value.w_lists, value.created_from, value.created_from_time, now)
 
-    def is_within_five_minutes(self, new_scheduled_time, now):
-        return new_scheduled_time and (new_scheduled_time - now).total_seconds() < 300
+    def is_within_five_minutes(self, new_scheduled_time: datetime, now: datetime) -> bool:
+        return (new_scheduled_time - now).total_seconds() < 300
 
-    def is_past_range(self, last_run_time, upper_range):
+    def is_past_range(self, last_run_time: datetime | None, upper_range: datetime) -> bool:
         return not last_run_time or last_run_time < upper_range
 
     def add_to_send_list(
         self,
-        alert_monitoring,
-        profile,
-        now,
-        one_hour_ago,
-        two_hours_ago,
-        four_hours_ago,
-        yesterday,
-        last_week,
+        alert_monitoring: dict[str, AlertMonitoringDataEntry],
+        profile: MonitoringProfileResourceModel,
+        now: datetime,
+        one_hour_ago: datetime,
+        two_hours_ago: datetime,
+        four_hours_ago: datetime,
+        yesterday: datetime,
+        last_week: datetime,
     ):
-        last_run_time = parse_date_str(profile["last_run_time"]) if profile.get("last_run_time") else None
+        if profile.schedule is None:
+            # This should not happen, as we're filtering specifically for monitoring profiles with a schedule
+            # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
+            return
+
+        last_run_time = parse_date_str(profile.last_run_time) if profile.last_run_time else None
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
         if last_run_time:
             last_run_time = utc_to_local(default_timezone, last_run_time)
 
-        # Convert time to current date for range comparision
-        if profile["schedule"].get("time"):
-            hour_min = profile["schedule"]["time"].split(":")
+        # Convert time to current date for range comparison
+        if profile.schedule.time:
+            hour_min = profile.schedule.time.split(":")
             schedule_today_plus_five_mins = utc_to_local(default_timezone, utcnow())
             schedule_today_plus_five_mins = schedule_today_plus_five_mins.replace(
                 hour=int(hour_min[0]), minute=int(hour_min[1])
             )
-            schedule_today_plus_five_mins = schedule_today_plus_five_mins + datetime.timedelta(minutes=5)
+            schedule_today_plus_five_mins = schedule_today_plus_five_mins + timedelta(minutes=5)
 
             # Check if the time window is according to schedule
             if (
-                profile["schedule"]["interval"] == "daily"
+                profile.schedule.interval == "daily"
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
                 and self.is_past_range(last_run_time, yesterday)
             ):
-                alert_monitoring["daily"]["w_lists"].append(profile)
+                alert_monitoring["daily"].w_lists.append(profile)
                 return
 
             # Check if the time window is according to schedule
             # Check if 'day' is according to schedule
             if (
-                profile["schedule"]["interval"] == "weekly"
+                profile.schedule.interval == "weekly"
                 and self.is_within_five_minutes(schedule_today_plus_five_mins, now)
-                and schedule_today_plus_five_mins.strftime("%a").lower() == profile["schedule"]["day"]
+                and schedule_today_plus_five_mins.strftime("%a").lower() == profile.schedule.day
                 and self.is_past_range(last_run_time, last_week)
             ):
-                alert_monitoring["weekly"]["w_lists"].append(profile)
+                alert_monitoring["weekly"].w_lists.append(profile)
                 return
         else:
             # Check if current time is within 'hourly' window
             if now.minute > 4:
                 return
 
-            if profile["schedule"]["interval"] == "one_hour" and self.is_past_range(last_run_time, one_hour_ago):
-                alert_monitoring["one"]["w_lists"].append(profile)
+            if profile.schedule.interval == "one_hour" and self.is_past_range(last_run_time, one_hour_ago):
+                alert_monitoring["one"].w_lists.append(profile)
                 return
 
             if (
-                profile["schedule"]["interval"] == "two_hour"
+                profile.schedule.interval == "two_hour"
                 and now.hour % 2 == 0
                 and self.is_past_range(last_run_time, two_hours_ago)
             ):
-                alert_monitoring["two"]["w_lists"].append(profile)
+                alert_monitoring["two"].w_lists.append(profile)
                 return
 
             if (
-                profile["schedule"]["interval"] == "four_hour"
+                profile.schedule.interval == "four_hour"
                 and now.hour % 4 == 0
                 and self.is_past_range(last_run_time, four_hours_ago)
             ):
-                alert_monitoring["four"]["w_lists"].append(profile)
+                alert_monitoring["four"].w_lists.append(profile)
                 return
 
-    async def send_alerts(self, monitoring_list, created_from, created_from_time, now):
+    async def send_alerts(
+        self,
+        monitoring_list: list[MonitoringProfileResourceModel],
+        created_from: str,
+        created_from_time: str,
+        now: datetime,
+    ):
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         error_recipients = []
         if general_settings and general_settings["values"].get("system_alerts_recipients"):
@@ -247,26 +269,40 @@ class MonitoringEmailAlerts(Command):
         companies_service = CompanyServiceAsync()
 
         for monitoring_data in monitoring_list:
-            if monitoring_data.get("users"):
-                users = await users_service.find_items_by_ids(monitoring_data["users"])
+            if monitoring_data.schedule is None:
+                # This should not happen, as we're filtering specifically for monitoring profiles with a schedule
+                # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
+                continue
 
-                internal_req = ParsedRequest()
-                internal_req.args = {
-                    "navigation": str(monitoring_data["_id"]),
-                    "created_from": created_from,
-                    "created_from_time": created_from_time,
-                    "skip_user_validation": True,
-                }
-                # TODO-ASYNC: update this below when `monitoring_search` is migrated to async
-                items = list(get_resource_service("monitoring_search").get(req=internal_req, lookup=None))
-                template_kwargs = {"profile": monitoring_data}
+            if monitoring_data.format_type is None:
+                # If for some reason this Monitoring Profile does not have a ``format_type`` set
+                # then we default it to ``monitoring_pdf``
+                monitoring_data.format_type = "monitoring_pdf"
+
+            if monitoring_data.users and len(monitoring_data.users):
+                users = await users_service.find_items_by_ids(monitoring_data.users)
+                company = (
+                    await companies_service.find_by_id(monitoring_data.company) if monitoring_data.company else None
+                )
+                if company is None:
+                    logger.exception(f"Company {monitoring_data.company} not found!")
+                    continue
+
+                search_request = NewshubSearchRequest(
+                    args=MonitoringSearchRequestArgs(
+                        navigation_ids=[monitoring_data.id],
+                        skip_user_validation=True,
+                        start_date=created_from,
+                        start_time=created_from_time,
+                    ),
+                    company=company,
+                )
+                cursor = await MonitoringSearchService().search(search_request)
+                items = await cursor.to_list_raw()
+
+                template_kwargs = {"profile": monitoring_data.to_dict()}
 
                 if items:
-                    company = await companies_service.find_by_id(monitoring_data["company"])
-                    if company is None:
-                        logger.exception(f"Company {monitoring_data['company']} not found!")
-                        continue
-
                     try:
                         template_kwargs.update(
                             {
@@ -275,11 +311,9 @@ class MonitoringEmailAlerts(Command):
                             }
                         )
                         truncate_article_body(items, monitoring_data)
-                        _file = await get_monitoring_file(monitoring_data, items)
-                        attachment = base64.b64encode(_file.read())
-                        formatter = (
-                            get_current_app().as_any().download_formatters[monitoring_data["format_type"]]["formatter"]
-                        )
+                        monitoring_file = await get_monitoring_file(monitoring_data, items)
+                        attachment = base64.b64encode(monitoring_file.read())
+                        formatter = get_formatter(monitoring_data.format_type)
 
                         for user in users:
                             await send_user_email(
@@ -292,20 +326,20 @@ class MonitoringEmailAlerts(Command):
                                         "file_name": formatter.format_filename(None),
                                         "content_type": "application/{}".format(formatter.FILE_EXTENSION),
                                         "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
-                                            monitoring_data["name"]
+                                            monitoring_data.name
                                         ),
                                     }
                                 ],
                             )
                     except Exception:
                         logger.exception(
-                            f"{self.log_msg} Error processing monitoring profile {monitoring_data['name']} for company {company.name}."
+                            f"{self.log_msg} Error processing monitoring profile {monitoring_data.name} for company {company.name}."
                         )
                         if error_recipients:
                             # Send an email to admin
                             template_kwargs = {
-                                "profile": monitoring_data,
-                                "name": monitoring_data["name"],
+                                "profile": monitoring_data.to_dict(),
+                                "name": monitoring_data.name,
                                 "company": company.name,
                                 "run_time": now,
                             }
@@ -314,7 +348,7 @@ class MonitoringEmailAlerts(Command):
                                 template="monitoring_error",
                                 template_kwargs=template_kwargs,
                             )
-                elif monitoring_data["schedule"].get("interval") != "immediate" and monitoring_data.get("always_send"):
+                elif monitoring_data.schedule.interval != "immediate" and monitoring_data.always_send:
                     for user in users:
                         await send_user_email(
                             user,
@@ -322,9 +356,8 @@ class MonitoringEmailAlerts(Command):
                             template_kwargs=template_kwargs,
                         )
 
-            get_resource_service("monitoring").patch(
-                monitoring_data["_id"],
-                {"last_run_time": local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)},
+            await MonitoringProfileService().update(
+                monitoring_data.id, {"last_run_time": local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)}
             )
 
 

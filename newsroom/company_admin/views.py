@@ -13,7 +13,6 @@ from newsroom.auth import auth_rules
 from newsroom.types import Company, Product
 from newsroom.core import get_current_wsgi_app
 from newsroom.email import send_template_email
-from newsroom.users import get_user_profile_data
 from newsroom.companies.utils import get_users_by_company
 from newsroom.utils import get_json_or_400_async, query_resource
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
@@ -24,10 +23,7 @@ blueprint = EndpointGroup("company_admin", __name__)
 
 @blueprint.endpoint("/company_admin", auth=[auth_rules.company_admin_only])
 async def index():
-    user_profile_data = await get_user_profile_data()
-    return await render_template(
-        "company_admin_index.html", data=(await get_view_data()), user_profile_data=user_profile_data
-    )
+    return await render_template("company_admin_index.html", data=(await get_view_data()))
 
 
 def filter_disabled_products(company: Company, products: List[Product]) -> Company:

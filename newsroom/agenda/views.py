@@ -5,7 +5,7 @@ from bson import ObjectId
 from pydantic import Field, field_validator
 from quart_babel import gettext
 
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.core.types import ESQuery, BaseModel, Request, Response, RestGetResponse
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 from superdesk.flask import render_template
@@ -18,7 +18,7 @@ from newsroom.auth.utils import (
     check_user_has_products,
 )
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.users import get_user_profile_data
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.products import get_products_by_company
 from newsroom.topics import get_user_topics_async
 from newsroom.topics_folders import get_company_folders, get_user_folders
@@ -55,17 +55,15 @@ from .filters import AgendaSearchRequestArgs
 
 @agenda_endpoints.endpoint("/agenda", auth=[auth_rules.section_required("agenda")])
 async def index() -> str:
-    user_profile_data = await get_user_profile_data()
     data = await get_view_data()
-    return await render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_index.html", data=data)
 
 
 @agenda_endpoints.endpoint("/bookmarks_agenda")
 async def bookmarks() -> str:
     data = await get_view_data()
-    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return await render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return await render_template("agenda_bookmarks.html", data=data)
 
 
 class AgendaItemViewArgs(BaseModel):
@@ -76,6 +74,7 @@ class AgendaItemParams(BaseModel):
     print: bool = False
     map: str | None = None
     type: str = "agenda"
+    format: str | None = None
 
     @field_validator("print", mode="before")
     def parse_print(cls, value: str | bool | None) -> bool | str | None:
@@ -111,7 +110,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
     if is_json_request(request):
         return Response(agenda_item_dict)
 
-    user_profile_data = await get_user_profile_data()
     if params.print:
         template = "agenda_item_print.html"
         await update_action_list([args.item_id], "prints", force_insert=True)
@@ -125,7 +123,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
             contacts=get_public_contacts(agenda_item_dict),
             links=get_links(agenda_item_dict),
             is_admin=user.is_admin_or_internal(),
-            user_profile_data=user_profile_data,
         )
 
     data = await get_view_data()
@@ -134,7 +131,6 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
         "agenda_index.html",
         data=data,
         title=agenda_item_dict.get("name", agenda_item_dict.get("headline")),
-        user_profile_data=user_profile_data,
     )
 
 
@@ -208,11 +204,7 @@ async def get_view_data() -> dict:
         "user": user_dict or {},
         "company": company.id if company else None,
         "topics": [t.to_dict() for t in topics if t.topic_type == "agenda"],
-        "formats": [
-            {"format": f["format"], "name": f["name"]}
-            for f in get_current_app().as_any().download_formatters.values()
-            if "agenda" in f["types"]
-        ],
+        "formats": get_formatters_id_and_names(SectionEnum.AGENDA),
         "navigations": navigations,
         "saved_items": saved_items,
         "events_only": company.events_only if company else False,
@@ -224,6 +216,7 @@ async def get_view_data() -> dict:
         "user_folders": user_folders,
         "company_folders": company_folders,
         "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
+        "location_filters_options": get_app_config("CALENDAR_LOCATIONS_FILTER_OPTIONS", {}),
     }
 
 
@@ -435,6 +428,7 @@ class SearchLocationsParams(BaseModel):
 
 @agenda_endpoints.endpoint("/agenda/search_locations")
 async def search_locations(args: None, params: SearchLocationsParams, request: Request) -> Response:
+    location_filter_options = get_app_config("CALENDAR_LOCATIONS_FILTER_OPTIONS", {})
     query = params.q
     apply_filters = len(query) > 0
 
@@ -461,36 +455,42 @@ async def search_locations(args: None, params: SearchLocationsParams, request: R
             "size": 1000,
         }
 
-    es_query: dict[str, Any] = {
-        "size": 0,
-        "aggs": {
-            "city_search_country": {
-                "terms": gen_agg_terms("address.country"),
-                "aggs": {
-                    "city_search_state": {
-                        "terms": gen_agg_terms("address.state"),
-                        "aggs": {
-                            "cities": {
-                                "terms": gen_agg_terms("address.city"),
-                            },
+    # Start with an empty aggregation structure
+    es_query: dict[str, Any] = {"size": 0, "aggs": {}}
+
+    # Conditionally add aggregations based on configuration
+    if location_filter_options.get("city", True):
+        es_query["aggs"]["city_search_country"] = {
+            "terms": gen_agg_terms("address.country"),
+            "aggs": {
+                "city_search_state": {
+                    "terms": gen_agg_terms("address.state"),
+                    "aggs": {
+                        "cities": {
+                            "terms": gen_agg_terms("address.city"),
                         },
                     },
                 },
             },
-            "state_search_country": {
-                "terms": gen_agg_terms("address.country"),
-                "aggs": {
-                    "states": {
-                        "terms": gen_agg_terms("address.state"),
-                    },
+        }
+
+    if location_filter_options.get("state", True):
+        es_query["aggs"]["state_search_country"] = {
+            "terms": gen_agg_terms("address.country"),
+            "aggs": {
+                "states": {
+                    "terms": gen_agg_terms("address.state"),
                 },
             },
-            "countries": {
-                "terms": gen_agg_terms("address.country"),
-            },
-            "places": {"terms": gen_agg_terms("name")},
-        },
-    }
+        }
+
+    if location_filter_options.get("country", True):
+        es_query["aggs"]["countries"] = {
+            "terms": gen_agg_terms("address.country"),
+        }
+
+    if location_filter_options.get("place", True):
+        es_query["aggs"]["places"] = {"terms": gen_agg_terms("name")}
 
     if apply_filters:
         es_query["query"] = {
@@ -511,58 +511,78 @@ async def search_locations(args: None, params: SearchLocationsParams, request: R
             },
         }
 
-        es_query["aggs"]["city_search"] = {
-            "filter": gen_agg_filter("address.city"),
-            "aggs": {"city_search_country": es_query["aggs"].pop("city_search_country")},
-        }
-        es_query["aggs"]["state_search"] = {
-            "filter": gen_agg_filter("address.state"),
-            "aggs": {"state_search_country": es_query["aggs"].pop("state_search_country")},
-        }
-        es_query["aggs"]["country_search"] = {
-            "filter": gen_agg_filter("address.country"),
-            "aggs": {"countries": es_query["aggs"].pop("countries")},
-        }
-        es_query["aggs"]["place_search"] = {
-            "filter": gen_agg_filter("name"),
-            "aggs": {"places": es_query["aggs"].pop("places")},
-        }
+        # Conditionally add filtered aggregations based on enabled options
+        if location_filter_options.get("city", True):
+            es_query["aggs"]["city_search"] = {
+                "filter": gen_agg_filter("address.city"),
+                "aggs": {"city_search_country": es_query["aggs"].pop("city_search_country")},
+            }
+
+        if location_filter_options.get("state", True):
+            es_query["aggs"]["state_search"] = {
+                "filter": gen_agg_filter("address.state"),
+                "aggs": {"state_search_country": es_query["aggs"].pop("state_search_country")},
+            }
+
+        if location_filter_options.get("country", True):
+            es_query["aggs"]["country_search"] = {
+                "filter": gen_agg_filter("address.country"),
+                "aggs": {"countries": es_query["aggs"].pop("countries")},
+            }
+
+        if location_filter_options.get("place", True):
+            es_query["aggs"]["place_search"] = {
+                "filter": gen_agg_filter("name"),
+                "aggs": {"places": es_query["aggs"].pop("places")},
+            }
 
     cursor = cast(ElasticsearchResourceCursorAsync, await AgendaItemService().search(es_query))
     aggs = cursor.hits.get("aggregations") or {}
 
     regions = []
-    for country_bucket in (aggs.get("city_search_country") or aggs["city_search"]["city_search_country"])["buckets"]:
-        country_name = country_bucket["key"]
-        for state_bucket in country_bucket["city_search_state"]["buckets"]:
-            state_name = state_bucket["key"]
-            for city_bucket in state_bucket["cities"]["buckets"]:
+
+    if location_filter_options.get("city", True):
+        for country_bucket in (aggs.get("city_search_country") or aggs["city_search"]["city_search_country"])[
+            "buckets"
+        ]:
+            country_name = country_bucket["key"]
+            for state_bucket in country_bucket["city_search_state"]["buckets"]:
+                state_name = state_bucket["key"]
+                for city_bucket in state_bucket["cities"]["buckets"]:
+                    regions.append(
+                        {"name": city_bucket["key"], "country": country_name, "state": state_name, "type": "city"}
+                    )
+
+    if location_filter_options.get("state", True):
+        for country_bucket in (aggs.get("state_search_country") or aggs["state_search"]["state_search_country"])[
+            "buckets"
+        ]:
+            country_name = country_bucket["key"]
+            for state_bucket in country_bucket["states"]["buckets"]:
                 regions.append(
-                    {"name": city_bucket["key"], "country": country_name, "state": state_name, "type": "city"}
+                    {
+                        "name": state_bucket["key"],
+                        "country": country_name,
+                        "type": "state",
+                    }
                 )
 
-    for country_bucket in (aggs.get("state_search_country") or aggs["state_search"]["state_search_country"])["buckets"]:
-        country_name = country_bucket["key"]
-        for state_bucket in country_bucket["states"]["buckets"]:
+    if location_filter_options.get("country", True):
+        for country_bucket in (aggs.get("countries") or aggs["country_search"]["countries"])["buckets"]:
             regions.append(
                 {
-                    "name": state_bucket["key"],
-                    "country": country_name,
-                    "type": "state",
+                    "name": country_bucket["key"],
+                    "type": "country",
                 }
             )
 
-    for country_bucket in (aggs.get("countries") or aggs["country_search"]["countries"])["buckets"]:
-        regions.append(
-            {
-                "name": country_bucket["key"],
-                "type": "country",
-            }
-        )
+    places = []
+    if location_filter_options.get("place", True):
+        places = [bucket["key"] for bucket in (aggs.get("places") or aggs["place_search"]["places"])["buckets"]]
 
     return Response(
         {
             "regions": regions,
-            "places": [bucket["key"] for bucket in (aggs.get("places") or aggs["place_search"]["places"])["buckets"]],
+            "places": places,
         }
     )

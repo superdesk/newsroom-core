@@ -2,8 +2,8 @@ import base64
 import email.policy as email_policy
 
 from lxml import etree
-from typing_extensions import TypedDict
-from typing import List, Optional, Dict, Any, Union
+from typing_extensions import Unpack
+from typing import List, Optional, Dict, Any, Union, TypedDict
 
 from quart_babel import gettext
 from flask_mail import Attachment, Message
@@ -17,6 +17,7 @@ from superdesk.flask import render_template, url_for
 
 from newsroom.gettext import get_user_timezone
 from newsroom.types import Company, User, Country, CompanyType, UserResourceModel
+from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
 from newsroom.template_loaders import template_locale
 from newsroom.utils import (
@@ -111,6 +112,13 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     return app.mail.send(msg)
 
 
+def format_subject(subject: Optional[str]) -> str:
+    """Only use first line of subject, otherwise it raises validation error."""
+    if subject is None:
+        return ""
+    return subject.split("\n")[0].strip()
+
+
 async def send_email(
     to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None
 ):
@@ -127,7 +135,7 @@ async def send_email(
     kwargs = {
         "to": to,
         "cc": cc,
-        "subject": subject,
+        "subject": format_subject(subject),
         "text_body": handle_long_lines_text(text_body) if text_body else None,
         "html_body": handle_long_lines_html(html_body) if html_body else None,
         "sender": sender,
@@ -229,7 +237,18 @@ def get_language_template_name(template_name: str, language: str, extension: str
     return fallback_template_name
 
 
-EmailKwargs = Dict[str, Any]
+class EmailAttachment(TypedDict):
+    file: Any
+    file_name: str
+    content_type: str
+    file_desc: str
+
+
+class EmailKwargs(TypedDict, total=False):
+    sender: str | tuple[str, str] | None
+    attachments_info: list[EmailAttachment] | None
+
+
 TemplateKwargs = Dict[str, Any]
 
 
@@ -239,7 +258,7 @@ async def send_user_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
-    **kwargs: EmailKwargs,
+    **kwargs: Unpack[EmailKwargs],
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
@@ -259,7 +278,7 @@ async def send_template_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     cc: Optional[List[str]] = None,
-    **kwargs: EmailKwargs,
+    **kwargs: Unpack[EmailKwargs],
 ) -> None:
     """Send email to list of recipients using default locale."""
     language = get_app_config("DEFAULT_LANGUAGE")
@@ -515,7 +534,7 @@ async def send_item_killed_notification_email(user: UserResourceModel, item: dic
 
 
 async def _send_wire_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
-    formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
+    formatter = get_formatter("text")
     recipients = [user.email]
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
@@ -524,7 +543,7 @@ async def _send_wire_killed_notification_email(user: UserResourceModel, item: di
 
 
 async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
-    formatter = get_current_app().as_any().download_formatters["text"]["formatter"]
+    formatter = get_formatter("text")
     recipients = [user.email]
     subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))

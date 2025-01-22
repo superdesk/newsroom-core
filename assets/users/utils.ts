@@ -89,5 +89,5 @@ export function hasSeatsAvailable(companyId: ICompany['_id'], seats: ISeats, pro
 }
 
 export function seatOccupiedByUser(user: IUser, product: IProduct) {
-    return user.products.find((userProduct: {section: string; _id: string}) => userProduct._id === product._id);
+    return (user.products || []).find((userProduct) => userProduct._id === product._id);
 }

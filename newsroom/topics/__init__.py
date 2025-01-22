@@ -8,6 +8,7 @@ from .topics_async import (
     get_agenda_notification_topics_for_query_by_id,
     get_topics_with_subscribers,
     get_topics_with_subscribers_async,
+    init_module,
 )
 from . import topics
 
@@ -30,6 +31,7 @@ module = Module(
     name="newsroom.topics",
     resources=[topic_resource_config],
     endpoints=[topic_endpoints],
+    init=init_module,
 )
 
 from . import views  # noqa

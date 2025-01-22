@@ -1,10 +1,11 @@
+from typing import Any, Optional, NoReturn
 import re
 import ipaddress
-from typing import Any, Optional
+
 from bson import ObjectId
 from bson.errors import InvalidId
-from pydantic import AfterValidator, BeforeValidator
-from pydantic_core import PydanticCustomError
+from pydantic import AfterValidator, BeforeValidator, ValidationError
+from pydantic_core import PydanticCustomError, InitErrorDetails
 from quart_babel import gettext
 
 from superdesk.core.app import get_current_async_app
@@ -154,3 +155,21 @@ def validate_valid_objectid(field_name: str) -> BeforeValidator:
         return value
 
     return BeforeValidator(_validate_objectid)
+
+
+def raise_custom_validation_error(resource: str, field_name: str, error_msg: str, input_value: Any) -> NoReturn:
+    """Raise a Pydantic ValidationError so it is caught by our error handlers
+
+    :raises pydantic.ValidationError: With the supplied details
+    """
+
+    raise ValidationError.from_exception_data(
+        resource,
+        [
+            InitErrorDetails(
+                type=PydanticCustomError(field_name, error_msg),
+                loc=(field_name,),
+                input=input_value,
+            )
+        ],
+    )

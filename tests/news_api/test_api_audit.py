@@ -1,45 +1,49 @@
-from pytest import fixture
-from eve.methods.get import get_internal, getitem_internal
-from superdesk import get_resource_service
-from quart import g
 from bson import ObjectId
+from pytest import fixture
 
-from newsroom.companies import CompanyServiceAsync
+from newsroom.types import SectionEnum, NewsApiAuditResourceModel
 
-from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
 from tests.core.utils import create_entries_for, find_one_for
 
 company_id = "5c3eb6975f627db90c84093c"
 
 
-def audit_check(item_id):
-    audits = list(get_resource_service("api_audit").find(where={}))
-    assert len(audits) == 1
-    assert str(audits[0]["items_id"][0]) == item_id
+async def audit_check(item_id):
+    cursor = await NewsApiAuditResourceModel.get_service().search({})
+    assert await cursor.count() == 1
+    assert (await cursor.next()).items_id == [item_id]
 
 
 @fixture(autouse=True)
 async def init(app):
-    await create_entries_for(
-        "companies",
-        [{"_id": ObjectId(company_id), "name": "Test Company", "is_enabled": True}],
-    )
-    await create_entries_for(
+    product_ids = await create_entries_for(
         "products",
         [
             {
                 "_id": ObjectId("5ab03a87bdd78169bb6d0783"),
                 "name": "Sample Product X",
-                "decsription": "a description",
-                "companies": [
-                    COMPANY_1_ID,
-                    COMPANY_2_ID,
-                ],
+                "description": "a description",
                 "navigations": ["5aa5e94ebdd7810884f66ed3"],
                 "sd_product_id": None,
                 "product_type": "news_api",
                 "query": "fish",
                 "is_enabled": True,
+            }
+        ],
+    )
+    await create_entries_for(
+        "companies",
+        [
+            {
+                "_id": ObjectId(company_id),
+                "name": "Test Company",
+                "is_enabled": True,
+                "products": [
+                    {
+                        "_id": product_ids[0],
+                        "section": SectionEnum.NEWS_API,
+                    }
+                ],
             }
         ],
     )
@@ -50,30 +54,37 @@ async def test_get_item_audit_creation(client, app):
         "items",
         [{"_id": "111", "pubstatus": "usable", "headline": "Headline of the story"}],
     )
-    await create_entries_for("news_api_tokens", [{"company": ObjectId(company_id), "enabled": True}])
-    token = await find_one_for("news_api_tokens", company=ObjectId(company_id))
+    token = await _create_company_auth_token(company_id)
     response = await client.get(
         "api/v1/news/item/111?format=NINJSFormatter",
         headers={"Authorization": token.get("token")},
     )
     assert response.status_code == 200
-    audit_check("111")
+    await audit_check("111")
 
 
 async def test_get_all_company_products_audit_creation(client, app):
-    async with app.test_request_context(path="/account/products/"):
-        g.company_id = COMPANY_2_ID
-        response = await get_internal("account/products")
-        assert len(response[0]["_items"]) == 1
-        audit_check("5ab03a87bdd78169bb6d0783")
+    token = await _create_company_auth_token(company_id)
+    response = await client.get(
+        "api/v1/account/products",
+        headers={"Authorization": token.get("token")},
+    )
+    assert response.status_code == 200
+    data = await response.get_json()
+    assert len(data["_items"]) == 1
+    await audit_check("5ab03a87bdd78169bb6d0783")
 
 
 async def test_get_single_product_audit_creation(client, app):
-    async with app.test_request_context(path="/account/products/"):
-        g.company_id = COMPANY_2_ID
-        response = await getitem_internal("account/products", _id="5ab03a87bdd78169bb6d0783")
-        assert str(response[0]["_id"]) == "5ab03a87bdd78169bb6d0783"
-        audit_check("5ab03a87bdd78169bb6d0783")
+    token = await _create_company_auth_token(company_id)
+    response = await client.get(
+        "api/v1/account/products/5ab03a87bdd78169bb6d0783",
+        headers={"Authorization": token.get("token")},
+    )
+    assert response.status_code == 200
+    data = await response.get_json()
+    assert data["_id"] == "5ab03a87bdd78169bb6d0783"
+    await audit_check("5ab03a87bdd78169bb6d0783")
 
 
 async def test_search_audit_creation(client, app):
@@ -91,9 +102,15 @@ async def test_search_audit_creation(client, app):
         ],
     )
 
-    async with app.test_request_context("/news", query_string=dict(q="fish", include_fields="body_html")):
-        g.company_instance = await CompanyServiceAsync().find_by_id(company_id)
-        g.company_id = company_id
-        response = await get_internal("news/search")
-        assert len(response[0]["_items"]) == 1
-        audit_check("5ab03a87bdd78169bb6d0785")
+    token = await _create_company_auth_token(company_id)
+
+    response = await client.get("/api/v1/news/search", headers={"Authorization": f"Token {token.get('token')}"})
+    json_data = await response.get_json()
+
+    assert len(json_data["_items"]) == 1
+    await audit_check("5ab03a87bdd78169bb6d0785")
+
+
+async def _create_company_auth_token(company_id):
+    await create_entries_for("news_api_tokens", [{"company": ObjectId(company_id), "enabled": True}])
+    return await find_one_for("news_api_tokens", company=ObjectId(company_id))

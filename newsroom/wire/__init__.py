@@ -2,6 +2,7 @@ from quart_babel import lazy_gettext
 
 import superdesk
 from superdesk.flask import url_for
+
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.search.config import init_nested_aggregation
@@ -65,33 +66,6 @@ def init_app(app: BaseNewsroomApp):
         blueprint="wire",
         badge="saved-items-count",
     )
-
-    from .formatters import (
-        TextFormatter,
-        NITFFormatter,
-        NewsMLG2Formatter,
-        JsonFormatter,
-        PictureFormatter,
-    )
-
-    app.download_formatter(
-        "text",
-        TextFormatter(),
-        lazy_gettext("Plain Text"),
-        ["wire", "agenda"],
-        ["text"],
-    )
-    app.download_formatter("nitf", NITFFormatter(), "NITF", ["wire"], ["text"])
-    app.download_formatter("newsmlg2", NewsMLG2Formatter(), "NewsMLG2", ["wire"], ["text"])
-    app.download_formatter("json", JsonFormatter(), "Json", ["agenda"], ["text"])
-    if app.config.get("ALLOW_PICTURE_DOWNLOAD", True):
-        app.download_formatter(
-            "picture",
-            PictureFormatter(),
-            lazy_gettext("Story Image"),
-            ["wire"],
-            ["picture"],
-        )
 
     app.add_template_global(utils.get_picture, "get_picture")
     app.add_template_global(utils.get_caption, "get_caption")

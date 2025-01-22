@@ -57,7 +57,6 @@ import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
-import NewItemsIcon from 'search/components/NewItemsIcon';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -268,17 +267,9 @@ class AgendaApp extends SearchBase<any> {
                                     toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                                     featuredFilter={this.props.featuredOnly}
                                     hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
+                                    newItems={this.props.newItems}
+                                    fetchItems={this.props.fetchItems}
                                 />
-                                {!(this.props.newItems || []).length ? null : (
-                                    <div className="navbar navbar--flex navbar--small">
-                                        <div className="navbar__inner navbar__inner--end">
-                                            <NewItemsIcon
-                                                newItems={this.props.newItems}
-                                                refresh={this.props.fetchItems}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                             <AgendaList
                                 actions={this.props.actions}

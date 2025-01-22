@@ -26,8 +26,8 @@
     gap: 0;
     flex-shrink: 0;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    max-height: clamp(360px, 50svh, 50svh);
+    grid-template-rows: auto auto auto auto;
+    max-height: clamp(320px, 50svh, 50svh);
     @include phone {
         .search-result__tags-list {
             border-bottom: 2px solid var(--main-header-color-bg);

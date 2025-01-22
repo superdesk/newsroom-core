@@ -69,16 +69,20 @@
 .search-result__tags-list-row {
     display: flex;
     flex-direction: row;
-    padding-block: 12px;
+    padding-block: var(--space--0-5);
     gap: var(--space--2);
-    min-height: 56px;
-    border-block-start: 1px dashed hsla(0, 0%, 20%, 0.2);
+    //min-height: 56px;
+    //border-block-start: 1px dashed hsla(0, 0%, 20%, 0.2);
     flex-shrink: 0;
     &:first-child {
         border: none;
     }
+    &:last-child {
+        padding-block-end: var(--space--1-5);
+    }
     .tags-list {
         flex-grow: 1;
+        gap: var(--space--0-5);
     }
     .search-result__tags-list-row-label {
         display: inline-flex;
@@ -121,6 +125,7 @@
         z-index: 1;
         background-color: var(--search-result-tags-list-color-bg);
         box-shadow: inset 0 1px 3px -2px hsla(0, 0%, 0%, 0.2);
+        padding-block-start: var(--space--1-5);
     }
 }
 .tags-list-row__button-group {

@@ -2,8 +2,8 @@ import re
 import json
 
 from copy import deepcopy
-from typing import Any, Dict, Optional
-from pydantic import BaseModel, field_validator
+from typing import Any, Dict, Optional, Annotated
+from pydantic import BaseModel, field_validator, AliasChoices, Field
 
 from bson import ObjectId
 from quart_babel import gettext
@@ -90,8 +90,7 @@ async def get_view_data():
     }
 
     if get_app_config("ENABLE_MONITORING"):
-        # TODO-ASYNC: update when monitoring app is moved to async
-        view_data["monitoring_list"] = get_monitoring_for_company(user_as_dict)
+        view_data["monitoring_list"] = await get_monitoring_for_company(user)
 
     view_data.update(await get_company_sections_monitoring_data(company, user))
 
@@ -99,8 +98,10 @@ async def get_view_data():
 
 
 class WhereParam(BaseModel):
-    company: Optional[ObjectIdField] = None
-    products_id: Optional[ObjectIdField] = None
+    company: ObjectIdField | None = None
+    products_id: Annotated[
+        ObjectIdField | None, Field(validation_alias=AliasChoices("products_id", "products._id"))
+    ] = None
 
 
 class ObjectIdListModel(BaseModel):

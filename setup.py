@@ -15,7 +15,7 @@ with open(requirements_txt_path, "r") as r:
 
 setup(
     name="Newsroom-Core",
-    version="3.0.0-alpha.1",
+    version="3.0.0-beta.1",
     description="Newsroom Core library",
     author="Sourcefabric",
     url="https://github.com/superdesk/newsroom-core",
@@ -25,6 +25,7 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     scripts=[],
+    python_requires=">=3.10",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",

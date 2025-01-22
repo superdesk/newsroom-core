@@ -8,13 +8,13 @@ aiofiles==24.1.0
     # via
     #   quart
     #   quart-uploads
-aiohappyeyeballs==2.4.3
+aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.10.10
+aiohttp==3.11.11
     # via elasticsearch
-aiosignal==1.3.1
+aiosignal==1.3.2
     # via aiohttp
-amqp==5.2.0
+amqp==5.3.1
     # via kombu
 annotated-types==0.7.0
     # via pydantic
@@ -31,17 +31,17 @@ asn1crypto==1.5.1
     #   oscrypto
     #   pyhanko
     #   pyhanko-certvalidator
-async-timeout==4.0.3
+async-timeout==5.0.1
     # via
     #   aiohttp
     #   redis
-attrs==24.2.0
+attrs==24.3.0
     # via aiohttp
-authlib==1.3.2
+authlib==1.4.0
     # via superdesk-core
 babel==2.16.0
     # via quart-babel
-bcrypt==4.2.0
+bcrypt==4.2.1
     # via superdesk-core
 behave==1.2.6
     # via wooper
@@ -49,34 +49,33 @@ billiard==4.2.1
     # via celery
 black==23.12.1
     # via -r black-requirements.txt
-blinker==1.8.2
+blinker==1.9.0
     # via
     #   elastic-apm
     #   flask
     #   flask-mail
     #   quart
-    #   raven
     #   sentry-sdk
     #   superdesk-core
-boto3==1.35.57
+boto3==1.36.3
     # via superdesk-core
-botocore==1.35.57
+botocore==1.36.3
     # via
     #   boto3
     #   s3transfer
 cachelib==0.9.0
     # via flask-caching
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   flask-oidc-ex
     #   google-auth
 celery[redis]==5.4.0
     # via superdesk-core
-cerberus==1.3.5
+cerberus==1.3.7
     # via
     #   eve
     #   superdesk-core
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   elastic-apm
     #   elasticsearch
@@ -88,11 +87,11 @@ chardet==5.2.0
     # via
     #   reportlab
     #   superdesk-core
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via requests
-ciso8601==2.3.1
+ciso8601==2.3.2
     # via eve-elastic
-click==8.1.7
+click==8.1.8
     # via
     #   black
     #   celery
@@ -108,11 +107,11 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.6.4
+coverage[toml]==7.6.10
     # via pytest-cov
-croniter==3.0.4
+croniter==6.0.0
     # via superdesk-core
-cryptography==43.0.3
+cryptography==44.0.0
     # via
     #   authlib
     #   jwcrypto
@@ -120,7 +119,7 @@ cryptography==43.0.3
     #   pyhanko-certvalidator
 cssselect2==0.7.0
     # via svglib
-deepdiff==8.0.1
+deepdiff==8.1.1
     # via superdesk-planning
 dnspython==2.7.0
     # via
@@ -140,10 +139,8 @@ email-validator==2.2.0
     # via wtforms
 eve @ git+https://github.com/MarkLark86/eve@use-quart
     # via superdesk-core
-eve-elastic @ git+https://github.com/MarkLark86/eve-elastic@use-quart
+eve-elastic @ git+https://github.com/superdesk/eve-elastic@async
     # via superdesk-core
-events==0.3
-    # via eve
 exceptiongroup==1.2.2
     # via
     #   hypercorn
@@ -153,14 +150,13 @@ feedparser==6.0.11
     # via superdesk-core
 flake8==7.1.1
     # via -r dev-requirements.in
-flask==3.0.3
+flask==3.1.0
     # via
     #   flask-caching
     #   flask-mail
     #   flask-oidc-ex
     #   flask-webpack
     #   quart
-    #   raven
 flask-caching==2.3.0
     # via -r requirements.txt
 flask-mail==0.10.0
@@ -219,7 +215,7 @@ itsdangerous==2.2.0
     #   flask
     #   flask-oidc-ex
     #   quart
-jinja2==3.1.4
+jinja2==3.1.5
     # via
     #   flask
     #   quart
@@ -237,7 +233,7 @@ kombu==5.4.2
     #   superdesk-core
 ldap3==2.9.1
     # via superdesk-core
-lxml==5.2.2
+lxml==5.3.0
     # via
     #   draftjs-exporter
     #   lxml-html-clean
@@ -245,7 +241,7 @@ lxml==5.2.2
     #   superdesk-core
     #   svglib
     #   xmlsec
-lxml-html-clean==0.3.1
+lxml-html-clean==0.4.1
     # via superdesk-core
 markupsafe==3.0.2
     # via
@@ -256,13 +252,13 @@ markupsafe==3.0.2
     #   wtforms
 mccabe==0.7.0
     # via flake8
-motor==3.5.3
+motor==3.6.1
     # via superdesk-core
 multidict==6.1.0
     # via
     #   aiohttp
     #   yarl
-mypy==1.13.0
+mypy==1.14.1
     # via -r mypy-requirements.txt
 mypy-extensions==1.0.0
     # via
@@ -272,7 +268,7 @@ oauth2client==4.1.3
     # via flask-oidc-ex
 oauthlib==3.2.2
     # via requests-oauthlib
-orderly-set==5.2.2
+orderly-set==5.2.3
     # via deepdiff
 oscrypto==1.3.0
     # via pyhanko-certvalidator
@@ -288,7 +284,7 @@ parse-type==0.6.4
     # via behave
 pathspec==0.12.1
     # via black
-pillow==10.4.0
+pillow==11.1.0
     # via
     #   reportlab
     #   superdesk-core
@@ -299,10 +295,12 @@ pluggy==1.5.0
     # via pytest
 priority==2.0.0
     # via hypercorn
-prompt-toolkit==3.0.48
+prompt-toolkit==3.0.50
     # via click-repl
-propcache==0.2.0
-    # via yarl
+propcache==0.2.1
+    # via
+    #   aiohttp
+    #   yarl
 pyasn1==0.6.1
     # via
     #   ldap3
@@ -317,30 +315,30 @@ pycodestyle==2.12.1
     # via flake8
 pycparser==2.22
     # via cffi
-pydantic==2.9.2
+pydantic==2.10.5
     # via
     #   -r mypy-requirements.txt
     #   superdesk-core
-pydantic-core==2.23.4
+pydantic-core==2.27.2
     # via pydantic
 pyflakes==3.2.0
     # via flake8
-pyhanko==0.25.1
+pyhanko==0.25.3
     # via xhtml2pdf
-pyhanko-certvalidator==0.26.3
+pyhanko-certvalidator==0.26.5
     # via
     #   pyhanko
     #   xhtml2pdf
-pyjwt==2.8.0
+pyjwt==2.10.1
     # via superdesk-core
 pymemcache==4.0.0
     # via superdesk-core
-pymongo==4.7.3
+pymongo==4.9.2
     # via
     #   eve
     #   motor
     #   superdesk-core
-pyparsing==3.2.0
+pyparsing==3.2.1
     # via
     #   httplib2
     #   pyrtf3
@@ -348,13 +346,13 @@ pypdf==5.1.0
     # via xhtml2pdf
 pyrtf3==0.47.5
     # via -r requirements.txt
-pytest==8.3.3
+pytest==8.3.4
     # via
     #   -r dev-requirements.in
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
-pytest-asyncio==0.24.0
+pytest-asyncio==0.25.2
     # via -r dev-requirements.in
 pytest-cov==6.0.0
     # via -r dev-requirements.in
@@ -414,13 +412,11 @@ quart-uploads==0.0.4
     # via quart-wtforms
 quart-wtforms==1.0.3
     # via -r requirements.txt
-raven[flask]==6.10.0
-    # via superdesk-core
-redis==5.1.1
+redis==5.2.1
     # via
     #   celery
     #   superdesk-core
-regex==2024.9.11
+regex==2024.11.6
     # via superdesk-core
 reportlab==4.2.5
     # via
@@ -439,21 +435,23 @@ requests==2.32.3
     #   wooper
 requests-oauthlib==2.0.0
     # via python-twitter
-responses==0.25.3
+responses==0.25.6
     # via -r dev-requirements.in
 rsa==4.9
     # via
     #   google-auth
     #   oauth2client
-s3transfer==0.10.3
+s3transfer==0.11.1
     # via boto3
 sentry-sdk[quart]==1.45.1
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   superdesk-core
 sgmllib3k==1.0.0
     # via feedparser
 simplejson==3.19.3
     # via eve
-six==1.16.0
+six==1.17.0
     # via
     #   behave
     #   flask-oidc-ex
@@ -462,26 +460,26 @@ six==1.16.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@async
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
 svglib==1.5.1
     # via xhtml2pdf
-taskgroup==0.0.0a4
+taskgroup==0.2.2
     # via hypercorn
 tinycss2==1.4.0
     # via
     #   cssselect2
     #   svglib
-tomli==2.0.2
+tomli==2.2.1
     # via
     #   black
     #   coverage
     #   hypercorn
     #   mypy
     #   pytest
-types-aiofiles==24.1.0.20240626
+types-aiofiles==24.1.0.20241221
     # via quart-uploads
 types-click==7.1.8
     # via types-flask
@@ -493,13 +491,13 @@ types-jinja2==2.11.9
     #   types-flask
 types-markupsafe==1.1.10
     # via types-jinja2
-types-protobuf==5.28.3.20241030
+types-protobuf==5.29.1.20241207
     # via -r mypy-requirements.txt
-types-python-dateutil==2.9.0.20241003
+types-python-dateutil==2.9.0.20241206
     # via
     #   -r mypy-requirements.txt
     #   arrow
-types-pytz==2024.2.0.20241003
+types-pytz==2024.2.0.20241221
     # via
     #   -r mypy-requirements.txt
     #   quart-babel
@@ -526,8 +524,8 @@ typing-extensions==4.12.2
     #   pydantic
     #   pydantic-core
     #   pypdf
-    #   superdesk-core
-tzdata==2024.2
+    #   taskgroup
+tzdata==2025.1
     # via
     #   celery
     #   kombu
@@ -568,11 +566,11 @@ werkzeug==3.1.3
     #   quart
 wooper==0.4.4
     # via -r dev-requirements.in
-wrapt==1.16.0
+wrapt==1.17.2
     # via elastic-apm
 wsproto==1.2.0
     # via hypercorn
-wtforms[email]==3.1.2
+wtforms[email]==3.2.1
     # via
     #   -r requirements.txt
     #   quart-wtforms
@@ -583,7 +581,7 @@ xmlsec==1.3.14
     # via
     #   python3-saml
     #   superdesk-core
-yarl==1.17.1
+yarl==1.18.3
     # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:

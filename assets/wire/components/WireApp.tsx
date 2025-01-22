@@ -62,7 +62,6 @@ import {
     listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
-import NewItemsIcon from 'search/components/NewItemsIcon';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -238,17 +237,9 @@ class WireApp extends SearchBase<any> {
                                     hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
                                     searchAllVersions={this.props.searchAllVersions}
                                     toggleSearchAllVersions={this.props.toggleSearchAllVersions}
+                                    newItems={this.props.newItems}
+                                    fetchItems={this.props.fetchItems}
                                 />
-                                {!(this.props.newItems || []).length ? null : (
-                                    <div className="navbar navbar--flex navbar--small">
-                                        <div className="navbar__inner navbar__inner--end">
-                                            <NewItemsIcon
-                                                newItems={this.props.newItems}
-                                                refresh={this.props.fetchItems}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                             <ItemsList
                                 actions={this.props.actions}
