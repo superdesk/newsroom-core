@@ -542,7 +542,9 @@ async def search_locations(args: None, params: SearchLocationsParams, request: R
     regions = []
 
     if location_filter_options.get("city", True):
-        for country_bucket in (aggs.get("city_search_country") or aggs["city_search"]["city_search_country"])["buckets"]:
+        for country_bucket in (aggs.get("city_search_country") or aggs["city_search"]["city_search_country"])[
+            "buckets"
+        ]:
             country_name = country_bucket["key"]
             for state_bucket in country_bucket["city_search_state"]["buckets"]:
                 state_name = state_bucket["key"]
@@ -552,7 +554,9 @@ async def search_locations(args: None, params: SearchLocationsParams, request: R
                     )
 
     if location_filter_options.get("state", True):
-        for country_bucket in (aggs.get("state_search_country") or aggs["state_search"]["state_search_country"])["buckets"]:
+        for country_bucket in (aggs.get("state_search_country") or aggs["state_search"]["state_search_country"])[
+            "buckets"
+        ]:
             country_name = country_bucket["key"]
             for state_bucket in country_bucket["states"]["buckets"]:
                 regions.append(

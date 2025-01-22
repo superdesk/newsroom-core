@@ -320,5 +320,3 @@ async def test_email_subject_validation(client, app, mocker):
     assert len(sub.mock_calls)
     call = sub.mock_calls[0]
     assert "foo" == call.kwargs["kwargs"]["subject"]
-
-

@@ -513,7 +513,6 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
     from newsroom.agenda import AgendaItemService
 
     # Import here to prevent circular imports
-    from newsroom.companies.utils import restrict_coverage_info
     from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 
     item_type = get_type()
