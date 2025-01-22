@@ -382,7 +382,7 @@ async def setup_user_company(app):
             },
             {
                 "_id": NEW_USER_ID,
-                "user_type": "adminstrator",
+                "user_type": "administrator",
                 "email": "restrict@user.com",
                 "first_name": "Restrict",
                 "last_name": "User",
@@ -406,12 +406,14 @@ async def init_company(app):
 
 @fixture
 async def public_company(app, init_company):
-    return await CompanyResource.get_service().find_by_id(COMPANY_1_ID)
+    company = await CompanyResource.get_service().find_by_id(COMPANY_1_ID)
+    return None if company is None else company.to_dict()
 
 
 @fixture
 async def public_user(app, init_company):
-    return await UserResourceModel.get_service().find_by_id(PUBLIC_USER_ID)
+    user = await UserResourceModel.get_service().find_by_id(PUBLIC_USER_ID)
+    return None if user is None else user.to_dict()
 
 
 @fixture
@@ -421,7 +423,8 @@ async def anonymous_user(client):
 
 @fixture
 async def restrict_user(app, init_company):
-    return await UserResourceModel.get_service().find_by_id(NEW_USER_ID)
+    user = await UserResourceModel.get_service().find_by_id(NEW_USER_ID)
+    return None if user is None else user.to_dict()
 
 
 @fixture

@@ -1,8 +1,8 @@
 from copy import deepcopy
 
 from superdesk.core import get_current_async_app, get_app_config
+from superdesk.core.types import MongoResourceConfig
 from superdesk.core.app import SuperdeskAsyncApp
-from superdesk.core.mongo import MongoResourceConfig
 from superdesk.flask import g
 
 from content_api import MONGO_PREFIX

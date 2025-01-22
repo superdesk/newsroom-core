@@ -534,7 +534,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
         if not is_admin_or_internal(user):
             remove_fields_for_public_user(item_to_copy)
 
-        if restrict_coverage_info(company):
+        if company and company.restrict_coverage_info:
             remove_restricted_coverage_info([item_to_copy])
 
         template_kwargs.update(
@@ -631,7 +631,7 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
     # First get the items directly from the resource service
     items_cursor = await wire_search.service.find(
         {"_id": {"$in": args.item_ids}},
-        sort=[("versioncreated", 0)],
+        sort=[("versioncreated", -1)],
         use_mongo=True,
     )
     if not await items_cursor.count():

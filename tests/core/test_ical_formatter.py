@@ -96,7 +96,7 @@ async def test_onclusive_no_end_time():
     assert "DTEND;VALUE=DATE:20240104" in output
 
 
-def test_onclusive_multiday():
+async def test_onclusive_multiday():
     event = {
         "name": "test",
         "dates": {
@@ -106,6 +106,6 @@ def test_onclusive_multiday():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART;VALUE=DATE:20241118" in output
     assert "DTEND;VALUE=DATE:20241121" in output

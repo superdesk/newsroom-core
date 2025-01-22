@@ -945,12 +945,14 @@ async def test_date_filters(client, app):
     # Test "Last 7 days" filter
     resp = await client.get("/wire/search?date_filter=last_week")
     assert resp.status_code == 200
-    assert len(resp.json["_items"]) == 4
+    json_data = await resp.get_json()
+    assert len(json_data["_items"]) == 4
 
     # Test "Last 30 days" filter
     resp = await client.get("/wire/search?date_filter=last_30_days")
     assert resp.status_code == 200
-    assert len((await resp.get_json())["_items"]) == 7
+    json_data = await resp.get_json()
+    assert len(json_data["_items"]) == 7
 
     # custom filter
     created_to = (now - timedelta(days=35)).strftime("%Y-%m-%d")
