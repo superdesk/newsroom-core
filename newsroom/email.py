@@ -112,6 +112,13 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     return app.mail.send(msg)
 
 
+def format_subject(subject: Optional[str]) -> str:
+    """Only use first line of subject, otherwise it raises validation error."""
+    if subject is None:
+        return ""
+    return subject.split("\n")[0].strip()
+
+
 async def send_email(
     to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None
 ):
@@ -128,7 +135,7 @@ async def send_email(
     kwargs = {
         "to": to,
         "cc": cc,
-        "subject": subject,
+        "subject": format_subject(subject),
         "text_body": handle_long_lines_text(text_body) if text_body else None,
         "html_body": handle_long_lines_html(html_body) if html_body else None,
         "sender": sender,

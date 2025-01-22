@@ -945,6 +945,7 @@ async def test_date_filters(client, app):
     # Test "Last 7 days" filter
     resp = await client.get("/wire/search?date_filter=last_week")
     assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 4
 
     # Test "Last 30 days" filter
     resp = await client.get("/wire/search?date_filter=last_30_days")
@@ -975,7 +976,7 @@ async def test_date_filters_query(client, app):
 
     # Last week
     assert _get_search_query(WireSearchRequestArgs(date_filter="last_week")) == [
-        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
+        {"range": {"versioncreated": {"gte": "now-7d/d", "time_zone": "Europe/Berlin"}}}
     ]
 
     # Last 30 Days
@@ -1020,3 +1021,37 @@ async def test_bookmark_old_items(client, public_user, company_products):
     resp = await client.get("/wire/search?bookmarks={}".format(public_user["_id"]))
     assert resp.status_code == 200
     assert 2 == len((await resp.get_json())["_items"])
+
+
+async def test_sorting_wire_items(app, client):
+    now = datetime.now(tz=pytz.UTC)
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "item2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=1),
+            },
+            {
+                "_id": "item3",
+                "type": "text",
+                "versioncreated": now,
+            },
+            {
+                "_id": "item1",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=5),
+            },
+        ],
+    )
+
+    resp = await client.get("/wire/items/item1,item3,item2")
+    assert resp.status_code == 200
+    json_data = await resp.get_json()
+    assert len(json_data) == 3
+    assert json_data[0]["_id"] == "item3"
+    assert json_data[1]["_id"] == "item2"
+    assert json_data[2]["_id"] == "item1"

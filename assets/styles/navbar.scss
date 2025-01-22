@@ -567,11 +567,3 @@ nav.search {
         }
     }
 }
-
-.navbar {
-    &.navbar--list-controls {
-        @include phone {
-            display: none;
-        }
-    }
-}

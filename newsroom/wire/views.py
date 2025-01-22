@@ -512,9 +512,15 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
 
     from newsroom.agenda import AgendaItemService
 
+    # Import here to prevent circular imports
+    from newsroom.companies.utils import restrict_coverage_info
+    from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
+
     item_type = get_type()
     service = AgendaItemService() if item_type == "agenda" else WireItemService()
     item_to_copy = (await service.find_by_id(args.item_id)).to_dict()  # type: ignore[attr-defined]
+    user = get_user_from_request(request)
+    company = get_company_from_request(request)
 
     if not item_to_copy:
         await request.abort(404)
@@ -525,17 +531,23 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
 
     template_kwargs = {"item": item_to_copy}
     if item_type == "agenda":
+        if not is_admin_or_internal(user):
+            remove_fields_for_public_user(item_to_copy)
+
+        if restrict_coverage_info(company):
+            remove_restricted_coverage_info([item_to_copy])
+
         template_kwargs.update(
             {
                 "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
                 "contacts": get_public_contacts(item_to_copy),
                 "calendars": ", ".join([calendar.get("name") for calendar in item_to_copy.get("calendars") or []]),
+                "item": item_to_copy,
             }
         )
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     await update_action_list([args.item_id], "copies", item_type=item_type)
-    user = get_user_from_request(request)
     await HistoryService().create_history_record([item_to_copy], "copy", user.id, user.company, params.type.value)
 
     return Response({"data": copy_data})
@@ -617,7 +629,11 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
     wire_search = WireSearchServiceAsync()
 
     # First get the items directly from the resource service
-    items_cursor = await wire_search.service.search({"_id": {"$in": args.item_ids}}, use_mongo=True)
+    items_cursor = await wire_search.service.find(
+        {"_id": {"$in": args.item_ids}},
+        sort=[("versioncreated", 0)],
+        use_mongo=True,
+    )
     if not await items_cursor.count():
         return Response([])
 

@@ -5,7 +5,7 @@ from pytest import fixture
 from datetime import datetime, timedelta
 from quart import url_for
 
-from newsroom.types import Product
+from newsroom.types import Product, UserResourceModel, CompanyResource
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
 from tests.core.utils import create_entries_for
@@ -19,8 +19,10 @@ PUBLIC_USER_LASTNAME = "Bar"
 PUBLIC_USER_NAME = "{} {}".format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 PUBLIC_USER_EMAIL = "foo@bar.com"
 TEST_USER_ID = ObjectId("5cc94454bc43165c045ffec9")
+NEW_USER_ID = ObjectId("59b4c5c61d41c8d736852f44")
 COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
 COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
+COMPANY_3_ID = ObjectId("6215ce6ed2943dec3725af3f")
 PRODUCT_1_ID = ObjectId()
 PRODUCT_2_ID = ObjectId()
 PRODUCT_3_ID = ObjectId()
@@ -334,6 +336,14 @@ async def setup_user_company(app):
                 "name": "Paper Co.",
                 "is_enabled": True,
             },
+            {
+                "_id": COMPANY_3_ID,
+                "sd_subscriber_id": "12345",
+                "name": "News Co.",
+                "is_enabled": True,
+                "contact_name": "Ketan",
+                "restrict_coverage_info": True,
+            },
         ],
     )
 
@@ -370,6 +380,21 @@ async def setup_user_company(app):
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "manage_company_topics": False,
             },
+            {
+                "_id": NEW_USER_ID,
+                "user_type": "adminstrator",
+                "email": "restrict@user.com",
+                "first_name": "Restrict",
+                "last_name": "User",
+                "company": COMPANY_3_ID,
+                "is_enabled": True,
+                "is_approved": True,
+                "_created": utcnow(),
+                "receive_email": True,
+                "receive_app_notifications": True,
+                "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
+            },
         ],
     )
 
@@ -381,17 +406,22 @@ async def init_company(app):
 
 @fixture
 async def public_company(app, init_company):
-    return app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    return await CompanyResource.get_service().find_by_id(COMPANY_1_ID)
 
 
 @fixture
 async def public_user(app, init_company):
-    return app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    return await UserResourceModel.get_service().find_by_id(PUBLIC_USER_ID)
 
 
 @fixture
 async def anonymous_user(client):
     await client.get(url_for("auth.logout"))
+
+
+@fixture
+async def restrict_user(app, init_company):
+    return await UserResourceModel.get_service().find_by_id(NEW_USER_ID)
 
 
 @fixture

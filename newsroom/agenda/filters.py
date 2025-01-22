@@ -178,7 +178,7 @@ def apply_item_type_filter(request: NewshubSearchRequest[AgendaSearchRequestArgs
                 },
             }
         )
-        request.search.exclude_fields.extend(["planning_items", "display_dates"])
+        request.search.exclude_fields.extend(["display_dates"])
     else:
         # Don't include Planning items that are associated with an Event
         request.search.query.filter.append(

@@ -61,54 +61,56 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
         }
 
         return (
-            <div className="agenda-planning__container info-box">
-                <div className="info-box__content">
-                    <span className="info-box__label">
+            <div className="agenda-planning__container">
+                <div className="preview__content-block">
+                    <div className="preview__content-block-title">
                         {gettext('Associated Event')}
-                    </span>
-                    <div className={classNames(
-                        'agenda-planning__preview',
-                        {'agenda-planning__preview--expanded': this.state.expanded}
-                    )}>
-                        {this.state.loading ? (
-                            <div className="spinner-border text-success" />
-                        ) : (
-                            <React.Fragment>
-                                <div className="agenda-planning__preview-header">
-                                    <a href='#' onClick={this.toggleExpanded}>
-                                        <i className={classNames('icon-small--arrow-down me-1', {
-                                            'rotate-90-ccw': !this.state.expanded,
-                                        })} />
-                                    </a>
-                                    <h3 onClick={this.toggleExpanded}>{getName(this.props.event)}</h3>
-                                </div>
-                                <div className="agenda-planning__preview-date">
-                                    <AgendaTime item={this.props.event}>
-                                        <AgendaListItemLabels item={this.props.event} />
-                                    </AgendaTime>
-                                </div>
-                                {!this.state.expanded ? null : (
-                                    <div className="agenda-planning__preview-metadata">
-                                        <AgendaMeta item={this.props.event} />
-                                        <AgendaLongDescription item={this.props.event} />
-                                        <AgendaPreviewAttachments item={this.props.event} />
-                                        <AgendaTags
-                                            item={this.props.event}
-                                            isItemDetail={false}
-                                        />
-                                        <AgendaEdNote
-                                            item={this.props.event}
-                                            plan={{}}
-                                            secondaryNoteField="state_reason"
-                                        />
-                                        <AgendaInternalNote
-                                            internalNote={getInternalNote(this.props.event, {})}
-                                            mt2={!!(this.props.event.ednote || this.props.event.state_reason)}
-                                        />
+                    </div>
+                    <div className='agenda-planning__preview-list'>
+                        <div className={classNames(
+                            'agenda-planning__preview',
+                            {'agenda-planning__preview--expanded': this.state.expanded}
+                        )}>
+                            {this.state.loading ? (
+                                <div className="spinner-border text-success" />
+                            ) : (
+                                <React.Fragment>
+                                    <div className="agenda-planning__preview-header">
+                                        <a href='#' onClick={this.toggleExpanded}>
+                                            <i className={classNames('icon-small--arrow-down me-1', {
+                                                'rotate-90-ccw': !this.state.expanded,
+                                            })} />
+                                        </a>
+                                        <h3 onClick={this.toggleExpanded}>{getName(this.props.event)}</h3>
                                     </div>
-                                )}
-                            </React.Fragment>
-                        )}
+                                    <div className="agenda-planning__preview-date">
+                                        <AgendaTime item={this.props.event}>
+                                            <AgendaListItemLabels item={this.props.event} />
+                                        </AgendaTime>
+                                    </div>
+                                    {!this.state.expanded ? null : (
+                                        <div className="agenda-planning__preview-metadata">
+                                            <AgendaMeta item={this.props.event} />
+                                            <AgendaLongDescription item={this.props.event} />
+                                            <AgendaPreviewAttachments item={this.props.event} />
+                                            <AgendaTags
+                                                item={this.props.event}
+                                                isItemDetail={false}
+                                            />
+                                            <AgendaEdNote
+                                                item={this.props.event}
+                                                plan={{}}
+                                                secondaryNoteField="state_reason"
+                                            />
+                                            <AgendaInternalNote
+                                                internalNote={getInternalNote(this.props.event, {})}
+                                                mt2={!!(this.props.event.ednote || this.props.event.state_reason)}
+                                            />
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -429,6 +429,10 @@ CELERY_TASK_ROUTES = {
         "queue": celery_queue("newsroom.push"),
         "routing_key": "newsroom.push",
     },
+    "newsroom.email.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),
         "routing_key": "newsroom.task",
@@ -813,10 +817,10 @@ AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
 WIRE_TIME_FILTERS = [
     {"name": lazy_gettext("Today"), "filter": "today", "default": False, "query": {"gte": "now/d"}},
     {
-        "name": lazy_gettext("Last Week"),
+        "name": lazy_gettext("Last 7 days"),
         "filter": "last_week",
         "default": False,
-        "query": {"gte": "now-1w/w", "lt": "now/w"},
+        "query": {"gte": "now-7d/d"},
     },
     {
         "name": lazy_gettext("Last 30 days"),
@@ -837,6 +841,7 @@ NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
 #: .. versionadded: 2.8
 #:
 AGENDA_TIME_FILTERS = [
+    {"name": lazy_gettext("Selected day"), "query": ""},
     {"name": lazy_gettext("Today"), "query": "now/d"},
     {
         "name": lazy_gettext("This Week"),
@@ -853,3 +858,14 @@ AGENDA_TIME_FILTERS = [
 #: .. versionadded:: 2.8
 #:
 COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER = False
+
+#: Calendar Location Filter options config
+#:
+#: .. versionadded: 2.9
+#:
+CALENDAR_LOCATIONS_FILTER_OPTIONS = {
+    "city": True,
+    "state": True,
+    "country": True,
+    "place": True,
+}

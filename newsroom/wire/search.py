@@ -57,16 +57,17 @@ class WireSearchService(BaseSearchService):
     section: Section = "wire"
 
     # Used by Agenda
-    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False):
+    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False, sort=None):
         search = SearchQuery()
 
         try:
             search.query = {
                 "bool": {
+                    "must": [{"terms": {"_id": item_ids}}],
                     "must_not": [
                         {"term": {"type": "composite"}},
                     ],
-                    "filter": [{"terms": {"_id": item_ids}}],
+                    "filter": [],
                     "should": [],
                 }
             }
@@ -84,6 +85,9 @@ class WireSearchService(BaseSearchService):
             if aggregations is not None:
                 search.source["aggs"] = aggregations
 
+            if sort:
+                search.source["sort"] = sort
+
             req = ParsedRequest()
             req.args = {"source": json.dumps(search.source)}
 
@@ -91,7 +95,7 @@ class WireSearchService(BaseSearchService):
 
         except Exception as exc:
             logger.error(
-                "Error in get_items for query: {}".format(json.dumps(search.source)),
+                "Error in get_items for query: {}".format(json.dumps(search.query)),
                 exc,
                 exc_info=True,
             )
