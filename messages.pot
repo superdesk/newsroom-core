@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.8.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-01-02 11:58+0100\n"
+"POT-Creation-Date: 2025-01-20 09:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1987,13 +1987,13 @@ msgstr ""
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:22
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:49
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:75
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:77
 msgid "Events Only"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:23
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:58
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:75
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:77
 msgid "Planning Only"
 msgstr ""
 
@@ -3116,7 +3116,7 @@ msgid "All"
 msgstr ""
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:195
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:203
 #: assets/user-profile/components/PauseNotificationModal.tsx:126
 #: assets/wire/components/filters/NavCreatedPicker.tsx:74
 msgid "To"
@@ -3903,18 +3903,18 @@ msgstr ""
 msgid "Search for"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:177
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:165
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:185
 #: assets/user-profile/components/PauseNotificationModal.tsx:111
 #: assets/wire/components/filters/NavCreatedPicker.tsx:62
 msgid "From"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:262
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:270
 msgid "Clear filters"
 msgstr ""
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:270
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:278
 msgid "Filters applied"
 msgstr ""
 
