@@ -460,9 +460,9 @@ six==1.17.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@3.0.0-alpha.1
     # via -r requirements.txt
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
+superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@release/3.0
     # via -r requirements.txt
 svglib==1.5.1
     # via xhtml2pdf
