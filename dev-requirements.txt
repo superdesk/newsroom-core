@@ -57,9 +57,9 @@ blinker==1.9.0
     #   quart
     #   sentry-sdk
     #   superdesk-core
-boto3==1.36.3
+boto3==1.36.4
     # via superdesk-core
-botocore==1.36.3
+botocore==1.36.4
     # via
     #   boto3
     #   s3transfer
@@ -137,7 +137,7 @@ elasticsearch[async]==7.17.12
     #   superdesk-core
 email-validator==2.2.0
     # via wtforms
-eve @ git+https://github.com/MarkLark86/eve@use-quart
+eve @ git+https://github.com/superdesk/eve@async
     # via superdesk-core
 eve-elastic @ git+https://github.com/superdesk/eve-elastic@async
     # via superdesk-core
@@ -185,7 +185,7 @@ hermescache==1.0.0
     # via superdesk-core
 honcho==2.0.0
     # via -r requirements.txt
-hpack==4.0.0
+hpack==4.1.0
     # via h2
 html5lib==1.1
     # via xhtml2pdf
@@ -197,7 +197,7 @@ hypercorn==0.17.3
     # via
     #   -r requirements.txt
     #   quart
-hyperframe==6.0.1
+hyperframe==6.1.0
     # via h2
 icalendar==5.0.13
     # via superdesk-planning
@@ -460,7 +460,7 @@ six==1.17.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@async
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
