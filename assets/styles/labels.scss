@@ -79,7 +79,7 @@ $flex-align: (
     --label-height: 20px;
 
     @each $name, $color in $label-bg-colors {
-        &.label--#{$name} {
+        &.label--#{"" + $name} {
             color: $white;
             background-color: $color;
         }
@@ -109,7 +109,7 @@ $flex-align: (
 
     &.label--hollow {
         @each $name, $color in $label-bg-colors {
-            &.label--#{$name} {
+            &.label--#{"" + $name} {
                 border: 1px solid $color;
                 background-color: transparent !important;
                 color: $color;
@@ -119,13 +119,13 @@ $flex-align: (
 
     &.label--translucent {
         @each $name, $color in $label-bg-colors-translucent {
-            &.label--#{$name} {
+            &.label--#{"" + $name} {
                 background-color: $color;
             }
         }
 
         @each $name, $color in $label-text-colors {
-            &.label--#{$name} {
+            &.label--#{"" + $name} {
                 color: $color;
             }
         }
