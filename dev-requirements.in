@@ -1,5 +1,4 @@
 -r requirements.txt
--r mypy-requirements.txt
 -r black-requirements.txt
 
 flake8

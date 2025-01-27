@@ -85,6 +85,21 @@ $flex-align: (
         }
     }
 
+    @each $name, $color in $labels-palette {
+        &.label--#{"" + $name} {
+            border-color: transparent;
+            color: $color;
+            text-decoration-color: $color;
+            background-color: rgba($color, 0.2);
+        }
+    }
+
+    @each $name, $color in $labels-palette {
+        &.label--rounded.label--#{"" + $name} {
+            background-color: rgba($color, 0.2);
+        }
+    }
+
     &.label--big {
         --label-height: 24px;
         font-size: 11px;

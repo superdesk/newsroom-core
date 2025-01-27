@@ -128,16 +128,17 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return 0
 
-    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False):
+    def get_items(self, item_ids, size=None, aggregations=None, apply_permissions=False, sort=None):
         search = SearchQuery()
 
         try:
             search.query = {
                 "bool": {
+                    "must": [{"terms": {"_id": item_ids}}],
                     "must_not": [
                         {"term": {"type": "composite"}},
                     ],
-                    "filter": [{"terms": {"_id": item_ids}}],
+                    "filter": [],
                     "should": [],
                 }
             }
@@ -155,6 +156,9 @@ class WireSearchService(BaseSearchService):
             if aggregations is not None:
                 search.source["aggs"] = aggregations
 
+            if sort:
+                search.source["sort"] = sort
+
             req = ParsedRequest()
             req.args = {"source": json.dumps(search.source)}
 
@@ -162,7 +166,7 @@ class WireSearchService(BaseSearchService):
 
         except Exception as exc:
             logger.error(
-                "Error in get_items for query: {}".format(json.dumps(search.source)),
+                "Error in get_items for query: {}".format(json.dumps(search.query)),
                 exc,
                 exc_info=True,
             )
@@ -341,7 +345,7 @@ class WireSearchService(BaseSearchService):
             date_range_query = self.get_date_range_query(date_filter)
         else:
             default_time_filter: Optional[TimeFilter] = next((f for f in self.get_time_filters() if f["default"]), None)
-            if default_time_filter:
+            if default_time_filter and not search.args.get("bookmarks"):
                 date_range_query = default_time_filter["query"]
                 date_range_query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
 

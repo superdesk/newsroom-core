@@ -54,6 +54,7 @@ function CoverageActionsComponent({
     ));
     const parentWatched = isWatched(agenda, user);
     const viewContentEmail = getConfig('view_content_tooltip_email');
+    const showLatestVersionOnly = getConfig('show_coverage_latest_version_only', true);
     const actionButtons = actionsToShow.map((action) => (
         <ActionButton
             key={action.name}
@@ -105,7 +106,22 @@ function CoverageActionsComponent({
             {actionButtons}
         </div>
     ) : (
-        <CollapseBox
+        showLatestVersionOnly ? (
+            <div className="coverage-item__row d-flex justify-content-end gap-2">
+                <ToolTip>
+                    <a
+                        key="contentLinkLatest"
+                        className="nh-button nh-button--small nh-button--tertiary"
+                        {...getViewContentButtonAttributes(wireVersions[0], viewContentEmail)}
+                        target={contentLinkTarget}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {gettext('View Content')}
+                    </a>
+                </ToolTip>
+                {actionButtons}
+            </div >
+        ) : (<CollapseBox
             id={coverage.coverage_id + '-actions'}
             title={(open) => (open ?
                 gettext('Hide all versions ({{count}})', {count: wireIds.length}) :
@@ -154,7 +170,7 @@ function CoverageActionsComponent({
                     </div>
                 ))}
             </div>
-        </CollapseBox>
+        </CollapseBox>)
     );
 }
 

@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
+import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE, getConfig} from 'utils';
 import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 
 import {
@@ -62,7 +62,6 @@ import {
     listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
-import NewItemsIcon from 'search/components/NewItemsIcon';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -224,6 +223,7 @@ class WireApp extends SearchBase<any> {
                                             refresh={this.props.fetchItems}
                                             setSortQuery={this.props.setSortQuery}
                                             setQuery={this.props.setQuery}
+                                            showDefaultTimeframeLabel={getConfig('show_default_time_frame_label') ?? true}
                                         />
                                     )
                                 }
@@ -237,17 +237,9 @@ class WireApp extends SearchBase<any> {
                                     hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
                                     searchAllVersions={this.props.searchAllVersions}
                                     toggleSearchAllVersions={this.props.toggleSearchAllVersions}
+                                    newItems={this.props.newItems}
+                                    fetchItems={this.props.fetchItems}
                                 />
-                                {!(this.props.newItems || []).length ? null : (
-                                    <div className="navbar navbar--flex navbar--small">
-                                        <div className="navbar__inner navbar__inner--end">
-                                            <NewItemsIcon
-                                                newItems={this.props.newItems}
-                                                refresh={this.props.fetchItems}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                             <ItemsList
                                 actions={this.props.actions}

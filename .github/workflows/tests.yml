@@ -10,7 +10,25 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.10']
+
+    services:
+      redis:
+          image: redis:alpine
+          ports:
+              - "6379:6379"
+
+      mongo:
+          image: mongo:6
+          ports:
+              - "27017:27017"
+
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.25
+        ports:
+            - "9200:9200"
+        env:
+            discovery.type: single-node
 
     steps:
       - uses: actions/checkout@v4
@@ -19,9 +37,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: docker compose
-        run: docker compose -f .actions-docker-compose.yml up -d
+          cache: 'pip'
 
       - run: |
              sudo apt-get update
@@ -45,12 +61,16 @@ jobs:
   client:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: ['14', '18', '20', 'lts/*']
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 14.x
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: npm install

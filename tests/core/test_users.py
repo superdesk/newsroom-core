@@ -659,7 +659,7 @@ def test_create_user_inherit_sections(app):
 
 def test_filter_and_sorting_user(app, client):
     users = client.get("/users/search?q=").get_json()
-    assert len(users) == 3
+    assert len(users) == 4
     response = client.get("/users/search?q=admin")
     assert "admin" in response.get_data(as_text=True)
     user_data = response.get_json()[0]
@@ -676,7 +676,7 @@ def test_filter_and_sorting_user(app, client):
     # sort by First_name
     users = client.get("/users/search?q=&sort=[('first_name', 1)]").get_json()
     assert users[0]["first_name"] == "Foo"
-    assert users[2]["first_name"] == "Zoe"
+    assert users[3]["first_name"] == "Zoe"
 
     # sort by Last_name
     users = client.get("/users/search?q=&sort=[('last_name', 1)]").get_json()
