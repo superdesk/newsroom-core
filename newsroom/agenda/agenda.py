@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Set, Any, Optional, List
 import logging
 from copy import deepcopy
@@ -152,7 +153,8 @@ class AgendaResource(newsroom.Resource):
     schema["urgency"] = {**planning_schema["urgency"], "mapping": {"type": "keyword"}}
     schema["priority"] = {**planning_schema["priority"], "mapping": {"type": "keyword"}}
     schema["place"] = planning_schema["place"]
-    schema["service"] = planning_schema["anpa_category"]
+    schema["service"] = deepcopy(planning_schema["anpa_category"])
+    schema["service"]["mapping"]["dynamic"] = False
     schema["state_reason"] = {"type": "string"}
 
     # Fields supporting Nested Aggregation / Filtering
@@ -185,6 +187,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "dynamic": False,
             "include_in_parent": True,  # Enabled so advanced search works across multiple fields
             "properties": {
                 "planning_id": not_analyzed,
@@ -230,7 +233,9 @@ class AgendaResource(newsroom.Resource):
 
     # other searchable fields needed in UI
     schema["calendars"] = events_schema["calendars"]
-    schema["location"] = events_schema["location"]
+    schema["location"] = deepcopy(events_schema["location"])
+    schema["location"]["mapping"]["dynamic"] = False
+    schema["location"]["mapping"]["properties"]["address"]["dynamic"] = True  # used for location search
 
     # update location name to allow exact search and term based searching
     schema["location"]["mapping"]["properties"]["name"] = {"type": "text", "fields": {"keyword": {"type": "keyword"}}}
@@ -246,6 +251,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "dynamic": False,
             "include_in_parent": True,
             "properties": {
                 "_id": not_analyzed,
@@ -657,7 +663,28 @@ def _remove_fields(source, fields):
     source["_source"]["exclude"].extend(fields)
 
 
-def planning_items_query_string(query, fields=None):
+def planning_items_query_string(query, fields=None, nested=False):
+    if nested:
+        # when searching nested planning items we need to prefix field names
+        # in query with `planning_items.` otherwise it will never match in nested
+        # field and negative queries eg. NOT service.name:Sport will match all
+        # nested planning items
+        query = re.sub(
+            r"""\b(
+                service\.name|
+                service\.code|
+                subject\.name|
+                subject\.code|
+                headline|
+                slugline|
+                description_text|
+                guid
+            ):""",
+            r"planning_items.\1:",
+            query,
+            flags=re.VERBOSE,
+        )
+
     return query_string(query, fields=fields or ["planning_items.*"])
 
 
@@ -966,7 +993,7 @@ class AgendaService(BaseSearchService):
                     },
                 }
             )
-            _remove_fields(search.source, ["planning_items", "display_dates"])
+            _remove_fields(search.source, ["display_dates"])
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["filter"].append(
@@ -1627,7 +1654,7 @@ class AgendaService(BaseSearchService):
                 "bool": {
                     "should": [
                         self.query_string(query),
-                        nested_query("planning_items", planning_items_query_string(query), name="query"),
+                        nested_query("planning_items", planning_items_query_string(query, nested=True), name="query"),
                     ]
                 },
             }

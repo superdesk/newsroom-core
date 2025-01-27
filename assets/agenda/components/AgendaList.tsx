@@ -122,6 +122,7 @@ interface IStateProps {
     userType: IUserType;
     hiddenGroupsShown: {[dateString: string]: boolean};
     itemTypeFilter: IAgendaState['agenda']['itemType'];
+    activeSortQuery: string;
 }
 
 interface IDispatchProps {
@@ -356,7 +357,7 @@ class AgendaList extends React.Component<IProps, IState> {
                     const isRead = version == null
                         ? this.props.readItems[itemId] != null // event
                         : version === this.props.readItems[itemId]; // planning item
-
+                    
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
                             {plans.map((plan) => (
@@ -435,7 +436,7 @@ class AgendaList extends React.Component<IProps, IState> {
                 }}
                 onScroll={this.props.onScroll}
             >
-                {groupedItems.length === 1 ?
+                {groupedItems.length === 1 && this.props.activeSortQuery !== '' ?
                     this.renderGroupItems(groupedItems[0], false) :
                     groupedItems.map((group) => (
                         <React.Fragment key={group.date}>
@@ -495,6 +496,7 @@ const mapStateToProps = (state: IAgendaState): IStateProps => ({
     userType: state.userType,
     hiddenGroupsShown: hiddenGroupsShownSelector(state),
     itemTypeFilter: state.agenda?.itemType,
+    activeSortQuery: state.search.activeSortQuery || '',
 });
 
 const mapDispatchToProps: IDispatchProps = {

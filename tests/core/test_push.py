@@ -945,3 +945,37 @@ def test_matching_topics_when_disabling_section(client, app):
     with app.test_request_context():
         matching = search.get_matching_topics(item["guid"], topics, users, companies)
         assert [] == matching
+
+
+# CPCN-967
+def test_global_topic_after_deleting_user(client, app):
+    add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "All",
+                "query": "*:*",
+                "is_enabled": True,
+                "product_type": "wire",
+            }
+        ],
+    )
+
+    client.post("/push", json=item)
+    search = get_resource_service("wire_search")
+
+    users = get_user_dict(use_globals=False)
+    companies = get_company_dict(use_globals=False)
+    topics = [
+        {
+            "_id": "all wire",
+            "query": "*:*",
+            "user": None,
+            "topic_type": "wire",
+            "subscribers": [{"user_id": TEST_USER_ID, "notification_type": "real-time"}],
+        },
+    ]
+    with app.test_request_context():
+        matching = search.get_matching_topics(item["guid"], topics, users, companies)
+        assert matching

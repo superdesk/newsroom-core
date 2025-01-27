@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 export default function PreviewBox(props: any) {
     return (
-        <div className='wire-column__preview__coverage'>
-            <div className={props.labelClass || 'wire-column__preview__coverage__headline'}>{props.label}</div>
+        <div className='preview__content-block'>
+            <div className={props.labelClass || 'preview__content-block-title'}>{props.label}</div>
             {props.children}
         </div>
     );

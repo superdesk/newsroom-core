@@ -13,8 +13,10 @@ PUBLIC_USER_FIRSTNAME = "Foo"
 PUBLIC_USER_LASTNAME = "Bar"
 PUBLIC_USER_NAME = "{} {}".format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 TEST_USER_ID = ObjectId("5cc94454bc43165c045ffec9")
+NEW_USER_ID = ObjectId("59b4c5c61d41c8d736852f44")
 COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
 COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
+COMPANY_3_ID = ObjectId("6215ce6ed2943dec3725af3f")
 PRODUCT_1_ID = ObjectId()
 PRODUCT_2_ID = ObjectId()
 PRODUCT_3_ID = ObjectId()
@@ -72,6 +74,13 @@ items = [
         "version": 2,
         "nextversion": "tag:weather",
         "versioncreated": datetime.now() - timedelta(days=10),
+        "service": [{"code": "c", "name": "Service C"}],
+    },
+    {
+        "_id": "tag:out-of-default-range",
+        "type": "text",
+        "version": 1,
+        "versioncreated": datetime.now() - timedelta(days=365),
         "service": [{"code": "c", "name": "Service C"}],
     },
 ]
@@ -235,6 +244,14 @@ def setup_user_company(app):
                 "name": "Paper Co.",
                 "is_enabled": True,
             },
+            {
+                "_id": COMPANY_3_ID,
+                "sd_subscriber_id": "12345",
+                "name": "News Co.",
+                "is_enabled": True,
+                "contact_name": "Ketan",
+                "restrict_coverage_info": True,
+            },
         ],
     )
 
@@ -271,6 +288,21 @@ def setup_user_company(app):
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "manage_company_topics": False,
             },
+            {
+                "_id": NEW_USER_ID,
+                "user_type": "adminstrator",
+                "email": "restrict@user.com",
+                "first_name": "Restrict",
+                "last_name": "User",
+                "company": COMPANY_3_ID,
+                "is_enabled": True,
+                "is_approved": True,
+                "_created": utcnow(),
+                "receive_email": True,
+                "receive_app_notifications": True,
+                "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
+            },
         ],
     )
 
@@ -288,6 +320,11 @@ def public_company(app, init_company):
 @fixture
 def public_user(app, init_company):
     return app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+
+
+@fixture
+def restrict_user(app, init_company):
+    return app.data.find_one("users", req=None, _id=NEW_USER_ID)
 
 
 @fixture

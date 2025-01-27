@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {gettext, isDisplayed, isMobilePhone} from 'utils';
+import {gettext, isDisplayed, isTablet} from 'utils';
 import {getCard} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
@@ -272,7 +272,7 @@ class HomeApp extends React.Component<IProps, {
     }
 
     render() {
-        return isMobilePhone() ?
+        return isTablet() ?
             this.renderMobile() :
             this.renderNonMobile();
     }

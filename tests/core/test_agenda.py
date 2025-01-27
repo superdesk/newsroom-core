@@ -313,6 +313,9 @@ def test_agenda_search_filtered_by_query_product(client, app, public_company):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 def test_coverage_request(client, app):
+    # enable config to include current user in CC
+    app.config["COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER"] = True
+
     post_json(
         client,
         "/settings/general_settings",
@@ -333,6 +336,7 @@ def test_coverage_request(client, app):
         assert resp.status_code == 201, resp.get_data().decode("utf-8")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["admin@bar.com"]
+        assert outbox[0].cc == ["admin@sourcefabric.org"]
         assert outbox[0].subject == "Coverage inquiry: Conference Planning"
         assert "admin admin" in outbox[0].body
         assert "admin@sourcefabric.org" in outbox[0].body

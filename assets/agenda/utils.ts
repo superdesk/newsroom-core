@@ -1,7 +1,15 @@
 import {get, isEmpty, keyBy, sortBy} from 'lodash';
 import moment from 'moment/moment';
 
-import {IAgendaItem, IPlanningItem, IAgendaListGroup, IAgendaListGroupItem, ICoverage, IUser} from 'interfaces';
+import {
+    IAgendaItem,
+    IPlanningItem,
+    IAgendaListGroup,
+    IAgendaListGroupItem,
+    ICoverage,
+    IUser,
+    IAgendaState
+} from 'interfaces';
 import {
     formatDate,
     formatMonth,
@@ -701,8 +709,12 @@ export function groupItems(
     minDate: moment.Moment | undefined,
     maxDate: moment.Moment | undefined,
     activeGrouping: string,
-    featuredOnly?: boolean
+    featuredOnly?: boolean,
+    itemTypeFilter?: IAgendaState['agenda']['itemType']
 ): Array<IAgendaListGroup> {
+    const excludePlanningExtraDates = (itemTypeFilter == null || itemTypeFilter === 'events') &&
+        window.newsroom.client_config.agenda_default_filter_hide_planning === true;
+
     if (items.length === 0) {
         return [];
     }
@@ -719,7 +731,7 @@ export function groupItems(
             item._hits?.matched_coverages?.length
         ))
         .forEach((item) => {
-            const itemExtraDates = getExtraDates(item);
+            const itemExtraDates = excludePlanningExtraDates ? [] : getExtraDates(item);
             const itemStartDate = getStartDate(item);
             let start: moment.Moment;
 

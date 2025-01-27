@@ -64,6 +64,9 @@ interface IClientConfig {
     collapsed_search_by_default?: boolean;
     show_user_register?: boolean;
     multimedia_website_search_url?: string;
+    show_default_time_frame_label?: boolean;
+    agenda_default_filter_hide_planning: boolean;
+    show_coverage_latest_version_only?: boolean;
 }
 
 interface Window {

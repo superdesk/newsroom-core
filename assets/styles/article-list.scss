@@ -130,14 +130,12 @@
     margin-block-start: 0;
     overflow: auto;
     flex-grow: 1;
+    z-index: 1; // Z-index fix for Chrome
 }
-
-
 
 .wire-articles__item-sidebar {
     margin-inline-end: var(--space--2);
 }
-
 
 // STATES 
 .wire-articles__item--covering {

@@ -20,14 +20,14 @@
 }
 .wire-column__main-header-container {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     background-color: var(--main-header-color-bg);
     box-shadow: 0 3px 6px hsla(0, 0%, 0%, 0.1), 0 1px 0 hsla(0, 0%, 0%, 0.06);
     gap: 0;
     flex-shrink: 0;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    max-height: clamp(360px, 50svh, 50svh);
+    grid-template-rows: auto auto auto auto;
+    max-height: clamp(320px, 50svh, 50svh);
     @include phone {
         .search-result__tags-list {
             border-bottom: 2px solid var(--main-header-color-bg);
@@ -46,7 +46,7 @@
 }
 
 .navbar.navbar--search-results {
-    z-index: 1;
+    z-index: 2;
     grid-row: 2 / 3;
 }
 

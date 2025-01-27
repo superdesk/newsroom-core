@@ -1,4 +1,4 @@
-import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from 'utils';
+import {createStore, getInitData, closeItemOnMobile, isTablet} from 'utils';
 import {initWebSocket} from 'websocket';
 import {render} from 'render-utils';
 
@@ -33,7 +33,7 @@ if (localStorage.getItem('view')) {
 window.onpopstate = function(event: any) {
     if (event.state) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
-        if (!isMobilePhone()) {
+        if (!isTablet()) {
             store.dispatch(setState(event.state));
             store.dispatch(fetchItems());
         }
