@@ -32,7 +32,7 @@ export class ToolTip extends React.PureComponent<any, any> {
                 const options: Partial<Tooltip.Options> = {
                     trigger: 'hover',
                     placement: this.props.placement || 'top',
-                    title: this.props.title,
+                    title: this.props.title ?? '',
                 };
 
                 if (this.props.title) {
