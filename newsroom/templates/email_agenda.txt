@@ -27,6 +27,7 @@ Note: {{ cov['planning']['ednote'] }} {% endif %}{% if is_admin and cov.get('pla
 {%- if related_events %}
 Related_Events:
 {%- for event in related_events %}
+Url: {{ url_for_agenda(event) }}
 {% if event.name %}{{ event.name }}
 {% endif %}
 {%- if event.slugline %}Slugline: {{ event.slugline }}

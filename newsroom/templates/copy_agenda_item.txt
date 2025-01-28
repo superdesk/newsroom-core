@@ -54,7 +54,7 @@ Description: {{ plan.description_text | plain_text }}
 {%- if related_events %}
 Related_Events:
 {%- for event in related_events %}
-
+Url: {{ url_for_agenda(event) }}
 {% if event.name %}{{ event.name }}
 {% endif %}
 {%- if event.slugline %}Slugline: {{ event.slugline }}
