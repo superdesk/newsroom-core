@@ -318,5 +318,6 @@ async def get_related_events(item: Dict[str, Any]) -> List[Dict[str, Any]]:
 
     related_events = []
     if item.get("event_ids"):
-        related_events = await AgendaSearchServiceAsync().get_items_for_action(item["event_ids"])
+        cursor = await AgendaSearchServiceAsync().get_items_by_id(item["event_ids"])
+        related_events = await cursor.to_list_raw()
     return related_events
