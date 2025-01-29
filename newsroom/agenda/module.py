@@ -41,6 +41,10 @@ def init_module(app: SuperdeskAsyncApp):
     if app.wsgi.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
         PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])
 
+    app.wsgi.config["CLIENT_CONFIG"]["agenda_default_filter_hide_planning"] = app.wsgi.config.get(
+        "AGENDA_DEFAULT_FILTER_HIDE_PLANNING", False
+    )
+
     init_nested_aggregation("agenda", ["subject"], app.wsgi.config.get("AGENDA_GROUPS", []), aggregations)
 
     register_formatter(iCalFormatter)

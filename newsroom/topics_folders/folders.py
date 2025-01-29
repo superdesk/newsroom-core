@@ -33,9 +33,15 @@ class FolderResourceService(NewshubAsyncResourceService[TopicFolderResourceModel
         except DuplicateKeyError:
             raise_custom_validation_error(TopicFolderResourceModel.__name__, "name", gettext("Name must be unique"), "")
 
-    async def update(self, item_id: str | ObjectId, updates: dict[str, Any], etag: str | None = None) -> None:
+    async def update(
+        self,
+        item_id: str | ObjectId,
+        updates: dict[str, Any],
+        etag: str | None = None,
+        original: TopicFolderResourceModel | None = None,
+    ) -> None:
         try:
-            await super().update(item_id, updates, etag)
+            await super().update(item_id, updates, etag, original)
         except DuplicateKeyError:
             raise_custom_validation_error(TopicFolderResourceModel.__name__, "name", gettext("Name must be unique"), "")
 

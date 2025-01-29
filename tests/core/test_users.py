@@ -676,7 +676,7 @@ async def test_user_has_paused_notifications():
 async def test_search_all_users(client):
     response = await client.get("/users/search?q=")
     users = await response.get_json()
-    assert len(users) == 3
+    assert len(users) == 4
 
 
 async def test_search_user_by_name(app, client):
@@ -697,12 +697,16 @@ async def test_update_and_sort(app, client):
     response = await client.get("/users/search?q=&sort=[('first_name', 1)]")
     users = await response.get_json()
     assert users[0]["first_name"] == "AAba"
-    assert users[2]["first_name"] == "Test"
+    assert users[1]["first_name"] == "Foo"
+    assert users[2]["first_name"] == "Restrict"
+    assert users[3]["first_name"] == "Test"
 
     response = await client.get("/users/search?q=&sort=[('last_name', -1)]")
     users = await response.get_json()
     assert users[0]["last_name"] == "Zoe"
-    assert users[1]["last_name"] == "Bar"
+    assert users[1]["last_name"] == "User"
+    assert users[2]["last_name"] == "Bar"
+    assert users[3]["last_name"] == "Bar"
 
 
 async def test_filter_users_by_company_id(app, client):

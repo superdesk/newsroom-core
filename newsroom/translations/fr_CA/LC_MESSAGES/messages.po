@@ -1,8 +1,8 @@
 # Translations template for Newsroom-Core.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the Newsroom-Core
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
@@ -11,19 +11,19 @@
 # Sabina <sabina.gergel@thecanadianpress.com>, 2024
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2024
 # Simon Peacock <simon.peacock@gmail.com>, 2024
-# Petr Jašek <petr.jasek@sourcefabric.org>, 2024
-# Nefertiti Patell, 2024
 # Paemiga Sararithi, 2024
-# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
+# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2025
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2025
+# Nefertiti Patell, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.8.0rc1\n"
+"Project-Id-Version: Newsroom-Core 2.8.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-21 11:35+0200\n"
+"POT-Creation-Date: 2025-01-02 11:58+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024\n"
+"Last-Translator: Nefertiti Patell, 2025\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,11 +32,11 @@ msgstr ""
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: newsroom/email.py:487
+#: newsroom/email.py:501
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:496
+#: newsroom/email.py:510
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr "%(section)s avis d'annulation"
@@ -211,9 +211,9 @@ msgstr ""
 "la page https://developers.google.com/maps/documentation/maps-static/styling"
 " pour plus de détails."
 
-#: assets/agenda/components/AgendaTags.tsx:44
+#: assets/agenda/components/AgendaTags.tsx:19
 #: assets/company-reports/components/ContentActivity.tsx:61
-#: assets/wire/components/PreviewTags.tsx:40 newsroom/agenda/__init__.py:66
+#: assets/wire/components/PreviewTags.tsx:26 newsroom/agenda/__init__.py:66
 #: newsroom/reports/content_activity.py:191
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:133
@@ -239,43 +239,43 @@ msgstr "Priorité de la nouvelle"
 msgid "Place"
 msgstr "Endroit"
 
-#: newsroom/agenda/agenda.py:56
+#: newsroom/agenda/agenda.py:57
 msgid "An event you have been watching has been updated"
 msgstr "Un événement que vous avez surveillé a été mis à jour"
 
-#: newsroom/agenda/agenda.py:57
+#: newsroom/agenda/agenda.py:58
 msgid "Event updated"
 msgstr "Événement mis à jour"
 
-#: newsroom/agenda/agenda.py:60
+#: newsroom/agenda/agenda.py:61
 msgid "An event you have been watching has been cancelled"
 msgstr "Un événement que vous avez surveillé a été annulé"
 
-#: newsroom/agenda/agenda.py:61
+#: newsroom/agenda/agenda.py:62
 msgid "Event cancelled"
 msgstr "Événement annulé"
 
-#: newsroom/agenda/agenda.py:64
+#: newsroom/agenda/agenda.py:65
 msgid "An event you have been watching has a new planning"
 msgstr "Un événement que vous avez surveillé a une nouvelle couverture"
 
-#: newsroom/agenda/agenda.py:65
+#: newsroom/agenda/agenda.py:66
 msgid "Planning added"
 msgstr "Couverture ajoutée"
 
-#: newsroom/agenda/agenda.py:68
+#: newsroom/agenda/agenda.py:69
 msgid "An event you have been watching has a planning cancelled"
 msgstr "La couverture d'un événement que vous avez surveillé a été annulée"
 
-#: newsroom/agenda/agenda.py:69
+#: newsroom/agenda/agenda.py:70
 msgid "Planning cancelled"
 msgstr "Couverture annulée"
 
-#: newsroom/agenda/agenda.py:72
+#: newsroom/agenda/agenda.py:73
 msgid "An event you have been watching has a new coverage added"
 msgstr "Une couverture a été ajoutée à un événement que vous avez surveillé"
 
-#: newsroom/agenda/agenda.py:73
+#: newsroom/agenda/agenda.py:74
 msgid "Coverage added"
 msgstr "Couverture ajoutée"
 
@@ -310,21 +310,21 @@ msgstr "À confirmer"
 msgid "Postponed"
 msgstr "Reportée"
 
-#: newsroom/agenda/views.py:221
+#: newsroom/agenda/views.py:222
 msgid "Cannot edit coverage watch when watching parent item"
 msgstr ""
 "Il n'est pas possible de modifier la surveillance d'une couverture lorsqu'un"
 " élément qui y est associé est surveillé "
 
-#: newsroom/agenda/views.py:228
+#: newsroom/agenda/views.py:229
 msgid "Coverage not found"
 msgstr "Couverture non trouvée"
 
-#: newsroom/agenda/views.py:240
+#: newsroom/agenda/views.py:241
 msgid "Error removing watch."
 msgstr "Erreur survenue lors du retrait de la surveillance. "
 
-#: newsroom/agenda/views.py:279
+#: newsroom/agenda/views.py:280
 #, python-format
 msgid "%(section)s item not found"
 msgstr "%(section)s élément non trouvé"
@@ -786,13 +786,13 @@ msgstr "Produits"
 msgid "Must provide a section for this report"
 msgstr "Une section doit être fournie pour ce rapport"
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:134
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:150
 #: assets/company-reports/components/ContentActivity.tsx:57
 #: newsroom/reports/content_activity.py:187
 msgid "Published"
 msgstr "Publié"
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:126
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:142
 #: assets/company-reports/components/ContentActivity.tsx:58
 #: assets/components/cards/edit/ConfigEvent.tsx:26
 #: assets/search/components/AdvancedSearchPanel.tsx:126
@@ -1013,7 +1013,6 @@ msgstr "Web"
 msgid "Editorial Note"
 msgstr "Note de la rédaction"
 
-#: assets/agenda/components/AgendaPreviewCoverages.tsx:56
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:134
 #: newsroom/templates/agenda_item_print.html:64
 msgid "Coverages:"
@@ -1127,7 +1126,7 @@ msgstr ""
 
 #: newsroom/templates/login_layout.html:13
 msgid "Login to Newshub"
-msgstr ""
+msgstr "Se connecter à Newshub"
 
 #: newsroom/templates/login_layout.html:47
 msgid "Reset password"
@@ -1143,13 +1142,13 @@ msgstr "Se connecter avec Google"
 
 #: newsroom/templates/login_layout.html:69
 msgid "Or"
-msgstr ""
+msgstr "Ou"
 
 #: newsroom/templates/login_layout.html:81
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Vous n'avez pas de compte ?"
 
-#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:13
+#: newsroom/templates/login_layout.html:82 newsroom/templates/signup.html:7
 #: newsroom/templates/signup_form.html:61
 msgid "Sign up"
 msgstr "S'inscrire"
@@ -1295,14 +1294,14 @@ msgstr "caractères"
 msgid "Source:"
 msgstr "Source:"
 
-#: assets/agenda/components/AgendaTags.tsx:40
-#: assets/wire/components/PreviewTags.tsx:33
+#: assets/agenda/components/AgendaTags.tsx:42
+#: assets/wire/components/PreviewTags.tsx:60
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: assets/wire/components/PreviewTags.tsx:53
+#: assets/wire/components/PreviewTags.tsx:38
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:141
 msgid "Content Type"
@@ -1507,52 +1506,57 @@ msgstr "Non décidée / au mérite"
 msgid "Not Intended / Cancelled"
 msgstr "Non prévue / annulée"
 
-#: newsroom/web/default_settings.py:637
+#: newsroom/web/default_settings.py:641
 msgid "Home"
 msgstr "Accueil"
 
-#: newsroom/web/default_settings.py:642
+#: newsroom/web/default_settings.py:646
 msgid "Wire"
 msgstr "Fil de presse"
 
-#: newsroom/web/default_settings.py:647
+#: newsroom/web/default_settings.py:651
 msgid "Agenda"
 msgstr "Calendrier"
 
-#: newsroom/web/default_settings.py:652
+#: newsroom/web/default_settings.py:656
 msgid "Monitoring"
 msgstr "Suivi"
 
-#: newsroom/web/default_settings.py:657
+#: newsroom/web/default_settings.py:661
 msgid "Saved / Watched"
 msgstr "Ma liste"
 
-#: newsroom/web/default_settings.py:695
+#: newsroom/web/default_settings.py:699
 msgid "Newshub"
 msgstr "NouvellesPro"
 
 #: assets/agenda/components/AgendaDateButtons.tsx:15
-#: assets/agenda/components/AgendaList.tsx:329
+#: assets/agenda/components/AgendaList.tsx:330
 #: assets/company-reports/components/ProductStories.tsx:26
 #: assets/components/CalendarButton.tsx:49
 #: assets/components/ExpiryDateInput.tsx:94
-#: newsroom/web/default_settings.py:818 newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:822 newsroom/web/default_settings.py:849
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: newsroom/web/default_settings.py:820
-msgid "Last Week"
-msgstr "La semaine dernière"
+#: assets/company-reports/components/ProductStories.tsx:29
+#: newsroom/web/default_settings.py:824
+msgid "Last 7 days"
+msgstr "Les 7 derniers jours"
 
-#: newsroom/web/default_settings.py:826
+#: newsroom/web/default_settings.py:830
 msgid "Last 30 days"
 msgstr "Les 30 derniers jours"
 
-#: newsroom/web/default_settings.py:846
+#: newsroom/web/default_settings.py:848
+msgid "Selected day"
+msgstr "Jour sélectionné"
+
+#: newsroom/web/default_settings.py:851
 msgid "This Week"
 msgstr "Cette semaine"
 
-#: newsroom/web/default_settings.py:850
+#: newsroom/web/default_settings.py:855
 msgid "This Month"
 msgstr "Ce mois-ci"
 
@@ -1657,15 +1661,15 @@ msgstr "La ressource a été mise à jour entre-temps, veuillez la rafraîchir."
 msgid "Failed to process request!"
 msgstr "La requête n'a pas pu être exécutée!"
 
-#: assets/utils.tsx:714
+#: assets/utils.tsx:718
 msgid "Item copied successfully."
 msgstr "Élément copié avec succès."
 
-#: assets/utils.tsx:718
+#: assets/utils.tsx:722
 msgid "Sorry, Copy is not supported."
 msgstr "Désolé, la copie n'est pas prise en charge."
 
-#: assets/utils.tsx:749
+#: assets/utils.tsx:753
 msgid "Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}"
 msgstr ""
 "Tous les jours à {{ time1 }}, {{ time2 }} et {{ time3 }} {{ timezone }}"
@@ -1730,57 +1734,57 @@ msgstr "Surveiller cette couverture"
 msgid "Stop watching this coverage"
 msgstr "Arrêter de surveiller cette couverture"
 
-#: assets/agenda/utils.ts:61
+#: assets/agenda/utils.ts:69
 msgid "coverage updated {{ at }}"
 msgstr "couverture mise à jour {{ at }}"
 
-#: assets/agenda/utils.ts:71
+#: assets/agenda/utils.ts:79
 msgid "Time to be confirmed"
 msgstr "Heure à confirmer"
 
-#: assets/agenda/utils.ts:81 assets/agenda/utils.ts:82
+#: assets/agenda/utils.ts:89 assets/agenda/utils.ts:90
 msgid "Coverage not planned"
 msgstr "Couverture non planifiée"
 
-#: assets/agenda/utils.ts:83 assets/agenda/utils.ts:90
+#: assets/agenda/utils.ts:91 assets/agenda/utils.ts:98
 msgid "Coverage planned"
 msgstr "Couverture planifiée"
 
-#: assets/agenda/utils.ts:84 assets/agenda/utils.ts:85
+#: assets/agenda/utils.ts:92 assets/agenda/utils.ts:93
 msgid "Coverage on merit"
 msgstr "Couverture au mérite"
 
-#: assets/agenda/utils.ts:86
+#: assets/agenda/utils.ts:94
 msgid "Coverage on request"
 msgstr "Couverture sur demande"
 
-#: assets/agenda/utils.ts:91
+#: assets/agenda/utils.ts:99
 msgid "Coverage in progress"
 msgstr "Couverture en cours"
 
-#: assets/agenda/utils.ts:92
+#: assets/agenda/utils.ts:100
 msgid "Coverage available"
 msgstr "Couverture disponible"
 
-#: assets/agenda/utils.ts:93
+#: assets/agenda/utils.ts:101
 msgid "Coverage cancelled"
 msgstr "Couverture annulée"
 
-#: assets/agenda/utils.ts:987
+#: assets/agenda/utils.ts:999
 msgid "assignee: {{name}}"
 msgstr "personne affectée : {{name}}"
 
-#: assets/agenda/utils.ts:988
+#: assets/agenda/utils.ts:1000
 msgid "desk: {{name}}"
 msgstr "Pupitre : {{name}}"
 
-#: assets/agenda/utils.ts:997
+#: assets/agenda/utils.ts:1009
 msgid ""
 "{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}"
 msgstr ""
 "{{ type }} couverture {{ slugline }} {{ status_text }} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1005
+#: assets/agenda/utils.ts:1017
 msgid ""
 "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} "
 "{{assignedDetails}}"
@@ -1788,7 +1792,7 @@ msgstr ""
 "Couverture {{ slugline }} planifiée {{ type }}, attendu le {{date}} à "
 "{{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1013
+#: assets/agenda/utils.ts:1025
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}} {{assignedDetails}}"
@@ -1796,19 +1800,19 @@ msgstr ""
 "Couverture {{ type }} {{ slugline }} en cours, attendu le {{date}} à "
 "{{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1017
+#: assets/agenda/utils.ts:1029
 msgid "{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}"
 msgstr "Couverture {{ type }} {{slugline}} annulée {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(update to come)"
 msgstr "(mise à jour à venir)"
 
-#: assets/agenda/utils.ts:1025
+#: assets/agenda/utils.ts:1037
 msgid "(updated)"
 msgstr "(mise à jour)"
 
-#: assets/agenda/utils.ts:1028
+#: assets/agenda/utils.ts:1040
 msgid ""
 "{{ type }} coverage {{ slugline }} available {{deliveryState}} "
 "{{assignedDetails}}"
@@ -1816,79 +1820,79 @@ msgstr ""
 "Couverture {{ type }} {{ slugline }} disponible {{deliveryState}} "
 "{{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1036
+#: assets/agenda/utils.ts:1048
 msgid "{{ type }} coverage {{assignedDetails}}"
 msgstr "Couverture {{ type }} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1106
+#: assets/agenda/utils.ts:1118
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr "{{startDate}} à {{endDate}} (Heure à déterminer)"
 
-#: assets/agenda/utils.ts:1112
+#: assets/agenda/utils.ts:1124
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr "{{startDate}} (Heure à déterminer)"
 
-#: assets/agenda/utils.ts:1117
+#: assets/agenda/utils.ts:1129
 msgid "{{startDate}} to {{endDate}}"
 msgstr "{{startDate}} à {{endDate}}"
 
-#: assets/agenda/utils.ts:1126
+#: assets/agenda/utils.ts:1138
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1134
+#: assets/agenda/utils.ts:1146
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1141
+#: assets/agenda/utils.ts:1153
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1149 assets/agenda/utils.ts:1159
+#: assets/agenda/utils.ts:1161 assets/agenda/utils.ts:1171
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} à {{endTime}} {{endDate}} {{timezone}}"
 
-#: assets/agenda/components/AgendaApp.tsx:161
+#: assets/agenda/components/AgendaApp.tsx:160
 msgid "{{agenda}} Content"
 msgstr "Contenu {{agenda}}"
 
+#: assets/agenda/components/AgendaApp.tsx:169
 #: assets/agenda/components/AgendaApp.tsx:170
-#: assets/agenda/components/AgendaApp.tsx:171
 #: assets/am-news/components/AmNewsApp.tsx:124
 #: assets/am-news/components/AmNewsApp.tsx:125
+#: assets/wire/components/WireApp.tsx:163
 #: assets/wire/components/WireApp.tsx:164
-#: assets/wire/components/WireApp.tsx:165
 msgid "Close filter panel"
 msgstr "Fermer le panneau de filtre"
 
+#: assets/agenda/components/AgendaApp.tsx:181
 #: assets/agenda/components/AgendaApp.tsx:182
-#: assets/agenda/components/AgendaApp.tsx:183
 #: assets/am-news/components/AmNewsApp.tsx:132
 #: assets/am-news/components/AmNewsApp.tsx:133
+#: assets/wire/components/WireApp.tsx:180
 #: assets/wire/components/WireApp.tsx:181
-#: assets/wire/components/WireApp.tsx:182
 msgid "Open filter panel"
 msgstr "Ouvrir le panneau de filtre"
 
-#: assets/agenda/components/AgendaApp.tsx:215
+#: assets/agenda/components/AgendaApp.tsx:214
 #: assets/am-news/components/AmNewsApp.tsx:151
-#: assets/wire/components/WireApp.tsx:201
+#: assets/wire/components/WireApp.tsx:200
 msgid "Side filter panel"
 msgstr "Panneau de filtre latéral"
 
-#: assets/agenda/components/AgendaApp.tsx:256
+#: assets/agenda/components/AgendaApp.tsx:255
 msgid "Date"
 msgstr "Date"
 
-#: assets/agenda/components/AgendaApp.tsx:257
+#: assets/agenda/components/AgendaApp.tsx:256
 msgid "Newest updates"
 msgstr "Dernière modification"
 
-#: assets/agenda/components/AgendaApp.tsx:258
+#: assets/agenda/components/AgendaApp.tsx:257
 msgid "Oldest updates"
 msgstr "Première modification"
 
-#: assets/agenda/components/AgendaApp.tsx:259
+#: assets/agenda/components/AgendaApp.tsx:258
 #: assets/search/components/SearchResultsBar/index.tsx:67
 msgid "Relevance"
 msgstr "Pertinence"
@@ -1911,8 +1915,8 @@ msgstr "Tous les calendriers"
 
 #: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:57
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:68
-#: assets/agenda/components/AgendaFilters.tsx:65
-#: assets/agenda/components/AgendaFilters.tsx:99
+#: assets/agenda/components/AgendaFilters.tsx:66
+#: assets/agenda/components/AgendaFilters.tsx:100
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:39
 #: assets/agenda/components/LocationFilter.tsx:498
 msgid "Clear selection"
@@ -1959,7 +1963,7 @@ msgstr "votre demande"
 msgid "Submit inquiry"
 msgstr "Soumettre une demande"
 
-#: assets/agenda/components/AgendaCoverages.tsx:67
+#: assets/agenda/components/AgendaCoverages.tsx:68
 msgid "Open {{agenda}} in a new tab"
 msgstr "Ouvrir {{agenda}} dans un nouvel onglet"
 
@@ -2014,22 +2018,22 @@ msgstr "Articles principaux/à la une"
 msgid "Top Stories"
 msgstr "Principaux articles"
 
-#: assets/agenda/components/AgendaFilters.tsx:58
-#: assets/agenda/components/AgendaFilters.tsx:64
+#: assets/agenda/components/AgendaFilters.tsx:59
+#: assets/agenda/components/AgendaFilters.tsx:65
 #: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr "Régions"
 
-#: assets/agenda/components/AgendaFilters.tsx:79
+#: assets/agenda/components/AgendaFilters.tsx:80
 msgid "Region"
 msgstr "Région"
 
-#: assets/agenda/components/AgendaFilters.tsx:92
-#: assets/agenda/components/AgendaFilters.tsx:98
+#: assets/agenda/components/AgendaFilters.tsx:93
+#: assets/agenda/components/AgendaFilters.tsx:99
 msgid "Coverage types"
 msgstr "Types de couverture"
 
-#: assets/agenda/components/AgendaFilters.tsx:102
+#: assets/agenda/components/AgendaFilters.tsx:103
 msgid "Coverage type"
 msgstr "Type de couverture"
 
@@ -2078,11 +2082,11 @@ msgstr "Événements et couvertures"
 msgid "Show"
 msgstr "Afficher"
 
-#: assets/agenda/components/AgendaList.tsx:333
+#: assets/agenda/components/AgendaList.tsx:334
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: assets/agenda/components/AgendaList.tsx:466
+#: assets/agenda/components/AgendaList.tsx:467
 #: assets/am-news/components/AmNewsList.tsx:196
 #: assets/wire/components/ItemsList.tsx:180
 msgid "No items found."
@@ -2129,7 +2133,14 @@ msgstr "reporté"
 msgid "event completed"
 msgstr "événement terminé"
 
+#: assets/agenda/components/AgendaPreviewCoverages.tsx:56
+msgid "Coverages"
+msgstr "Couvertures"
+
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:69
+msgid "Previous Coverages"
+msgstr "Couvertures précédentes"
+
 #: assets/agenda/components/AgendaPreviewCoverages.tsx:147
 msgid "Previous Coverages:"
 msgstr "Couvertures précédentes:"
@@ -2169,15 +2180,16 @@ msgstr "Détails de l'invitation"
 #: assets/agenda/components/CoverageItemStatus.tsx:105
 #: assets/agenda/components/CoverageItemStatus.tsx:125
 #: assets/agenda/components/preview/coverage/CoverageActions.tsx:27
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:83
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:84
 msgid "Open in new tab"
 msgstr "Ouvrir dans un nouvel onglet"
 
 #: assets/agenda/components/CoverageItemStatus.tsx:110
 #: assets/agenda/components/CoverageItemStatus.tsx:130
 #: assets/agenda/components/CoverageItemStatus.tsx:141
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:90
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:150
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:91
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:119
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:166
 msgid "View Content"
 msgstr "Voir le contenu"
 
@@ -2216,8 +2228,8 @@ msgid "{{ name }} (City, {{ state }}, {{ country }})"
 msgstr "{{ name }} (Ville, {{ state }}, {{ country }})"
 
 #: assets/agenda/components/LocationFilter.tsx:352
-msgid "{{ name }} (State, {{ country }})"
-msgstr "{{ name }} (État, {{ country }})"
+msgid "{{ name }} (State/Province, {{ country }})"
+msgstr "{{ name }} (État/Province, {{ country }})"
 
 #: assets/agenda/components/LocationFilter.tsx:371
 msgid "{{ name }} (Country)"
@@ -2257,11 +2269,11 @@ msgstr "À la recherche d'endroits..."
 msgid "No regions found"
 msgstr "Aucune région trouvée"
 
-#: assets/agenda/components/LocationFilter.tsx:525
+#: assets/agenda/components/LocationFilter.tsx:527
 msgid "Places"
 msgstr "Endroits"
 
-#: assets/agenda/components/LocationFilter.tsx:534
+#: assets/agenda/components/LocationFilter.tsx:536
 msgid "No places found"
 msgstr "Aucun endroit trouvé"
 
@@ -2269,11 +2281,11 @@ msgstr "Aucun endroit trouvé"
 msgid "Day:"
 msgstr "Jour : "
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:111
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:127
 msgid "Hide all versions ({{count}})"
 msgstr "Masquer toutes les versions ({{count}})"
 
-#: assets/agenda/components/preview/coverage/CoverageActions.tsx:112
+#: assets/agenda/components/preview/coverage/CoverageActions.tsx:128
 msgid "Show all versions ({{count}})"
 msgstr "Afficher toutes les versions ({{count}})"
 
@@ -2842,10 +2854,6 @@ msgstr "Dernières 24 heures"
 msgid "This week"
 msgstr "Cette semaine"
 
-#: assets/company-reports/components/ProductStories.tsx:29
-msgid "Last 7 days"
-msgstr "Les 7 derniers jours"
-
 #: assets/company-reports/components/ProductStories.tsx:30
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -3332,7 +3340,7 @@ msgid "Keywords"
 msgstr "Mots clés"
 
 #: assets/monitoring/components/MonitoringApp.tsx:29
-#: assets/wire/components/WireApp.tsx:82
+#: assets/wire/components/WireApp.tsx:81
 msgid "{{monitoring}} Profiles"
 msgstr "Profils de {{monitoring}}"
 
@@ -3761,7 +3769,7 @@ msgstr "Appliquer ces règles à au moins un de ces champs de recherche :"
 
 #: assets/search/components/AdvancedSearchPanel.tsx:134
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:148
-#: assets/wire/components/PreviewTags.tsx:35
+#: assets/wire/components/PreviewTags.tsx:18
 msgid "Slugline"
 msgstr "Titre de rappel"
 
@@ -3986,14 +3994,14 @@ msgstr "sans"
 msgid "Clear"
 msgstr "Effacer"
 
-#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:157
+#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:155
+msgid "inside"
+msgstr "dans"
+
+#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:184
 #: assets/search/components/SearchResultsBar/SearchResultsQueryRow.tsx:26
 msgid "Search for"
 msgstr "Rechercher"
-
-#: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:163
-msgid "inside"
-msgstr "dans"
 
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:177
@@ -4051,6 +4059,9 @@ msgid ""
 "The initial search is limited to the {{dateFilterName}}. Please find "
 "different date ranges in the filter panel using the burger menu."
 msgstr ""
+"La recherche initiale est limitée aux {{dateFilterName}}. Vous pouvez "
+"rechercher d'autres plages de dates dans le panneau de filtre en utilisant "
+"le menu latéral."
 
 #: assets/search/components/SearchResultsBar/index.tsx:266
 #: assets/users/components/filters/UserListSortFilter.tsx:83
@@ -4463,7 +4474,7 @@ msgstr "Nouvelles seulement"
 msgid "{{ count }} item(s) selected"
 msgstr "{{ count }} élément(s) sélectionné(s)"
 
-#: assets/wire/components/WireApp.tsx:155
+#: assets/wire/components/WireApp.tsx:154
 msgid "{{wire}} Content"
 msgstr "Contenu {{wire}}"
 

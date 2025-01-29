@@ -1,9 +1,9 @@
 from quart_babel import lazy_gettext
 
 import superdesk
+from superdesk.core.types import MongoResourceConfig
 from superdesk.core.module import Module
 from superdesk.core.app import SuperdeskAsyncApp
-from superdesk.core.mongo import MongoResourceConfig
 from superdesk.core.resources import ResourceConfig
 
 from newsroom import MONGO_PREFIX

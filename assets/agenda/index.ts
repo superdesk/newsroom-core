@@ -1,5 +1,5 @@
 import {IAgendaState} from 'interfaces';
-import {createStore, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
+import {createStore, getInitData, isTablet, closeItemOnMobile} from 'utils';
 import {initWebSocket} from 'websocket';
 
 import agendaReducer from './reducers';
@@ -28,7 +28,7 @@ if (localStorage.getItem('view')) {
 window.onpopstate = function(event: any) {
     if (event.state) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
-        if (!isMobilePhone()) {
+        if (!isTablet()) {
             store.dispatch(setState(event.state));
             store.dispatch(fetchItems());
         }

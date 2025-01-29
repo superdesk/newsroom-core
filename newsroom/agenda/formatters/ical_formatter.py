@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import timedelta
 
 import arrow
 import icalendar
@@ -75,7 +76,9 @@ class iCalFormatter(BaseFormatter):
         event.add("dtstart", start.date() if dates.get("all_day") else start)
         if dates.get("end"):
             end = datetime(dates["end"])
-            event.add("dtend", end.date() if dates.get("no_end_time") or dates.get("all_day") else end)
+            event.add(
+                "dtend", end.date() + timedelta(days=1) if dates.get("no_end_time") or dates.get("all_day") else end
+            )
         try:
             rrule = item["event"]["dates"]["recurring_rule"]
             event.add("rrule", get_rrule_kwargs(rrule))
