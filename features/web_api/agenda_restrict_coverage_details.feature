@@ -209,14 +209,14 @@ Feature: Agenda Restricted Coverage Details
             "coverages": [{
                 "coverage_id": "plan1_cov1",
                 "coverage_type": "text",
-                "scheduled": "__no_value__",
+                "scheduled": "2018-05-28T10:51:52+0000",
                 "slugline": "__no_value__",
                 "workflow_status": "__no_value__",
                 "coverage_status": "__no_value__"
             }, {
                 "coverage_id": "plan1_cov2",
                 "coverage_type": "text",
-                "scheduled": "__no_value__",
+                "scheduled": "2018-05-28T10:51:52+0000",
                 "slugline": "__no_value__",
                 "workflow_status": "__no_value__",
                 "coverage_status": "__no_value__"
@@ -234,7 +234,7 @@ Feature: Agenda Restricted Coverage Details
                         "g2_content_type": "text",
                         "ednote": "__no_value__",
                         "internal_note": "__no_value__",
-                        "scheduled": "__no_value__",
+                        "scheduled": "2018-05-28T10:51:52+0000",
                         "slugline": "__no_value__"
                     }
                 }, {
@@ -245,7 +245,7 @@ Feature: Agenda Restricted Coverage Details
                         "g2_content_type": "text",
                         "ednote": "__no_value__",
                         "internal_note": "__no_value__",
-                        "scheduled": "__no_value__",
+                        "scheduled": "2018-05-28T10:51:52+0000",
                         "slugline": "__no_value__"
                     }
                 }]
@@ -276,7 +276,7 @@ Feature: Agenda Restricted Coverage Details
             "coverages": [{
                 "coverage_id": "plan1_cov1",
                 "coverage_type": "text",
-                "scheduled": "__no_value__",
+                "scheduled": "2018-05-28T10:51:52+0000",
                 "slugline": "__no_value__",
                 "workflow_status": "__no_value__",
                 "coverage_status": "__no_value__"
@@ -299,7 +299,7 @@ Feature: Agenda Restricted Coverage Details
                         "g2_content_type": "text",
                         "ednote": "__no_value__",
                         "internal_note": "__no_value__",
-                        "scheduled": "__no_value__",
+                        "scheduled": "2018-05-28T10:51:52+0000",
                         "slugline": "__no_value__"
                     }
                 }, {
@@ -366,14 +366,14 @@ Feature: Agenda Restricted Coverage Details
             "coverages": [{
                 "coverage_id": "plan1_cov1",
                 "coverage_type": "text",
-                "scheduled": "__no_value__",
+                "scheduled": "2018-05-28T10:51:52+0000",
                 "slugline": "__no_value__",
                 "workflow_status": "__no_value__",
                 "coverage_status": "__no_value__"
             }, {
                 "coverage_id": "plan1_cov2",
                 "coverage_type": "text",
-                "scheduled": "__no_value__",
+                "scheduled": "2018-05-28T10:51:52+0000",
                 "slugline": "__no_value__",
                 "workflow_status": "__no_value__",
                 "coverage_status": "__no_value__"

@@ -223,6 +223,8 @@ def remove_restricted_coverage_info(items):
         "delivery_id",
         "delivery_href",
         "deliveries",
+        "scheduled",
+        "g2_content_type",
     )
 
     planning_keys_to_copy = (
@@ -271,7 +273,9 @@ def remove_restricted_coverage_info(items):
             ]
             for coverage in plan["coverages"]:
                 if not coverage_is_completed(coverage):
-                    coverage["planning"] = {"g2_content_type": coverage["planning"]["g2_content_type"]}
+                    coverage["planning"] = {
+                        key: val for key, val in coverage["planning"].items() if key in coverage_keys_to_copy
+                    }
 
     return items
 

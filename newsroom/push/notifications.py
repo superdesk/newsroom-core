@@ -107,78 +107,83 @@ class NotificationManager:
                 continue
 
             for subscriber in topic.subscribers or []:
-                user = users.get(subscriber.user_id)
+                try:
+                    user = users.get(subscriber.user_id)
 
-                if not user:
-                    continue
+                    if not user:
+                        continue
 
-                company = companies.get(user.company) if user.company else None
+                    company = companies.get(user.company) if user.company else None
 
-                section: SectionEnum = topic.topic_type or SectionEnum.WIRE
-                if user.id not in users_processed:
-                    # Only send websocket notification once for each item
-                    await save_user_notifications(
-                        [
-                            dict(
-                                user=user.id,
-                                item=item["_id"],
-                                resource=section.value,
-                                action="topic_matches",
-                                data=None,
-                            )
-                        ]
-                    )
-                    users_processed.add(user.id)
-
-                if not user.receive_email:
-                    continue
-                elif subscriber.notification_type == "scheduled":
-                    await notification_queue_service.add_item_to_queue(user.id, section.value, topic.id, item)
-                elif user.id in users_with_realtime_subscription:
-                    # This user has already received a realtime notification email about this item
-                    # No need to send another
-                    continue
-                else:
-                    users_with_realtime_subscription.add(user.id)
-                    if topic.topic_type == SectionEnum.WIRE:
-                        wire_service = WireSearchServiceAsync()
-                        query = await wire_service.get_topic_items_query(
-                            topic,
-                            user,
-                            company,
-                            args=WireSearchRequestArgs(
-                                page_size=1,
-                                ids=[item["_id"]],
-                                es_highlight=True,
-                            ),
+                    section: SectionEnum = topic.topic_type or SectionEnum.WIRE
+                    if user.id not in users_processed:
+                        # Only send websocket notification once for each item
+                        await save_user_notifications(
+                            [
+                                dict(
+                                    user=user.id,
+                                    item=item["_id"],
+                                    resource=section.value,
+                                    action="topic_matches",
+                                    data=None,
+                                )
+                            ]
                         )
-                        cursor = await wire_service.service.find(SearchRequest(elastic=query))
-                        items = await cursor.to_list_raw()
+                        users_processed.add(user.id)
+
+                    if not user.receive_email:
+                        continue
+                    elif subscriber.notification_type == "scheduled":
+                        await notification_queue_service.add_item_to_queue(user.id, section.value, topic.id, item)
+                    elif user.id in users_with_realtime_subscription:
+                        # This user has already received a realtime notification email about this item
+                        # No need to send another
+                        continue
                     else:
-                        agenda_service = AgendaSearchServiceAsync()
-                        query = await agenda_service.get_topic_items_query(
-                            topic,
+                        users_with_realtime_subscription.add(user.id)
+                        if topic.topic_type == SectionEnum.WIRE:
+                            wire_service = WireSearchServiceAsync()
+                            query = await wire_service.get_topic_items_query(
+                                topic,
+                                user,
+                                company,
+                                args=WireSearchRequestArgs(
+                                    page_size=1,
+                                    ids=[item["_id"]],
+                                    es_highlight=True,
+                                ),
+                            )
+                            cursor = await wire_service.service.find(SearchRequest(elastic=query))
+                            items = await cursor.to_list_raw()
+                        else:
+                            agenda_service = AgendaSearchServiceAsync()
+                            query = await agenda_service.get_topic_items_query(
+                                topic,
+                                user,
+                                company,
+                                args=AgendaSearchRequestArgs(
+                                    page_size=1,
+                                    ids=[item["_id"]],
+                                    es_highlight=True,
+                                ),
+                            )
+                            cursor = await agenda_service.service.find(SearchRequest(elastic=query))
+                            items = await cursor.to_list_raw()
+                        highlighted_item = item
+
+                        if len(items) > 0:
+                            highlighted_item = items[0]
+
+                        await send_new_item_notification_email(
                             user,
-                            company,
-                            args=AgendaSearchRequestArgs(
-                                page_size=1,
-                                ids=[item["_id"]],
-                                es_highlight=True,
-                            ),
+                            topic.label,
+                            item=highlighted_item,
+                            section=section.value,
                         )
-                        cursor = await agenda_service.service.find(SearchRequest(elastic=query))
-                        items = await cursor.to_list_raw()
-                    highlighted_item = item
-
-                    if len(items) > 0:
-                        highlighted_item = items[0]
-
-                    await send_new_item_notification_email(
-                        user,
-                        topic.label,
-                        item=highlighted_item,
-                        section=section.value,
-                    )
+                except Exception as e:
+                    logger.exception(e)
+                    # when there is an error for specific topic/subscriber continue
+                    continue
 
         return users_with_realtime_subscription
 

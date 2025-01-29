@@ -103,6 +103,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
         // activate logs actions for non production instances.
         // (this should always be the last middleware)
         middlewares.push(
+            // @ts-ignore
             createLogger({
                 duration: true,
                 collapsed: true,
@@ -561,8 +562,12 @@ export function isTouchDevice() {
     || navigator.maxTouchPoints > 0;       // works on IE10/11 and Surface
 }
 
-export function isMobilePhone() {
+export function isTablet() {
     return isTouchDevice() && screen.width < 768;
+}
+
+export function isMobilePhoneScreen(dimensions: number) {
+    return dimensions < 575;
 }
 
 /**
@@ -633,7 +638,7 @@ export function recordAction(item: any, action: any = 'open', section: any = 'wi
 }
 
 export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: any, previewItem: any) {
-    if (isMobilePhone()) {
+    if (isTablet()) {
         dispatch(openItemDetails(null));
         dispatch(previewItem(null));
     }
@@ -677,7 +682,7 @@ export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: a
         mobile: false,
     };
 
-    return isMobilePhone() ?
+    return isTablet() ?
         showActionIconsConfig.mobile : (
             isExtended ?
                 showActionIconsConfig.large :

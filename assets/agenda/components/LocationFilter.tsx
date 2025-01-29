@@ -349,7 +349,7 @@ export class LocationFilter extends React.Component<any, any> {
                     )}
                     onClick={() => this.onChange(item)}
                 >
-                    {gettext('{{ name }} (State, {{ country }})', {
+                    {gettext('{{ name }} (State/Province, {{ country }})', {
                         name: item.name,
                         country: item.country,
                     })}
@@ -432,7 +432,7 @@ export class LocationFilter extends React.Component<any, any> {
     render() {
         const activeFilter = get(this.props, 'activeFilter.location') || {};
         const isActive = activeFilter.type != null;
-
+        const isPlaceEnabled = this.props.locationEnabledOptions?.place;
         return (
             <div
                 key="location"
@@ -522,17 +522,21 @@ export class LocationFilter extends React.Component<any, any> {
                                         </button>
                                     )}
 
-                                    <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
-                                    {this.state.results.places.length > 0 ? (
-                                        this.state.results.places.map(this.renderRegionSearchResult)
-                                    ) : (
-                                        <button
-                                            key="empty-places"
-                                            className="dropdown-item disabled"
-                                            disabled={true}
-                                        >
-                                            {gettext('No places found')}
-                                        </button>
+                                    {isPlaceEnabled && (
+                                        <>
+                                            <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
+                                            {this.state.results.places.length > 0 ? (
+                                                this.state.results.places.map(this.renderRegionSearchResult)
+                                            ) : (
+                                                <button
+                                                    key="empty-places"
+                                                    className="dropdown-item disabled"
+                                                    disabled={true}
+                                                >
+                                                    {gettext('No places found')}
+                                                </button>
+                                            )}
+                                        </>
                                     )}
                                 </React.Fragment>
                             )}
@@ -547,4 +551,5 @@ export class LocationFilter extends React.Component<any, any> {
 LocationFilter.propTypes = {
     activeFilter: PropTypes.object,
     toggleFilter: PropTypes.func,
+    locationEnabledOptions: PropTypes.object,
 };

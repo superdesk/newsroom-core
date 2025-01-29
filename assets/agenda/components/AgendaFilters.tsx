@@ -48,6 +48,7 @@ const renderFilter = {
                 key="location"
                 activeFilter={props.activeFilter}
                 toggleFilter={props.toggleFilter}
+                locationEnabledOptions = {props.locationEnabledOptions}
             />
         )
     ),
@@ -154,6 +155,7 @@ const mapStateToProps = (state: IAgendaState) => ({
     locators: state.locators?.items || [],
     itemTypeFilterConfig: state.uiConfig.subnav?.item_type || {},
     subnavConfig: state,
+    locationEnabledOptions: state.locationsFiltersOptions || {},
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

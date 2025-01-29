@@ -78,7 +78,7 @@ async def test_onclusive_all_day():
     formatter = iCalFormatter()
     output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART;VALUE=DATE:20240101" in output
-    assert "DTEND;VALUE=DATE:20240103" in output
+    assert "DTEND;VALUE=DATE:20240104" in output
 
 
 async def test_onclusive_no_end_time():
@@ -93,4 +93,19 @@ async def test_onclusive_no_end_time():
     formatter = iCalFormatter()
     output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART:20240101T100000Z" in output
-    assert "DTEND;VALUE=DATE:20240103" in output
+    assert "DTEND;VALUE=DATE:20240104" in output
+
+
+async def test_onclusive_multiday():
+    event = {
+        "name": "test",
+        "dates": {
+            "start": "2024-11-18T00:00:00",
+            "end": "2024-11-20T00:00:00",
+            "all_day": True,
+        },
+    }
+    formatter = iCalFormatter()
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
+    assert "DTSTART;VALUE=DATE:20241118" in output
+    assert "DTEND;VALUE=DATE:20241121" in output

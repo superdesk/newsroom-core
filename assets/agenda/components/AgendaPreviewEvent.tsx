@@ -130,17 +130,21 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
         const {itemsById, eventIds} = this.props;
 
         return (
-            <div className="agenda-planning__container info-box">
-                <div className="info-box__content">
-                    <span className="info-box__label">{gettext('Related Events')}</span>
-                    {this.state.loading ? (
-                        <div className="spinner-border text-success" />
-                    ) : (
-                        eventIds
-                            .map((id) => itemsById[id])
-                            .filter((event) => event != null)
-                            .map((event) => this.renderEvent(event))
-                    )}
+            <div className="agenda-planning__container">
+                <div className="preview__content-block">
+                    <div className="preview__content-block-title">
+                        {gettext('Related Events')}
+                    </div>
+                    <div className="agenda-planning__preview-list">
+                        {this.state.loading ? (
+                            <div className="spinner-border text-success" />
+                        ) : (
+                            eventIds
+                                .map((id) => itemsById[id])
+                                .filter((event) => event != null)
+                                .map((event) => this.renderEvent(event))
+                        )}
+                    </div>
                 </div>
             </div>
         );

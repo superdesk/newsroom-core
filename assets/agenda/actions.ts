@@ -335,7 +335,7 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
 
         // If there are groups shown, then load the hidden items for those groups
         const state = getState();
-        const {activeGrouping, featuredOnly} = state.agenda;
+        const {activeGrouping, featuredOnly, itemType} = state.agenda;
         const {fromDate, toDate, searchParams} = getAgendaSearchParamsFromState(state);
 
         let minDate: moment.Moment | undefined;
@@ -376,7 +376,7 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
         }
 
         const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '') === '' ?
-            groupItems(items, minDate, maxDate, activeGrouping, featuredOnly) :
+            groupItems(items, minDate, maxDate, activeGrouping, featuredOnly, itemType) :
             [{
                 date: '',
                 items: items.map((item) => item._id),

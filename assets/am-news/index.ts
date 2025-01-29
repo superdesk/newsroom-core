@@ -1,6 +1,6 @@
 import {get, startsWith} from 'lodash';
 
-import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
+import {createStore, getInitData, closeItemOnMobile, isTablet} from '../utils';
 import {initWebSocket} from 'websocket';
 
 import {getReadItems} from 'local-store';
@@ -45,7 +45,7 @@ if (navigationId) {
 window.onpopstate = function(event: any) {
     if (event.state) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
-        if (!isMobilePhone()) {
+        if (!isTablet()) {
             store.dispatch(setState(event.state));
         }
     }

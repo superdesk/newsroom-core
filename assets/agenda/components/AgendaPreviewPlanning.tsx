@@ -63,9 +63,9 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         if (planningIds == null || planningIds.length == 0) {
             return;
         }
-        
+
         this.setState({loading: true});
-        
+
         fetchItemsByIdToRedux(planningIds)
             .finally(() => {
                 this.setState({loading: false});
@@ -128,7 +128,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
             <React.Fragment>
                 {/* Current Planning Items */}
                 {!plan ? null : (
-                    <div className="agenda-planning__container info-box">
+                    <div className="agenda-planning__container">
                         <div className="info-box__content">
                             <span className="info-box__label">{gettext('Planning Item')}</span>
                             <AgendaPreviewCoverages
@@ -145,7 +145,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                     </div>
                 )}
                 {!otherPlanningItems.length ? null : (
-                    <div className="agenda-planning__container info-box">
+                    <div className="agenda-planning__container">
                         <div className="info-box__content">
                             <span className="info-box__label">
                                 {plan == null ? gettext('Planning Items') : gettext('Other Planning Items')}

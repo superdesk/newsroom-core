@@ -3,28 +3,41 @@ const defaultOptions = {
     redirect: 'manual',
 };
 
+interface RequestOptions {
+    parseJson?: boolean;
+}
+
 function options(custom: any = {}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
-function checkStatus(response: Response): Promise<any> {
+function checkStatus(response: Response, requestOptions: RequestOptions = {parseJson: true}): Promise<any> {
+    const {parseJson = true} = requestOptions;
+
     if (response.status === 204) {
         return Promise.resolve({});
-    } else if (response.status >= 200 && response.status < 300) {
+    }
+
+    if (response.status >= 200 && response.status < 300) {
         const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('application/json')) {
+        if (parseJson && contentType && contentType.includes('application/json')) {
             return response.json();
         }
         return Promise.resolve(response);
-    } else if (response.status === 400) {
+    }
+
+    if (response.status === 400) {
         return response.json().then((data: any) => Promise.reject({errorData: data}));
-    } else if (response.type === 'opaqueredirect') {
+    }
+
+    if (response.type === 'opaqueredirect') {
         window.location.reload();
     }
 
     console.error(response);
     return Promise.reject(response);
 }
+
 
 function getHeaders(etag: any) {
     const headers: any = {'Content-Type': 'application/json'};
@@ -70,12 +83,17 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    post(url: any, data: any, etag?: string) {
+    post(
+        url: any,
+        data: any,
+        etag?: string,
+        requestOptions: RequestOptions = {parseJson: true}
+    ) {
         return fetch(url, options({
             method: 'POST',
             headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
-        })).then(checkStatus);
+        })).then((response) => checkStatus(response, requestOptions));
     }
 
     /**
