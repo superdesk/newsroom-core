@@ -73,6 +73,7 @@
     <p>Related Events:</p>
     {% for event in related_events %}
         <div>
+            URL: <a href="{{ url_for_agenda(event) }}">{{ url_for_agenda(event) }}</a>
             {% if event.name %}
                 <div>{{ event.name }}</div>
             {% endif %}
