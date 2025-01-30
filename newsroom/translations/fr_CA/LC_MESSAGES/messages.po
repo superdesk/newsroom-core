@@ -1134,7 +1134,7 @@ msgstr "Réinitialiser le mot de passe"
 
 #: newsroom/templates/login_layout.html:47
 msgid "Click here to reset"
-msgstr ""
+msgstr "Cliquez ici pour réinitialiser votre mot de passe"
 
 #: newsroom/templates/login_layout.html:59
 msgid "Log In with Google"
