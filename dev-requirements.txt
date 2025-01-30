@@ -35,9 +35,9 @@ async-timeout==5.0.1
     # via
     #   aiohttp
     #   redis
-attrs==24.3.0
+attrs==25.1.0
     # via aiohttp
-authlib==1.4.0
+authlib==1.4.1
     # via superdesk-core
 babel==2.16.0
     # via quart-babel
@@ -57,9 +57,9 @@ blinker==1.9.0
     #   quart
     #   sentry-sdk
     #   superdesk-core
-boto3==1.36.3
+boto3==1.36.9
     # via superdesk-core
-botocore==1.36.3
+botocore==1.36.9
     # via
     #   boto3
     #   s3transfer
@@ -137,7 +137,7 @@ elasticsearch[async]==7.17.12
     #   superdesk-core
 email-validator==2.2.0
     # via wtforms
-eve @ git+https://github.com/MarkLark86/eve@use-quart
+eve @ git+https://github.com/superdesk/eve@async
     # via superdesk-core
 eve-elastic @ git+https://github.com/superdesk/eve-elastic@async
     # via superdesk-core
@@ -185,7 +185,7 @@ hermescache==1.0.0
     # via superdesk-core
 honcho==2.0.0
     # via -r requirements.txt
-hpack==4.0.0
+hpack==4.1.0
     # via h2
 html5lib==1.1
     # via xhtml2pdf
@@ -197,7 +197,7 @@ hypercorn==0.17.3
     # via
     #   -r requirements.txt
     #   quart
-hyperframe==6.0.1
+hyperframe==6.1.0
     # via h2
 icalendar==5.0.13
     # via superdesk-planning
@@ -252,7 +252,7 @@ markupsafe==3.0.2
     #   wtforms
 mccabe==0.7.0
     # via flake8
-motor==3.6.1
+motor==3.7.0
     # via superdesk-core
 multidict==6.1.0
     # via
@@ -315,7 +315,7 @@ pycodestyle==2.12.1
     # via flake8
 pycparser==2.22
     # via cffi
-pydantic==2.10.5
+pydantic==2.10.6
     # via
     #   -r mypy-requirements.txt
     #   superdesk-core
@@ -342,7 +342,7 @@ pyparsing==3.2.1
     # via
     #   httplib2
     #   pyrtf3
-pypdf==5.1.0
+pypdf==5.2.0
     # via xhtml2pdf
 pyrtf3==0.47.5
     # via -r requirements.txt
@@ -352,7 +352,7 @@ pytest==8.3.4
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
-pytest-asyncio==0.25.2
+pytest-asyncio==0.25.3
     # via -r dev-requirements.in
 pytest-cov==6.0.0
     # via -r dev-requirements.in
@@ -441,7 +441,7 @@ rsa==4.9
     # via
     #   google-auth
     #   oauth2client
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via boto3
 sentry-sdk[quart]==1.45.1
     # via
@@ -460,7 +460,7 @@ six==1.17.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@async
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
