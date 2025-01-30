@@ -2340,7 +2340,7 @@ article.list {
     }
     @include md {
         inset-block-start: var(--navbar-height);
-        inset-inline-start: var(--sidenav-size-width);
+        inset-inline-start: var(--sidenav-size);
         inset-block-end: var(--footer-size--height);
     }
 
