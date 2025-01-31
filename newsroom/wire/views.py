@@ -434,6 +434,11 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
             template_kwargs["linkList"] = [get_links(item) for item in items]
             template_kwargs["is_admin"] = is_admin_or_internal(user_dict)
 
+            # Import here to prevent circular imports
+            from newsroom.agenda.utils import get_related_events
+
+            template_kwargs["related_events"] = await get_related_events(items[0])
+
         await save_user_notifications(
             [
                 dict(
