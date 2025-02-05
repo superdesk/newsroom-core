@@ -129,6 +129,10 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
     render() {
         const {itemsById, eventIds} = this.props;
 
+        if (!eventIds || eventIds.length === 0) {
+            return null;
+        }
+
         return (
             <div className="agenda-planning__container">
                 <div className="preview__content-block">
