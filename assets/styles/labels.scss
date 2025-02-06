@@ -1,18 +1,18 @@
 // Labels
 
 $labels-palette: (
-  top-story: var(--color-top-story),
-  blue: $main-blue,
-  green: $green,
-  green-dark: $green-dark,
-  orange: $orange,
-  orange2: $orange2,
-  red: $red,
-  available: $green,
-  restricted: var(--color-text--muted),
-  yellow: $yellow,
-  gray-dark: $cool-gray-dark,
-  gray-mid: $cool-gray-mid,
+  'top-story': var(--color-top-story),
+  'blue': $main-blue,
+  'green': $green,
+  'green-dark': $green-dark,
+  'orange': $orange,
+  'orange2': $orange2,
+  'red': $red,
+  'available': $green,
+  'restricted': var(--color-text--muted),
+  'yellow': $yellow,
+  'gray-dark': $cool-gray-dark,
+  'gray-mid': $cool-gray-mid,
 );
 
 $flex-justify: (
@@ -58,7 +58,7 @@ $flex-align: (
     color: $gray-mid;
 
     @each $name, $color in $labels-palette {
-        &.label--#{"" + $name} {
+        &.label--#{$name} {
             border-color: transparent;
             color: $color;
             text-decoration-color: $color;
@@ -66,7 +66,7 @@ $flex-align: (
         }
     }
     @each $name, $color in $labels-palette {
-        &.label--rounded.label--#{"" + $name} {
+        &.label--rounded.label--#{$name} {
             background-color: rgba($color, 0.2);
         }
     }
@@ -80,7 +80,7 @@ $flex-align: (
     }
     &.label--fill {
         @each $name, $color in $labels-palette {
-            &.label--#{"" + $name} {
+            &.label--#{$name} {
                 background-color: $color;
                 border-color: $color;
                 color: $white;
