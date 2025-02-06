@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import classNames from 'classnames';
 
 import {gettext} from 'utils';
-import {getName, getInternalNote} from '../utils';
+import {getName, getInternalNote, getFilteredItems} from '../utils';
 import {fetchItemsByIdToRedux} from '../actions';
 
 import AgendaTime from './AgendaTime';
@@ -18,7 +18,7 @@ import {IAgendaItem} from 'interfaces';
 
 interface AgendaPreviewEventProps {
     item: IAgendaItem;
-    itemsById: Record<string, IAgendaItem>;
+    itemsById: Array<IAgendaItem>;
     eventIds: Array<string>;
     fetchItemsByIdToRedux: (ids: Array<string>) => Promise<void>;
 }
@@ -55,6 +55,7 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
         const {eventIds, fetchItemsByIdToRedux} = this.props;
     
         if (eventIds == null || eventIds.length == 0) {
+            this.setState({loading: false});
             return;
         }
         
@@ -129,9 +130,7 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
     render() {
         const {itemsById, eventIds} = this.props;
 
-        if (!eventIds || eventIds.length === 0) {
-            return null;
-        }
+        const filteredEvents = getFilteredItems(eventIds, itemsById);
 
         return (
             <div className="agenda-planning__container">
@@ -142,11 +141,10 @@ class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProp
                     <div className="agenda-planning__preview-list">
                         {this.state.loading ? (
                             <div className="spinner-border text-success" />
+                        ) : filteredEvents.length === 0 ? (
+                            <div>{gettext('No Related Events')}</div>
                         ) : (
-                            eventIds
-                                .map((id) => itemsById[id])
-                                .filter((event) => event != null)
-                                .map((event) => this.renderEvent(event))
+                            filteredEvents.map((event) => this.renderEvent(event))
                         )}
                     </div>
                 </div>

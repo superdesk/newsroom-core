@@ -6,6 +6,7 @@ import {isPlanningItem} from '../utils';
 import {fetchItemsByIdToRedux} from '../actions';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import {IAgendaItem, ICoverageItemAction, IUser, IAgendaPreviewConfig, IArticle, IAgendaState} from 'interfaces';
+import {getFilteredItems} from '../utils';
 
 interface IOwnProps {
     item: IAgendaItem;
@@ -61,6 +62,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         this.setState({loading: true});
 
         if (planningIds == null || planningIds.length == 0) {
+            this.setState({loading: false});
             return;
         }
 
@@ -85,11 +87,6 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         }));
     }
 
-    getRelatedPlanningItems() {
-        const {item, items} = this.props;
-        return (item.planning_ids || []).map((id:any) => items[id]);
-    }
-
     render() {
         const {
             item,
@@ -106,7 +103,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         const planningItems = item.planning_items || [];
         const plan = planningItems.find((p) => p.guid === planningId);
         const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
-        const relatedPlanningItems = this.getRelatedPlanningItems();
+        const relatedPlanningItems = getFilteredItems(item.planning_ids || [], this.props.items);
 
         if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
@@ -173,9 +170,11 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                         </span>
                         {loading ? (
                             <div className="spinner-border text-success" />
+                        ) : relatedPlanningItems.length === 0 ? (
+                            <div>{gettext('No Related Planning Items')}</div>
                         ) : (
-                            relatedPlanningItems && relatedPlanningItems.map((planningItem: any) => {
-                                const isExpanded = expandedPlanningItems[planningItem._id] || false;
+                            relatedPlanningItems.map((planningItem: any) => {
+                                const isExpanded = planningItem && expandedPlanningItems[planningItem._id] || false;
                                 return (
                                     <div
                                         key={planningItem.guid}
