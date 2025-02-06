@@ -174,7 +174,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                             <div>{gettext('No Related Planning Items')}</div>
                         ) : (
                             relatedPlanningItems.map((planningItem: any) => {
-                                const isExpanded = planningItem && expandedPlanningItems[planningItem._id] || false;
+                                const isExpanded = expandedPlanningItems[planningItem._id] || false;
                                 return (
                                     <div
                                         key={planningItem.guid}
