@@ -30,13 +30,7 @@ BLUEPRINTS = []
 
 CORE_APPS = []
 
-MODULES = [
-    "newsroom.mgmt_api.companies",
-    "newsroom.mgmt_api.navigations",
-    "newsroom.mgmt_api.topics",
-    "newsroom.mgmt_api.products",
-    "newsroom.mgmt_api.users",
-]
+MODULES = []
 
 INSTALLED_APPS = []
 
