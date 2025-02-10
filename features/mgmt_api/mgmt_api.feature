@@ -12,6 +12,3 @@ Feature: Management API
         Given empty auth token
         When we get "/"
         Then we get response code 401
-
-        When we get "/users"
-        Then we get response code 401

@@ -15,7 +15,7 @@ import logging
 from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
-from superdesk.flask import Config, jsonify, g
+from superdesk.flask import Config, jsonify
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.auth_server.auth import JWTAuth

@@ -53,6 +53,7 @@ async def before_scenario_async(context, scenario):
         "MGMT_API_ENABLED": True,
         "AUTH_SERVER_SHARED_SECRET": "test-secret",
         "CACHE_TYPE": "null",
+        "ASYNC_AUTH_CLASS": "newsroom.mgmt_api.auth.jwt:JWTTokenAuth",
     }
 
     context.app = get_app(config=config)

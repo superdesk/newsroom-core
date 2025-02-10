@@ -58,3 +58,5 @@ CACHE_REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 CACHE_URL = CACHE_REDIS_URL
 
 APM_SERVICE_NAME = "CP NewsPro Management API"
+
+ASYNC_AUTH_CLASS = "newsroom.mgmt_api.auth.jwt:JWTTokenAuth"
