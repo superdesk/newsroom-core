@@ -18,7 +18,7 @@ from superdesk.errors import SuperdeskApiError
 from superdesk.flask import Config, jsonify
 
 from newsroom.factory import BaseNewsroomApp
-from newsroom.auth_server.auth import JWTAuth
+from newsroom.mgmt_api.auth.jwt import JWTTokenAuth
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class NewsroomMGMTAPI(BaseNewsroomApp):
     INSTANCE_CONFIG = "settings_mgmtapi.py"
-    AUTH_SERVICE = JWTAuth
+    AUTH_SERVICE = JWTTokenAuth
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not hasattr(self, "settings"):

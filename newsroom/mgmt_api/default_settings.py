@@ -59,4 +59,4 @@ CACHE_URL = CACHE_REDIS_URL
 
 APM_SERVICE_NAME = "CP NewsPro Management API"
 
-ASYNC_AUTH_CLASS = "newsroom.mgmt_api.auth.jwt:JWTTokenAuth"
+ASYNC_AUTH_CLASS = "newsroom.mgmt_api.auth:JWTTokenAuth"
