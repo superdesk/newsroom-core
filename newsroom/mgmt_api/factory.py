@@ -11,11 +11,11 @@
 
 import os
 import logging
-import flask
 
 from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
+from superdesk.flask import Config, jsonify, g
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.auth_server.auth import JWTAuth
@@ -32,16 +32,16 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not hasattr(self, "settings"):
-            self.settings = flask.Config(".")
+            self.settings = Config(".")
 
         if config and config.get("BEHAVE"):
             # ``superdesk.tests.update_config`` adds ``planning`` to ``INSTALLED_APPS``
             # So if we're running behave tests, reset this config here
             config["INSTALLED_APPS"] = []
 
-        super(NewsroomMGMTAPI, self).__init__(
-            import_name=import_name, config=config, **kwargs
-        )
+        self.wsgi = self
+
+        super(NewsroomMGMTAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
     def load_app_default_config(self):
         """
@@ -69,7 +69,7 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
 
     def setup_error_handlers(self):
         def json_error(err):
-            return flask.jsonify(err), err["code"]
+            return jsonify(err), err["code"]
 
         def handle_werkzeug_errors(err):
             return json_error(
@@ -99,13 +99,8 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
             )
 
         def base_exception_error(err):
-            if (
-                type(err) is ElasticRequestError
-                and err.error == "search_phase_execution_exception"
-            ):
-                return json_error(
-                    {"error": 1, "message": "Invalid search query", "code": 400}
-                )
+            if type(err) is ElasticRequestError and err.error == "search_phase_execution_exception":
+                return json_error({"error": 1, "message": "Invalid search query", "code": 400})
 
             return json_error(
                 {
@@ -121,6 +116,10 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(Exception, base_exception_error)
+
+    # TODO-ASYNC: Method signature removed in `develop` branch, investigate
+    def settings_app(self, *args, **kwargs):
+        pass
 
 
 def get_app(config=None, **kwargs):

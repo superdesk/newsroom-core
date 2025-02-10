@@ -1,16 +1,14 @@
 import bson
-import superdesk
 from superdesk.core.types import Response
 from quart_babel import gettext
 import ipaddress
+from newsroom.products import ProductsService
 
 
-def validate_product_refs(product_refs):
-    products_service = superdesk.get_resource_service("products")
+async def validate_product_refs(product_refs):
+    products_service = ProductsService()
     product_ids = [bson.ObjectId(ref["_id"]) for ref in product_refs]
-    products = list(
-        products_service.get_from_mongo(req=None, lookup={"_id": {"$in": product_ids}})
-    )
+    products = list(await products_service.search(lookup={"_id": {"$in": product_ids}}))
     products_by_id = {str(product["_id"]): product for product in products}
 
     for ref in product_refs:

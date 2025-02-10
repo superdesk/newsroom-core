@@ -18,6 +18,7 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     AUTH_SERVER_SHARED_SECRET,
     CLIENT_URL,
+    AUTH_SERVER_EXPIRATION_DELAY,
 )
 import os
 
@@ -27,8 +28,14 @@ URL_PREFIX = env("MGMTAPI_URL_PREFIX", server_url.path.strip("/")) or ""
 
 BLUEPRINTS = []
 
-CORE_APPS = [
-    "newsroom.mgmt_api",
+CORE_APPS = []
+
+MODULES = [
+    "newsroom.mgmt_api.companies",
+    "newsroom.mgmt_api.navigations",
+    "newsroom.mgmt_api.topics",
+    "newsroom.mgmt_api.products",
+    "newsroom.mgmt_api.users",
 ]
 
 INSTALLED_APPS = []
@@ -40,9 +47,7 @@ DEFAULT_LANGUAGE = "en"
 MONGO_DBNAME = env("MONGO_DBNAME", "newsroom")
 # mongo
 MONGO_URI = env("MONGO_URI", f"mongodb://localhost/{MONGO_DBNAME}")
-CONTENTAPI_MONGO_URI = env(
-    "CONTENTAPI_MONGO_URI", f"mongodb://localhost/{MONGO_DBNAME}"
-)
+CONTENTAPI_MONGO_URI = env("CONTENTAPI_MONGO_URI", f"mongodb://localhost/{MONGO_DBNAME}")
 # elastic
 ELASTICSEARCH_INDEX = env("ELASTICSEARCH_INDEX", MONGO_DBNAME)
 CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBNAME)
