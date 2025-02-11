@@ -36,11 +36,12 @@ def before_scenario(context, scenario):
         return
 
     try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    loop.run_until_complete(before_scenario_async(context, scenario))
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(before_scenario_async(context, scenario))
+    except Exception as e:
+        # Make sure exceptions raised are printed to the console
+        logger.exception(e)
+        raise e
 
 
 async def before_scenario_async(context, scenario):
@@ -53,7 +54,6 @@ async def before_scenario_async(context, scenario):
         "MGMT_API_ENABLED": True,
         "AUTH_SERVER_SHARED_SECRET": "test-secret",
         "CACHE_TYPE": "null",
-        "ASYNC_AUTH_CLASS": "newsroom.mgmt_api.auth.jwt:JWTTokenAuth",
     }
 
     context.app = get_app(config=config)

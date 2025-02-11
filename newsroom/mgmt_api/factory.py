@@ -39,6 +39,8 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
             # So if we're running behave tests, reset this config here
             config["INSTALLED_APPS"] = []
 
+        # Assigns the instance to `self.wsgi` to ensure compatibility with code
+        # that expects `app.wsgi`, such as `config_oauth` and OAuth initialization.
         self.wsgi = self
 
         super(NewsroomMGMTAPI, self).__init__(import_name=import_name, config=config, **kwargs)

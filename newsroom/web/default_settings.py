@@ -144,7 +144,6 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.search",
     "newsroom.notifications.commands",
-    "newsroom.mgmt_api",
 ]
 
 ASYNC_AUTH_CLASS = "newsroom.auth.session_auth:NewshubSessionAuth"
