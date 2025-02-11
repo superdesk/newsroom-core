@@ -28,6 +28,7 @@ API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class NewsroomMGMTAPI(BaseNewsroomApp):
     INSTANCE_CONFIG = "settings_mgmtapi.py"
+    AUTH_SERVICE = JWTTokenAuth()
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not hasattr(self, "settings"):
