@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {gettext} from 'utils';
 
 import {searchQuerySelector} from 'search/selectors';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {IconButton} from 'components/IconButton';
 
 class SearchBar extends React.Component<any, any> {
@@ -90,7 +90,7 @@ class SearchBar extends React.Component<any, any> {
                     {this.props.toggleAdvancedSearchPanel == null ? null : (
                         <Button
                             variant="tertiary"
-                            value={gettext('Advanced Search')}
+                            text={gettext('Advanced Search')}
                             data-test-id="show-advanced-search-panel-btn"
                             className="nh-button--advanced-search"
                             onClick={this.props.toggleAdvancedSearchPanel}

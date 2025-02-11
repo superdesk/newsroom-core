@@ -6,7 +6,7 @@ import {isEmpty} from 'lodash';
 import {gettext} from 'utils';
 
 import {selectAll, selectNone} from 'wire/actions';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {IconButton} from 'components/IconButton';
 
 class SelectedItemsBar extends React.PureComponent<any, any> {
@@ -43,14 +43,14 @@ class SelectedItemsBar extends React.PureComponent<any, any> {
         return (
             <div className='multi-action-bar multi-action-bar--open'>
                 <Button
-                    value={gettext('Select All')}
+                    text={gettext('Select All')}
                     variant='primary'
                     className='me-2'
                     onClick={this.props.selectAll}
                 />
 
                 <Button
-                    value={gettext('Cancel')}
+                    text={gettext('Cancel')}
                     variant='secondary'
                     onClick={this.props.selectNone}
                 />

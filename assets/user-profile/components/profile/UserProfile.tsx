@@ -20,7 +20,7 @@ import {
 } from '../../actions';
 import {IUserProfileState} from 'user-profile/reducers';
 import {IUserProfileUpdates} from 'interfaces/user';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 interface IProps {
     user: IUser;
@@ -179,7 +179,7 @@ class UserProfile extends React.PureComponent<IProps> {
                                         {getSubscriptionTimesString(user)}
                                     </span>
                                     <Button
-                                        value={gettext('Edit schedule')}
+                                        text={gettext('Edit schedule')}
                                         variant="tertiary"
                                         size="small"
                                         onClick={this.props.openEditTopicNotificationsModal}
@@ -246,13 +246,13 @@ class UserProfile extends React.PureComponent<IProps> {
 
                 <div className='profile-content__footer'>
                     <Button
-                        value={gettext('Cancel')}
+                        text={gettext('Cancel')}
                         variant='secondary'
                         onClick={onCancel}
                     />
 
                     <Button
-                        value={gettext('Save Changes')}
+                        text={gettext('Save Changes')}
                         variant='primary'
                         onClick={this.save}
                     />

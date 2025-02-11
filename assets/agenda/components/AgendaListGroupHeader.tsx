@@ -6,7 +6,7 @@ import {formatDate, gettext} from 'utils';
 import {getCoverageIcon} from '../utils';
 
 import {Skeleton} from 'primereact/skeleton';
-import {Button} from '../../components/Buttons';
+import {Button} from '../../components/Button';
 
 interface IProps {
     group: string;
@@ -81,7 +81,7 @@ export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, to
             )}
             <div className="list-group-header__actions">
                 <Button
-                    value={itemsShown ? gettext('Hide') : gettext('Show all')}
+                    text={itemsShown ? gettext('Hide') : gettext('Show all')}
                     variant='tertiary'
                     size='small'
                     onClick={() => {

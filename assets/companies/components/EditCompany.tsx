@@ -24,7 +24,7 @@ import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 interface IStateProps {
@@ -178,7 +178,7 @@ class EditCompany extends React.Component<IProps, IState> {
                         </div>
                         <div className="list-item__preview-toolbar-right">
                             <Button
-                                value={gettext('Approve Company & Users')}
+                                text={gettext('Approve Company & Users')}
                                 type='submit'
                                 variant='tertiary'
                                 size='small'

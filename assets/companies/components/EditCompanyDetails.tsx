@@ -8,7 +8,7 @@ import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import TextListInput from 'components/TextListInput';
 
 interface IProps {
@@ -194,13 +194,13 @@ export function EditCompanyDetails({
             <div className='list-item__preview-footer'>
                 {company._id && (
                     <Button
-                        value={gettext('Delete')}
+                        text={gettext('Delete')}
                         variant='secondary'
                         onClick={deleteCompany}
                     />
                 )}
                 <Button
-                    value={gettext('Save')}
+                    text={gettext('Save')}
                     variant='primary'
                     data-test-id="save-btn"
                     onClick={save}

@@ -10,7 +10,7 @@ import {gettext} from 'utils';
 import {sectionsPropType} from 'features/sections/types';
 import {MAX_TILE_IMAGES} from '../actions';
 import AuditInformation from 'components/AuditInformation';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 class EditNavigation extends React.Component<any, any> {
@@ -109,13 +109,13 @@ class EditNavigation extends React.Component<any, any> {
                                 </div>
                                 <div className='list-item__preview-footer'>
                                     <Button
-                                        value={gettext('Delete')}
+                                        text={gettext('Delete')}
                                         variant='secondary'
                                         onClick={this.props.onDelete}
                                     />
 
                                     <Button
-                                        value={gettext('Save')}
+                                        text={gettext('Save')}
                                         variant='primary'
                                         onClick={this.props.onSave}
                                     />

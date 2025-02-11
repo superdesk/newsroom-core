@@ -8,7 +8,7 @@ import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 import {IProps as IParentProps} from './SearchResultTagsList';
 import {ISearchParams} from 'interfaces';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 const searchTokenRegEx = /[^\s"]+|(?:"[^"]+?"(?:~[0-9]+)?)/g;
 
@@ -131,7 +131,7 @@ export function SearchResultsAdvancedSearchRow({
         advancedSearchTags.push(
             <Button
                 key="tag-clear-button"
-                value={gettext('Clear')}
+                text={gettext('Clear')}
                 variant='tertiary'
                 size='small'
                 onClick={(event) => {

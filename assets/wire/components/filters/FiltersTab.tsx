@@ -22,7 +22,7 @@ import {
 } from '../../../agenda/actions';
 
 import {resultsFilteredSelector} from 'search/selectors';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {ICreatedFilter} from 'interfaces/search';
 
 class FiltersTab extends React.Component<any, any> {
@@ -154,14 +154,14 @@ class FiltersTab extends React.Component<any, any> {
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>
                         <Button
                             data-test-id="filter-panel--clear-btn"
-                            value={gettext('Clear')}
+                            text={gettext('Clear')}
                             variant='secondary'
                             onClick={this.reset}
                         />
 
                         <Button
                             data-test-id="filter-panel--search-btn"
-                            value={gettext('Search')}
+                            text={gettext('Search')}
                             variant='primary'
                             onClick={this.search}
                         />

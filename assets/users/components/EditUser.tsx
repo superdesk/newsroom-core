@@ -30,8 +30,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
-import ActionButton from 'components/ActionButton';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {IconButton} from 'components/IconButton';
 import CloseButton from 'components/CloseButton';
 import {IUserSettingsState} from 'users/reducers';
@@ -177,7 +176,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                             <div className="list-item__preview-toolbar-right">
                                 {original.is_approved === false ? (
                                     <Button
-                                        value={gettext('Approve')}
+                                        text={gettext('Approve')}
                                         type="submit"
                                         variant='tertiary'
                                         size='small'
@@ -191,7 +190,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                         <input type="hidden" name="user" value={user._id} />
                                         <Button
                                             data-test-id="impersonate-user-btn"
-                                            value={gettext('Impersonate User')}
+                                            text={gettext('Impersonate User')}
                                             type="submit"
                                             variant='tertiary'
                                             size='small'
@@ -465,7 +464,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                             ? null
                             : (
                                 <Button
-                                    value={gettext('Reset Password')}
+                                    text={gettext('Reset Password')}
                                     variant='secondary'
                                     id='resetPassword'
                                     onClick={onResetPassword}
@@ -475,14 +474,14 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                         }
                         {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && (
                             <Button
-                                value={gettext('Delete')}
+                                text={gettext('Delete')}
                                 variant='secondary'
                                 onClick={onDelete}
                             />
                         )}
                         <Button
                             data-test-id="save-btn"
-                            value={gettext('Save')}
+                            text={gettext('Save')}
                             variant='primary'
                             onClick={onSave}
                         />

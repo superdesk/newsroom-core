@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 import {closeModal} from 'actions';
 import CloseModalButton from './CloseModalButton';
 import classNames from 'classnames';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 interface IProps {
     title: string;
@@ -96,13 +96,13 @@ class Modal extends React.Component<IProps, IState> {
                                 <Button
                                     type='reset'
                                     variant='secondary'
-                                    value={this.props.onCancelLabel || gettext('Cancel')}
+                                    text={this.props.onCancelLabel || gettext('Cancel')}
                                     onClick={this.props.closeModal}
                                 />
                                 <Button
                                     type='submit'
                                     variant='primary'
-                                    value={this.props.onSubmitLabel || gettext('Save')}
+                                    text={this.props.onSubmitLabel || gettext('Save')}
                                     disabled={this.state.submitting || !this.props.formValid}
                                     onClick={this.onSubmit}
                                 />     

@@ -13,7 +13,7 @@ import {FormSection} from 'components/FormSection';
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 import {TopicFolderEditor} from './TopicFolderEditor';
 import {noop} from 'lodash';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 const TOPIC_NAME_MAXLENGTH = 40;
 
@@ -238,7 +238,7 @@ const TopicForm: React.FC<IProps> = ({
                                         <Button
                                             variant="tertiary"
                                             size="small"
-                                            value={gettext('Edit schedule')}
+                                            text={gettext('Edit schedule')}
                                             onClick={openEditTopicNotificationsModal}
                                         />
                                     </div>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {gettext} from 'utils';
 import types from 'wire/types';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 const isFollowing = (item: any, topics: any) =>
     item && item.slugline && topics && topics.find(
@@ -17,7 +17,7 @@ export default function FollowStory({item, user, topics, followStory}: any) {
     if (canFollowStory) {
         return (
             <Button
-                value={gettext('Follow story')}
+                text={gettext('Follow story')}
                 variant='secondary'
                 disabled={disabled}
                 onClick={() => followStory(item)}

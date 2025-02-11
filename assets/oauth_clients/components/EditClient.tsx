@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import TextInput from 'components/TextInput';
 import {gettext} from 'utils';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 class EditClient extends React.Component<any, any> {
@@ -54,13 +54,13 @@ class EditClient extends React.Component<any, any> {
                             <div className='list-item__preview-footer'>
                                 {this.props.client._id && (
                                     <Button
-                                        value={gettext('Delete')}
+                                        text={gettext('Delete')}
                                         variant='secondary'
                                         onClick={this.props.onDelete}
                                     />
                                 )}
                                 <Button
-                                    value={gettext('Save')}
+                                    text={gettext('Save')}
                                     variant='primary'
                                     onClick={this.props.onSave}
                                 />

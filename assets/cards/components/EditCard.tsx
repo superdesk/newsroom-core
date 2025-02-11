@@ -11,7 +11,7 @@ import {
     CARD_TYPES,
     getCardEditComponent,
 } from 'components/cards/utils';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 
@@ -79,12 +79,12 @@ class EditCard extends React.Component<any, any> {
                     </div>
                     <div className='list-item__preview-footer'>
                         <Button
-                            value={gettext('Delete')}
+                            text={gettext('Delete')}
                             variant='secondary'
                             onClick={this.props.onDelete}
                         />
                         <Button
-                            value={gettext('Save')}
+                            text={gettext('Save')}
                             variant='primary'
                             onClick={this.props.onSave}
                         />

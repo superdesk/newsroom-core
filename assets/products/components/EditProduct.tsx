@@ -9,7 +9,7 @@ import {gettext, getProductQuery} from 'utils';
 import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 const getProductCompanies = (product: any, companies: any) => ({
@@ -176,12 +176,12 @@ class EditProduct extends React.Component<any, any> {
                                 <div className='list-item__preview-footer'>
                                     {this.getPoductTestButton(this.props.product)}
                                     <Button
-                                        value={gettext('Delete')}
+                                        text={gettext('Delete')}
                                         variant='secondary'
                                         onClick={this.props.onDelete}
                                     />
                                     <Button
-                                        value={gettext('Save')}
+                                        text={gettext('Save')}
                                         variant='primary'
                                         onClick={this.props.onSave}
                                     />

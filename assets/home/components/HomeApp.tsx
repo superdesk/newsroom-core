@@ -19,7 +19,7 @@ import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {IconButton} from 'components/IconButton';
 import {IHomeState} from 'home/reducers';
 
@@ -144,7 +144,7 @@ class HomeApp extends React.Component<IProps, {
                                         !this.hasPersonalDashboard ? (
                                             <div className="home-tools">
                                                 <Button
-                                                    value={gettext('Personalize Home')}
+                                                    text={gettext('Personalize Home')}
                                                     variant='secondary'
                                                     size='small'
                                                     onClick={() => {

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext} from 'utils';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import {IconButton} from './IconButton';
 
 export default class CardEditor extends React.Component<any, any> {
@@ -61,7 +61,7 @@ export default class CardEditor extends React.Component<any, any> {
                             <div className="card-body">{editorCardBody}</div>
                             <div className="card-footer d-flex">
                                 <Button   
-                                    value={saveText}
+                                    text={saveText}
                                     variant='primary'
                                     className='ms-auto'
                                     disabled={Object.keys(errors || {}).length > 0}
@@ -70,7 +70,7 @@ export default class CardEditor extends React.Component<any, any> {
 
                                 {!hideCancel && (
                                     <Button   
-                                        value={gettext('Cancel')}
+                                        text={gettext('Cancel')}
                                         variant='secondary'
                                         className='ms-3'
                                         onClick={this.onCancelClick}

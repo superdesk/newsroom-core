@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 import DatePicker from 'react-datepicker';
 
 import SelectInput from 'components/SelectInput';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 class MonitoringSchedule extends React.Component<any, any> {
     static propTypes: any;
@@ -195,7 +195,7 @@ class MonitoringSchedule extends React.Component<any, any> {
                     </div>
                     <div className='list-item__preview-footer'>
                         <Button
-                            value={gettext('Save')}
+                            text={gettext('Save')}
                             variant='primary'
                             onClick={onsaveMonitoringProfileSchedule}
                         />

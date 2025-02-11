@@ -5,7 +5,7 @@ export type IPropsVariant = 'primary' | 'secondary' | 'tertiary';
 export type IPropsSize = 'small' | 'medium' | 'large';
 
 export interface IPropsButtonBase {
-    value: string;
+    text: string;
     variant?: IPropsVariant;
     size?: IPropsSize;
     id?: string;
@@ -20,12 +20,12 @@ interface IPropsButton extends IPropsButtonBase {
 }
 
 interface IPropsSubmit extends IPropsButtonBase {
-    type?: 'submit',
+    type: 'submit',
     onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 interface IPropsReset extends IPropsButtonBase {
-    type?: 'reset',
+    type: 'reset',
     onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
@@ -45,13 +45,13 @@ export class Button extends React.PureComponent<IProps> {
                 type={this.props.type ?? 'button'}
                 id={this.props.id}
                 className={classes}
-                aria-label={this.props.value}
+                aria-label={this.props.text}
                 data-test-id={this.props['data-test-id']}
                 tabIndex={0}
                 disabled={this.props.disabled}
                 onClick={(event) => this.props.onClick && this.props.onClick(event)}
             >
-                {this.props.value}
+                {this.props.text}
             </button>
         );
     }

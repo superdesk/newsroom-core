@@ -11,7 +11,7 @@ import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
 
 import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 import CloseButton from 'components/CloseButton';
 
 class MonitoringEditor extends React.Component<any, any> {
@@ -195,14 +195,14 @@ class MonitoringEditor extends React.Component<any, any> {
                                 {isAdmin && (
                                     <div className="list-item__preview-footer">
                                         <Button
-                                            value={gettext('Cancel')}
+                                            text={gettext('Cancel')}
                                             variant='secondary'
                                             disabled={this.state.saving}
                                             onClick={this.props.closeEditor}
                                         />
 
                                         <Button
-                                            value={gettext('Save')}
+                                            text={gettext('Save')}
                                             variant='primary'
                                             disabled={this.state.saving || !this.state.dirty}
                                             onClick={this.saveprofile}

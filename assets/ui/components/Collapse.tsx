@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext} from 'utils';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 export class CollapseBoxWithButton extends React.Component<any, any> {
     static propTypes: any;
@@ -40,7 +40,7 @@ export class CollapseBoxWithButton extends React.Component<any, any> {
                     {this.props.edit && (
                         <Button
                             data-test-id="edit-btn"
-                            value={gettext('Edit')}
+                            text={gettext('Edit')}
                             variant='tertiary'
                             size='small'
                             onClick={this.props.edit}

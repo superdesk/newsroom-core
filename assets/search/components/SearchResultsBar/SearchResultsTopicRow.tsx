@@ -8,7 +8,7 @@ import {canUserUpdateTopic} from 'users/utils';
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 import {IProps as IParentProps} from './SearchResultTagsList';
-import {Button} from 'components/Buttons';
+import {Button} from 'components/Button';
 
 type IProps = Pick<IParentProps,
     'user' |
@@ -95,7 +95,7 @@ export function SearchResultsTopicRow({
                     {!hasActiveTopic || !canUserUpdateTopic(user, activeTopic) ? null : (
                         <Button
                             data-test-id="update-topic-btn"
-                            value={gettext('Update topic')}
+                            text={gettext('Update topic')}
                             variant='tertiary'
                             size='small'
                             onClick={(event) => {
@@ -115,7 +115,7 @@ export function SearchResultsTopicRow({
                     )}
                     <Button
                         data-test-id="save-topic-btn"
-                        value={hasActiveTopic
+                        text={hasActiveTopic
                             ? gettext('Save as new topic')
                             : gettext('Save new topic')
                         }
