@@ -174,6 +174,7 @@ MODULES = [
     "newsroom.reports",
     "newsroom.monitoring.module",
     "newsroom.news_api.api_audit",
+    "newsroom.mgmt_api.mgmt_api_docs",
 ]
 
 SITE_NAME = "Newshub"
