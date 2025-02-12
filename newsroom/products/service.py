@@ -11,6 +11,8 @@ from newsroom.core.resources.service import NewshubAsyncResourceService
 
 
 class ProductsService(NewshubAsyncResourceService[ProductResourceModel], AsyncCacheableService):
+    resource_name = "products"
+
     cache_lookup = {"is_enabled": True}
 
     async def create(self, docs: Sequence[ProductResourceModel | dict[str, Any]]) -> list[str]:
