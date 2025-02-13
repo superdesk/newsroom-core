@@ -1,4 +1,4 @@
-from newsroom.products.products import ProductsService
+from newsroom.products.service import ProductsService
 from newsroom.types import ProductResourceModel
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig
 from content_api import MONGO_PREFIX
