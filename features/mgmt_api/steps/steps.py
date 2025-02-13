@@ -1,5 +1,6 @@
 from newsroom.tests.steps import *  # noqa
 from behave import given
+from superdesk.tests.steps import get_resource_name, apply_placeholders, set_user_default, get_prefixed_url, assert_ok
 
 
 @given("empty auth token")
@@ -9,3 +10,41 @@ def given_empty_auth_token(context):
         context.headers = []
 
     context.headers = [header for header in context.headers if header[0] != "Authorization"]
+
+
+async def store_placeholder(context, url):
+    if context.response.status_code in (200, 201):
+        try:
+            item = json.loads(await context.response.get_data())
+        except ValueError:
+            assert False, await context.response.get_data()
+        if item.get("_id"):
+            try:
+                setattr(context, get_resource_name(url), item)
+                context.placeholders = getattr(context, "placeholders", {})
+                context.placeholders[get_resource_name(url)] = item
+            except (IndexError, KeyError):
+                pass
+
+
+async def post_data(context, url, success=False):
+    with context.app.mail.record_messages() as outbox:
+        data = apply_placeholders(context, context.text)
+        url = apply_placeholders(context, url)
+        set_user_default(url, data)
+        context.response = await context.client.post(
+            get_prefixed_url(context.app, url), data=data, headers=context.headers
+        )
+        if success:
+            await assert_ok(context.response)
+
+        item = await get_json_data(context.response)
+        context.outbox = outbox
+        await store_placeholder(context, url)
+        return item
+
+
+@when('we post to this "{url}"')
+@async_run_until_complete
+async def step_impl_when_post_url(context, url):
+    await post_data(context, url)
