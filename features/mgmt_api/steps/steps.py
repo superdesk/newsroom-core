@@ -1,6 +1,14 @@
 from newsroom.tests.steps import *  # noqa
+from newsroom.tests.web_api.steps import *  # noqa
 from behave import given
-from superdesk.tests.steps import get_resource_name, apply_placeholders, set_user_default, get_prefixed_url, assert_ok
+from superdesk.tests.steps import (
+    get_resource_name,
+    apply_placeholders,
+    set_user_default,
+    get_prefixed_url,
+    get_res,
+    if_match,
+)
 
 
 @given("empty auth token")
@@ -27,7 +35,9 @@ async def store_placeholder(context, url):
                 pass
 
 
-async def post_data(context, url, success=False):
+@when('we post to this "{url}"')
+@async_run_until_complete
+async def step_impl_when_post_url(context, url):
     with context.app.mail.record_messages() as outbox:
         data = apply_placeholders(context, context.text)
         url = apply_placeholders(context, url)
@@ -35,16 +45,20 @@ async def post_data(context, url, success=False):
         context.response = await context.client.post(
             get_prefixed_url(context.app, url), data=data, headers=context.headers
         )
-        if success:
-            await assert_ok(context.response)
-
         item = await get_json_data(context.response)
         context.outbox = outbox
         await store_placeholder(context, url)
         return item
 
 
-@when('we post to this "{url}"')
+@when('we patch to this "{url}"')
 @async_run_until_complete
-async def step_impl_when_post_url(context, url):
-    await post_data(context, url)
+async def _step_impl_when_patch_url(context, url):
+    with context.app.mail.record_messages() as outbox:
+        url = apply_placeholders(context, url)
+        res = await get_res(url, context)
+        headers = if_match(context, res.get("_etag"))
+        data = apply_placeholders(context, context.text)
+        href = get_prefixed_url(context.app, url)
+        context.response = await context.client.patch(href, data=data, headers=headers)
+        context.outbox = outbox

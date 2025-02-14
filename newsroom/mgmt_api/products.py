@@ -11,7 +11,6 @@ class CPProductResourceModel(ProductResourceModel):
 
 class CPProductsService(ProductsService):
     resource_name = "products"
-    pass
 
 
 products_resource_config = ResourceConfig(
@@ -20,6 +19,7 @@ products_resource_config = ResourceConfig(
     service=CPProductsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
+    uses_etag=False,
 )
 
 module = Module(

@@ -67,7 +67,7 @@ company_resource_config = ResourceConfig(
 
 
 class CompanyProductsResource(NewshubResourceModel):
-    product: Annotated[Optional[ObjectId], validate_data_relation_async("products")]
+    product: Annotated[Optional[str], validate_data_relation_async("products", convert_to_objectid=True)]
     seats: int = 0
     link: bool = False
 
@@ -83,13 +83,6 @@ async def get_company_products(company):
 
 
 class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource]):
-    async def get(self, req, lookup):
-        self.company = await get_company(req)
-        company_products = await get_company_products(self.company)
-        lookup["_id"] = {"$in": [p["_id"] for p in company_products]}
-        lookup.pop("companies", None)
-        return await super().get(req, lookup)
-
     async def find_one(self, req, **lookup):
         lookup.pop("companies", None)
         return await super().find_one(req, **lookup)
@@ -106,7 +99,8 @@ class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource
                 product = data.to_dict()
                 company = await get_company()
                 assert product
-                company_products = [p for p in await get_company_products(company) if p["_id"] != product["_id"]]
+                company_products = [p for p in await get_company_products(company) if p and p["_id"] != product["_id"]]
+                company_products.append(product)
                 await CompanyService().system_update(company["_id"], {"products": company_products})
                 ids.append(id)
         return ids
@@ -114,7 +108,7 @@ class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource
     async def on_fetched(self, doc):
         for item in doc["_items"]:
             await self._fix_link(item)
-            if hasattr(self, "company") and self.company and self.company.get("products"):
+            if hasattr(self, "company") and self.company and self.company.products:
                 for product_ref in self.company["products"]:
                     if product_ref["_id"] == item["_id"]:
                         item["seats"] = product_ref["seats"]
@@ -131,25 +125,6 @@ class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource
         request = get_current_request()
         company_id = request.view_args["companies"]
         item["_links"]["self"]["href"] = f"companies/{company_id}/products/{item['_id']}"
-
-
-from typing import Optional
-from enum import Enum
-from pydantic import BaseModel
-
-
-class UserActions(str, Enum):
-    activate = "activate"
-    disable = "disable"
-
-
-class RouteArguments(BaseModel):
-    user_id: str
-    action: UserActions
-
-
-class URLParams(BaseModel):
-    verbose: bool = False
 
 
 company_products_resource_config = ResourceConfig(

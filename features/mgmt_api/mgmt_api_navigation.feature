@@ -1,7 +1,6 @@
 Feature: Management API - Navigation
     Scenario: Create a navigation
-        Given empty "navigations"
-        When we post to "/navigations"
+        When we post to this "api/navigations"
         """
         {
             "name": "navigation1",
@@ -26,8 +25,7 @@ Feature: Management API - Navigation
         """
 
     Scenario: Delete a navigation
-       Given empty "navigations"
-        When we post to "/navigations"
+        When we post to this "/navigations"
         """
         [{
             "name": "navigation1",
@@ -39,8 +37,7 @@ Feature: Management API - Navigation
         Then we get response code 204
 
     Scenario: Update a navigation
-        Given empty "navigations"
-        When we post to "/navigations"
+        When we post to this "/navigations"
         """
         [{"name": "navigation1"}]
         """
