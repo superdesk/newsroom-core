@@ -37,6 +37,14 @@ class GlobalTopicsService(TopicService):
         app.cache.delete(str(original.id))
 
 
+class CPFolderResourceModel(TopicFolderResourceModel):
+    pass
+
+
+class CPFolderResourceService(FolderResourceService):
+    pass
+
+
 topics_resource_config = ResourceConfig(
     name="topics",
     data_class=GlobalTopicsResource,
@@ -47,8 +55,8 @@ topics_resource_config = ResourceConfig(
 
 folders_resource_config = ResourceConfig(
     name="topic_folders",
-    data_class=TopicFolderResourceModel,
-    service=FolderResourceService,
+    data_class=CPFolderResourceModel,
+    service=CPFolderResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
 )

@@ -1,19 +1,16 @@
 from bson.objectid import ObjectId
 
-from newsroom.products.views import get_product_ref
-from newsroom.utils import find_one
 from superdesk.errors import SuperdeskApiError
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 from content_api import MONGO_PREFIX
 from typing import Annotated, Optional, List, Union
-from newsroom.types import CompanyResource
+from newsroom.types import CompanyResource, CompanyProduct
 from newsroom.companies.companies_async import CompanyService
 from .utils import validate_product_refs, get_errors_company
 from newsroom.core import get_current_wsgi_app
 from superdesk.core.resources.validators import validate_data_relation_async
 from newsroom.core.resources import NewshubResourceModel
 from newsroom.core.resources import NewshubAsyncResourceService
-from superdesk.core.types import Request, Response
 from superdesk.core.module import Module
 from newsroom.mgmt_api.products import CPProductsService
 from newsroom.auth.utils import get_current_request
@@ -24,12 +21,11 @@ class CPCompaniesResource(CompanyResource):
     CP Companies Schema
     """
 
-    country: Optional[str] = None
+    country: Optional[str] = "CAN"
 
 
 class CPCompaniesService(CompanyService):
-    async def on_create(self, docs: List[CompanyResource]):
-        await super().on_create(docs)
+    async def on_create(self, docs: List[CPCompaniesResource]):
         for doc in docs:
             errors = get_errors_company(doc)
             if errors:
@@ -37,6 +33,7 @@ class CPCompaniesService(CompanyService):
                 raise SuperdeskApiError.badRequestError(message=message, payload=message)
             if doc.products:
                 await validate_product_refs(doc.products)
+        await super().on_create(docs)
 
     async def on_created(self, docs):
         await super().on_created(docs)
@@ -46,7 +43,7 @@ class CPCompaniesService(CompanyService):
 
     async def on_update(self, updates, original):
         if updates.get("products"):
-            await validate_product_refs(updates.products)
+            await validate_product_refs(updates["products"])
         await super().on_update(updates, original)
         app = get_current_wsgi_app()
         app.cache.delete(str(original.id))
@@ -74,57 +71,48 @@ class CompanyProductsResource(NewshubResourceModel):
 
 async def get_company():
     request = get_current_request()
-    company = await CompanyService().find_by_id(ObjectId(request.get_view_args("companies")))
+    company = await CPCompaniesService().find_by_id(ObjectId(request.get_view_args("companies")))
     return company.to_dict()
 
 
-async def get_company_products(company):
+def get_company_products(company):
     return company.get("products") or []
 
 
-class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource]):
-    async def find_one(self, req, **lookup):
-        lookup.pop("companies", None)
-        return await super().find_one(req, **lookup)
+def get_product_ref(product, seats) -> CompanyProduct:
+    return CompanyProduct(
+        _id=product.get("_id"),
+        section=product.get("product_type"),
+        seats=seats,
+    )
 
+
+class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource]):
     async def on_create(self, docs, **kwargs):
         ids = []
+        company = await get_company()  # Fetch company once instead of inside the loop
+
         for doc in docs:
-            doc = doc.to_dict()
-            if isinstance(doc.get("product"), str):
-                doc["product"] = ObjectId(doc["product"])
-            id = doc.pop("product", None)
-            if id:
-                data = await CPProductsService().find_by_id(ObjectId(id))
-                product = data.to_dict()
-                company = await get_company()
-                assert product
-                company_products = [p for p in await get_company_products(company) if p and p["_id"] != product["_id"]]
-                company_products.append(product)
-                await CompanyService().system_update(company["_id"], {"products": company_products})
-                ids.append(id)
+            product_id = doc.product
+            if not product_id:
+                continue  # Skip if no product is provided
+
+            link = doc.link
+            product_data_cursor = await CPProductsService().find_by_id(ObjectId(product_id))
+            if not product_data_cursor:
+                continue  # Skip if product is not found
+
+            product = product_data_cursor.to_dict()
+            company_products = [p for p in get_company_products(company) if p["_id"] != product["_id"]]
+
+            if link:
+                company_products.append(get_product_ref(product, doc.seats).to_dict())
+
+        if ids:
+            await CPCompaniesService().system_update(ObjectId(company["_id"]), {"products": company_products})
+
+        ids.append(product_id)
         return ids
-
-    async def on_fetched(self, doc):
-        for item in doc["_items"]:
-            await self._fix_link(item)
-            if hasattr(self, "company") and self.company and self.company.products:
-                for product_ref in self.company["products"]:
-                    if product_ref["_id"] == item["_id"]:
-                        item["seats"] = product_ref["seats"]
-                        break
-        return await super().on_fetched(doc)
-
-    async def on_fetched_item(self, doc):
-        await self._fix_link(doc)
-        return await super().on_fetched_item(doc)
-
-    async def _fix_link(self, item):
-        from newsroom.auth.utils import get_current_request
-
-        request = get_current_request()
-        company_id = request.view_args["companies"]
-        item["_links"]["self"]["href"] = f"companies/{company_id}/products/{item['_id']}"
 
 
 company_products_resource_config = ResourceConfig(

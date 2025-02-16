@@ -3,12 +3,15 @@ from superdesk.core.types import Response
 from quart_babel import gettext
 import ipaddress
 from newsroom.products import ProductsService
+from newsroom.types import CompanyProduct
 
 
 async def validate_product_refs(product_refs):
     products_service = ProductsService()
+    product_refs = [ref.to_dict() if isinstance(ref, CompanyProduct) else ref for ref in product_refs]
     product_ids = [bson.ObjectId(ref["_id"]) for ref in product_refs]
-    products = list(await products_service.search(lookup={"_id": {"$in": product_ids}}))
+    cursor = await products_service.search(lookup={"_id": {"$in": product_ids}})
+    products = await cursor.to_list_raw()
     products_by_id = {str(product["_id"]): product for product in products}
 
     for ref in product_refs:
