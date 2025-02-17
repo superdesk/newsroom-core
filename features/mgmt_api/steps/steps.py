@@ -1,5 +1,5 @@
 from newsroom.tests.steps import *  # noqa
-from newsroom.tests.web_api.steps import step_impl_given_newsroom_resource, given # noqa
+from newsroom.tests.web_api.steps import step_impl_given_newsroom_resource, given  # noqa
 from superdesk.tests.steps import (
     get_resource_name,
     apply_placeholders,
