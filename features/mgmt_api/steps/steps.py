@@ -1,5 +1,6 @@
-from newsroom.tests.steps import *  # noqa
-from newsroom.tests.web_api.steps import step_impl_given_newsroom_resource, given  # noqa
+from newsroom.tests.steps import async_run_until_complete
+from newsroom.tests.web_api.steps import get_json_data
+import json
 from superdesk.tests.steps import (
     get_resource_name,
     apply_placeholders,
@@ -8,6 +9,7 @@ from superdesk.tests.steps import (
     get_res,
     if_match,
 )
+from behave import given, when
 
 
 @given("empty auth token")
