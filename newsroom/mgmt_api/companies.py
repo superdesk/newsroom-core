@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from superdesk.errors import SuperdeskApiError
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig, RestParentLink
 from content_api import MONGO_PREFIX
-from typing import Annotated, Optional, List, Union
+from typing import Annotated, Optional, List
 from newsroom.types import CompanyResource, CompanyProduct
 from newsroom.companies.companies_async import CompanyService
 from .utils import validate_product_refs, get_errors_company

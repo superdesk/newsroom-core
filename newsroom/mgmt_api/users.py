@@ -1,5 +1,4 @@
 from bson.objectid import ObjectId
-from pymongo.collation import Collation
 from flask import current_app as app
 from newsroom.users.service import UsersService
 from newsroom.types import UserResourceModel
@@ -11,6 +10,7 @@ from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEn
 from content_api import MONGO_PREFIX
 from superdesk.core.module import Module
 from typing import Any
+from newsroom.core import get_current_wsgi_app
 
 
 class CPUsersResource(UserResourceModel):
@@ -35,7 +35,7 @@ class CPUsersService(UsersService):
                 await validate_product_refs(doc.products)
 
     @override
-    async def on_update(self, updates, original):
+    async def on_update(self, updates: dict[str, Any], original: UserResourceModel):
         if updates.get("products"):
             await validate_product_refs(updates.products)
         return await super().on_update(updates, original)
@@ -46,7 +46,8 @@ class CPUsersService(UsersService):
 
     @override
     async def on_delete(self, doc):
-        pass
+        app = get_current_wsgi_app()
+        app.cache.delete(str(doc.id))
 
 
 users_resource_config = ResourceConfig(
