@@ -37,7 +37,7 @@ class CPUsersService(UsersService):
     @override
     async def on_update(self, updates: dict[str, Any], original: UserResourceModel):
         if updates.get("products"):
-            await validate_product_refs(updates.products)
+            await validate_product_refs(updates["products"])
         return await super().on_update(updates, original)
 
     @override

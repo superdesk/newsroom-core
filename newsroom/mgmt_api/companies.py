@@ -35,7 +35,7 @@ class CPCompaniesService(CompanyService):
                 await validate_product_refs(doc.products)
         await super().on_create(docs)
 
-    async def on_created(self, docs):
+    async def on_created(self, docs: List[CPCompaniesResource]):
         await super().on_created(docs)
         app = get_current_wsgi_app()
         for doc in docs:
