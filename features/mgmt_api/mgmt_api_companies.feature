@@ -77,7 +77,6 @@ Feature: Management API - Companies
             ]
         }
         """
-    @skip
     Scenario: Validate company products section
         Given newsroom "products"
         """

@@ -115,7 +115,6 @@ Feature: Management API - Users
             []
         }
         """
-    @skip
     Scenario: Validate product type
         Given newsroom "products"
         """
@@ -155,7 +154,7 @@ Feature: Management API - Users
         }
         """
 
-        When we patch "/users/#users._id#"
+        When we patch to this "/users/#users._id#"
         """
         {
             "products": [

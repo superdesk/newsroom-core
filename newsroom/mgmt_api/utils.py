@@ -18,6 +18,7 @@ async def validate_product_refs(product_refs):
         product = products_by_id.get(str(ref["_id"]))
         assert product is not None
         ref["section"] = product["product_type"]
+    return product_refs
 
 
 def get_errors_company(updates, original=None):

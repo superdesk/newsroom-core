@@ -32,7 +32,7 @@ class CPCompaniesService(CompanyService):
                 message = "invalid ip address"
                 raise SuperdeskApiError.badRequestError(message=message, payload=message)
             if doc.products:
-                await validate_product_refs(doc.products)
+                doc.products = await validate_product_refs(doc.products)
         await super().on_create(docs)
 
     async def on_created(self, docs: List[CPCompaniesResource]):
@@ -43,7 +43,7 @@ class CPCompaniesService(CompanyService):
 
     async def on_update(self, updates, original):
         if updates.get("products"):
-            await validate_product_refs(updates["products"])
+            updates["products"] = await validate_product_refs(updates["products"])
         await super().on_update(updates, original)
         app = get_current_wsgi_app()
         app.cache.delete(str(original.id))

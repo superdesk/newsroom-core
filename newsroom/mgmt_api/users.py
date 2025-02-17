@@ -32,13 +32,12 @@ class CPUsersService(UsersService):
             if doc.company:
                 doc.company = ObjectId(doc.company)
             if doc.products:
-                await validate_product_refs(doc.products)
+                doc.products = await validate_product_refs(doc.products)
 
     @override
     async def on_update(self, updates: dict[str, Any], original: UserResourceModel):
         if updates.get("products"):
-            await validate_product_refs(updates["products"])
-        return await super().on_update(updates, original)
+            updates["products"] = await validate_product_refs(updates["products"])
 
     @override
     async def on_updated(self, updates: dict[str, Any], original: UserResourceModel):
