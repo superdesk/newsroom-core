@@ -31,13 +31,54 @@ Feature: Management API - Products
         Then we get response code 200
 
         When we post to this "companies/#companies._id#/products"
-            """
-            [
-                {
-                    "product": "#products._id#",
-                    "seats": 5,
-                    "link": true
-                }
-            ]
-            """
-            Then we get response code 201
+        """
+        [
+            {
+                "product": "#products._id#",
+                "seats": 5,
+                "link": true
+            }
+        ]
+        """
+        Then we get response code 201
+
+        When we get "companies/#companies._id#/products"
+        Then we get existing resource
+        """
+        {"_items": [
+            {
+                "name": "A fishy Product",
+                "description": "new description",
+                "query": "fish",
+                "product_type": "agenda",
+                "seats": 5
+            }
+        ]}
+        """
+
+        When we get "companies/#companies._id#"
+        Then we get existing resource
+        """
+        {"products": [
+            {"_id": "#products._id#", "section": "agenda", "seats": 5}
+        ]}
+        """
+
+        When we post to this "companies/#companies._id#/products"
+        """
+        [
+            {
+                "product": "#products._id#",
+                "link": false
+            }
+        ]
+        """
+        Then we get response code 201
+        When we get "companies/#companies._id#/products"
+        Then we get existing resource
+        """
+        {"_items": []}
+        """
+
+        When we delete "/products/#products._id#"
+        Then we get response code 204

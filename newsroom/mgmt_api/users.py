@@ -10,7 +10,7 @@ from newsroom.users.service import UsersService
 from newsroom.types import UserResourceModel
 
 from superdesk.core.module import Module
-from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
+from superdesk.core.resources import ResourceConfig, MongoIndexOptions, MongoResourceConfig, RestEndpointConfig
 from superdesk.errors import SuperdeskApiError
 
 
@@ -54,7 +54,17 @@ users_resource_config = ResourceConfig(
     name="users",
     data_class=CPUsersResource,
     service=CPUsersService,
-    mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
+    mongo=MongoResourceConfig(
+        prefix=MONGO_PREFIX,
+        indexes=[
+            MongoIndexOptions(
+                name="email",
+                keys=[("email", 1)],
+                unique=True,
+                collation={"locale": "en", "strength": 2},
+            ),
+        ],
+    ),
     rest_endpoints=RestEndpointConfig(auth=False),
 )
 

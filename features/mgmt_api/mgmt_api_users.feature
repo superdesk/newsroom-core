@@ -208,7 +208,6 @@ Feature: Management API - Users
         """
         Then we get response code 201
     
-    @skip
     Scenario: Search case insensitive
         Given newsroom "users"
         """
