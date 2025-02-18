@@ -131,7 +131,7 @@ exceptiongroup==1.2.2
     # via pytest
 feedparser==6.0.11
     # via superdesk-core
-flake8==7.1.1
+flake8==7.1.2
     # via -r dev-requirements.in
 flask==1.1.2
     # via
