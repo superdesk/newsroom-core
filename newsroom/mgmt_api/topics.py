@@ -1,12 +1,14 @@
-from newsroom.topics.topics_async import TopicResourceModel, TopicService
-from newsroom.topics_folders.folders import FolderResourceService
-from newsroom.types import TopicFolderResourceModel
-from superdesk.errors import SuperdeskApiError
+from newsroom import MONGO_PREFIX
 from newsroom.core import get_current_wsgi_app
+from newsroom.types import TopicFolderResourceModel
+from newsroom.topics_folders.folders import FolderResourceService
+from newsroom.topics.topics_async import TopicResourceModel, TopicService
 
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig
-from content_api import MONGO_PREFIX
 from superdesk.core.module import Module
+from superdesk.errors import SuperdeskApiError
+from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
+
+from typing import Any, Dict, List
 
 
 class GlobalTopicsResource(TopicResourceModel):
@@ -14,7 +16,7 @@ class GlobalTopicsResource(TopicResourceModel):
 
 
 class GlobalTopicsService(TopicService):
-    async def on_create(self, docs):
+    async def on_create(self, docs: List[TopicResourceModel]) -> None:
         await super().on_create(docs)
         for doc in docs:
             user = doc.user
@@ -25,13 +27,13 @@ class GlobalTopicsService(TopicService):
                 message = "Please set is_global True, or provide user in the body."
                 raise SuperdeskApiError.badRequestError(message=message, payload=message)
 
-    async def on_created(self, docs):
+    async def on_created(self, docs: List[TopicResourceModel]) -> None:
         await super().on_created(docs)
         app = get_current_wsgi_app()
         for doc in docs:
             app.cache.set(str(doc.id), doc)
 
-    async def on_update(self, updates, original):
+    async def on_update(self, updates: Dict[str, Any], original: TopicResourceModel) -> None:
         await super().on_update(updates, original)
         app = get_current_wsgi_app()
         app.cache.delete(str(original.id))
@@ -60,7 +62,6 @@ folders_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
 )
-
 
 module = Module(
     name="newsroom.mgmt_api.topics",

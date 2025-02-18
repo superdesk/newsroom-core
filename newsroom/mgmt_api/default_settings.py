@@ -36,6 +36,7 @@ MODULES = [
     "newsroom.mgmt_api.companies",
     "newsroom.mgmt_api.users",
     "newsroom.mgmt_api.topics",
+    "newsroom.mgmt_api.companies_products",
 ]
 
 INSTALLED_APPS = []

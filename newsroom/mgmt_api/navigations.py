@@ -1,8 +1,9 @@
+from newsroom import MONGO_PREFIX
 from newsroom.navigations import NavigationsService
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig
-from content_api import MONGO_PREFIX
 from newsroom.types import NavigationModel
+
 from superdesk.core.module import Module
+from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
 
 
 class CPNavigationModel(NavigationModel):

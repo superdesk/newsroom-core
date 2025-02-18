@@ -1,8 +1,9 @@
+from newsroom import MONGO_PREFIX
 from newsroom.products.service import ProductsService
 from newsroom.types import ProductResourceModel
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig
-from content_api import MONGO_PREFIX
+
 from superdesk.core.module import Module
+from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
 
 
 class CPProductResourceModel(ProductResourceModel):

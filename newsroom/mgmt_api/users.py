@@ -1,16 +1,17 @@
+from typing import Any, List, Dict
+from typing_extensions import override
 from bson.objectid import ObjectId
 from flask import current_app as app
+
+from newsroom import MONGO_PREFIX
+from newsroom.core import get_current_wsgi_app
+from newsroom.mgmt_api.utils import validate_product_refs
 from newsroom.users.service import UsersService
 from newsroom.types import UserResourceModel
-from superdesk.errors import SuperdeskApiError
-from typing_extensions import override
 
-from newsroom.mgmt_api.utils import validate_product_refs
-from superdesk.core.resources import ResourceConfig, MongoResourceConfig, RestEndpointConfig
-from content_api import MONGO_PREFIX
 from superdesk.core.module import Module
-from typing import Any
-from newsroom.core import get_current_wsgi_app
+from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
+from superdesk.errors import SuperdeskApiError
 
 
 class CPUsersResource(UserResourceModel):
@@ -19,7 +20,7 @@ class CPUsersResource(UserResourceModel):
 
 class CPUsersService(UsersService):
     @override
-    async def on_create(self, docs):
+    async def on_create(self, docs: List[UserResourceModel]) -> None:
         await super().on_create(docs)
         for doc in docs:
             if doc.user_type != "administrator" and not doc.company:
@@ -35,16 +36,16 @@ class CPUsersService(UsersService):
                 doc.products = await validate_product_refs(doc.products)
 
     @override
-    async def on_update(self, updates: dict[str, Any], original: UserResourceModel):
+    async def on_update(self, updates: Dict[str, Any], original: UserResourceModel) -> None:
         if updates.get("products"):
             updates["products"] = await validate_product_refs(updates["products"])
 
     @override
-    async def on_updated(self, updates: dict[str, Any], original: UserResourceModel):
+    async def on_updated(self, updates: Dict[str, Any], original: UserResourceModel) -> None:
         pass
 
     @override
-    async def on_delete(self, doc):
+    async def on_delete(self, doc: UserResourceModel) -> None:
         app = get_current_wsgi_app()
         app.cache.delete(str(doc.id))
 
