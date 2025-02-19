@@ -143,8 +143,8 @@ async def create(request: Request) -> Response:
         request_updates = await request.get_json()
         process_form_request(new_data, request_updates, form)
 
-        ids = await MonitoringProfileService().create([new_data])
-        return Response({"success": True, "_id": ids[0], "users": new_data.get("users")}, 201)
+        new_items = await MonitoringProfileService().create([new_data])
+        return Response({"success": True, "_id": new_items[0].id, "users": new_data.get("users")}, 201)
     return Response(form.errors, 400)
 
 
