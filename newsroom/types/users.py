@@ -1,7 +1,6 @@
 from datetime import datetime, date
 
 import pytz
-from pydantic import Field
 
 from typing import Annotated, List, Optional
 from quart_babel import lazy_gettext
