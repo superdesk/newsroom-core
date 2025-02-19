@@ -11,10 +11,6 @@ from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEn
 from typing import Any, Dict, List
 
 
-class GlobalTopicsResource(TopicResourceModel):
-    pass
-
-
 class GlobalTopicsService(TopicService):
     async def on_create(self, docs: List[TopicResourceModel]) -> None:
         await super().on_create(docs)
@@ -39,17 +35,9 @@ class GlobalTopicsService(TopicService):
         app.cache.delete(str(original.id))
 
 
-class CPFolderResourceModel(TopicFolderResourceModel):
-    pass
-
-
-class CPFolderResourceService(FolderResourceService):
-    pass
-
-
 topics_resource_config = ResourceConfig(
     name="topics",
-    data_class=GlobalTopicsResource,
+    data_class=TopicResourceModel,
     service=GlobalTopicsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
@@ -57,8 +45,8 @@ topics_resource_config = ResourceConfig(
 
 folders_resource_config = ResourceConfig(
     name="topic_folders",
-    data_class=CPFolderResourceModel,
-    service=CPFolderResourceService,
+    data_class=TopicFolderResourceModel,
+    service=FolderResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
 )

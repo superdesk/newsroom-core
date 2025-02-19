@@ -12,7 +12,7 @@ from superdesk.core.resources import (
 
 from newsroom import MONGO_PREFIX
 from newsroom.auth.utils import get_current_request
-from newsroom.mgmt_api.products import CPProductsService
+from newsroom.products import ProductsService
 from newsroom.mgmt_api.companies import CPCompaniesService, company_resource_config
 from newsroom.core.resources import NewshubResourceModel, NewshubAsyncResourceService
 from newsroom.products.views import get_product_ref
@@ -45,7 +45,7 @@ class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource
                 continue  # Skip if no product is provided
 
             link = doc.link
-            product_data_cursor = await CPProductsService().find_by_id(ObjectId(product_id))
+            product_data_cursor = await ProductsService().find_by_id(ObjectId(product_id))
             if not product_data_cursor:
                 continue
 
