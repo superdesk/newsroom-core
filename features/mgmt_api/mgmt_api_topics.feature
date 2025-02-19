@@ -2,13 +2,12 @@ Feature: Management API - Topics
     Background: Setup companies and users
         When we post to this "/companies"
         """
-        [{"_id":"619277ef8bbbbfac6034aab4","name": "zzz company"}]
+        [{"name": "zzz company"}]
         """
         Then we get response code 201
         When we post to this "/users"
         """
         {   
-            "_id":"619277ef8bbbbfac6034aab7",
             "first_name": "Foo",
             "last_name": "Bar",
             "email": "foo@bar.org",
@@ -96,26 +95,26 @@ Feature: Management API - Topics
         """
         [
             {   
-                "_id":"619277ef8bbbbfac6034aac1",
                 "name": "test",
                 "section": "wire"
             }
         ]
         """
-        Given newsroom "topics"
+        When we post to this "/topics"
         """
         [
             {
                 "label": "topic1",
-                "company": "619277ef8bbbbfac6034aab4",
+                "company": "#companies._id#",
                 "topic_type": "wire",
                 "query": "topic1",
                 "is_global": true,
-                "user": "619277ef8bbbbfac6034aab7",
-                "folder": "619277ef8bbbbfac6034aac1"
+                "user": "#users._id#",
+                "folder": "#topic_folders._id#"
             }
         ]
         """
+        Then we get response code 201
         When we get "/topics"
         Then we get list with 1 items
 
@@ -137,7 +136,6 @@ Feature: Management API - Topics
         When we post to this "/navigations"
         """
         {   
-            "_id": "67ad7453e5baa77730e925dd",
             "name": "navigation1",
             "description": "navigation1",
             "order": 1
@@ -154,7 +152,7 @@ Feature: Management API - Topics
             "query": "topic1",
             "is_global": true,
             "user": "#users._id#",
-            "navigation": ["67ad7453e5baa77730e925dd"]
+            "navigation": ["#navigations._id#"]
         }
         """
         Then we get response code 201

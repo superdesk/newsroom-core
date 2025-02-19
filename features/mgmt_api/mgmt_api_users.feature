@@ -217,6 +217,12 @@ Feature: Management API - Users
                 "last_name": "Cena",
                 "email": "JohnCena@wwe.com",
                 "user_type": "administrator"
+            },
+            {
+                "first_name": "Alex",
+                "last_name": "Billiam",
+                "email": "alexbilliam@wwe.com",
+                "user_type": "administrator"
             }
         ]
         """
