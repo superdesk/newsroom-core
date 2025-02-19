@@ -14,22 +14,11 @@ from superdesk.core.resources import ResourceConfig, MongoIndexOptions, MongoRes
 from superdesk.errors import SuperdeskApiError
 
 
-class CPUsersResource(UserResourceModel):
-    pass
-
-
 class CPUsersService(UsersService):
     @override
     async def on_create(self, docs: List[UserResourceModel]) -> None:
         await super().on_create(docs)
         for doc in docs:
-            if doc.user_type != "administrator" and not doc.company:
-                message = "Company is required if user type is not administrator."
-                raise SuperdeskApiError.badRequestError(message=message, payload=message)
-            locale = doc.locale
-            if locale and locale not in app.config["LANGUAGES"]:
-                message = "Locale is not in configured list of locales."
-                raise SuperdeskApiError.badRequestError(message=message, payload=message)
             if doc.company:
                 doc.company = ObjectId(doc.company)
             if doc.products:
@@ -52,7 +41,7 @@ class CPUsersService(UsersService):
 
 users_resource_config = ResourceConfig(
     name="users",
-    data_class=CPUsersResource,
+    data_class=UserResourceModel,
     service=CPUsersService,
     mongo=MongoResourceConfig(
         prefix=MONGO_PREFIX,

@@ -82,11 +82,10 @@ class NewsroomMGMTAPI(BaseNewsroomApp):
                 }
             )
 
-        def superdesk_api_error(err):
+        def superdesk_api_error(err: SuperdeskApiError):
             return json_error(
                 {
-                    "error": err.message or "",
-                    "message": err.payload,
+                    "message": err.message,
                     "code": err.status_code or 500,
                 }
             )
