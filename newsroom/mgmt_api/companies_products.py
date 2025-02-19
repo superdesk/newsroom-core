@@ -1,5 +1,5 @@
 from bson.objectid import ObjectId
-from typing import Annotated, Optional, List, Dict, Any
+from typing import Annotated, List, Dict, Any
 
 from superdesk.core.module import Module
 from superdesk.core.resources.validators import validate_data_relation_async
@@ -19,7 +19,7 @@ from newsroom.products.views import get_product_ref
 
 
 class CompanyProductsResource(NewshubResourceModel):
-    product: Annotated[Optional[str], validate_data_relation_async("products", convert_to_objectid=True)]
+    product: Annotated[str | None, validate_data_relation_async("products", convert_to_objectid=True)]
     seats: int = 0
     link: bool = False
 
@@ -51,7 +51,6 @@ class CompanyProductsService(NewshubAsyncResourceService[CompanyProductsResource
 
             product = product_data_cursor
 
-            print(product, "\n\n\n\n\n\n\n\n\n")
             company_products = [p for p in get_company_products(company) if p["_id"] != product.id]
 
             if link:

@@ -6,18 +6,10 @@ from superdesk.core.module import Module
 from superdesk.core.resources import MongoResourceConfig, ResourceConfig, RestEndpointConfig
 
 
-class CPNavigationModel(NavigationModel):
-    pass
-
-
-class CPNavigationsService(NavigationsService):
-    pass
-
-
 navigation_resource_config = ResourceConfig(
     name="navigations",
-    data_class=CPNavigationModel,
-    service=CPNavigationsService,
+    data_class=NavigationModel,
+    service=NavigationsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
 )
