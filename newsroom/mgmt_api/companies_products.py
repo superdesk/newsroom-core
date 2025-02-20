@@ -1,20 +1,20 @@
 from bson.objectid import ObjectId
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
+from pydantic import BaseModel
+
+from newsroom.types.common import SectionEnum
 from newsroom.products import ProductsService
-from newsroom.mgmt_api.companies import CPCompaniesService
 from newsroom.products.views import get_product_ref
+from newsroom.mgmt_api.companies import CPCompaniesService
+from newsroom.types import CompanyResource, CompanyProduct
 
 from superdesk.core.module import Module
-from pydantic import BaseModel
 from superdesk.core.types import Request, Response
 from superdesk.core.resources import fields
 from superdesk.core.web import EndpointGroup
 
-from newsroom.types import CompanyResource, CompanyProduct
-from newsroom.types.common import SectionEnum
 
-
-def get_company_products(company: Dict[str, Any]) -> List[dict]:
+def get_company_products(company: CompanyResource) -> List[CompanyProduct]:
     return company.products or []
 
 
@@ -22,7 +22,8 @@ company_products_endpoints = EndpointGroup("company_products", __name__, url_pre
 
 
 class CPCompanyProduct(CompanyProduct):
-    section: Optional[SectionEnum] = None  # Declare it as optional
+    # Declare section as optional
+    section: Optional[SectionEnum] = None  # type: ignore
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -45,6 +46,9 @@ class CompanyProductRouteArguments(BaseModel):
 )
 async def update_company_products(args: CompanyProductRouteArguments, params: None, request: Request) -> Response:
     company = await args.get_company()
+    if not company:
+        return Response({"error": "Company not found"}, status=404)
+
     product_links_json = await request.get_json()
     product_links: list[CPCompanyProduct] = [CPCompanyProduct.from_dict(link) for link in product_links_json]
     ids: List = []
@@ -80,6 +84,9 @@ async def update_company_products(args: CompanyProductRouteArguments, params: No
 )
 async def get_company_products_endpoint(args: CompanyProductRouteArguments, params: None, request: Request) -> Response:
     company = await args.get_company()
+    if not company:
+        return Response({"error": "Company not found"}, status=404)
+
     company_products = get_company_products(company)
 
     products_data = []
