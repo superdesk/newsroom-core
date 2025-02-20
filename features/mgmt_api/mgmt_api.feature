@@ -14,10 +14,6 @@ Feature: Management API
                         "title": "products"
                     },
                     {
-                        "href": "companies/<regex(\"[a-f0-9]{24}\"):companies>/products",
-                        "title": "company_products"
-                    },
-                    {
                         "href": "companies",
                         "title": "companies"
                     },

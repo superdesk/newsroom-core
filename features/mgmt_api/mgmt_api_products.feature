@@ -80,5 +80,5 @@ Feature: Management API - Products
         {"_items": []}
         """
 
-        When we delete "/products/#products._id#"
+        When we delete this "/products/#products._id#"
         Then we get response code 204

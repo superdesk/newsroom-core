@@ -13,7 +13,6 @@ from newsroom.types import UserResourceModel
 from superdesk.core.module import Module
 from superdesk.core.resources import (
     ResourceConfig,
-    MongoIndexOptions,
     MongoResourceConfig,
     RestEndpointConfig,
 )
@@ -58,17 +57,7 @@ users_resource_config = ResourceConfig(
     name="users",
     data_class=UserResourceModel,
     service=CPUsersService,
-    mongo=MongoResourceConfig(
-        prefix=MONGO_PREFIX,
-        indexes=[
-            MongoIndexOptions(
-                name="email",
-                keys=[("email", 1)],
-                unique=True,
-                collation={"locale": "en", "strength": 2},
-            ),
-        ],
-    ),
+    mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     rest_endpoints=RestEndpointConfig(auth=False),
 )
 

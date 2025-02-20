@@ -86,3 +86,22 @@ async def _step_impl_when_patch_url(context: Any, url: str) -> None:
         href = get_prefixed_url(context.app, url)
         context.response = await context.client.patch(href, data=data, headers=headers)
         context.outbox = outbox
+
+
+@when('we delete this "{url}"')
+@async_run_until_complete
+async def _step_impl_when_delete_url(context, url):
+    """
+    Sends a DELETE request to delete a item at the given URL.
+
+    :param context: Behave test context.
+    :param url: API endpoint URL.
+    """
+    with context.app.mail.record_messages() as outbox:
+        url = apply_placeholders(context, url)
+        res = await get_res(url, context)
+        headers = if_match(context, res.get("_etag"))
+        href = get_prefixed_url(context.app, url)
+        async with context.app.test_request_context(href):
+            context.response = await context.client.delete(href, headers=headers)
+        context.outbox = outbox
