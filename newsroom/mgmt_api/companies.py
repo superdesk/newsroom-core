@@ -43,7 +43,7 @@ company_resource_config = ResourceConfig(
     data_class=CompanyResource,
     service=CPCompaniesService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
 )
 
 module = Module(

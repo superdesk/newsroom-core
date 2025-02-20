@@ -192,9 +192,6 @@ Feature: Management API - Users
         """
 
         Then we get error 400
-        """
-        {"code": 400, "message": "Locale is not in configured list of locales."}
-        """
 
         When we post to this "/users"
         """

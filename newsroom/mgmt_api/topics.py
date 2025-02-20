@@ -40,7 +40,7 @@ topics_resource_config = ResourceConfig(
     data_class=TopicResourceModel,
     service=GlobalTopicsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
 )
 
 folders_resource_config = ResourceConfig(
@@ -48,7 +48,7 @@ folders_resource_config = ResourceConfig(
     data_class=TopicFolderResourceModel,
     service=FolderResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
 )
 
 module = Module(

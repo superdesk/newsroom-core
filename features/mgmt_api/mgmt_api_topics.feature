@@ -131,7 +131,7 @@ Feature: Management API - Topics
             "navigation": ["619277ef8bbbbfac6034aab7"]
         }
         """
-        Then we get response code 500
+        Then we get response code 400
 
         When we post to this "/navigations"
         """

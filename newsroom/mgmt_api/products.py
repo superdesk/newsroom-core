@@ -11,7 +11,7 @@ products_resource_config = ResourceConfig(
     data_class=ProductResourceModel,
     service=ProductsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
     uses_etag=False,
 )
 

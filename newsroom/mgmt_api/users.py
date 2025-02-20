@@ -58,7 +58,7 @@ users_resource_config = ResourceConfig(
     data_class=UserResourceModel,
     service=CPUsersService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
 )
 
 module = Module(

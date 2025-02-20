@@ -11,7 +11,7 @@ navigation_resource_config = ResourceConfig(
     data_class=NavigationModel,
     service=NavigationsService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(auth=False),
+    rest_endpoints=RestEndpointConfig(),
 )
 
 module = Module(
