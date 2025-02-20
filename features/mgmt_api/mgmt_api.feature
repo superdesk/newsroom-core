@@ -28,6 +28,14 @@ Feature: Management API
                     {
                         "href": "topic_folders",
                         "title": "topic_folders"
+                    },
+                    {
+                        "href": "/api/companies/<regex('[a-f0-9]{24}'):company_id>/products",
+                        "title": "update_company_products"
+                    },
+                    {
+                        "href": "/api/companies/<regex('[a-f0-9]{24}'):company_id>/products",
+                        "title": "get_company_products_endpoint"
                     }
                 ]
         }}

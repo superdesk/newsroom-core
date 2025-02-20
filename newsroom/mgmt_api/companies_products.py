@@ -27,10 +27,9 @@ class CPCompanyProduct(CompanyProduct):
 
     @classmethod
     def from_dict(cls, data: dict):
-        """Allow `product` key as an alias for `_id` and ignore `section`."""
+        """Allow `product` key as an alias for `_id`"""
         if "product" in data:
             data["_id"] = data.pop("product")
-        data.pop("section", None)  # Ignore 'section' if present
         return super().from_dict(data)
 
 
