@@ -18,7 +18,7 @@ def get_company_products(company: CompanyResource) -> List[CompanyProduct]:
     return company.products or []
 
 
-company_products_endpoints = EndpointGroup("company_products", __name__, url_prefix="/api")
+company_products_endpoints = EndpointGroup("company_products", __name__)
 
 
 class CPCompanyProduct(CompanyProduct):
@@ -66,7 +66,6 @@ async def update_company_products(args: CompanyProductRouteArguments, params: No
 
         if doc.link:
             updated_products.append(get_product_ref(product_data, doc.seats).to_dict())
-            pass
 
         ids.append(product_id)
 

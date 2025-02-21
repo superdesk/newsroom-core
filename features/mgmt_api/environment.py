@@ -2,7 +2,7 @@ import asyncio
 from superdesk.tests.environment import setup_before_all, setup_before_scenario
 from newsroom.auth_server.oauth2 import generate_jwt_token, config_oauth
 from newsroom.mgmt_api.app import get_app as _get_app
-from newsroom.mgmt_api.default_settings import CORE_APPS, MODULES
+from newsroom.mgmt_api.default_settings import CORE_APPS, MODULES, ASYNC_AUTH_CLASS, URL_PREFIX
 from superdesk.tests import setup as setup_app
 import logging
 
@@ -54,7 +54,8 @@ async def before_scenario_async(context, scenario):
         "MGMT_API_ENABLED": True,
         "AUTH_SERVER_SHARED_SECRET": "test-secret",
         "CACHE_TYPE": "null",
-        "ASYNC_AUTH_CLASS": "newsroom.mgmt_api.auth:JWTTokenAuth",
+        "ASYNC_AUTH_CLASS": ASYNC_AUTH_CLASS,
+        "URL_PREFIX": URL_PREFIX,
     }
 
     context.app = get_app(config=config)

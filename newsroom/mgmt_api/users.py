@@ -17,6 +17,7 @@ from superdesk.core.resources import (
     RestEndpointConfig,
 )
 from superdesk.core.types import Request
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync, MongoResourceCursorAsync
 
 
 class CPUsersService(UsersService):
@@ -45,7 +46,9 @@ class CPUsersService(UsersService):
     async def on_delete(self, doc: UserResourceModel) -> None:
         get_current_wsgi_app().cache.delete(str(doc.id))
 
-    async def find(self, req: Request):
+    async def find(
+        self, req: Request
+    ) -> ElasticsearchResourceCursorAsync[UserResourceModel] | MongoResourceCursorAsync[UserResourceModel]:
         where = json.loads(req.where or "{}") if isinstance(req.where, str) else req.where or {}
         if "email" in where:
             where["email"] = {"$regex": re.compile("^{}$".format(re.escape(where["email"])), re.IGNORECASE)}
