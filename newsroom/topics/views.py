@@ -50,7 +50,7 @@ async def post_topic(request: Request) -> Response:
         )
     )
 
-    ids = await TopicService().create([topic])
+    new_topics = await TopicService().create([topic])
     await auto_enable_user_emails(topic, None, request.user)
 
     if topic.get("is_global"):
@@ -58,7 +58,7 @@ async def post_topic(request: Request) -> Response:
     else:
         push_user_notification("topic_created")
 
-    return Response({"success": True, "_id": ids[0]}, 201)
+    return Response({"success": True, "_id": new_topics[0].id}, 201)
 
 
 @topic_endpoints.endpoint("/topics/my_topics", methods=["GET"])

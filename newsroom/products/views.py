@@ -78,7 +78,7 @@ async def parse_objectid_or_abort(request: Request, value: str | ObjectId) -> Ob
 async def create(request: Request):
     creation_data = await get_json_or_400_async(request)
     products = await ProductsService().create([creation_data])
-    return Response({"success": True, "_id": products[0]}, 201)
+    return Response({"success": True, "_id": products[0].id}, 201)
 
 
 @products_endpoints.endpoint("/products/<string:product_id>", methods=["POST"], auth=[auth_rules.admin_only])

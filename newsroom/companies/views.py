@@ -82,8 +82,8 @@ async def create_company(request: Request) -> Response:
 
     company_data = get_company_updates(company)
 
-    ids = await CompanyService().create([company_data])
-    return Response({"success": True, "_id": ids[0]}, 201)
+    new_companies = await CompanyService().create([company_data])
+    return Response({"success": True, "_id": new_companies[0].id}, 201)
 
 
 def get_company_updates(data, original=None):

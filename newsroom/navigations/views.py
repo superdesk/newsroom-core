@@ -78,11 +78,11 @@ async def create(request: Request):
 
     creation_data = await prepare_navigation_data(nav_data)
     product_ids = creation_data.pop("products", [])
-    created_ids = await NavigationsService().create([creation_data])
+    new_items = await NavigationsService().create([creation_data])
 
     if product_ids is not None:
-        await add_remove_products_for_navigation(ObjectId(created_ids[0]), product_ids)
-    return Response({"success": True, "_id": created_ids[0]}, 201)
+        await add_remove_products_for_navigation(new_items[0].id, product_ids)
+    return Response({"success": True, "_id": new_items[0].id}, 201)
 
 
 @navigations_endpoints.endpoint(

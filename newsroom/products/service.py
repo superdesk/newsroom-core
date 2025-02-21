@@ -15,7 +15,7 @@ class ProductsService(NewshubAsyncResourceService[ProductResourceModel], AsyncCa
 
     cache_lookup = {"is_enabled": True}
 
-    async def create(self, docs: Sequence[ProductResourceModel | dict[str, Any]]) -> list[str]:
+    async def create(self, docs: Sequence[ProductResourceModel | dict[str, Any]]) -> list[ProductResourceModel]:
         company_products: dict[ObjectId, Any] = {}
 
         for doc in docs:
