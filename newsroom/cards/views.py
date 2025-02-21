@@ -54,9 +54,9 @@ async def search(args: None, params: CardSearchParams, request: Request) -> Resp
 )
 async def create(request: Request) -> Response:
     card_data = json.loads((await request.get_form()).get("card"))
-    new_ids = await CardsResourceService().create([card_data])
+    new_cards = await CardsResourceService().create([card_data])
 
-    return Response({"success": True, "_id": new_ids[0]}, 201, ())
+    return Response({"success": True, "_id": new_cards[0].id}, 201, ())
 
 
 class CardItemUrlArgs(BaseModel):

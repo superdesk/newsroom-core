@@ -66,7 +66,7 @@ async def create(request: Request) -> Response:
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
     try:
-        ids = await ClientService().create([doc])
+        new_items = await ClientService().create([doc])
     except ValidationError as error:
         return Response(
             {
@@ -77,7 +77,7 @@ async def create(request: Request) -> Response:
             (),
         )
 
-    return Response({"success": True, "_id": ids[0], "password": password}, 201)
+    return Response({"success": True, "_id": new_items[0].id, "password": password}, 201)
 
 
 @clients_endpoints.endpoint(

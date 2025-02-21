@@ -1,9 +1,10 @@
-from typing import Sequence, Any
+from typing import Sequence, Any, cast
 
 from pymongo.errors import DuplicateKeyError
 from bson import ObjectId
 from quart_babel import gettext
 
+from superdesk.core.types import Request, Response
 from superdesk.core.module import SuperdeskAsyncApp
 from superdesk.core.resources import (
     ResourceConfig,
@@ -12,6 +13,7 @@ from superdesk.core.resources import (
     RestEndpointConfig,
     RestParentLink,
 )
+from superdesk.core.web import ItemRequestViewArgs
 
 from newsroom import MONGO_PREFIX
 from newsroom.types import (
@@ -26,8 +28,48 @@ from newsroom.topics.topics_async import TopicService
 from newsroom.signals import user_deleted
 
 
+from superdesk.core.resources import ResourceRestEndpoints
+
+
+class FolderRestEndpoints(ResourceRestEndpoints):
+    def _format_error_to_newshub_style(self, response_body: dict) -> dict:
+        # Hack to provide Newshub style errors from REST Endpoints API
+        # Only needed for TopicFolders - most APIs in Newshub use Endpoints and ResourceServices directly
+        # TODO-ASYNC: Provide a better way for the App to handle validation level errors from Web REST APIs
+
+        if response_body.get("_status") == "ERR" and response_body.get("_issues"):
+            # Converts
+            # {"_issues": {"name": {"name": "Name must be unique"}}}
+            # to
+            # {"name": "Name must be unique"}
+            return {
+                field: list(field_error.values())[0]
+                for field, field_error in response_body["_issues"].items()
+                if len(field_error.values())
+            }
+
+        return response_body
+
+    async def create_item(self, request: Request) -> Response:
+        """Processes a create item request"""
+        response = await super().create_item(request)
+        response.body = self._format_error_to_newshub_style(cast(dict, response.body))
+        return response
+
+    async def update_item(
+        self,
+        args: ItemRequestViewArgs,
+        params: None,
+        request: Request,
+    ) -> Response:
+        """Processes an update item request"""
+        response = await super().update_item(args, params, request)
+        response.body = self._format_error_to_newshub_style(cast(dict, response.body))
+        return response
+
+
 class FolderResourceService(NewshubAsyncResourceService[TopicFolderResourceModel]):
-    async def create(self, docs: Sequence[TopicFolderResourceModel | dict[str, Any]]) -> list[str]:
+    async def create(self, docs: Sequence[TopicFolderResourceModel | dict[str, Any]]) -> list[TopicFolderResourceModel]:
         try:
             return await super().create(docs)
         except DuplicateKeyError:
@@ -39,9 +81,9 @@ class FolderResourceService(NewshubAsyncResourceService[TopicFolderResourceModel
         updates: dict[str, Any],
         etag: str | None = None,
         original: TopicFolderResourceModel | None = None,
-    ) -> None:
+    ) -> TopicFolderResourceModel:
         try:
-            await super().update(item_id, updates, etag, original)
+            return await super().update(item_id, updates, etag, original)
         except DuplicateKeyError:
             raise_custom_validation_error(TopicFolderResourceModel.__name__, "name", gettext("Name must be unique"), "")
 
@@ -87,6 +129,7 @@ user_topic_folders_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
     rest_endpoints=RestEndpointConfig(
+        endpoints_class=FolderRestEndpoints,
         parent_links=[RestParentLink(resource_name="users", model_id_field="user")],
         url="topic_folders",
         auth=[auth_rules.any_user_role],
@@ -105,6 +148,7 @@ company_topic_folder_resource_config = ResourceConfig(
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
     rest_endpoints=RestEndpointConfig(
+        endpoints_class=FolderRestEndpoints,
         parent_links=[RestParentLink(resource_name="companies", model_id_field="company")],
         url="topic_folders",
         auth=[auth_rules.any_user_role],
