@@ -1,7 +1,7 @@
 from datetime import datetime, date
 
 import pytz
-
+import logging
 from typing import Annotated, List, Optional
 from quart_babel import lazy_gettext
 
@@ -19,6 +19,9 @@ from newsroom.core.resources.model import NewshubResourceModel
 
 from .company import CompanyProduct, CompanyResource
 from .user_roles import UserRole
+
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardModel(Dataclass):
@@ -127,7 +130,7 @@ class UserResourceModel(NewshubResourceModel):
         user_type = values.get("user_type")
         company = values.get("company")
         if user_type != UserRole.ADMINISTRATOR and not company:
-            raise SuperdeskApiError.badRequestError("Company is required if user type is not administrator.")
+            logger.warning("Company is required if user type is not administrator.")
         return values
 
 
