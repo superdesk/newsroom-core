@@ -4,7 +4,40 @@ Feature: Management API
         Then we get existing resource
         """
         {"_links": {
-            "child": []
+            "child": [
+                    {
+                        "href": "navigations",
+                        "title": "navigations"
+                    },
+                    {
+                        "href": "products",
+                        "title": "products"
+                    },
+                    {
+                        "href": "companies",
+                        "title": "companies"
+                    },
+                    {
+                        "href": "users",
+                        "title": "users"
+                    },
+                    {
+                        "href": "topics",
+                        "title": "topics"
+                    },
+                    {
+                        "href": "topic_folders",
+                        "title": "topic_folders"
+                    },
+                    {
+                        "href": "companies/<regex('[a-f0-9]{24}'):company_id>/products",
+                        "title": "update_company_products"
+                    },
+                    {
+                        "href": "companies/<regex('[a-f0-9]{24}'):company_id>/products",
+                        "title": "get_company_products_endpoint"
+                    }
+                ]
         }}
         """
 
