@@ -9,6 +9,7 @@ from newsroom.core import get_current_wsgi_app
 from newsroom.mgmt_api.utils import validate_product_refs
 from newsroom.users.service import UsersService
 from newsroom.types import UserResourceModel
+from newsroom.types.user_roles import UserRole
 
 from superdesk.core.module import Module
 from superdesk.core.resources import (
@@ -16,6 +17,7 @@ from superdesk.core.resources import (
     MongoResourceConfig,
     RestEndpointConfig,
 )
+from superdesk.errors import SuperdeskApiError
 from superdesk.core.types import Request
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync, MongoResourceCursorAsync
 
@@ -25,6 +27,8 @@ class CPUsersService(UsersService):
     async def on_create(self, docs: List[UserResourceModel]) -> None:
         await super().on_create(docs)
         for doc in docs:
+            if doc.user_type != UserRole.ADMINISTRATOR and not doc.company:
+                raise SuperdeskApiError.badRequestError("Company is required if user type is not administrator.")
             if doc.company:
                 doc.company = ObjectId(doc.company)
             if doc.products:
