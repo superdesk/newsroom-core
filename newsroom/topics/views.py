@@ -14,7 +14,6 @@ from newsroom.auth import auth_rules
 from .topics_async import get_user_topics, auto_enable_user_emails, topic_endpoints, TopicService
 
 from newsroom.utils import get_json_or_400
-from newsroom.notifications import push_user_notification, push_company_notification, save_user_notifications
 from newsroom.users.service import UsersService
 
 
@@ -37,6 +36,7 @@ async def get_topics(args: RouteArguments, params: None, request: Request) -> Re
 )
 async def post_topic(request: Request) -> Response:
     """Creates a user topic"""
+    from newsroom.notifications import push_user_notification, push_company_notification
 
     topic = await get_json_or_400()
     topic.update(
@@ -70,6 +70,8 @@ async def get_list_my_topics(request: Request) -> Response:
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["POST"])
 async def update_topic(args: RouteArguments, params: None, request: Request) -> Response:
     """Updates a followed topic"""
+    from newsroom.notifications import push_user_notification, push_company_notification
+
     data = await get_json_or_400()
     original = await TopicService().find_by_id(args.topic_id)
 
@@ -113,6 +115,8 @@ async def update_topic(args: RouteArguments, params: None, request: Request) -> 
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["DELETE"])
 async def delete(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes a followed topic by given id"""
+    from newsroom.notifications import push_user_notification, push_company_notification
+
     service = TopicService()
     original = await service.find_by_id(args.topic_id)
 
@@ -163,6 +167,8 @@ def get_topic_url(topic: TopicResourceModel):
 
 @topic_endpoints.endpoint("/topic_share", methods=["POST"])
 async def share(request: Request) -> Response:
+    from newsroom.notifications import save_user_notifications
+
     data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")

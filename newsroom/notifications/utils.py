@@ -10,9 +10,9 @@ from superdesk.notification import push_notification
 
 from newsroom.exceptions import AuthorizationError
 from newsroom.auth.utils import get_user_id_from_request
-from newsroom.wire import WireSearchServiceAsync
 from newsroom.topics.topics_async import TopicService
 from .services import NotificationsService
+from newsroom.types import WireItem
 
 
 def user_notifications_lookup(user_id: ObjectId) -> dict[str, Any]:
@@ -69,7 +69,7 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     item_ids = [n["item"] for n in saved_notifications]
 
     wire_cursor, agenda_cursor, topic_items = await gather(
-        WireSearchServiceAsync().get_items_by_id(item_ids),
+        WireItem().get_service().get_items_by_id(item_ids),
         AgendaSearchServiceAsync().get_items_by_id(item_ids),
         TopicService().find_by_ids_raw(item_ids),
     )
