@@ -14,6 +14,7 @@ from newsroom.auth import auth_rules
 from .topics_async import get_user_topics, auto_enable_user_emails, topic_endpoints, TopicService
 
 from newsroom.utils import get_json_or_400
+from newsroom import notifications
 from newsroom.users.service import UsersService
 
 
@@ -36,8 +37,6 @@ async def get_topics(args: RouteArguments, params: None, request: Request) -> Re
 )
 async def post_topic(request: Request) -> Response:
     """Creates a user topic"""
-    # Import here to prevent circular imports
-    from newsroom.notifications import push_user_notification, push_company_notification
 
     topic = await get_json_or_400()
     topic.update(
@@ -55,9 +54,9 @@ async def post_topic(request: Request) -> Response:
     await auto_enable_user_emails(topic, None, request.user)
 
     if topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(request.user.id))
+        notifications.push_company_notification("topic_created", user_id=str(request.user.id))
     else:
-        push_user_notification("topic_created")
+        notifications.push_user_notification("topic_created")
 
     return Response({"success": True, "_id": new_topics[0].id}, 201)
 
@@ -71,9 +70,6 @@ async def get_list_my_topics(request: Request) -> Response:
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["POST"])
 async def update_topic(args: RouteArguments, params: None, request: Request) -> Response:
     """Updates a followed topic"""
-    # Import here to prevent circular imports
-    from newsroom.notifications import push_user_notification, push_company_notification
-
     data = await get_json_or_400()
     original = await TopicService().find_by_id(args.topic_id)
 
@@ -107,9 +103,9 @@ async def update_topic(args: RouteArguments, params: None, request: Request) -> 
     await auto_enable_user_emails(updates, original, request.user)
 
     if topic.is_global or updates.get("is_global", False) != original.is_global:
-        push_company_notification("topics")
+        notifications.push_company_notification("topics")
     else:
-        push_user_notification("topics")
+        notifications.push_user_notification("topics")
 
     return Response({"success": True})
 
@@ -117,9 +113,6 @@ async def update_topic(args: RouteArguments, params: None, request: Request) -> 
 @topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["DELETE"])
 async def delete(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes a followed topic by given id"""
-    # Import here to prevent circular imports
-    from newsroom.notifications import push_user_notification, push_company_notification
-
     service = TopicService()
     original = await service.find_by_id(args.topic_id)
 
@@ -129,9 +122,9 @@ async def delete(args: RouteArguments, params: None, request: Request) -> Respon
     await service.delete(original)
 
     if original.is_global:
-        push_company_notification("topics")
+        notifications.push_company_notification("topics")
     else:
-        push_user_notification("topics")
+        notifications.push_user_notification("topics")
 
     return Response({"success": True})
 
@@ -170,9 +163,6 @@ def get_topic_url(topic: TopicResourceModel):
 
 @topic_endpoints.endpoint("/topic_share", methods=["POST"])
 async def share(request: Request) -> Response:
-    # Import here to prevent circular imports
-    from newsroom.notifications import save_user_notifications
-
     data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")
@@ -189,7 +179,7 @@ async def share(request: Request) -> Response:
 
         user_dict = user.to_dict()
         topic_url = get_topic_url(topic)
-        await save_user_notifications(
+        await notifications.save_user_notifications(
             [
                 dict(
                     user=user.id,
