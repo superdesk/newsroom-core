@@ -156,8 +156,15 @@ flask==3.1.0
     #   flask-mail
     #   flask-oidc-ex
     #   flask-webpack
-    #   quart
-flask-caching==2.3.0
+    #   flask-wtf
+    #   raven
+    #   sentry-sdk
+    #   superdesk-core
+flask-babel==1.0.0
+    # via
+    #   -r requirements.txt
+    #   superdesk-core
+flask-caching==2.3.1
     # via -r requirements.txt
 flask-mail==0.10.0
     # via superdesk-core
