@@ -10,7 +10,7 @@ from superdesk.notification import push_notification
 
 from newsroom.exceptions import AuthorizationError
 from newsroom.auth.utils import get_user_id_from_request
-from newsroom.wire import WireSearchServiceAsync
+from newsroom.types import WireItem, AgendaItem
 from newsroom.topics.topics_async import TopicService
 from .services import NotificationsService
 
@@ -57,9 +57,6 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     Returns the stories that user has notifications for
     :return: List of stories. None if there is not user session.
     """
-
-    from newsroom.agenda import AgendaSearchServiceAsync
-
     try:
         user_id = get_user_id_from_request(None)
     except AuthorizationError:
@@ -68,14 +65,10 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     saved_notifications = await get_user_notifications(user_id)
     item_ids = [n["item"] for n in saved_notifications]
 
-    wire_cursor, agenda_cursor, topic_items = await gather(
-        WireSearchServiceAsync().get_items_by_id(item_ids),
-        AgendaSearchServiceAsync().get_items_by_id(item_ids),
+    wire_items, agenda_items, topic_items = await gather(
+        WireItem.get_service().find_by_ids_raw(item_ids),
+        AgendaItem.get_service().find_by_ids_raw(item_ids),
         TopicService().find_by_ids_raw(item_ids),
-    )
-    wire_items, agenda_items = await gather(
-        wire_cursor.to_list_raw(),
-        agenda_cursor.to_list_raw(),
     )
 
     return {
