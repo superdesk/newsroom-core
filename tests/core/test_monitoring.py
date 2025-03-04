@@ -13,6 +13,8 @@ from superdesk import get_resource_service
 
 
 company_id = "5c3eb6975f627db90c84093c"
+second_company_id = "6c3eb6975f627db90c84093e"
+
 even_now = utcnow().replace(hour=4, minute=0)
 
 
@@ -36,7 +38,15 @@ def init(app):
                 "name": "Press 2 Co.",
                 "is_enabled": True,
                 "contact_name": "Tom",
-            }
+            },
+            {
+                "_id": ObjectId(second_company_id),
+                "phone": "2132132a134",
+                "sd_subscriber_id": "12345",
+                "name": "News 2 Co.",
+                "is_enabled": True,
+                "contact_name": "Tom",
+            },
         ],
     )
 
@@ -147,6 +157,45 @@ def test_fetch_monitoring(client):
     items = json.loads(response.get_data())
     assert 1 == len(items)
     assert "5db11ec55f627d8aa0b545fb" == items[0]["_id"]
+
+
+def test_fetch_monitoring_by_companies(client, app):
+    app.data.insert(
+        "monitoring",
+        [
+            {
+                "_id": ObjectId("6db11ec55f627d8aa0b545fe"),
+                "is_enabled": True,
+                "users": [
+                    ObjectId("5c53afa45f627d8333220f15"),
+                    ObjectId("5c4684645f627debec1dc3db"),
+                ],
+                "company": ObjectId(second_company_id),
+                "subject": "Second Monitoring Subject",
+                "name": "W2",
+                "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07254",
+                "description": "D3",
+                "alert_type": "full_text",
+                "query": "headline: (product)",
+                "format_type": "monitoring_pdf",
+                "schedule": {"interval": "immediate"},
+            }
+        ],
+    )
+    response = client.get("/monitoring/all")
+    assert response.status_code == 200
+    items = json.loads(response.get_data())
+    assert 2 == len(items)
+
+    response = client.get('/monitoring/all?q=&where={"company":"6c3eb6975f627db90c84093e"}')
+    assert response.status_code == 200
+    items = json.loads(response.get_data())
+    assert 1 == len(items)
+
+    response = client.get('/monitoring/all?q=&where={"company":"5c3eb6975f627db90c84093c"}')
+    assert response.status_code == 200
+    items = json.loads(response.get_data())
+    assert 1 == len(items)
 
 
 def test_post_monitoring(client):
