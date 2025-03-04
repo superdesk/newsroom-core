@@ -13,7 +13,6 @@ from superdesk import get_resource_service
 
 
 company_id = "5c3eb6975f627db90c84093c"
-
 even_now = utcnow().replace(hour=4, minute=0)
 
 
@@ -37,7 +36,7 @@ def init(app):
                 "name": "Press 2 Co.",
                 "is_enabled": True,
                 "contact_name": "Tom",
-            },
+            }
         ],
     )
 
