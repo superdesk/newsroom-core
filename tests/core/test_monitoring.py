@@ -149,6 +149,18 @@ def test_fetch_monitoring(client):
     assert "5db11ec55f627d8aa0b545fb" == items[0]["_id"]
 
 
+def test_fetch_monitoring_by_companies(client, app):
+    response = client.get('/monitoring/all?q=&where={"company":"5c3eb6975f627db90c84093c"}')
+    assert response.status_code == 200
+    items = json.loads(response.get_data())
+    assert 1 == len(items)
+
+    response = client.get('/monitoring/all?q=&where={"company":"6c3eb6975f627db90c84093e"}')
+    assert response.status_code == 200
+    items = json.loads(response.get_data())
+    assert 0 == len(items)
+
+
 def test_post_monitoring(client):
     response = client.post(
         "/monitoring/new",
