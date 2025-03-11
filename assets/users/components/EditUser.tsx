@@ -10,7 +10,7 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 import {EditUserProductPermission} from './EditUserProductPermission';
 
-import {gettext} from 'utils';
+import {gettext, noop} from 'utils';
 import {
     isUserAdmin,
     getUserTypes,
@@ -194,6 +194,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                             type="submit"
                                             variant='tertiary'
                                             size='small'
+                                            onClick={noop}
                                         />
                                     </form>
                                 )}
