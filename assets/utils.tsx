@@ -779,3 +779,5 @@ export function notificationsWillBePaused(pausedFrom: number, pausedTo: number):
 
     return pausedFrom > today && pausedTo > today;
 }
+
+export const noop = () => {};

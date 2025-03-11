@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext, noop} from 'utils';
 import {connect} from 'react-redux';
 import {get, sortBy} from 'lodash';
 
@@ -113,6 +113,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
                                     text={gettext('Save')}
                                     type='submit'
                                     variant='primary'
+                                    onClick={noop}
                                 />
                             </form>
                         </div>

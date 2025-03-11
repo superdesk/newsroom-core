@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from '../utils';
+import {gettext, noop} from '../utils';
 import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
 import {Button} from 'components/Button';
@@ -140,6 +140,7 @@ class EditPanel extends React.Component<any, any> {
                             type='submit'
                             variant='primary'
                             disabled={this.props.saveDisabled}
+                            onClick={noop}
                         />
                     </div>
                 </form>

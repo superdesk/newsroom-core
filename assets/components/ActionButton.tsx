@@ -2,7 +2,7 @@ import React from 'react';
 import {IconButton, IPropsSize, IPropsVariant} from './IconButton';
 
 interface IProps {
-    testId?: string,
+    ['data-test-id']?: string,
     item: any,
     action: any,
     group?: string,
@@ -24,7 +24,7 @@ class ActionButton extends React.Component<IProps> {
                 variant={this.props.variant}
                 size={this.props.size}
                 border={this.props.border}
-                data-test-id={this.props.testId}
+                data-test-id={this.props['data-test-id']}
                 disabled={disabled}
                 onClick={
                     () => {

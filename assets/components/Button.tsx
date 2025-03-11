@@ -21,12 +21,12 @@ interface IPropsButton extends IPropsButtonBase {
 
 interface IPropsSubmit extends IPropsButtonBase {
     type: 'submit',
-    onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+    onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 interface IPropsReset extends IPropsButtonBase {
     type: 'reset',
-    onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+    onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 type IProps = IPropsButton | IPropsSubmit |  IPropsReset;

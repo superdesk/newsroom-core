@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext, noop} from 'utils';
 
 import CheckboxInput from 'components/CheckboxInput';
 import {Button} from 'components/Button';
@@ -166,6 +166,7 @@ function CompanyPermissions({
                         text={gettext('Save')}
                         type='submit'
                         variant='primary'
+                        onClick={noop}
                     />
                 </div>
             </form>
