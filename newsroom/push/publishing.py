@@ -127,7 +127,7 @@ class Publisher:
             await service.update(original.id, item.to_dict(context={"use_objectid": True}))
             return original.id
         else:
-            return (await service.create([item]))[0]
+            return (await service.create([item]))[0].id
 
     async def publish_event(self, event: dict[str, Any], orig: dict[str, Any]):
         logger.debug("publishing event %s", event)
@@ -163,7 +163,7 @@ class Publisher:
                     await service.system_update(plan["_id"], {"event_id": agenda_id})
 
             await signals.publish_event.send(agenda, None, None, True)
-            agenda_id = (await service.create([agenda]))[0]
+            agenda_id = (await service.create([agenda]))[0].id
         else:
             # replace the original document
             updates = None
@@ -237,7 +237,7 @@ class Publisher:
             agenda.setdefault("_id", planning["guid"])
             agenda.setdefault("guid", planning["guid"])
             await signals.publish_planning.send(agenda, new_plan)
-            return (await service.create([agenda]))[0]
+            return (await service.create([agenda]))[0].id
         else:
             # Replace the original
             await signals.publish_planning.send(agenda, new_plan)
@@ -296,7 +296,7 @@ class Publisher:
             # setting _id of agenda to be equal to planning if there's no event id
             agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
             agenda.setdefault("guid", planning.get("event_item", planning["guid"]) or planning["guid"])
-            return (await service.create([agenda]))[0]
+            return (await service.create([agenda]))[0].id
         else:
             # Replace the original document
             await service.update(agenda["_id"], agenda)

@@ -174,7 +174,11 @@ MODULES = [
     "newsroom.reports",
     "newsroom.monitoring.module",
     "newsroom.news_api.api_audit",
+    "newsroom.mgmt_api.mgmt_api_docs",
 ]
+
+ASYNC_POPULATE_HATEOAS = False
+ASYNC_RESPOND_NESTED_VALIDATION_ERRORS = False
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"

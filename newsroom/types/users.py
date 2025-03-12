@@ -1,12 +1,12 @@
 from datetime import datetime, date
 
 import pytz
-from pydantic import Field
-
+import logging
 from typing import Annotated, List, Optional
 from quart_babel import lazy_gettext
 
 from superdesk.core import get_app_config
+from superdesk.errors import SuperdeskApiError
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources import Dataclass
 from superdesk.core.resources.validators import (
@@ -14,11 +14,14 @@ from superdesk.core.resources.validators import (
     validate_iunique_value_async,
     validate_data_relation_async,
 )
-
+from pydantic import Field, field_validator, model_validator
 from newsroom.core.resources.model import NewshubResourceModel
 
 from .company import CompanyProduct, CompanyResource
 from .user_roles import UserRole
+
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardModel(Dataclass):
@@ -113,6 +116,22 @@ class UserResourceModel(NewshubResourceModel):
 
     def is_events_only_access(self, company: CompanyResource | None) -> bool:
         return company.events_only if company and not self.is_admin() else False
+
+    @field_validator("locale", mode="before")
+    @classmethod
+    def validate_locale(cls, value: str | None) -> str | None:
+        if value is not None and value not in get_app_config("LANGUAGES", []):
+            raise SuperdeskApiError.badRequestError("Locale is not in configured list of locales.")
+        return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_user_type_company(cls, values):
+        user_type = values.get("user_type")
+        company = values.get("company")
+        if user_type != UserRole.ADMINISTRATOR and not company:
+            logger.warning("Company is required if user type is not administrator.")
+        return values
 
 
 class UserAuthResourceModel(UserResourceModel):

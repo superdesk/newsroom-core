@@ -196,12 +196,12 @@ async def create(request: Request) -> Response:
             if auth_provider.features["verify_email"]:
                 add_token_data(new_user)
 
-        ids = await UsersAuthService().create([new_user])
+        new_users = await UsersAuthService().create([new_user])
 
         if auth_provider and auth_provider.features["verify_email"]:
             await send_token(new_user, token_type="new_account", update_token=False)
 
-        return Response({"success": True, "_id": ids[0]}, 201)
+        return Response({"success": True, "_id": new_users[0].id}, 201)
 
     return Response(form.errors, 400)
 

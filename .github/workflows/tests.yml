@@ -54,13 +54,16 @@ jobs:
 
       - name: behave (Web)
         run: behave --format progress2 --logging-level=ERROR features/web_api
+      
+      - name: behave (MGMT)
+        run: behave --format progress2 --logging-level=ERROR features/mgmt_api
 
   client:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: ['14', '18', '20']
+        node-version: ['14', '18', '20', 'lts/*']
 
     steps:
       - uses: actions/checkout@v4
