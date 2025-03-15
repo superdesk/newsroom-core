@@ -10,6 +10,7 @@ import {updateUserNotificationSchedule} from 'user-profile/actions';
 import Modal from 'components/Modal';
 import {TimezoneInput} from 'components/TimezoneInput';
 import {TimePicker} from 'components/cards/TimePicker';
+import {IconButton} from 'components/IconButton';
 
 interface IProps {
     modalFormInvalid(): void;
@@ -146,29 +147,26 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                                     this.updateTime(value, index);
                                                 }}
                                             />
-                                            <button
-                                                type='button'
-                                                className="icon-button icon-button--mini icon-button--secondary icon-button--bordered"
+                                            <IconButton
+                                                icon='minus'
+                                                border
+                                                className='icon-button--mini'
                                                 data-test-id="remove-schedule"
-                                                aria-label={gettext('Remove schedule')}
+                                                ariaLabel={gettext('Remove schedule')}
                                                 disabled={this.state.times.length < 2}
                                                 onClick={() => this.updateNumberPerDay({type: 'remove', index})}
-                                            >
-                                                <i className="icon--minus" />
-                                            </button>
+                                            />
                                         </div>
                                     );
                                 })}
                                 {this.state.times.length < 3 && (
-                                    <button
-                                        type='button'
-                                        className="icon-button icon-button--secondary icon-button--bordered"
+                                    <IconButton
+                                        icon='plus'
+                                        border
                                         data-test-id="add-schedule"
-                                        aria-label={gettext('Add schedule')}
+                                        ariaLabel={gettext('Add schedule')}
                                         onClick={() => this.updateNumberPerDay({type:'add'})}
-                                    >
-                                        <i className="icon--plus" />
-                                    </button>
+                                    />
                                 )}  
                             </div>
                             <TimezoneInput

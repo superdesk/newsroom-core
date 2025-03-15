@@ -28,10 +28,9 @@ export function Topic({topic, actions, users, selected, subscriptionType}: IProp
         (action) => (
             <ActionButton
                 key={action.name}
-                testId={`topic-action--${action.name}`}
+                data-test-id={`topic-action--${action.name}`}
                 item={topic}
-                className='icon-button icon-button--primary'
-                displayName={false}
+                variant='primary'
                 action={action}
             />
         )

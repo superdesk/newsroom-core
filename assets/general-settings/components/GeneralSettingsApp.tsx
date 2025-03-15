@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext, noop} from 'utils';
 import {connect} from 'react-redux';
 import {get, sortBy} from 'lodash';
 
@@ -9,6 +9,7 @@ import {save} from '../actions';
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
+import {Button} from 'components/Button';
 
 function isInput(field: any) {
     return ['text', 'number', 'boolean'].includes(field.type);
@@ -108,8 +109,12 @@ class GeneralSettingsApp extends React.Component<any, any> {
                             <AuditInformation item={audit} noPadding/>
                             <form onSubmit={this.onSubmit}>
                                 {fields}
-
-                                <button type="submit" className="nh-button nh-button--primary">{gettext('Save')}</button>
+                                <Button
+                                    text={gettext('Save')}
+                                    type='submit'
+                                    variant='primary'
+                                    onClick={noop}
+                                />
                             </form>
                         </div>
                     </section>
