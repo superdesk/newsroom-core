@@ -84,8 +84,8 @@ async def create():
     if section and section.get("search_type"):
         creation_data["search_type"] = section["search_type"]
 
-    section_filter_id = await SectionFiltersService().create([creation_data])
-    return Response({"success": True, "_id": section_filter_id[0]}, 201)
+    new_section_filters = await SectionFiltersService().create([creation_data])
+    return Response({"success": True, "_id": new_section_filters[0].id}, 201)
 
 
 class DetailArgs(BaseModel):

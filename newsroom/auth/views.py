@@ -270,7 +270,8 @@ async def signup(req: Request):
                     for product in await enabled_products.to_list_raw()
                 ],
             }
-            company_dict["_id"] = (await company_service.create([company_dict]))[0]
+            new_company = (await company_service.create([company_dict]))[0]
+            company_dict["_id"] = new_company.id
 
         user_service = UsersService()
         new_user_dict: User = {
@@ -287,7 +288,8 @@ async def signup(req: Request):
             "sections": {section["_id"]: True for section in app.sections},
             "user_type": UserRole.PUBLIC.value,
         }
-        new_user_dict["_id"] = ObjectId((await user_service.create([new_user_dict]))[0])
+        new_user = (await user_service.create([new_user_dict]))[0]
+        new_user_dict["_id"] = new_user.id
         await send_new_signup_email(cast(Company, company_dict), cast(User, new_user_dict), is_new_company)
 
         return await render_template("signup_success.html"), 200

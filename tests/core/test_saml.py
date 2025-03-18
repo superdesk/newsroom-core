@@ -100,7 +100,7 @@ async def test_company_auth_domains(app, client):
         await service.create([CompanyResource(id=ObjectId(), name="TEST2", auth_domains=["EXAMPLE.COM"])])
     assert_unique_domain_error(error)
 
-    ids = await service.create(
+    companies = await service.create(
         [
             CompanyResource(id=ObjectId(), name="test3", auth_domains=[]),
             CompanyResource(id=ObjectId(), name="test4", auth_domains=["foo.com", "bar.com"]),
@@ -112,5 +112,5 @@ async def test_company_auth_domains(app, client):
     assert_unique_domain_error(error)
 
     with pytest.raises(ValidationError) as error:
-        await service.update(ids[0], dict(auth_domains=["unique.com", "example.com"]))
+        await service.update(companies[0].id, dict(auth_domains=["unique.com", "example.com"]))
     assert_unique_domain_error(error)

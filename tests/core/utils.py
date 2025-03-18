@@ -64,7 +64,8 @@ async def create_entries_for(resource: str, items: list[Any]) -> list[ObjectId |
     async_app = app.async_app
 
     try:
-        return await async_app.resources.get_resource_service(resource).create(items)
+        items = await async_app.resources.get_resource_service(resource).create(items)
+        return [item.id for item in items]
     except KeyError:
         print(f"Failed to find async service for {resource}")
         ids = []

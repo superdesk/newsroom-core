@@ -26,9 +26,12 @@ Calendars: Sports
 
 Planning Item
 Coverage Type: text
+Scheduled: 3/23/23, 2:00 AM
 
 
 Planning Item
 Coverage Type: picture
+Scheduled: 3/23/23, 2:00 AM
 
 Coverage Type: video
+Scheduled: 3/23/23, 2:00 AM
