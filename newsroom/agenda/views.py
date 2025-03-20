@@ -346,6 +346,14 @@ def search_locations():
     # Start with an empty aggregation structure
     es_query = {"size": 0, "aggs": {}}
 
+    # Exclude agenda items where state is "killed"
+    es_query["query"] = {
+        "bool": {
+            "must_not": [{"term": {"state": "killed"}}],
+            "filter": [],
+        },
+    }
+
     # Conditionally add aggregations based on configuration
     if location_filter_options.get("city", True):
         es_query["aggs"]["city_search_country"] = {
