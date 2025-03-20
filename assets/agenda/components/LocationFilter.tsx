@@ -337,6 +337,9 @@ export class LocationFilter extends React.Component<any, any> {
                 </button>
             );
         } else if (item.type === LOCATION_TYPE.STATE) {
+            if (!item.name){
+                return null;
+            }
             return (
                 <button
                     key={`state.${item.name}[${index}]`}
