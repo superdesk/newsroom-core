@@ -338,13 +338,18 @@ def search_locations():
         }
 
     def gen_agg_terms(field: str):
-        return {
-            "field": f"location.{field}.keyword",
-            "size": 1000,
-        }
+        return {"field": f"location.{field}.keyword", "size": 1000, "exclude": [""]}
 
     # Start with an empty aggregation structure
     es_query = {"size": 0, "aggs": {}}
+
+    # Exclude agenda items where state is "killed"
+    es_query["query"] = {
+        "bool": {
+            "must_not": [{"term": {"state": "killed"}}],
+            "filter": [],
+        },
+    }
 
     # Conditionally add aggregations based on configuration
     if location_filter_options.get("city", True):
