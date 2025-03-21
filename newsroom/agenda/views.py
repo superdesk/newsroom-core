@@ -461,13 +461,14 @@ def search_locations():
         ]:
             country_name = country_bucket["key"]
             for state_bucket in country_bucket["states"]["buckets"]:
-                regions.append(
-                    {
-                        "name": state_bucket["key"],
-                        "country": country_name,
-                        "type": "state",
-                    }
-                )
+                if state_bucket["key"]:
+                    regions.append(
+                        {
+                            "name": state_bucket["key"],
+                            "country": country_name,
+                            "type": "state",
+                        }
+                    )
 
     if location_filter_options.get("country", True):
         for country_bucket in (aggs.get("countries") or aggs["country_search"]["countries"])["buckets"]:
