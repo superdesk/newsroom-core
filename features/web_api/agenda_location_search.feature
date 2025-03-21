@@ -80,6 +80,46 @@ Feature: Agenda Search - Filter Locations Based on State
         }
         """
 
+        And we post json to "/push"
+        """
+        {
+            "guid": "event5", "type": "event", "state": "scheduled", "pubstatus": "usable",
+            "slugline": "Empty Name Event",
+            "name": "",
+            "dates": {
+                "start": "2018-05-28T04:00:00+0000",
+                "end": "2018-05-28T05:00:00+0000",
+                "tz": "Australia/Sydney"
+            },
+            "calendars": [{"qcode": "cal3", "name": "Calendar3"}],
+            "subject": [
+                {"code": "d3", "scheme": "sttdepartment", "name": "Dep3"},
+                {"code": "s3", "scheme": "sttsubj", "name": "Sub3"},
+                {"code": "e3", "scheme": "event_type", "name": "Art"}
+            ],
+            "place": [
+                {"code": "ON", "name": "Ontario"}
+            ],
+            "anpa_category": [
+                {"qcode": "e", "name": "Entertainment"},
+                {"qcode": "f", "name": "Finance"}
+            ],
+            "location": [{
+                "name": "",
+                "address": {
+                    "city": "",
+                    "state": "Ontario",
+                    "country": "Canada",
+                    "line": ["Empty Street"],
+                    "postal_code": "M5V 3L9",
+                    "type": "museum",
+                    "title": "Empty Location Name",
+                    "area": "Downtown Toronto"
+                }
+            }]
+        }
+        """
+
     @auth @admin
     Scenario: Verify locations are filtered based on event state
         When we get "/agenda/search_locations"
@@ -92,5 +132,26 @@ Feature: Agenda Search - Filter Locations Based on State
             "places": [
                 "Sydney Harbour Bridge"
             ]
+        }
+        """
+
+    @auth @admin
+    Scenario: Verify locations with empty names are not included in the response
+        When we get "/agenda/search_locations"
+        Then we get existing resource
+        """
+        {
+            "regions": [
+                {
+                    "name": "New South Wales",
+                    "country": "Australia",
+                    "type": "state"
+                },
+                {
+                    "name": "Australia",
+                    "type": "country"
+                }
+            ],
+            "places": []
         }
         """

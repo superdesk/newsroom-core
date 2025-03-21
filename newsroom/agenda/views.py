@@ -338,10 +338,7 @@ def search_locations():
         }
 
     def gen_agg_terms(field: str):
-        return {
-            "field": f"location.{field}.keyword",
-            "size": 1000,
-        }
+        return {"field": f"location.{field}.keyword", "size": 1000, "exclude": [""]}
 
     # Start with an empty aggregation structure
     es_query = {"size": 0, "aggs": {}}
@@ -461,14 +458,13 @@ def search_locations():
         ]:
             country_name = country_bucket["key"]
             for state_bucket in country_bucket["states"]["buckets"]:
-                if state_bucket["key"]:
-                    regions.append(
-                        {
-                            "name": state_bucket["key"],
-                            "country": country_name,
-                            "type": "state",
-                        }
-                    )
+                regions.append(
+                    {
+                        "name": state_bucket["key"],
+                        "country": country_name,
+                        "type": "state",
+                    }
+                )
 
     if location_filter_options.get("country", True):
         for country_bucket in (aggs.get("countries") or aggs["country_search"]["countries"])["buckets"]:
