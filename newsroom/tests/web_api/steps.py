@@ -1,6 +1,10 @@
+from base64 import b64encode
+
 from behave import then, when, given
 from behave.api.async_step import async_run_until_complete
 from eve.methods.common import parse
+from authlib.jose import jwt
+from authlib.jose.errors import BadSignatureError
 
 from superdesk import get_resource_service
 from superdesk.core import json, get_current_async_app
@@ -113,6 +117,14 @@ async def when_we_login_as_user(context, email, password):
         assert response.status_code == 302, response.status_code
 
 
+@when("we logout")
+@async_run_until_complete
+async def when_we_logout(context):
+    async with context.app.test_request_context("/login"):
+        response = await context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
+        assert response.status_code == 302, response.status_code
+
+
 @then("we get products assigned to items")
 @async_run_until_complete
 async def then_we_get_users_with_products(context):
@@ -187,3 +199,46 @@ async def step_impl_given_newsroom_resource(context, resource):
             setattr(context, resource, items[-1])
         except KeyError:
             pass
+
+
+@when('we do OAuth2 with id "{client_id}" and password "{password}"')
+@async_run_until_complete
+async def step_impl_when_do_oauth2(context, client_id, password):
+    client_id_str = apply_placeholders(context, client_id)
+    password_str = apply_placeholders(context, password)
+    encoded_user_pass = b64encode(b"%s:%s" % (client_id_str.encode(), password_str.encode())).decode("ascii")
+    headers = [
+        ("Content-Type", "multipart/form-data"),
+        ("Authorization", f"Basic {encoded_user_pass}"),
+    ]
+    context.response = await context.client.post(
+        get_prefixed_url(context.app, "/api/auth_server/token"),
+        form={"grant_type": "client_credentials"},
+        headers=headers,
+    )
+
+
+@then("we get a valid oauth2 access token")
+@async_run_until_complete
+async def step_impl_then_we_get_access_token(context):
+    assert context.response.status_code == 200
+    resp = json.loads(await context.response.get_data())
+    assert set(resp).issuperset({"expires_in", "token_type", "access_token"})
+    # we now validate JWT signature and payload
+
+    # we first try to decode with a bad secret, it must fail
+    try:
+        jwt.decode(resp["access_token"], "BAD_SECRET")
+    except BadSignatureError:
+        pass
+    else:
+        raise Exception("jwt.decode should raise an error with wrong secret")
+
+    # and now we try with the right secret, it should work this time
+    claims = jwt.decode(resp["access_token"], context.app.config["AUTH_SERVER_SHARED_SECRET"])
+
+    # we validate the payload
+    claims.validate()
+
+    # and check that we get expected keys
+    assert set(claims).issuperset({"client_id", "iss", "iat", "exp"})
