@@ -50,7 +50,10 @@ export function Tag({testId, text, keyValue, shade, readOnly, onClick, label, op
                         <button
                             data-test-id="remove-tag-button"
                             className='tag-label__remove'
-                            onClick={onClick}
+                            onClick={(event) => {
+                                event.preventDefault();
+                                onClick();
+                            }} 
                         >
                             <i className="icon--close-thin" />
                         </button>

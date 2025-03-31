@@ -106,7 +106,9 @@ export function SearchResultsAdvancedSearchRow({
                         shade={shades[field]}
                         readOnly={readonly}
                         onClick={(event) => {
-                            event.preventDefault();
+                            if (event && event.preventDefault) {
+                                event.preventDefault();
+                            }
                             removeKeywordEntry(field, index);
                             refresh?.();
                         }}
