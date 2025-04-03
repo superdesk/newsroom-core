@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from '../utils';
+import {gettext, noop} from '../utils';
 import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
+import {Button} from 'components/Button';
 
 class EditPanel extends React.Component<any, any> {
     static propTypes: any;
@@ -127,19 +128,19 @@ class EditPanel extends React.Component<any, any> {
                     </div>
                     <div className='list-item__preview-footer'>
                         {this.props.onCancel && (
-                            <input
-                                type="button"
-                                className="nh-button nh-button--secondary"
-                                value={gettext('Cancel')}
-                                onClick={this.props.onCancel}
+                            <Button
+                                text={gettext('Cancel')}
+                                variant='secondary'
                                 disabled={this.props.cancelDisabled}
+                                onClick={this.props.onCancel}
                             />
                         )}
-                        <input
+                        <Button
+                            text={gettext('Save')}
                             type='submit'
-                            className='nh-button nh-button--primary'
-                            value={gettext('Save')}
+                            variant='primary'
                             disabled={this.props.saveDisabled}
+                            onClick={noop}
                         />
                     </div>
                 </form>

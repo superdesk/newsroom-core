@@ -1,8 +1,9 @@
+import json
 import base64
 from bson import ObjectId
 
 import flask
-from flask import jsonify, current_app as app, send_file
+from flask import jsonify, current_app as app, send_file, request
 from flask_babel import gettext
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
@@ -114,7 +115,17 @@ def update_schedule(id):
 
 @blueprint.route("/monitoring/all", methods=["GET"])
 def search_all():
-    monitoring_list = list(query_resource("monitoring"))
+    lookup = {}
+    where_param = request.args.get("where")
+    if where_param:
+        try:
+            where = json.loads(where_param)
+            if where.get("company"):
+                lookup["company"] = where["company"]
+        except json.JSONDecodeError as e:
+            return jsonify({"error": f"Invalid 'where' parameter. JSON decoding failed: {str(e)}"}), 400
+
+    monitoring_list = list(query_resource("monitoring", lookup=lookup))
     return jsonify(monitoring_list), 200
 
 
