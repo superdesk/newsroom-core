@@ -14,6 +14,7 @@
     "fix": "eslint assets --ext .js --ext .jsx --ext .ts --ext .tsx --fix",
     "test": "karma start --single-run",
     "karma": "karma start",
+    "debug-unit-tests": "karma start --reporters=progress --browsers=Chrome",
     "design-app": "webpack-dev-server --mode development --config=webpack.design.js"
   },
   "dependencies": {
