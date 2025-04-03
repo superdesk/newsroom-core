@@ -79,7 +79,7 @@ $flex-align: (
     --label-height: 20px;
 
     @each $name, $color in $label-bg-colors {
-        &.label--#{"" + $name} {
+        &.label--#{$name} {
             color: $white;
             background-color: $color;
         }
