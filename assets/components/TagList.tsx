@@ -12,7 +12,10 @@ export default function TagList({tags, onClick, readOnly}: any) {
                     key={index}
                     text={t}
                     readOnly={readOnly}
-                    onClick={onClick}
+                    onClick={(event) => {
+                        event.preventDefault();
+                        onClick();
+                    }}
                 />
             ))}
         </ul>
