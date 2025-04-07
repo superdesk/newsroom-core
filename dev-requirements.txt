@@ -329,7 +329,7 @@ pytest==8.3.5
     #   -r dev-requirements.in
     #   pytest-cov
     #   pytest-mock
-pytest-cov==6.0.0
+pytest-cov==6.1.1
     # via -r dev-requirements.in
 pytest-mock==3.14.0
     # via -r dev-requirements.in
