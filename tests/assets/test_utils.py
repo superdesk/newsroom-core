@@ -1,7 +1,7 @@
 import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from werkzeug.datastructures import FileStorage
-from newsroom.assets.utils import get_content_disposition, generate_response_headers, save_file_and_get_url
+from newsroom.assets.utils import get_content_disposition, save_file_and_get_url
 
 
 @pytest.fixture(autouse=True)
@@ -18,8 +18,7 @@ def test_content_disposition_with_extension():
 
 def test_content_disposition_without_extension_using_metadata():
     filename = "example"
-    metadata = {"contentType": "application/pdf"}
-    disposition = get_content_disposition(filename, metadata)
+    disposition = get_content_disposition(filename, "application/pdf")
     assert disposition == 'attachment; filename="example.pdf"'
 
 
@@ -32,24 +31,6 @@ def test_content_disposition_with_unsafe_filename():
     filename = "../path/to/example.pdf"
     disposition = get_content_disposition(filename)
     assert disposition == 'attachment; filename="path_to_example.pdf"'
-
-
-def test_generate_response_headers():
-    media_file = Mock()
-    media_file.filename = "testfile.pdf"
-    media_file.upload_date = "Wed, 21 Oct 2015 07:28:00 GMT"
-    media_file.content_type = "application/pdf"
-    media_file.metadata = {"contentType": "application/pdf"}
-
-    expected_headers = [
-        ("Content-Disposition", 'attachment; filename="testfile.pdf"'),
-        ("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT"),
-        ("Cache-Control", "max-age=604800, public"),
-        ("Content-Type", "application/pdf"),
-    ]
-
-    headers = generate_response_headers(media_file)
-    assert headers == expected_headers
 
 
 async def test_save_file_and_get_url_successful():
