@@ -39,7 +39,6 @@ def init_app(app):
 @blueprint.route("/login/google", methods=["GET"])
 @rate_limit(60, timedelta(hours=1))
 def google_login():
-    global oauth
     redirect_uri = url_for(".google_authorized", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -47,7 +46,6 @@ def google_login():
 @blueprint.route("/login/google_authorized", methods=["GET"])
 @rate_limit(60, timedelta(hours=1))
 async def google_authorized():
-    global oauth
     token = oauth.google.authorize_access_token()
 
     async def redirect_with_error(error_str):
