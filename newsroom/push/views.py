@@ -153,8 +153,7 @@ async def push_binary(request: Request):
 @push_endpoints.endpoint("/push_binary/<path:media_id>")
 async def push_binary_get(args: RouteArguments, _: None, request: Request):
     app = get_current_wsgi_app()
-    media_file = await app.media.exists_async(args.media_id, resource=ASSETS_RESOURCE)
-    if media_file:
+    if await app.media.exists_async(args.media_id, resource=ASSETS_RESOURCE):
         return Response({})
 
     await request.abort(404)
