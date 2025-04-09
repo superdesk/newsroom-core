@@ -10,7 +10,7 @@ TEST_PNG_BLACK_DOT = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x
 
 
 async def save_black_dot_image(app):
-    media_id = await app.media_async.put(TEST_PNG_BLACK_DOT, content_type="image/png", filename="image.png")
+    media_id = await app.media.put_async(TEST_PNG_BLACK_DOT, content_type="image/png", filename="image.png")
     return media_id
 
 
@@ -30,7 +30,7 @@ async def test_media_not_found(client):
 
 
 async def test_filename_in_response_header(client, app):
-    media_id = await app.media_async.put(b"Plain text content", content_type="text/plain", filename="testfile.txt")
+    media_id = await app.media.put_async(b"Plain text content", content_type="text/plain", filename="testfile.txt")
 
     response = await client.get(f"/assets/{media_id}?filename=testfile.txt")
     assert response.status_code == 200

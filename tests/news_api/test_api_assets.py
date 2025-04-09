@@ -10,7 +10,7 @@ def get_fixture_path(fixture):
 
 async def setup_image(app):
     with open(get_fixture_path("picture.jpg"), "rb") as f:
-        return await app.media_async.put(
+        return await app.media.put_async(
             f,
             content_type="image/jpg",
             filename="picture.jpg",

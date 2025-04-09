@@ -350,7 +350,9 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
                     try:
                         media_id, file_extension = formatter.get_picture_rendition(item, item_type=item_type)
                         file = await get_media_file(media_id)
-                        zf.writestr(f"baseimage{file_extension}", file.read())
+                        if not file:
+                            return await request.abort(404)
+                        zf.writestr(f"baseimage{file_extension}", await file.read())
                     except ValueError:
                         pass
             _file.seek(0)
