@@ -146,14 +146,14 @@ async def push_binary(request: Request):
 
     media_id = (await request.get_form())["media_id"]
     app = get_current_wsgi_app()
-    await app.media_async.put(media, media_id, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
+    await app.media.put_async(media, media_id, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return Response({"status": "OK"}, 201)
 
 
-@push_endpoints.endpoint("/push_binary/<string:media_id>")
+@push_endpoints.endpoint("/push_binary/<path:media_id>")
 async def push_binary_get(args: RouteArguments, _: None, request: Request):
     app = get_current_wsgi_app()
-    media_file = await app.media_async.get(args.media_id, resource=ASSETS_RESOURCE)
+    media_file = await app.media.exists_async(args.media_id, resource=ASSETS_RESOURCE)
     if media_file:
         return Response({})
 
