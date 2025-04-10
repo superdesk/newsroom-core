@@ -15,7 +15,6 @@ from superdesk.core.types import SearchRequest
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.types import CompanyProduct, UserResourceModel, UserAuthResourceModel, UserRole
-from newsroom.auth.providers import AuthProvider
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
