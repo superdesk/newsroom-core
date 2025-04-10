@@ -189,16 +189,13 @@ async def create(request: Request) -> Response:
         new_user.receive_app_notifications = True
 
         company = await new_user.get_company()
-        auth_provider: AuthProvider | None = None
-        if company:
-            auth_provider = get_company_auth_provider(company)
-
-            if auth_provider.features["verify_email"]:
-                add_token_data(new_user)
+        auth_provider = get_company_auth_provider(company)
+        if auth_provider.features["verify_email"]:
+            add_token_data(new_user)
 
         new_users = await UsersAuthService().create([new_user])
 
-        if auth_provider and auth_provider.features["verify_email"]:
+        if auth_provider.features["verify_email"]:
             await send_token(new_user, token_type="new_account", update_token=False)
 
         return Response({"success": True, "_id": new_users[0].id}, 201)
