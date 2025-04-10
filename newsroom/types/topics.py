@@ -1,8 +1,8 @@
 from enum import Enum, unique
-from pydantic import Field
+from pydantic import Field, field_validator
 from typing import Any, Annotated
 
-
+from superdesk.utc import utcnow
 from superdesk.core.resources import Dataclass
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources.validators import validate_data_relation_async
@@ -47,6 +47,11 @@ class TopicResourceModel(NewshubResourceModel):
     navigation: Annotated[list[ObjectIdField] | None, validate_data_relation_async("navigations")] = None
     folder: Annotated[ObjectIdField | None, validate_data_relation_async("topic_folders")] = None
     advanced: AdvancedSearchParams | None = None
+
+    @field_validator("created", mode="before")
+    @classmethod
+    def set_created(cls, value):
+        return utcnow()
 
 
 @unique
