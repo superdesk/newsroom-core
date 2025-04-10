@@ -97,7 +97,7 @@ async def get_company_products_endpoint(args: CompanyProductRouteArguments, para
             }
             products_data.append(item)
 
-    return Response({"_items": products_data}, 201)
+    return Response({"_items": products_data}, 200)
 
 
 module = Module(
