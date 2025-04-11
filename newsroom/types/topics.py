@@ -56,6 +56,7 @@ class TopicResourceModel(NewshubResourceModel):
             # the base `NewshubResourceModel` both have the same member (`created`).
             # Without this `created_filter` does not get converted/saved
             values["_created"] = utcnow()
+        return values
 
 
 @unique
