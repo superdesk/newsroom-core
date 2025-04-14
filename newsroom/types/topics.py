@@ -1,8 +1,8 @@
 from enum import Enum, unique
-from pydantic import Field
+from pydantic import Field, model_validator
 from typing import Any, Annotated
 
-
+from superdesk.utc import utcnow
 from superdesk.core.resources import Dataclass
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 from superdesk.core.resources.validators import validate_data_relation_async
@@ -47,6 +47,16 @@ class TopicResourceModel(NewshubResourceModel):
     navigation: Annotated[list[ObjectIdField] | None, validate_data_relation_async("navigations")] = None
     folder: Annotated[ObjectIdField | None, validate_data_relation_async("topic_folders")] = None
     advanced: AdvancedSearchParams | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_dict(cls, values) -> dict:
+        if not values.get("_created"):
+            # `_created` needs to be set otherwise there is a clash given `TopicResourceModel` and
+            # the base `NewshubResourceModel` both have the same member (`created`).
+            # Without this `created_filter` does not get converted/saved
+            values["_created"] = utcnow()
+        return values
 
 
 @unique
