@@ -50,7 +50,7 @@ async def update_company_products(args: CompanyProductRouteArguments, params: No
     product_links: list[CPCompanyProduct] = [CPCompanyProduct.from_dict(link) for link in product_links_json]
     ids: List = []
 
-    company_products = get_company_products(company)
+    company_products = [cp.to_dict() for cp in get_company_products(company)]
     updated_products = company_products[:]
 
     for doc in product_links:
@@ -62,7 +62,7 @@ async def update_company_products(args: CompanyProductRouteArguments, params: No
         if not product_data:
             continue
 
-        updated_products = [p for p in updated_products if p._id != product_data.id]
+        updated_products = [p for p in updated_products if str(p.get("_id")) != str(product_data.id)]
 
         if doc.link:
             updated_products.append(get_product_ref(product_data, doc.seats).to_dict())
