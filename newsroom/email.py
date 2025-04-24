@@ -6,7 +6,7 @@ from typing import List, Optional, Dict, Any, Union
 from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
-from flask import current_app, render_template, url_for
+from flask import current_app, render_template, url_for, request
 from flask_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
@@ -137,7 +137,11 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
         "sender_name": sender_name or current_app.config.get("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
-    _send_email.apply_async(kwargs=kwargs)
+
+    if request:  # don't block request
+        _send_email.apply_async(kwargs=kwargs)
+    else:  # running in celery worker already
+        _send_email.apply(kwargs=kwargs, throw=False)
 
 
 def send_new_signup_email(company: Company, user: User, is_new_company: bool):
