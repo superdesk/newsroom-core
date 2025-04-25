@@ -1,6 +1,7 @@
 import hmac
 import flask
 import logging
+import elasticapm
 
 import superdesk
 import newsroom.signals as signals
@@ -92,6 +93,12 @@ def push():
     if not lock(lock_name, expire=60):
         return flask.abort(503)
     try:
+        logger.info(
+            "received item id=%s %s",
+            item.get("guid") or item.get("_id"),
+            item.get("headline") or item.get("name") or item.get("slugline") or "",
+        )
+
         signals.push.send(app._get_current_object(), item=item)
 
         if item.get("type") == "event":
@@ -179,14 +186,15 @@ def publish_item(doc, original):
 
     fix_hrefs(doc)
     logger.debug("publishing %s", doc["guid"])
-    for assoc in doc.get("associations", {}).values():
-        if assoc:
-            assoc.setdefault("subscribers", [])
-            app.generate_renditions(assoc)
+    with elasticapm.capture_span("generate_renditions"):
+        for assoc in doc.get("associations", {}).values():
+            if assoc:
+                assoc.setdefault("subscribers", [])
+                app.generate_renditions(assoc)
 
-    # If there is a function defined that generates renditions for embedded images call it.
-    if app.generate_embed_renditions:
-        app.generate_embed_renditions(doc)
+        # If there is a function defined that generates renditions for embedded images call it.
+        if app.generate_embed_renditions:
+            app.generate_embed_renditions(doc)
 
     try:
         if doc.get("coverage_id"):
@@ -924,7 +932,10 @@ def send_user_notification_emails(item, user_matches, users, section):
                 send_history_match_notification_email(user, item=item, section=section)
 
 
+@elasticapm.capture_span()
 def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
+    logger.info("Finding matching topics for item %s", item["_id"])
+
     topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
@@ -959,9 +970,12 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectI
         return set()
 
 
+@elasticapm.capture_span()
 def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
     users_processed: Set[ObjectId] = set()
     users_with_realtime_subscription: Set[ObjectId] = set()
+
+    logger.info("Sending topic notifications for item %s", item["_id"])
 
     for topic in topics:
         if topic["_id"] not in topic_matches:
@@ -1003,29 +1017,31 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
                     # No need to send another
                     continue
                 else:
-                    users_with_realtime_subscription.add(user["_id"])
-                    search_service = superdesk.get_resource_service(
-                        "wire_search" if topic["topic_type"] == "wire" else "agenda"
-                    )
-                    query = search_service.get_topic_query(
-                        topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
-                    )
+                    with elasticapm.capture_span("notify_user"):
+                        users_with_realtime_subscription.add(user["_id"])
+                        search_service = superdesk.get_resource_service(
+                            "wire_search" if topic["topic_type"] == "wire" else "agenda"
+                        )
+                        query = search_service.get_topic_query(
+                            topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
+                        )
 
-                    if not query:
-                        # subscriber should not get the notification
-                        continue
+                        if not query:
+                            # subscriber should not get the notification
+                            continue
 
-                    items = search_service.get_items_by_query(query, size=1)
-                    highlighted_item = item
-                    if items.count():
-                        highlighted_item = items[0]
+                        items = search_service.get_items_by_query(query, size=1)
+                        highlighted_item = item
+                        if items.count():
+                            highlighted_item = items[0]
 
-                    send_new_item_notification_email(
-                        user,
-                        topic["label"],
-                        item=highlighted_item,
-                        section=section,
-                    )
+                        logger.info("Sending topic notification for item %s to %s", item["_id"], user["email"])
+                        send_new_item_notification_email(
+                            user,
+                            topic["label"],
+                            item=highlighted_item,
+                            section=section,
+                        )
             except Exception as e:
                 logger.exception(e)
                 # when there is an error for specific topic/subscriber continue
