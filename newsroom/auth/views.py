@@ -115,7 +115,7 @@ def email_has_exceeded_max_login_attempts(email):
     app = get_current_app().as_any()
     login_attempt = app.cache.get(email)
 
-    if not login_attempt:
+    if not login_attempt or not login_attempt.get("attempt_count"):
         app.cache.set(email, {"attempt_count": 0})
         return False
 
@@ -123,7 +123,7 @@ def email_has_exceeded_max_login_attempts(email):
     app.cache.set(email, login_attempt)
     max_attempt_allowed = get_app_config("MAXIMUM_FAILED_LOGIN_ATTEMPTS")
 
-    if login_attempt["attempt_count"] == max_attempt_allowed:
+    if login_attempt["attempt_count"] >= max_attempt_allowed:
         if login_attempt.get("user_id"):
             get_resource_service("auth_user").patch(
                 id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False}
