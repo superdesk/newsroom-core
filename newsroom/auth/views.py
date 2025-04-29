@@ -115,7 +115,7 @@ def email_has_exceeded_max_login_attempts(email):
     app = get_current_app().as_any()
     login_attempt = app.cache.get(email)
 
-    if not login_attempt or not login_attempt.get("attempt_count"):
+    if not login_attempt or "attempt_count" not in login_attempt:
         app.cache.set(email, {"attempt_count": 0})
         return False
 
