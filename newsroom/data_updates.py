@@ -32,17 +32,18 @@ DATA_UPDATE_TEMPLATE = """
 # Author  : $user
 # Creation: $current_date
 
-from superdesk.commands.data_updates import DataUpdate as _DataUpdate
+from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
+from superdesk.commands.data_updates import BaseDataUpdate
 
 
-class DataUpdate(_DataUpdate):
+class DataUpdate(BaseDataUpdate):
+    resource = "$resource"
+    use_async_resources = True
 
-    resource = '$resource'
-
-    def forwards(self, mongodb_collection, mongodb_database):
+    async def forwards(self, collection: AsyncIOMotorCollection, database: AsyncIOMotorDatabase) -> None:
         $default_fw_implementation
 
-    def backwards(self, mongodb_collection, mongodb_database):
+    async def backwards(self, collection: AsyncIOMotorCollection, database: AsyncIOMotorDatabase) -> None:
         $default_bw_implementation
 """.lstrip(
     "\n"
