@@ -72,7 +72,7 @@ charset-normalizer==3.3.2
     # via requests
 ciso8601==2.3.1
     # via eve-elastic
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements.txt
     #   black
