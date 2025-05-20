@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Dict
 
 from newsroom.core.resources.model import NewshubResourceModel
 from newsroom.core.resources.validators import validate_multi_field_iunique_value_async
@@ -10,4 +10,4 @@ class NavigationModel(NewshubResourceModel):
     is_enabled: bool = True
     order: Optional[int] = None
     product_type: str = "wire"
-    tile_images: Optional[list[str]] = None
+    tile_images: Optional[list[Dict]] = None

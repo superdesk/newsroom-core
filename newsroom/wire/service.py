@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, cast, List
 from datetime import datetime, timedelta
 import logging
 
@@ -10,16 +10,12 @@ from superdesk.core import get_app_config
 from superdesk.core.resources import AsyncResourceService
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 
-from newsroom.types import (
-    SectionEnum,
-    ProductResourceModel,
-    UserResourceModel,
-    CompanyResource,
-    WireItem,
-)
+from newsroom.types import SectionEnum, ProductResourceModel, UserResourceModel, CompanyResource, WireItem, Navigation
 from newsroom.auth.utils import get_user_or_none_from_request
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.search.base_web_service import BaseWebSearchService
+from newsroom.products import get_products_by_navigation_async
+from newsroom.search.utils import query_string
 from newsroom.search.filters import (
     apply_query_string,
     apply_date_range,
@@ -460,3 +456,40 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
                 apply_not_canceled_filter,
             ],
         )
+
+    async def get_navigation_story_count(
+        self, navigations: List[Navigation], section: SectionEnum, company: CompanyResource, user: UserResourceModel
+    ):
+        """Used by Market Place to count the number of items in each navigation
+        It sets the "story_count" in the navigations
+        """
+        search: NewshubSearchRequest = NewshubSearchRequest(section=section, company=company, user=user)
+
+        aggs_filters = {}
+        navigation_ids: list[ObjectId | str] = [ObjectId(navigation.get("_id")) for navigation in navigations]
+        products_map = await get_products_by_navigation_async(navigation_ids, section)
+        for navigation in navigations:
+            navigation_id = navigation.get("_id")
+            products = [p for p in products_map if p.query is not None and navigation_id in p.navigations]
+            navigation_filter_should = [query_string(str(product.query)) for product in products]
+
+            if navigation_filter_should:
+                aggs_filters[str(navigation_id)] = {
+                    "bool": {"should": navigation_filter_should, "minimum_should_match": 1}
+                }
+
+        search.search.aggs = {"navigations": {"filters": {"filters": aggs_filters}}}
+        try:
+            results = await self.search(search, [])
+            buckets = results.hits.get("aggregations", {}).get("navigations", {}).get("buckets", {})
+            for navigation in navigations:
+                navigation_id = navigation.get("_id")
+                doc_count = buckets.get(str(navigation_id), {}).get("doc_count", 0)
+                if doc_count > 0:
+                    navigation["story_count"] = doc_count
+        except Exception as exc:
+            logger.error(
+                "Error in get_navigation_story_count for query: {}".format(search.search.aggs),
+                exc,
+                exc_info=True,
+            )
