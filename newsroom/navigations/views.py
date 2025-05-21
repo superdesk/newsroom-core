@@ -134,7 +134,7 @@ async def prepare_navigation_data(data: dict[str, Any]) -> dict[str, Any]:
         file = await get_file_from_request(f"file{index}")
 
         if file:
-            file_url = await save_file_and_get_url(f"file{index}")
+            file_url = await save_file_and_get_url(file)
             if file_url:
                 tile["file_url"] = file_url
 

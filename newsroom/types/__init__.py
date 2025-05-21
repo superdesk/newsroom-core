@@ -304,3 +304,4 @@ Article = Dict[str, Any]
 
 class Navigation(Entity):
     name: str
+    story_count: Optional[str]

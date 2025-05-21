@@ -2,7 +2,6 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 
 from superdesk.flask import render_template, jsonify, request
-from superdesk import get_resource_service
 
 from newsroom.types import Navigation, CompanyResource, UserResourceModel, SectionEnum
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
@@ -58,7 +57,7 @@ async def get_view_data():
 
 
 async def get_story_count(navigations: list[Navigation], user: UserResourceModel, company: CompanyResource):
-    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations, SECTION_ID, company, user)
+    await WireSearchServiceAsync().get_navigation_story_count(navigations, SectionEnum(SECTION_ID), company, user)
 
 
 async def get_home_page_data():
@@ -95,7 +94,7 @@ async def index():
 @login_required
 @section(SECTION_ID)
 async def home():
-    return await render_template("market_place_home.html", data=get_home_page_data())
+    return await render_template("market_place_home.html", data=await get_home_page_data())
 
 
 @blueprint.route("/{}/search".format(SECTION_ID))
