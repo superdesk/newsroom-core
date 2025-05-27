@@ -577,6 +577,12 @@ class WireItemUrlParams(BaseModel):
 
 @wire_endpoints.endpoint("/wire/<item_id>")
 async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Request, **kwargs) -> Response | str:
+    return await item_view_endpoint(args, params, request, **kwargs)
+
+
+async def item_view_endpoint(
+    args: WireItemRouteArgs, params: WireItemUrlParams, request: Request, **kwargs
+) -> Response | str:
     wire_service = WireSearchServiceAsync()
 
     wire_item = await wire_service.service.find_by_id(args.item_id)

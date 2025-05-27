@@ -42,7 +42,7 @@ async def get_view_data():
     await get_story_count(navigations, user, company)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user.id),
+        "user": user.to_dict(),
         "user_type": user.user_type,
         "company": str(company.id) if company else None,
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],

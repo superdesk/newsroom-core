@@ -28,7 +28,7 @@ async def get_view_data():
     company = get_company_from_request(None)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user.id),
+        "user": user.to_dict(),
         "company": str(company.id) if company else None,
         "navigations": [],
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
