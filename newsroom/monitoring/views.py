@@ -16,7 +16,7 @@ from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.formatters import get_formatters_id_and_names, get_formatter
 from newsroom.email import send_user_email
 from newsroom.wire.utils import update_action_list
-from newsroom.wire.views import item as wire_print, WireItemRouteArgs, WireItemUrlParams
+from newsroom.wire.views import item_view_endpoint as wire_print, WireItemRouteArgs, WireItemUrlParams
 from newsroom.notifications import push_user_notification
 from newsroom.wire import WireSearchServiceAsync
 
@@ -42,7 +42,7 @@ async def get_view_data():
     ui_config_service = UiConfigResourceService()
 
     return {
-        "user": str(user.id),
+        "user": user.to_dict(),
         "company": str(company.id) if company else None,
         "navigations": await get_monitoring_for_company(user),
         "context": "monitoring",
@@ -149,7 +149,7 @@ async def create(request: Request) -> Response:
 
 
 class EditMonitoringUrlParams(WireItemUrlParams):
-    context: SectionEnum = SectionEnum.WIRE
+    context: SectionEnum = SectionEnum.MONITORING
 
     @field_validator("print", mode="before")
     def parse_print(cls, value: str | bool | None) -> bool | str | None:
@@ -185,6 +185,7 @@ async def edit(args: WireItemRouteArgs, params: EditMonitoringUrlParams, request
             date_items_dict=get_date_items_dict(items),
             monitoring_profile=monitoring_profile,
             monitoring_report_name=get_app_config("MONITORING_REPORT_NAME", "Newsroom"),
+            print=True,
         )
 
     profile = await MonitoringProfileService().find_by_id(args.item_id)
@@ -210,6 +211,7 @@ async def edit(args: WireItemRouteArgs, params: EditMonitoringUrlParams, request
                     return Response({"error": gettext("Bad request")}, 400)
 
             process_form_request(updates, request_updates, form)
+            updates.pop("id")
             await MonitoringProfileService().update(args.item_id, updates)
             return Response({"success": True})
         return Response(form.errors, 400)
