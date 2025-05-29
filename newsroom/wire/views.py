@@ -1,4 +1,4 @@
-from typing import Any, TypedDict
+from typing import Any, TypedDict, Optional
 import io
 import zipfile
 
@@ -77,9 +77,13 @@ HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
-async def set_permissions(wire_item: WireItem, ignore_latest=False):
+async def set_permissions(
+    wire_item: WireItem, ignore_latest: bool = False, service: Optional[WireSearchServiceAsync] = None
+):
     try:
-        cursor = await WireSearchServiceAsync().get_items_by_id(
+        if not service:
+            service = WireSearchServiceAsync()
+        cursor = await service.get_items_by_id(
             [wire_item.id],
             WireSearchRequestArgs(
                 ignore_latest=ignore_latest,
