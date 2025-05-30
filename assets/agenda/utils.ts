@@ -280,11 +280,11 @@ export function hasLocation(item: any) {
 }
 
 export function hasLocationNotes(item: IAgendaItem) {
-    return get(item, 'location[0].details[0].length', 0) > 0;
+    return get(item, 'location[0].details', '').trim().length > 0;
 }
 
 export function getLocationDetails(item: IAgendaItem) {
-    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details.trim();
 }
 
 /**

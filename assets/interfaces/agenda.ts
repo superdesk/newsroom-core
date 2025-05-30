@@ -35,7 +35,7 @@ export interface ILocation {
     type?: string;
     qcode: string;
     location?: {lat: number; lon: number};
-    details?: string[];
+    details?: string;
     address?: {
         area?: string;
         locality?: string;

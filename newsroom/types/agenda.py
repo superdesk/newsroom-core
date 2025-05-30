@@ -126,7 +126,18 @@ class EventLocation(Dataclass):
     qcode: fields.Keyword | None = None
     geo: str | None = None
     formatted_address: str | None = None
-    details: list[str] | None = None
+    details: str | None = None
+
+    @field_validator("details", mode="before")
+    @classmethod
+    def normalize_details(cls, value: Any) -> str:
+        if isinstance(value, list):
+            return ", ".join(filter(None, value))
+        elif isinstance(value, str):
+            return value
+        elif value is None:
+            return ""
+        raise ValueError("Invalid type for 'details': must be string or list of strings.")
 
 
 class PlanningItemAgenda(Dataclass):
