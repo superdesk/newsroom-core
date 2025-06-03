@@ -57,7 +57,7 @@ async def search():
 @blueprint.route("/bookmarks_factcheck")
 @login_required
 async def bookmarks():
-    data = get_view_data()
+    data = await get_view_data()
     data["bookmarks"] = True
     return await render_template("factcheck_bookmarks.html", data=data)
 
