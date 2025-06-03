@@ -48,7 +48,7 @@ async def get_view_data():
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],
         "navigations": navigations,
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
-        "saved_items": await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
+        "saved_items": await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": SECTION_ID,
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,

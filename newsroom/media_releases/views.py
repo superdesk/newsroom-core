@@ -32,9 +32,7 @@ async def get_view_data():
         "company": str(company.id) if company else None,
         "navigations": [],
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
-        "saved_items": await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(
-            SectionEnum.MEDIA_RELEASES
-        ),
+        "saved_items": await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "media_releases",
         "ui_config": await ui_config_service.get_section_config("media_releases"),
     }
@@ -77,7 +75,7 @@ async def bookmark():
     await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification(
         "saved_items",
-        count=await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MEDIA_RELEASES),
+        count=await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
     )
     return jsonify(), 200
 
