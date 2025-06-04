@@ -9,7 +9,7 @@ from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.formatters import get_formatters_id_and_names
 from newsroom.factcheck import blueprint
 from newsroom.decorator import login_required, section
-from newsroom.wire import WireSearchServiceAsync
+from .search import FactCheckSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -32,7 +32,7 @@ async def get_view_data():
         "company": str(company.id) if company else None,
         "navigations": [],
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
-        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.FACTCHECK),
+        "saved_items": await FactCheckSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "factcheck",
         "ui_config": await ui_config_service.get_section_config("factcheck"),
     }
@@ -57,7 +57,7 @@ async def search():
 @blueprint.route("/bookmarks_factcheck")
 @login_required
 async def bookmarks():
-    data = get_view_data()
+    data = await get_view_data()
     data["bookmarks"] = True
     return await render_template("factcheck_bookmarks.html", data=data)
 
@@ -73,9 +73,7 @@ async def bookmark():
     data = await get_json_or_400()
     assert data.get("items")
     await update_action_list(data.get("items"), "bookmarks", item_type="items")
-    push_user_notification(
-        "saved_items", count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.FACTCHECK)
-    )
+    push_user_notification("saved_items", count=await FactCheckSearchServiceAsync().get_current_user_bookmarks_count())
     return jsonify(), 200
 
 
@@ -99,16 +97,22 @@ async def versions(_id):
 @blueprint.route("/factcheck/<_id>")
 @login_required
 async def item(_id):
-    item = get_entity_or_404(_id, "items")
-    await set_permissions(item, "factcheck")
+    factcheck_service = FactCheckSearchServiceAsync()
+
+    factcheck_item = await factcheck_service.service.find_by_id(_id)
+    if not factcheck_item:
+        await request.abort(404)
+
+    await set_permissions(factcheck_item, service=factcheck_service)
+
     ui_config_service = UiConfigResourceService()
-    config = await ui_config_service.get_section_config("factcheck")
+    config = await ui_config_service.get_section_config(SectionEnum.FACTCHECK)
     display_char_count = config.get("char_count", False)
     if is_json_request(request):
-        return jsonify(item)
-    if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item)
-    previous_versions = get_previous_versions(item)
+        return jsonify(factcheck_item.to_dict())
+    if not factcheck_item.user_has_access:
+        return await render_template("wire_item_access_restricted.html", item=factcheck_item.to_dict())
+    previous_versions = await get_previous_versions(factcheck_item)
     if "print" in request.args:
         template = "wire_item_print.html"
         await update_action_list([_id], "prints", force_insert=True)
@@ -116,7 +120,7 @@ async def item(_id):
         template = "wire_item.html"
     return await render_template(
         template,
-        item=item,
+        item=factcheck_item.to_dict(),
         previous_versions=previous_versions,
         display_char_count=display_char_count,
     )

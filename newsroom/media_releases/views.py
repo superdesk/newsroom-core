@@ -9,7 +9,7 @@ from newsroom.auth.utils import get_user_from_request, get_company_from_request
 from newsroom.formatters import get_formatters_id_and_names
 from newsroom.media_releases import blueprint
 from newsroom.decorator import login_required, section
-from newsroom.wire import WireSearchServiceAsync
+from .search import MediaReleasesSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -32,7 +32,7 @@ async def get_view_data():
         "company": str(company.id) if company else None,
         "navigations": [],
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
-        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MEDIA_RELEASES),
+        "saved_items": await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "media_releases",
         "ui_config": await ui_config_service.get_section_config("media_releases"),
     }
@@ -74,7 +74,8 @@ async def bookmark():
     assert data.get("items")
     await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification(
-        "saved_items", count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MEDIA_RELEASES)
+        "saved_items",
+        count=await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
     )
     return jsonify(), 200
 
@@ -99,16 +100,21 @@ async def versions(_id):
 @blueprint.route("/media_releases/<_id>")
 @login_required
 async def item(_id):
-    item = get_entity_or_404(_id, "items")
-    set_permissions(item, "media_releases")
+    media_release_service = MediaReleasesSearchServiceAsync()
+    media_release_item = await media_release_service.service.find_by_id(_id)
+    if not media_release_item:
+        await request.abort(404)
+
+    await set_permissions(media_release_item, service=media_release_service)
+
     ui_config_service = UiConfigResourceService()
-    config = await ui_config_service.get_section_config("media_releases")
+    config = await ui_config_service.get_section_config(SectionEnum.MEDIA_RELEASES)
     display_char_count = config.get("char_count", False)
     if is_json_request(request):
-        return jsonify(item)
-    if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item)
-    previous_versions = get_previous_versions(item)
+        return jsonify(media_release_item.to_dict())
+    if not media_release_item.user_has_access:
+        return await render_template("wire_item_access_restricted.html", item=media_release_item.to_dict())
+    previous_versions = await get_previous_versions(media_release_item)
     if "print" in request.args:
         template = "wire_item_print.html"
         await update_action_list([_id], "prints", force_insert=True)
@@ -116,7 +122,7 @@ async def item(_id):
         template = "wire_item.html"
     return await render_template(
         template,
-        item=item,
+        item=media_release_item.to_dict(),
         previous_versions=previous_versions,
         display_char_count=display_char_count,
     )
