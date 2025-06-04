@@ -51,6 +51,8 @@ from superdesk.default_settings import (  # noqa
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
+    SENTRY_TRACES_SAMPLE_RATE,
+    SENTRY_PROFILES_SAMPLE_RATE,
     CACHE_URL,
 )
 
