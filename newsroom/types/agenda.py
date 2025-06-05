@@ -40,6 +40,8 @@ class AgendaWorkflowState(str, Enum):
     CANCELLED = "cancelled"
     RESCHEDULED = "rescheduled"
     POSTPONED = "postponed"
+    INGESTED = "ingested"
+    ACTIVE = "active"
 
 
 class AgendaCVItem(Dataclass):
