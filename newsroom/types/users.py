@@ -105,7 +105,7 @@ class UserResourceModel(NewshubResourceModel):
             return False
 
         timezone = pytz.timezone(self.notification_schedule.timezone or get_app_config("DEFAULT_TIMEZONE") or "UTC")
-        if self.notification_schedule.pause_from is not None and self.notification_schedule.pause_to is not None:
+        if self.notification_schedule.pause_from and self.notification_schedule.pause_to:
             now = datetime.now(timezone).date()
             pause_from_date = date.fromisoformat(self.notification_schedule.pause_from)
             pause_to_date = date.fromisoformat(self.notification_schedule.pause_to)
