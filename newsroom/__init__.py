@@ -12,6 +12,8 @@ from typing import Dict, List, Tuple
 
 from newsroom.types import UserRole
 
+__version__ = "3.0.0-beta.1"
+
 # reuse content api dbs
 MONGO_PREFIX = "CONTENTAPI_MONGO"
 ELASTIC_PREFIX = "CONTENTAPI_ELASTICSEARCH"

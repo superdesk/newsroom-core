@@ -77,9 +77,13 @@ HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
-async def set_permissions(wire_item: WireItem, ignore_latest=False):
+async def set_permissions(
+    wire_item: WireItem, ignore_latest: bool = False, service: WireSearchServiceAsync | None = None
+):
     try:
-        cursor = await WireSearchServiceAsync().get_items_by_id(
+        if not service:
+            service = WireSearchServiceAsync()
+        cursor = await service.get_items_by_id(
             [wire_item.id],
             WireSearchRequestArgs(
                 ignore_latest=ignore_latest,
@@ -350,7 +354,9 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
                     try:
                         media_id, file_extension = formatter.get_picture_rendition(item, item_type=item_type)
                         file = await get_media_file(media_id)
-                        zf.writestr(f"baseimage{file_extension}", file.read())
+                        if not file:
+                            return await request.abort(404)
+                        zf.writestr(f"baseimage{file_extension}", await file.read())
                     except ValueError:
                         pass
             _file.seek(0)
@@ -581,6 +587,12 @@ class WireItemUrlParams(BaseModel):
 
 @wire_endpoints.endpoint("/wire/<item_id>")
 async def item(args: WireItemRouteArgs, params: WireItemUrlParams, request: Request, **kwargs) -> Response | str:
+    return await item_view_endpoint(args, params, request, **kwargs)
+
+
+async def item_view_endpoint(
+    args: WireItemRouteArgs, params: WireItemUrlParams, request: Request, **kwargs
+) -> Response | str:
     wire_service = WireSearchServiceAsync()
 
     wire_item = await wire_service.service.find_by_id(args.item_id)

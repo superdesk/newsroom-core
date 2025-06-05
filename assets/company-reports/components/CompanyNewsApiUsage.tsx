@@ -80,13 +80,13 @@ class CompanyNewsApiUsage extends React.Component<any, any> {
         const filterNodes = [
             (<CalendarButton
                 key='news_api_from'
-                labelClass='ms-3 mt-1'
+                labelClass='ms-3 d-flex align-items-center'
                 label={gettext('FROM:')}
                 selectDate={this.onFromDateChange}
                 activeDate={get(reportParams, 'date_from') || moment()} />),
             (<CalendarButton
                 key='news_api_to'
-                labelClass='mt-1'
+                labelClass='d-flex align-items-center'
                 label={gettext('TO:')}
                 selectDate={this.onEndDateChange}
                 activeDate={get(reportParams, 'date_to') || moment()} />)];

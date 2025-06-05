@@ -744,6 +744,13 @@ class BaseSearchService(Service):
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
+        if search.args.get("bookmarks"):
+            search.query["bool"]["must"].append(
+                {
+                    "term": {"bookmarks": str(search.args["bookmarks"])},
+                }
+            )
+
         if search.args.get("ids"):
             search.query["bool"]["must"].append({"ids": {"values": search.args["ids"]}})
 

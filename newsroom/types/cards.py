@@ -1,5 +1,5 @@
 from typing import Annotated
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, NotRequired, List
 from enum import Enum, unique
 
 from pydantic import Field, StringConstraints
@@ -33,6 +33,9 @@ class DashboardCardConfig(TypedDict, total=False):
     size: int
     events: list[dict]
     sources: list[dict]
+    more_url: NotRequired[str]
+    more_url_label: NotRequired[str]
+    navigations: NotRequired[List[str]]
 
 
 class CardResourceModel(NewshubResourceModel):

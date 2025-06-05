@@ -6,7 +6,6 @@ from superdesk.core import json
 
 from newsroom.types import Section, UserRole
 import newsroom
-from newsroom.products.products import get_products_by_navigation
 from newsroom.search.service import BaseSearchService, SearchQuery
 
 
@@ -96,53 +95,6 @@ class WireSearchService(BaseSearchService):
         except Exception as exc:
             logger.error(
                 "Error in get_items for query: {}".format(json.dumps(search.query)),
-                exc,
-                exc_info=True,
-            )
-
-    # Used by MarketPlace
-    def get_navigation_story_count(self, navigations, section, company, user):
-        """Get story count by navigation"""
-
-        search = SearchQuery()
-        self.prefill_search_args(search)
-        self.prefill_search_items(search)
-        search.section = section
-        search.user = user
-        search.company = company
-        self.apply_section_filter(search)
-
-        aggs = {}
-
-        for navigation in navigations:
-            navigation_id = navigation.get("_id")
-            products = get_products_by_navigation([navigation_id]) or []
-            navigation_filter = {"bool": {"should": [], "minimum_should_match": 1}}
-            for product in products:
-                if product.get("query"):
-                    navigation_filter["bool"]["should"].append(self.query_string(product.get("query")))
-
-            if navigation_filter["bool"]["should"]:
-                aggs.setdefault("navigations", {}).setdefault("filters", {}).setdefault("filters", {})[
-                    str(navigation_id)
-                ] = navigation_filter
-
-        source = {"query": search.query, "aggs": aggs, "size": 0}
-        req = ParsedRequest()
-        req.args = {"source": json.dumps(source)}
-
-        try:
-            results = self.internal_get(req, None)
-            buckets = results.hits["aggregations"]["navigations"]["buckets"]
-            for navigation in navigations:
-                navigation_id = navigation.get("_id")
-                doc_count = buckets.get(str(navigation_id), {}).get("doc_count", 0)
-                if doc_count > 0:
-                    navigation["story_count"] = doc_count
-
-        except Exception as exc:
-            logger.error(
-                "Error in get_navigation_story_count for query: {}".format(json.dumps(source)),
                 exc,
                 exc_info=True,
             )

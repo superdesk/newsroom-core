@@ -375,8 +375,8 @@ async def get_company_api_usage():
                 "from": page_from,
                 "aggs": {
                     "items": {
-                        "aggs": {"endpoints": {"terms": {"size": MAX_TERMS_SIZE, "field": "endpoint"}}},
-                        "terms": {"size": MAX_TERMS_SIZE, "field": "subscriber"},
+                        "aggs": {"endpoints": {"terms": {"size": MAX_TERMS_SIZE, "field": "endpoint.keyword"}}},
+                        "terms": {"size": MAX_TERMS_SIZE, "field": "subscriber.keyword"},
                     },
                 },
             }

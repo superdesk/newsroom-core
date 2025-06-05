@@ -2,7 +2,6 @@ from eve.render import send_response
 from eve.methods.get import get_internal
 
 from superdesk.flask import render_template, jsonify, request
-from superdesk import get_resource_service
 
 from newsroom.types import Navigation, CompanyResource, UserResourceModel, SectionEnum
 from newsroom.auth.utils import get_user_from_request, get_company_from_request
@@ -11,7 +10,7 @@ from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.decorator import login_required, section
 from newsroom.topics import get_user_topics
 from newsroom.navigations import get_navigations_by_company
-from newsroom.wire import WireSearchServiceAsync
+from .search import MarketPlaceSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -43,13 +42,13 @@ async def get_view_data():
     await get_story_count(navigations, user, company)
     ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user.id),
+        "user": user.to_dict(),
         "user_type": user.user_type,
         "company": str(company.id) if company else None,
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],
         "navigations": navigations,
         "formats": get_formatters_id_and_names(SectionEnum.WIRE),
-        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
+        "saved_items": await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": SECTION_ID,
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
@@ -58,7 +57,9 @@ async def get_view_data():
 
 
 async def get_story_count(navigations: list[Navigation], user: UserResourceModel, company: CompanyResource):
-    get_resource_service(search_endpoint_name).get_navigation_story_count(navigations, SECTION_ID, company, user)
+    await MarketPlaceSearchServiceAsync().get_navigation_story_count(
+        navigations, SectionEnum(SECTION_ID), company, user
+    )
 
 
 async def get_home_page_data():
@@ -76,7 +77,7 @@ async def get_home_page_data():
         "company": str(company.id) if company else None,
         "navigations": navigations,
         "cards": await (await CardsResourceService().find({"dashboard": SECTION_ID})).to_list_raw(),
-        "saved_items": await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
+        "saved_items": await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": SECTION_ID,
         "home_page": True,
         "title": SECTION_NAME,
@@ -95,7 +96,7 @@ async def index():
 @login_required
 @section(SECTION_ID)
 async def home():
-    return await render_template("market_place_home.html", data=get_home_page_data())
+    return await render_template("market_place_home.html", data=await get_home_page_data())
 
 
 @blueprint.route("/{}/search".format(SECTION_ID))
@@ -127,7 +128,7 @@ async def bookmark():
     await update_action_list(data.get("items"), "bookmarks", item_type="items")
     push_user_notification(
         "saved_items",
-        count=await WireSearchServiceAsync().get_current_user_bookmarks_count(SectionEnum.MARKET_PLACE),
+        count=await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(),
     )
     return jsonify(), 200
 
@@ -152,16 +153,21 @@ async def versions(_id):
 @blueprint.route("/{}/<_id>".format(SECTION_ID))
 @login_required
 async def item(_id):
-    item = get_entity_or_404(_id, "items")
-    set_permissions(item, "aapX")
+    marketplace_service = MarketPlaceSearchServiceAsync()
+    marketplace_item = await marketplace_service.service.find_by_id(_id)
+    if not marketplace_item:
+        await request.abort(404)
+
+    await set_permissions(marketplace_item, service=marketplace_service)
+
     ui_config_service = UiConfigResourceService()
-    config = await ui_config_service.get_section_config(SECTION_ID)
+    config = await ui_config_service.get_section_config(SectionEnum.MARKET_PLACE)
     display_char_count = config.get("char_count", False)
     if is_json_request(request):
-        return jsonify(item)
-    if not item.get("_access"):
-        return await render_template("wire_item_access_restricted.html", item=item)
-    previous_versions = get_previous_versions(item)
+        return jsonify(marketplace_item.to_dict())
+    if not marketplace_item.user_has_access:
+        return await render_template("wire_item_access_restricted.html", item=marketplace_item.to_dict())
+    previous_versions = await get_previous_versions(marketplace_item)
     if "print" in request.args:
         template = "wire_item_print.html"
         await update_action_list([_id], "prints", force_insert=True)
@@ -169,7 +175,7 @@ async def item(_id):
         template = "wire_item.html"
     return await render_template(
         template,
-        item=item,
+        item=marketplace_item.to_dict(),
         previous_versions=previous_versions,
         display_char_count=display_char_count,
     )
