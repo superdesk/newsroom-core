@@ -120,7 +120,7 @@ class AgendaCoverage(Dataclass):
 
 
 class EventLocation(Dataclass):
-    name: fields.TextWithKeyword
+    name: fields.TextWithKeyword | None = None
     address: Annotated[dict | None, fields.dynamic_mapping()] = None
     location: fields.Geopoint | None = None
     qcode: fields.Keyword | None = None
