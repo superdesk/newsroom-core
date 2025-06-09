@@ -686,6 +686,7 @@ AGENDA_SEARCH_FIELDS = [
     "definition_long",
     "description_text",
     "location.name",
+    "location.details",
 ]
 
 
