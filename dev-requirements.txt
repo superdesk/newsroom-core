@@ -298,6 +298,8 @@ pycparser==2.22
     # via cffi
 pyflakes==3.2.0
     # via flake8
+pygments==2.19.1
+    # via pytest
 pyhanko==0.18.0
     # via xhtml2pdf
 pyhanko-certvalidator==0.22.0
@@ -324,7 +326,7 @@ pypng==0.20220715.0
     # via qrcode
 pyrtf3==0.47.5
     # via -r requirements.txt
-pytest==8.3.5
+pytest==8.4.0
     # via
     #   -r dev-requirements.in
     #   pytest-cov
