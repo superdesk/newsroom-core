@@ -56,7 +56,7 @@ class NewItemsIcon extends React.Component<IProps> {
                 ref={(elem: any) => this.dom.tooltip = elem}
                 title={gettext('refresh')}
                 aria-label={gettext('refresh')}
-                className="button__reset-styles d-flex align-items-center ms-3"
+                className="button__reset-styles d-flex align-items-center"
                 onClick={this.props.refresh}
             >
                 <i className="icon--refresh icon--pink" />

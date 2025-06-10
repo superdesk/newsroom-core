@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {gettext} from 'utils';
+import {Button} from '../../components/Button';
 
 
 class AgendaCoverageRequest extends React.Component<any, any> {
@@ -51,19 +52,17 @@ class AgendaCoverageRequest extends React.Component<any, any> {
                     </div>
                 </div>
                 <div className='nh-button__group'>
-                    <input
-                        type='button'
-                        className='nh-button nh-button--secondary'
-                        value={gettext('Cancel')}
+                    <Button
+                        text={gettext('Cancel')}
+                        variant='secondary'
                         onClick={this.reset}
-                    ></input>
-                    <input
-                        type='button'
-                        className='nh-button nh-button--primary'
-                        value={gettext('Submit inquiry')}
+                    />
+                    <Button
+                        text={gettext('Submit inquiry')}
+                        variant='primary'
                         disabled={!this.state.message}
                         onClick={this.requestCoverage}
-                    ></input>
+                    />
                 </div>
             </div>
         </div>);

@@ -20,7 +20,7 @@ import {
     getInternalNote,
 } from '../utils';
 import ActionMenu from '../../components/ActionMenu';
-import {LIST_ANIMATIONS, isMobilePhone, gettext} from 'utils';
+import {LIST_ANIMATIONS, isTablet, gettext} from 'utils';
 import TopStoryLabel from './TopStoryLabel';
 import ToBeConfirmedLabel from './ToBeConfirmedLabel';
 import {LabelGroup} from 'ui/components/LabelGroup';
@@ -385,9 +385,8 @@ class AgendaListItem extends React.Component<IProps> {
                 {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
-                        className="icon-button icon-button--primary"
+                        variant='primary'
                         action={action}
-                        isVisited={action.visited && action.visited(this.props.user, this.props.item)}
                         item={this.props.item}
                     />
                 ))}
@@ -415,9 +414,8 @@ class AgendaListItem extends React.Component<IProps> {
                 {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
-                        className="icon-button icon-button--primary"
+                        variant='primary'
                         action={action}
-                        isVisited={action.visited && action.visited(this.props.user, this.props.item)}
                         item={this.props.item} />
                 ))}
 
@@ -438,7 +436,7 @@ class AgendaListItem extends React.Component<IProps> {
     }
 
     render() {
-        return isMobilePhone() ?
+        return isTablet() ?
             this.renderMobile() :
             this.renderNonMobile();
     }

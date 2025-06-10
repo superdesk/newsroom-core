@@ -1,15 +1,10 @@
 import {ComponentType} from 'react';
-import 'primereact/resources/primereact.min.css';
-
 import {IArticle, ICoverageMetadataPreviewProps} from 'interfaces';
-import {gettext, isTouchDevice} from 'utils';
 
-import {registerCoverageFieldComponent} from './agenda/components/preview';
+import {gettext} from 'utils';
 import {Button} from './ui/components/Button';
 
-if (isTouchDevice()) {
-    document.documentElement.classList.add('no-touch');
-}
+import {registerCoverageFieldComponent} from './agenda/components/preview';
 
 interface IExtensions {
     prepareWirePreview?(content: HTMLElement, item: IArticle): HTMLElement;

@@ -1,18 +1,18 @@
 // Labels
 
 $labels-palette: (
-  top-story: var(--color-top-story),
-  blue: $main-blue,
-  green: $green,
-  green-dark: $green-dark,
-  orange: $orange,
-  orange2: $orange2,
-  red: $red,
-  available: $green,
-  restricted: var(--color-text--muted),
-  yellow: $yellow,
-  gray-dark: $cool-gray-dark,
-  gray-mid: $cool-gray-mid,
+  'top-story': var(--color-top-story),
+  'blue': $main-blue,
+  'green': $green,
+  'green-dark': $green-dark,
+  'orange': $orange,
+  'orange2': $orange2,
+  'red': $red,
+  'available': $green,
+  'restricted': var(--color-text--muted),
+  'yellow': $yellow,
+  'gray-dark': $cool-gray-dark,
+  'gray-mid': $cool-gray-mid,
 );
 
 $flex-justify: (

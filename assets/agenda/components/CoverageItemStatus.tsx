@@ -83,10 +83,11 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             <ActionButton
                 key={action.name}
                 item={coverage}
-                className='icon-button icon-button--small icon-button--bordered icon-button--tertiary'
+                variant='tertiary'
+                border
+                size='small'
                 action={action}
                 plan={this.props.item}
-                isVisited={parentWatched}
                 disabled={parentWatched}
             />
         );

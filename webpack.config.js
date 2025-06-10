@@ -6,7 +6,7 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const config = {
     mode: 'production',
     entry: {
-        newsroom_js: path.resolve(__dirname, 'assets/index.ts'),
+        newsroom_js: path.resolve(__dirname, 'assets/main.ts'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.ts'),
         oauth_clients_js: path.resolve(__dirname, 'assets/oauth_clients/index.ts'),
         users_js: path.resolve(__dirname, 'assets/users/index.ts'),
