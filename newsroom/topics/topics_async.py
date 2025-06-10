@@ -108,7 +108,8 @@ async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
                 {"user": user.id},
                 {"$and": [{"company": user.company}, {"is_global": True}]},
             ]
-        }
+        },
+        max_results=500,
     )
     return await data.to_list_raw()
 
@@ -121,7 +122,8 @@ async def get_user_topics_async(user: UserResourceModel) -> list[TopicResourceMo
                 {"user": user.id},
                 {"$and": [{"company": user.company}, {"is_global": True}]},
             ]
-        }
+        },
+        max_results=500,
     )
     return await data.to_list()
 

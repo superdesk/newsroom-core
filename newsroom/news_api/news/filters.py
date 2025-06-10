@@ -38,6 +38,7 @@ async def prefill_products(request: NewshubSearchRequest[NewsApiSearchRequestArg
     if request.args.product_ids:
         cursor = await products_service.find(
             {"is_enabled": True, "companies": request.company.id, "_id": {"$in": request.args.product_ids}},
+            max_results=500,
         )
         request.products = await cursor.to_list()
     else:
