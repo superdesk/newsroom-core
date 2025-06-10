@@ -1,6 +1,6 @@
 {
   "name": "newsroom-core",
-  "version": "2.8.2",
+  "version": "2.9.1",
   "license": "GPLv3",
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
     "fix": "eslint assets --ext .js --ext .jsx --ext .ts --ext .tsx --fix",
     "test": "karma start --single-run",
     "karma": "karma start",
+    "debug-unit-tests": "karma start --reporters=progress --browsers=Chrome",
     "design-app": "webpack-dev-server --mode development --config=webpack.design.js"
   },
   "dependencies": {
@@ -41,7 +42,6 @@
     "lodash": "^4.17.19",
     "moment": "2.30.1",
     "moment-timezone": "0.5.46",
-    "sass": "~1.3.0",
     "popper.js": "1.14.4",
     "primeicons": "^7.0.0",
     "primereact": "^10.8.4",
@@ -50,7 +50,7 @@
     "react-dom": "^17.0.2",
     "react-redux": "8.1.3",
     "react-router-dom": "^6.23.1",
-    "react-sortable-hoc": "0.8.3",
+    "react-sortable-hoc": "2.0.0",
     "react-toggle": "4.1.3",
     "reactstrap": "9.0.1",
     "redux": "4.2.1",
