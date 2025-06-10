@@ -50,7 +50,7 @@ async def get_public_cards() -> List[CardResourceModel]:
     if app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
 
-    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
+    cards = await (await CardsResourceService().search({"dashboard": "newsroom"})).to_list()
     app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
 
     return cards

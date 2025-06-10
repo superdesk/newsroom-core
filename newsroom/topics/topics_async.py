@@ -102,7 +102,7 @@ async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
     if not user_id:
         return []
     user = await UsersService().find_by_id(user_id)
-    data = await TopicService().find(
+    data = await TopicService().search(
         {
             "$or": [
                 {"user": user.id},
@@ -115,7 +115,7 @@ async def get_user_topics(user_id: Union[ObjectId, str, None]) -> List[Topic]:
 
 # TODO-ASYNC: Replace all usage of `get_user_topics` with this one, and remove the `_async` suffix from the name
 async def get_user_topics_async(user: UserResourceModel) -> list[TopicResourceModel]:
-    data = await TopicService().find(
+    data = await TopicService().search(
         {
             "$or": [
                 {"user": user.id},

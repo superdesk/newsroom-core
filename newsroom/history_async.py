@@ -58,8 +58,8 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             abort(400)
 
-        # Use self.find to execute the query and get the cursor
-        return cast(ElasticsearchResourceCursorAsync, await self.find(query))
+        # Use self.search to execute the query and get the cursor
+        return cast(ElasticsearchResourceCursorAsync, await self.search(query))
 
     async def fetch_history(self, query: dict[str, Any], all: bool = False):
         cursor = await self.query_items(query)

@@ -17,7 +17,7 @@ cards_endpoints = EndpointGroup("cards", __name__)
 
 @cards_endpoints.endpoint("/cards", methods=["GET"])
 async def index() -> Response:
-    return Response(await (await CardsResourceService().find({})).to_list_raw(), 200, ())
+    return Response(await (await CardsResourceService().search({})).to_list_raw(), 200, ())
 
 
 class CardSearchParams(BaseModel):
