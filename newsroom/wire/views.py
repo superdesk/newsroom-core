@@ -228,7 +228,7 @@ async def get_home_data():
     company = get_company_from_request(None)
     company_dict = company.to_dict() if company else None
 
-    cards = await (await CardsResourceService().search({"dashboard": "newsroom"})).to_list_raw()
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list_raw()
     topics = await get_user_topics_async(user)
     ui_config_service = UiConfigResourceService()
 
@@ -292,7 +292,7 @@ async def get_media_card_external(args: MediaCardRouteArguments, params: None, r
 @wire_endpoints.endpoint("/card_items")
 async def get_card_items() -> Response:
     company = get_company_from_request(None)
-    cards = await (await CardsResourceService().search({"dashboard": "newsroom"})).to_list()
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
     items_by_card = await get_items_by_card(cards, company.id if company else None)
     return Response({"_items": items_by_card})
 

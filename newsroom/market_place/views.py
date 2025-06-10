@@ -76,7 +76,7 @@ async def get_home_page_data():
         "user": str(user.id),
         "company": str(company.id) if company else None,
         "navigations": navigations,
-        "cards": await (await CardsResourceService().search({"dashboard": SECTION_ID})).to_list_raw(),
+        "cards": await (await CardsResourceService().find({"dashboard": SECTION_ID})).to_list_raw(),
         "saved_items": await MarketPlaceSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": SECTION_ID,
         "home_page": True,

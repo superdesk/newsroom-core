@@ -36,7 +36,7 @@ async def prefill_products(request: NewshubSearchRequest[NewsApiSearchRequestArg
     assert request.company is not None
 
     if request.args.product_ids:
-        cursor = await products_service.search(
+        cursor = await products_service.find(
             {"is_enabled": True, "companies": request.company.id, "_id": {"$in": request.args.product_ids}},
         )
         request.products = await cursor.to_list()
