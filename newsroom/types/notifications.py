@@ -18,7 +18,7 @@ class Notification(ResourceModel):
 
     user: user_validated_type
     action: str
-    data: dict = Field(default_factory=dict)
+    data: dict | None = None
 
 
 class NotificationTopic(Dataclass):
