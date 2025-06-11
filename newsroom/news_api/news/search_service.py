@@ -1,6 +1,7 @@
 from typing import Any
 from urllib.parse import urlencode
 
+from pydantic import AliasChoices
 from werkzeug.datastructures import ImmutableMultiDict
 
 from content_api.errors import UnexpectedParameterError
@@ -72,10 +73,13 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         url_args: ImmutableMultiDict = flask_request.args
         allowed_fields = set(model.model_fields.keys())
 
-        for field in model.model_fields.values():
-            if field.validation_alias:
-                for alias in field.validation_alias.choices:
-                    allowed_fields.add(alias)
+        for field, info in model.model_fields.items():
+            if isinstance(info.validation_alias, AliasChoices):
+                # Exclude `AliasPath` instances from choices, as we won't be able to
+                # translate that into a field name
+                allowed_fields |= set([choice for choice in info.validation_alias.choices if isinstance(choice, str)])
+            else:
+                allowed_fields.add(info.alias or field)
 
         unknown_fields = set(url_args.keys()) - allowed_fields
         if unknown_fields:
