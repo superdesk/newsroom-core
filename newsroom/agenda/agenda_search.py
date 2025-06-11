@@ -106,7 +106,7 @@ class AgendaSearchServiceAsync(BaseWebSearchService[AgendaSearchRequestArgs, Age
             matching_event_ids: set[str] = (
                 set() if args.item_type is not None else await self._get_event_ids_matching_query(args)
             )
-            date_range = {} if not args.start_date and args.end_date else get_date_filters(args)
+            date_range = {} if not (args.start_date and args.end_date) else get_date_filters(args)
             for item in response["_items"]:
                 if item["_id"] in matching_event_ids:
                     item["_search_matched_event"] = True
