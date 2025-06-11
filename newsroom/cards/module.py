@@ -27,7 +27,7 @@ cards_resource_config = ResourceConfig(
 async def get_settings_data():
     app = get_current_wsgi_app()
 
-    cards_task = CardsResourceService().find({}, max_results=500)
+    cards_task = CardsResourceService().find({})
     navs_task = NavigationsService().search(lookup={"is_enabled": True})
 
     cards, navigations = await gather((await cards_task).to_list_raw(), (await navs_task).to_list_raw())

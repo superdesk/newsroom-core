@@ -104,10 +104,10 @@ async def get_company_and_user_saved_searches():
     current_company = get_company_from_request(None)
     lookup_company = dict(company=current_company.id if current_company else None)
 
-    users_cursor = await UsersService().find(lookup_company, max_results=500)
+    users_cursor = await UsersService().find(lookup_company)
     users = get_entity_dict(await users_cursor.to_list_raw())
 
-    cursor = await TopicService().find(lookup_company, max_results=500)
+    cursor = await TopicService().find(lookup_company)
     topics = await cursor.to_list_raw()
 
     saved_topics = defaultdict(lambda: dict(my_topics=0, company_topics=0))
@@ -184,7 +184,7 @@ async def get_company_report():
 
     for company in companies:
         company_id = str(company["_id"])
-        cursor = await users_service.find({"company": company_id}, max_results=500)
+        cursor = await users_service.find({"company": company_id})
         users = await cursor.to_list_raw()
 
         company_result = {
@@ -414,7 +414,7 @@ async def get_company_names(company_ids):
 async def get_product_company():
     args = deepcopy(request.args.to_dict())
     lookup = {"_id": ObjectId(args.get("product"))} if args.get("product") else None
-    cursor = await ProductsService().find(lookup, max_results=500)
+    cursor = await ProductsService().find(lookup)
     products = await cursor.to_list_raw()
 
     res = [
@@ -435,7 +435,7 @@ async def get_product_company():
 
 async def get_expired_companies():
     lookup = {"expiry_date": {"$lte": utcnow().replace(hour=0, minute=0, second=0)}}
-    cursor = await CompanyServiceAsync().find(lookup, max_results=500)
+    cursor = await CompanyServiceAsync().find(lookup)
     expired = await cursor.to_list_raw()
 
     results = {"results": expired, "name": gettext("Expired companies")}
