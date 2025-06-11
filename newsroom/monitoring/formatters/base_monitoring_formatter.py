@@ -8,7 +8,7 @@ from newsroom.wire.formatters.text import TextFormatter
 
 
 class BaseMonitoringFormatter(TextFormatter):
-    section = [SectionEnum.MONITORING]
+    sections = [SectionEnum.MONITORING]
 
     async def get_monitoring_file(
         self,

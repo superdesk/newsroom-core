@@ -9,7 +9,7 @@ from superdesk.flask import url_for
 from superdesk.utc import utcnow
 
 from newsroom.types import SectionEnum
-from newsroom.formatters import BaseFormatter
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
 
 
@@ -38,6 +38,7 @@ class iCalFormatter(BaseFormatter):
     format_id = "ical"
     name = lazy_gettext("iCalendar")
     sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
 
     VERSION = "2.0"
     PRODID = "Newshub"

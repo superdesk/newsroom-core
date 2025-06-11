@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from superdesk.core import get_app_config
 
 from newsroom.types import SectionEnum
-from newsroom.formatters import BaseFormatter
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 from newsroom.utils import parse_dates
 from newsroom.agenda.utils import get_filtered_subject
 
@@ -19,6 +19,7 @@ class CSVFormatter(BaseFormatter):
     format_id = "Csv"
     name = lazy_gettext("CSV")
     sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
 
     VERSION = "1.0"
     PRODID = "Newshub"
