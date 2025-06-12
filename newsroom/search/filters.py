@@ -476,5 +476,6 @@ def validate_request(request: NewshubSearchRequest) -> None:
                 403, gettext(f"User does not have access to {request.section} section"), title=gettext("403. Forbidden")
             )
 
-    if request.args.page > 1000:
-        raise AuthorizationError(400, gettext("Page limit exceeded"), title=gettext("403. Forbidden"))
+    if request.args.page_size >= 1000 or (request.args.page - 1) * request.args.page_size >= 1000:
+        # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+        raise BadParameterValueError(gettext("Page limit exceeded"))
