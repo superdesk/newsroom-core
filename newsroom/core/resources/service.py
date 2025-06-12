@@ -2,7 +2,12 @@ from typing import Generic, Any, ClassVar, TypeVar
 
 from bson import ObjectId
 
-from superdesk.core.resources.service import AsyncResourceService
+from superdesk.core.types import SearchRequest, SortParam, ProjectedFieldArg
+from superdesk.core.resources.service import (
+    AsyncResourceService,
+    ElasticsearchResourceCursorAsync,
+    MongoResourceCursorAsync,
+)
 
 from newsroom.core import get_current_wsgi_app
 
@@ -57,3 +62,30 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
         Returns the list of all the entries raw as list
         """
         return [entry async for entry in self.get_all_raw()]
+
+    async def find(
+        self,
+        req: SearchRequest | dict,
+        page: int = 1,
+        max_results: int = 500,
+        sort: SortParam | None = None,
+        projection: ProjectedFieldArg | None = None,
+        use_mongo: bool = False,
+    ) -> ElasticsearchResourceCursorAsync[NewshubResourceModelType] | MongoResourceCursorAsync[
+        NewshubResourceModelType
+    ]:
+        """Find items from the resource
+
+        Note: Overriding super method to set default ``max_results`` to 500
+
+        :param req: SearchRequest instance, or a lookup dictionary, for the search params to be used
+        :param page: The page number to retrieve (defaults to 1)
+        :param max_results: The maximum number of results to retrieve per page (defaults to 500)
+        :param sort: The sort order to use (defaults to resource default sort, or not sorting applied)
+        :param projection: The field projections to be applied
+        :param use_mongo: If ``True`` will force use mongo, else will attempt elastic first
+        :return: An async iterable with ``ResourceModel`` instances
+        :raises SuperdeskApiError.notFoundError: If Elasticsearch is not configured
+        """
+
+        return await super().find(req, page, max_results, sort, projection, use_mongo)
