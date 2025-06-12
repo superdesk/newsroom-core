@@ -45,6 +45,20 @@ async def fix_updates(doc: dict[str, Any], next_item: WireItem):
         logger.warning("Didn't fix ancestors in 50 iterations", extra={"guid": doc["guid"]})
 
 
+def fix_translation_value(items: list[dict]) -> list[dict]:
+    """Fix bug from Superdesk side that sometimes sends translation values as a string
+
+    Only store the ``translations`` attribute for CV items if it is a dictionary
+    otherwise it is removed.
+    """
+
+    for item in items:
+        if not isinstance(item.get("translations"), dict):
+            item.pop("translations", None)
+
+    return items
+
+
 def format_qcode_items(items: list[dict[str, Any]] | None = None):
     if not items:
         return []
@@ -53,7 +67,7 @@ def format_qcode_items(items: list[dict[str, Any]] | None = None):
         if not item.get("code"):
             item["code"] = item.get("qcode")
 
-    return items
+    return fix_translation_value(items)
 
 
 def get_display_dates(planning_items: list[dict[str, Any]]):
