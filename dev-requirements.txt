@@ -279,7 +279,9 @@ pillow==10.4.0
 platformdirs==4.3.6
     # via black
 pluggy==1.5.0
-    # via pytest
+    # via
+    #   pytest
+    #   pytest-cov
 prompt-toolkit==3.0.47
     # via click-repl
 pyasn1==0.6.1
@@ -331,7 +333,7 @@ pytest==8.4.0
     #   -r dev-requirements.in
     #   pytest-cov
     #   pytest-mock
-pytest-cov==6.1.1
+pytest-cov==6.2.1
     # via -r dev-requirements.in
 pytest-mock==3.14.1
     # via -r dev-requirements.in
