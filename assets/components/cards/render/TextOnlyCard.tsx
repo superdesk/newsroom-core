@@ -25,10 +25,10 @@ const getTextOnlyPanel = (item: IArticle, openItem: any, cardId: string, listCon
 );
 
 const TextOnlyCard: ComponentType<ICardProps> = (props: ICardProps) => {
-    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
+    const {items, title, id, openItem, isActive, cardId, listConfig, kind} = props;
 
     return (
-        <CardRow title={title} id={id} isActive={isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
+        <CardRow title={title} id={id} isActive={isActive} kind={kind} onMoreNewsClicked={props.onMoreNewsClicked}>
             {items.map((item: any) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
         </CardRow>
     );
