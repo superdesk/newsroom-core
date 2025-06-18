@@ -670,4 +670,5 @@ default_agenda_filters: list[SearchFilterFunction] = [
     prefill_args_from_topic,
     prefill_item_type_arg,
     apply_agenda_date_filters,
+    apply_highlights,
 ] + filters_without_dates
