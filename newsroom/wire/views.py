@@ -199,13 +199,10 @@ async def get_personal_dashboards_data(
     async def _get_topic_data(topic_id: ObjectId):
         for topic in topics:
             if topic.id == topic_id:
-                topic_items = await get_topic_items(topic)
-                if topic_items:
-                    return {
-                        "_id": topic.id,
-                        "items": topic_items,
-                    }
-                break
+                return {
+                    "_id": topic.id,
+                    "items": await get_topic_items(topic) or [],
+                }
         return None
 
     async def _get_dashboard_data(dashboard: DashboardModel, dashboard_index: int):
