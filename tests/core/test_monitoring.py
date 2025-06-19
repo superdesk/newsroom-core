@@ -23,7 +23,7 @@ def mock_utcnow():
 
 
 def get_fixture_path(fixture):
-    return os.path.join(os.path.dirname(__file__), "fixtures", fixture)
+    return os.path.join(os.path.dirname(__file__), "../fixtures", fixture)
 
 
 @fixture(autouse=True)
@@ -52,6 +52,7 @@ async def init(app):
                 "last_name": "Doe",
                 "is_enabled": True,
                 "receive_email": True,
+                "company": ObjectId(company_id),
             },
             {
                 "_id": ObjectId("5c4684645f627debec1dc3db"),
@@ -266,10 +267,10 @@ async def test_send_immediate_alerts(client, app):
 
 
 def assert_recipients(outbox, recipients: List[str]):
-    assert len(outbox) == len(recipients)
     outbox_recipients = []
     for o in outbox:
         outbox_recipients.extend(o.recipients)
+    assert len(outbox_recipients) == len(recipients)
     for recipient in recipients:
         assert recipient in outbox_recipients
 
@@ -1148,3 +1149,255 @@ async def test_send_immediate_headline_subject_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Article headline about product"
         assert "Newsroom Monitoring: W1" in outbox[0].body
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_send_immediate_email_alerts(client, app):
+    await post_json(
+        client,
+        "/settings/general_settings",
+        {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")},
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "version": "1",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>"
+                '<!-- EMBED START Audio {id: "editor_2"} -->'
+                "<figure>"
+                '    <audio controls src="/assets.mp3"></audio>'
+                "    <figcaption>Assistant Treasurer</figcaption>"
+                "</figure>"
+                '<!-- EMBED END Audio {id: "editor_2"} -->'
+                "<p>Something after the embed",
+                "source": "AAAA",
+            }
+        ],
+    )
+    await login_public(client)
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert w is not None
+    await update_entries_for(
+        "monitoring",
+        ObjectId("5db11ec55f627d8aa0b545fb"),
+        {"format_type": "monitoring_email", "alert_type": "full_text", "keywords": ["text"]},
+        w,
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
+        assert outbox[0].sender == "newsroom@localhost"
+        assert outbox[0].subject == "Monitoring Subject"
+        assert "Something after the embed" in outbox[0].body
+        ## TODO When code to remove the embeds from email is ported
+        # assert 'Assistant Treasurer' not in outbox[0].body
+        assert "Newsroom Monitoring: W1" in outbox[0].body
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_immediate_email_alerts_twice(client, app):
+    await post_json(
+        client,
+        "/settings/general_settings",
+        {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")},
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+                "version": "1",
+            }
+        ],
+    )
+    await create_entries_for(
+        "history",
+        [
+            {
+                "action": "email",
+                "company": ObjectId("5c3eb6975f627db90c84093c"),
+                "section": "monitoring",
+                "monitoring": ObjectId("5db11ec55f627d8aa0b545fb"),
+                "versioncreated": utcnow(),
+                "version": "1",
+                "item": "foo",
+            }
+        ],
+    )
+    await login_public(client)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_email_to_disabled_users(client, app):
+    await create_entries_for(
+        "users",
+        [
+            {
+                "_id": ObjectId("5d4ccb7265af3eaa4a8395bc"),
+                "email": "boo_user@bar.com",
+                "first_name": "Boo_First_name",
+                "last_name": "Boo_Last_name",
+                "is_enabled": False,
+                "receive_email": True,
+                "company": ObjectId(company_id),
+            },
+            {
+                "_id": ObjectId("617f257c04bfdad4366b6997"),
+                "email": "ringin@bar.com",
+                "first_name": "Ring_In_First_name",
+                "last_name": "Ring_In_Last_name",
+                "is_enabled": True,
+                "receive_email": True,
+                "company": ObjectId(company_id),
+            },
+        ],
+    )
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert w is not None
+    users = [ObjectId("5d4ccb7265af3eaa4a8395bc"), ObjectId("617f257c04bfdad4366b6997")]
+    await update_entries_for("monitoring", ObjectId("5db11ec55f627d8aa0b545fb"), {"users": users}, w)
+
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert len(outbox[0].recipients) == 1
+        assert_recipients(
+            outbox,
+            ["ringin@bar.com"],
+        )
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_email_to_disabled_companies(client, app):
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    c = await find_one_by_id("companies", company_id)
+    assert c is not None
+    await update_entries_for("companies", ObjectId(company_id), {"is_enabled": False}, c)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0
+
+
+async def test_save_only_users_belonging_to_company(client, app):
+    w = await find_one_by_id("users", "5c53afa45f627d8333220f15")
+    await update_entries_for(
+        "users", ObjectId("5c53afa45f627d8333220f15"), {"company": ObjectId("5c3eb6975f627db90c84093c")}, w
+    )
+    await post_json(
+        client,
+        "/monitoring/5db11ec55f627d8aa0b545fb/users",
+        {"users": ["5c53afa45f627d8333220f15", "111111111111111111111111"]},
+    )
+    m = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert m["users"] == [ObjectId("5c53afa45f627d8333220f15")]
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_send_profile_email(client, app):
+    await post_json(
+        client, "/settings/general_settings", {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")}
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    m = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert m is not None
+    await update_entries_for(
+        "monitoring",
+        ObjectId("5db11ec55f627d8aa0b545fb"),
+        {
+            "email": "atest@a.com,btest@b.com",
+            "format_type": "monitoring_email",
+            "is_enabled": "true",
+        },
+        m,
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 3
+        assert_recipients(
+            outbox,
+            ["atest@a.com", "btest@b.com", "foo_user2@bar.com", "foo_user@bar.com"],
+        )
+
+
+async def test_save_monitoring_email(client, app):
+    response = await client.post(
+        "/monitoring/5db11ec55f627d8aa0b545fb",
+        json={"email": "axb.com, a@b.com", "company": ObjectId(company_id), "name": "test"},
+    )
+    data = json.loads(await response.get_data())
+    assert data["email"] == "Invalid email address"
+    response = await client.post(
+        "/monitoring/5db11ec55f627d8aa0b545fb",
+        json={"email": "a@b.com , d@e.com", "company": ObjectId(company_id), "name": "test"},
+    )
+    data = json.loads(await response.get_data())
+    assert data["success"] is True
+    response = await client.get("/monitoring/5db11ec55f627d8aa0b545fb")
+    data = json.loads(await response.get_data())
+    assert data["email"] == "a@b.com,d@e.com"

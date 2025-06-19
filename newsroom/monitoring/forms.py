@@ -8,7 +8,11 @@ alert_types = [
     ("full_text", gettext("Full text")),
     ("linked_text", gettext("Linked extract(s)")),
 ]
-format_types = [("monitoring_pdf", gettext("PDF")), ("monitoring_rtf", gettext("RTF"))]
+format_types = [
+    ("monitoring_pdf", gettext("PDF")),
+    ("monitoring_rtf", gettext("RTF")),
+    ("monitoring_email", gettext("Email")),
+]
 
 
 class MonitoringForm(QuartForm):
@@ -22,6 +26,7 @@ class MonitoringForm(QuartForm):
     alert_type = SelectField(gettext("Alert Type"), choices=alert_types, default="full_text")
     format_type = SelectField(gettext("Format Type"), choices=format_types, default="monitoring_pdf")
     company = StringField(gettext("Company"), validators=[DataRequired()])
+    email = StringField("Email Address", validators=[])
     is_enabled = BooleanField(gettext("Enabled"), default=True, validators=[])
     always_send = BooleanField(gettext("Always Send"), default=False, validators=[])
     headline_subject = BooleanField(

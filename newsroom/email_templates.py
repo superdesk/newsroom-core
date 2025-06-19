@@ -58,6 +58,7 @@ DEFAULT_SUBJECTS = {
     "{% endif %}",
     "monitoring_error": "Error sending alerts for monitoring: {{ profile.name | safe }}",
     "monitoring_email_no_updates": "{{ (profile.subject or profile.name) | safe }}",
+    "monitoring_export": "{{ (monitoring_profile.subject or monitoring_profile.name) | safe }}",
     "share_items": "From {{ app_name }}: {{ subject_name | safe }}",
     "share_topic": "From {{ app_name }}: {{ topic.label | safe }}",
     "share_wire": "From {{ app_name }}: {{ subject_name | safe }}",

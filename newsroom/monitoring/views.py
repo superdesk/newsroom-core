@@ -74,6 +74,11 @@ def process_form_request(updates, request_updates, form):
     if "keywords" in request_updates:
         updates["keywords"] = request_updates["keywords"]
 
+    if "email" in request_updates:
+        updates["email"] = request_updates.get("email").replace(" ", "")
+        if updates["email"] == "":
+            updates["email"] = None
+
 
 async def get_monitoring_for_company(user: UserResourceModel | None):
     company = user.company if user else None
@@ -90,10 +95,16 @@ class MonitoringIdUrlArg(BaseModel):
 )
 async def update_users(args: MonitoringIdUrlArg, params: None, request: Request) -> Response:
     updates = await request.get_json()
-    if "users" not in updates:
-        return Response({"error": gettext("Users data not provided")}, 403)
+    profile = await MonitoringProfileService().find_by_id(args.profile_id)
+    if not profile:
+        return Response({"error": gettext("Profile not found")}, status=404)
 
-    updates["users"] = [user_id for user_id in updates["users"]]
+    if "users" not in updates:
+        return Response({"error": gettext("Users data not provided")}, status=403)
+
+    updates["users"] = [
+        u.id for u in (await UsersService().find_by_ids(updates["users"])) if u.company == profile.company
+    ]
     await MonitoringProfileService().update(args.profile_id, updates)
     return Response({"success": True})
 
@@ -329,6 +340,7 @@ async def share(request: Request) -> Response:
                     "file_name": formatter.format_filename(None),
                     "content_type": "application/{}".format(formatter.FILE_EXTENSION),
                     "file_desc": "Monitoring Report",
+                    "headers": {},
                 }
             ],
         )
