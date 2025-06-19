@@ -14,6 +14,7 @@ import pathlib
 
 from pydantic import BaseModel
 from urllib.parse import urlparse
+import quart
 from quart_babel import gettext
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 
@@ -62,7 +63,7 @@ def init_saml_auth(req):
     return auth
 
 
-async def prepare_flask_request(request):
+async def prepare_request(request: quart.Request) -> dict:
     url_data = urlparse(request.url)
     return {
         "https": "off" if "http://localhost" in get_app_config("CLIENT_URL", "") else "on",
@@ -101,6 +102,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
             if not company.get("internal"):
                 userdata["user_type"] = "public"
+            return userdata
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
@@ -111,6 +113,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
             if not company.get("internal"):
                 userdata["user_type"] = "public"
+            return userdata
 
     # last option is global env variable
     saml_company_config = get_app_config("SAML_COMPANY")
@@ -120,15 +123,17 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
         else:
             logger.warning("Company %s not found", saml_company_config)
+        return userdata
 
     return userdata
 
 
 @blueprint.endpoint("/login/saml", methods=["GET", "POST"], auth=False)
 async def saml():
-    req = await prepare_flask_request(request)
+    req = await prepare_request(request)
     auth = init_saml_auth(req)
     errors = []
+    form = await request.form
 
     if "slo" in request.args:
         name_id = None
@@ -138,7 +143,7 @@ async def saml():
         if SESSION_SESSION_ID in session:
             session_index = session[SESSION_SESSION_ID]
         return redirect(auth.logout(name_id=name_id, session_index=session_index))
-    elif "acs" in request.args or request.form:
+    elif "acs" in request.args or form:
         auth.process_response()
         errors = auth.get_errors()
         if len(errors) == 0:
@@ -174,7 +179,7 @@ async def saml():
 
 @blueprint.endpoint("/login/saml_metadata", auth=False)
 async def saml_metadata():
-    req = await prepare_flask_request(request)
+    req = await prepare_request(request)
     auth = init_saml_auth(req)
     settings = auth.get_settings()
     metadata = settings.get_sp_metadata()
