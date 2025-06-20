@@ -451,7 +451,7 @@ export function submitDownloadItems(items: any, params: any) {
                 const blob = await response.blob();
                 initiateDownload(blob);
             } catch (error) {
-                console.error('Error downloading file:', error);
+                errorHandler(error);
             }
         }
         dispatch(setDownloadItems(items));

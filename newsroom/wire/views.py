@@ -374,7 +374,7 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
         else:
             _file.write(file_data)
             _file.seek(0)
-        mimetype = "application/zip"
+        mimetype = formatter.BULK_MIMETYPE
         if filename is not None:
             attachment_filename = filename
 

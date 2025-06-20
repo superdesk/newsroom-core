@@ -102,7 +102,7 @@ class iCalFormatter(BaseFormatter):
                     event.add("location", loc["name"])
                 try:
                     event.add("geo", (loc["location"]["lat"], loc["location"]["lon"]))
-                except KeyError:
+                except (KeyError, TypeError):
                     pass
 
         # links
