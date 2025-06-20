@@ -450,7 +450,7 @@ export function submitDownloadItems(items: any, params: any) {
                 const response = await server.post(url, payload, undefined, {parseJson: false});
                 const blob = await response.blob();
                 initiateDownload(blob);
-            } catch (error) {
+            } catch (error: any) {
                 errorHandler(error);
             }
         }
