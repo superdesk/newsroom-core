@@ -788,6 +788,7 @@ def locked(_id: str, service: str):
 @celery.task
 def notify_new_wire_item(_id, check_topics=True):
     with locked(_id, "wire"):
+        logger.info("Send notifications for wire item %s", _id)
         item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
         if item:
             notify_new_item(item, check_topics=check_topics)
@@ -796,6 +797,7 @@ def notify_new_wire_item(_id, check_topics=True):
 @celery.task
 def notify_new_agenda_item(_id, check_topics=True, is_new=False):
     with locked(_id, "agenda"):
+        logger.info("Send notifications for agenda item %s", _id)
         agenda = app.data.find_one("agenda", req=None, _id=_id)
         if agenda:
             if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id and is_new:
@@ -934,7 +936,7 @@ def send_user_notification_emails(item, user_matches, users, section):
 
 @elasticapm.capture_span()
 def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
-    logger.info("Finding matching topics for item %s", item["_id"])
+    logger.info("Finding matching topics for wire item %s", item["_id"])
 
     topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
@@ -949,6 +951,8 @@ def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]
 
 
 def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
+    logger.info("Finding matching topics for agenda item %s", item["_id"])
+
     topics = get_topics_with_subscribers("agenda")
     topic_matches = superdesk.get_resource_service("agenda").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
