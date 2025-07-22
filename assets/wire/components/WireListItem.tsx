@@ -306,7 +306,7 @@ class WireListItem extends React.Component<IProps, IState> {
                             </div>
                         )}
 
-                        {!!showItemVersions(item) && (
+                        {showItemVersions(item) && (
                             <div
                                 className="no-bindable wire-articles__item__versions-btn"
                             >
