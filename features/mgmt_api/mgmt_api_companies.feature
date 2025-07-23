@@ -77,6 +77,7 @@ Feature: Management API - Companies
             ]
         }
         """
+
     Scenario: Validate company products section
         Given newsroom "products"
         """
@@ -94,7 +95,7 @@ Feature: Management API - Companies
             "phone": "99999999",
             "sections": {"wire": true, "agenda": true},
             "products": [
-                {"_id": "#products._id#", "section": "wire"}
+                {"_id": "#products._id#", "section": "wire", "seats": 5}
             ]
         }
         """
@@ -105,7 +106,7 @@ Feature: Management API - Companies
         """
         {
             "products": [
-                {"_id": "#products._id#", "section": "agenda", "seats": 0}
+                {"_id": "#products._id#", "section": "agenda", "seats": 5}
             ]
         }
         """
@@ -167,4 +168,19 @@ Feature: Management API - Companies
                 {"_id": "#products._id#", "section": "agenda"}
             ]
         }
+        """
+
+    Scenario: Validate missing product
+        When we post to "/companies"
+        """
+        {
+            "name": "test",
+            "products": [
+                {"_id": "67cb0e0a158982f25bdbb4a1", "section": "agenda", "seats": 10}
+            ]
+        }
+        """
+        Then we get response code 400
+        """
+        {"_issues": {"exception": "product 67cb0e0a158982f25bdbb4a1 not found"}}
         """
