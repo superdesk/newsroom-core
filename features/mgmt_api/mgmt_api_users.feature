@@ -229,3 +229,25 @@ Feature: Management API - Users
 
         When we get "/users?where={"email": "JohnCena@wwe.com"}"
         Then we get list with 1 items
+
+    Scenario: Validate missing product
+        Given newsroom "companies"
+        """
+        [{"name": "zzz company"}]
+        """
+        When we post to "/users"
+        """
+        {
+            "first_name": "John",
+            "last_name": "Cena",
+            "email": "johncena@wwe.com",
+            "company": "#companies._id#",
+            "products": [
+                {"_id": "67cb0e0a158982f25bdbb4a1", "section": "agenda", "seats": 10}
+            ]
+        }
+        """
+        Then we get response code 400
+        """
+        {"_issues": {"exception": "product 67cb0e0a158982f25bdbb4a1 not found"}}
+        """

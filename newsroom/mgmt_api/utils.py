@@ -1,4 +1,5 @@
 import bson
+
 from typing import List
 from newsroom.types import CompanyProduct
 from newsroom.products import ProductsService
@@ -14,6 +15,8 @@ async def validate_product_refs(product_refs: List[CompanyProduct]) -> List[Comp
 
     for ref in product_refs:
         product = products_by_id.get(str(ref["_id"]))
-        assert product is not None
+        if not product:
+            raise ValueError(f"product {ref['_id']} not found")
         ref["section"] = product["product_type"]
+
     return product_refs
