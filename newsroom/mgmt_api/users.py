@@ -52,31 +52,14 @@ class CPUsersService(UsersService):
 
 
 class UsersRestEndpoints(ResourceRestEndpoints):
-    async def search_items(self, args: None, params: SearchRequest, request: Request) -> Response:
-        """Processes a search request
-
-        If the request includes ``email`` in the ``where`` param, then tell MongoDB to be case-insensitive
-        with the search
-
-        :param args: Not supported
-        :param params: The search parameters for this request
-        :param request: The HTTP request instance
-        :return: The REST response containing matches items for this request
-        """
-
-        if params.where:
-            where = json.loads(params.where) if isinstance(params.where, str) else params.where
-            if where.get("email"):
-                where["email"] = {"$regex": re.compile("^{}$".format(re.escape(where["email"])), re.IGNORECASE)}
-                params.where = where
-        return await super().search_items(args, params, request)
+    pass
 
 
 users_resource_config = ResourceConfig(
     name="users",
     data_class=UserResourceModel,
     service=CPUsersService,
-    mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
+    mongo=MongoResourceConfig(prefix=MONGO_PREFIX, collation=True),
     rest_endpoints=RestEndpointConfig(endpoints_class=UsersRestEndpoints),
 )
 
