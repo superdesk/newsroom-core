@@ -1404,13 +1404,16 @@ async def test_push_planning_signal(client, app):
         item["dates"]["all_day"] = True
         assert is_new
 
-    newsroom.signals.publish_planning.connect(on_push_planning)
+    try:
+        newsroom.signals.publish_planning.connect(on_push_planning)
 
-    planning = deepcopy(test_planning)
-    await client.post("/push", json=planning)
+        planning = deepcopy(test_planning)
+        await client.post("/push", json=planning)
 
-    parsed = await find_one_by_id("agenda", planning["guid"])
-    assert parsed and parsed["dates"]["all_day"]
+        parsed = await find_one_by_id("agenda", planning["guid"])
+        assert parsed and parsed["dates"]["all_day"]
+    finally:
+        newsroom.signals.publish_planning.disconnect(on_push_planning)
 
 
 async def test_push_events_signal(client, app):
