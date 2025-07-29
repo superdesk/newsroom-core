@@ -1451,3 +1451,43 @@ async def test_push_planning_coverages_assignemnt_info(client, app):
     assert "sports@example.com" == coverage["assigned_desk_email"]
     assert "John Doe" == coverage["assigned_user_name"]
     assert "john@example.com" == coverage["assigned_user_email"]
+
+
+async def test_push_set_photo_coverage_href_async(client, app):
+    planning = deepcopy(test_planning)
+    planning["coverages"] = [planning["coverages"][1]]
+    planning["coverages"][0]["workflow_status"] = "completed"
+
+    # Test default behaviour
+    response = await client.post("/push", json=planning)
+    assert response.status_code == 200
+    parsed = await find_one_by_id("agenda", planning["guid"])
+    assert parsed["coverages"][0]["deliveries"][0]["delivery_href"] is None
+
+    # Test setting href with sync function
+    planning["_id"] = planning["guid"] = "foo"
+    planning["coverages"][0]["coverage_id"] = "foo.pic"
+
+    def _set_href(coverage, planning_item, deliveries=None) -> str:
+        slugline = coverage["slugline"]
+        return f"/photo/{slugline}"
+
+    with mock.patch.object(app, "set_photo_coverage_href", _set_href):
+        response = await client.post("/push", json=planning)
+        assert response.status_code == 200
+        parsed = await find_one_by_id("agenda", planning["guid"])
+        assert "/photo/Vivid Photos" == parsed["coverages"][0]["deliveries"][0]["delivery_href"]
+
+    # Test setting href with async function
+    planning["_id"] = planning["guid"] = "bar"
+    planning["coverages"][0]["coverage_id"] = "bar.pic"
+
+    async def _set_href_async(coverage, planning_item, deliveries=None) -> str:
+        slugline = coverage["slugline"]
+        return f"/async/photo/{slugline}"
+
+    with mock.patch.object(app, "set_photo_coverage_href", _set_href_async):
+        response = await client.post("/push", json=planning)
+        assert response.status_code == 200
+        parsed = await find_one_by_id("agenda", planning["guid"])
+        assert "/async/photo/Vivid Photos" == parsed["coverages"][0]["deliveries"][0]["delivery_href"]
