@@ -34,6 +34,7 @@ from .filters import (
     apply_agenda_query_string,
     apply_agenda_filters,
     apply_agenda_date_filters,
+    apply_highlights,
 )
 from .agenda_service import AgendaItemService
 from .utils import remove_restricted_coverage_info
@@ -70,6 +71,7 @@ class AgendaSearchServiceAsync(BaseWebSearchService[AgendaSearchRequestArgs, Age
         apply_agenda_filters,
         apply_advanced_search,
         apply_agenda_date_filters,
+        apply_highlights,
     ]
     get_topic_items_query_user_filters = [
         apply_section_filter,
