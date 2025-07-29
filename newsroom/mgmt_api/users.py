@@ -63,7 +63,7 @@ class UsersRestEndpoints(ResourceRestEndpoints):
         :return: The REST response containing matches items for this request
         """
         if params.where:
-            params.collation = True
+            params.case_insensitive = True
         return await super().search_items(args, params, request)
 
 
