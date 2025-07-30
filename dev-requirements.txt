@@ -475,7 +475,7 @@ six==1.17.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v3.0.0-alpha.4
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v3.0.0-alpha.5
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v3.0.0-alpha.1
     # via -r requirements.txt
