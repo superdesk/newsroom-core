@@ -204,7 +204,7 @@ Feature: Management API - Users
         }
         """
         Then we get response code 201
-    
+
     Scenario: Search case insensitive
         Given newsroom "users"
         """
@@ -228,6 +228,28 @@ Feature: Management API - Users
         Then we get list with 1 items
 
         When we get "/users?where={"email": "JohnCena@wwe.com"}"
+        Then we get list with 1 items
+
+    Scenario: Search using $in
+        Given newsroom "users"
+        """
+        [
+            {
+                "first_name": "John",
+                "last_name": "Cena",
+                "email": "JohnCena@wwe.com",
+                "user_type": "administrator"
+            },
+            {
+                "first_name": "Alex",
+                "last_name": "Billiam",
+                "email": "alexbilliam@wwe.com",
+                "user_type": "administrator"
+            }
+        ]
+        """
+
+        When we get "/users?where={"email": {"$in": ["johncena@wwe.com", "foo@example.com"]}}"
         Then we get list with 1 items
 
     Scenario: Validate missing product

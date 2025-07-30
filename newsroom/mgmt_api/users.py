@@ -1,5 +1,3 @@
-import re
-import json
 from typing import Any, List, Dict
 from typing_extensions import override
 from bson.objectid import ObjectId
@@ -55,20 +53,15 @@ class UsersRestEndpoints(ResourceRestEndpoints):
     async def search_items(self, args: None, params: SearchRequest, request: Request) -> Response:
         """Processes a search request
 
-        If the request includes ``email`` in the ``where`` param, then tell MongoDB to be case-insensitive
-        with the search
+        If the request includes where make the search case-insensitive.
 
         :param args: Not supported
         :param params: The search parameters for this request
         :param request: The HTTP request instance
         :return: The REST response containing matches items for this request
         """
-
         if params.where:
-            where = json.loads(params.where) if isinstance(params.where, str) else params.where
-            if where.get("email"):
-                where["email"] = {"$regex": re.compile("^{}$".format(re.escape(where["email"])), re.IGNORECASE)}
-                params.where = where
+            params.case_insensitive = True
         return await super().search_items(args, params, request)
 
 
