@@ -47,7 +47,7 @@ async def handle_publish_planning(item):
     plan_id = await publisher.publish_planning_item(item, orig.to_dict() if orig else {})
     event_id = await publisher.publish_planning_into_event(item)
 
-    # Prefer parent Event when sending notificaitons
+    # Prefer parent Event when sending notifications
     _id = event_id or plan_id
     await notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
 
@@ -77,7 +77,7 @@ async def handle_publish_planning_featured(item):
 
 
 def get_publish_handler(
-    item_type: Literal["event", "planning", "text", "planning_featured"]
+    item_type: Literal["event", "planning", "text", "planning_featured"],
 ) -> PublishHandlerFunc | None:
     handlers = {
         "event": handle_publish_event,
