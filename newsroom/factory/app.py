@@ -10,7 +10,6 @@ import re
 import pathlib
 import importlib
 
-import sentry_sdk
 from flask_mail import Mail
 from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
@@ -26,9 +25,6 @@ from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
 from superdesk.factory.app import SuperdeskEve
-
-from sentry_sdk.integrations.asyncio import AsyncioIntegration
-from sentry_sdk.integrations.quart import QuartIntegration
 
 import newsroom
 from newsroom.auth.eve_auth import SessionAuth
@@ -285,17 +281,6 @@ class BaseNewsroomApp(SuperdeskEve):
             self.config["DOMAIN"][resource]["url"] = settings["regex_url"]
         elif "<regex(" in settings.get("url"):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
-
-    def setup_sentry(self):
-        if self.config.get("SENTRY_DSN"):
-            # Given how quart_flask_patch patches things, it makes Sentry SDK to think that flask is installed
-            # mistakenly enabling FlaskIntegration, which breaks QuartIntegration, and preventing sentry from working properly.
-            # https://github.com/pgjones/quart-flask-patch/blob/0.3.0/src/quart_flask_patch/_patch.py#L110
-            # This prevents flask integration from being enabled at all until we're can use a newer version of sentry-sdk where
-            # specific integrations can be disabled https://github.com/getsentry/sentry-python/releases/tag/2.11.0
-            sentry_sdk.integrations._processed_integrations.add("flask")
-
-            sentry_sdk.init(dsn=self.config["SENTRY_DSN"], integrations=[QuartIntegration(), AsyncioIntegration()])
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
