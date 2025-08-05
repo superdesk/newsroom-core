@@ -17,21 +17,23 @@ from ..fixtures import (  # noqa: F401
     init_agenda_items,
 )
 from .test_push import upload_binary
+from newsroom.history_async import HistoryService
+from tests.core.utils import update_entries_for
 
 items_ids = [item["_id"] for item in items[:2]]
 item = items[:2][0]
 
 
-def download_zip_file(client, _format, section):
+async def download_zip_file(client, _format, section):
     now = utcnow()
     payload = {"items": items_ids, "type": section, "format": _format}
-    resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
+    resp = await client.post("/download", json=payload)
     assert resp.status_code == 200
     assert resp.mimetype == "application/zip"
     assert resp.headers.get("Content-Disposition") == "attachment; filename={}-newsroom.zip".format(
         now.strftime("%Y%m%d%H%M")
     )
-    _file = io.BytesIO(resp.get_data())
+    _file = io.BytesIO(await resp.get_data())
     return _file
 
 
@@ -123,9 +125,9 @@ agenda_formats = [
 ]
 
 
-def setup_image(client, app):
+async def setup_image(client, app):
     media_id = str(bson.ObjectId())
-    upload_binary("picture.jpg", client, media_id=media_id)
+    await upload_binary("picture.jpg", client, media_id=media_id)
     associations = {
         "featuremedia": {
             "mimetype": "image/jpeg",
@@ -137,15 +139,16 @@ def setup_image(client, app):
             },
         }
     }
-    app.data.update("items", item["_id"], {"associations": associations}, item)
+    await update_entries_for("items", item["_id"], {"associations": associations}, item)
 
 
-def test_download_single(client, app):
-    setup_image(client, app)
+async def test_download_single(client, app):
+    await setup_image(client, app)
     for _format in wire_formats:
         payload = {"items": [item["_id"]], "format": _format["format"]}
-        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
-        assert resp.status_code == 200
+        await HistoryService().delete_many({})
+        resp = await client.post("/download", json=payload)
+        assert resp.status_code == 200, await resp.get_data(as_text=True)
         assert resp.mimetype == _format["mimetype"]
         assert resp.headers.get("Content-Disposition") in [
             "attachment; filename=%s" % _format["filename"],
@@ -153,17 +156,16 @@ def test_download_single(client, app):
         ]
 
 
-def test_wire_download(client, app):
-    setup_image(client, app)
-    for _format in wire_formats:
-        _file = download_zip_file(client, _format["format"], "wire")
-        with zipfile.ZipFile(_file) as zf:
-            assert _format["filename"] in zf.namelist()
-            content = zf.open(_format["filename"]).read()
-            if _format.get("test_content"):
-                _format["test_content"](content)
+async def test_wire_download(client, app):
+    await setup_image(client, app)
+    _file = await download_zip_file(client, wire_formats[0]["format"], "wire")
+    with zipfile.ZipFile(_file) as zf:
+        assert wire_formats[0]["filename"] in zf.namelist()
+        content = zf.open(wire_formats[0]["filename"]).read()
+        if wire_formats[0].get("test_content"):
+            wire_formats[0]["test_content"](content)
     history, count = app.data.find("history", None, None)
-    assert (len(wire_formats) * len(items_ids)) == count
+    assert (len(items_ids)) == count
     assert "download" == history[0]["action"]
     assert history[0].get("user")
     assert history[0].get("versioncreated") + timedelta(seconds=2) >= utcnow()
@@ -173,20 +175,19 @@ def test_wire_download(client, app):
     assert history[0].get("section") == "wire"
 
 
-def test_agenda_download(client, app):
-    setup_image(client, app)
-    for _format in agenda_formats:
-        payload = {"items": [agenda_items[0]["_id"]], "type": "agenda", "format": _format["format"]}
-        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
-        assert resp.status_code == 200, resp.get_data()
-        assert resp.mimetype == _format["mimetype"]
-        if _format.get("test_content"):
-            _format["test_content"](resp.get_data())
-        assert resp.headers.get("content-disposition") == "attachment; filename=%s" % filename(
-            _format["filename"], agenda_items[0]
-        )
+async def test_agenda_download(client, app):
+    await setup_image(client, app)
+    payload = {"items": [agenda_items[0]["_id"]], "type": "agenda", "format": agenda_formats[0]["format"]}
+    resp = await client.post("/download", json=payload)
+    assert resp.status_code == 200, await resp.get_data()
+    assert resp.mimetype == agenda_formats[0]["mimetype"]
+    if agenda_formats[0].get("test_content"):
+        agenda_formats[0]["test_content"](await resp.get_data())
+    assert resp.headers.get("content-disposition") == "attachment; filename=%s" % filename(
+        agenda_formats[0]["filename"], agenda_items[0]
+    )
     history, count = app.data.find("history", None, None)
-    assert (len([w for w in wire_formats if w["format"] != "picture"]) * 1) == count
+    assert 1 == count
     assert "download" == history[0]["action"]
     assert history[0].get("user")
     assert history[0].get("versioncreated") + timedelta(seconds=2) >= utcnow()

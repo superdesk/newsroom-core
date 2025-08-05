@@ -1,137 +1,96 @@
-from flask import request
+from typing import Any, ClassVar, cast
+from urllib.parse import urlencode
+from pydantic import field_validator, model_validator
 
-from content_api.errors import BadParameterValueError
+from content_api.errors import UnexpectedParameterError
+from newsroom.news_api.news.filters_utils import parse_iso_date
+from superdesk.core.types import Response
+from superdesk.core.types.web import Request
+from superdesk.core.resources.fields import Field
 
-from newsroom.news_api.news.search_service import NewsAPINewsService
+from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
+from newsroom.news_api.news.types import NewsApiSearchRequestArgs
+from newsroom.news_api.news.search_service import NewsApiSearchServiceAsync, default_search_filters
 
 
-class NewsAPIFeedService(NewsAPINewsService):
-    # set of parameters that the API will allow.
-    allowed_params = {
-        "start_date",
-        "end_date",
-        "include_fields",
-        "exclude_fields",
-        "max_results",
-        "version",
-        "where",
-        "q",
-        "default_operator",
-        "filter",
-        "service",
-        "subject",
-        "genre",
-        "urgency",
-        "priority",
-        "type",
-        "item_source",
-        "timezone",
-        "products",
-        "exclude_ids",
-    }
+allowed_exclude_fields = {
+    "version",
+    "firstcreated",
+    "headline",
+    "byline",
+    "slugline",
+}
 
-    default_sort = [{"versioncreated": "asc"}]
 
-    # set of fields that are allowed to be excluded in the exlude_fields parameter
-    allowed_exclude_fields = {
-        "version",
-        "firstcreated",
-        "headline",
-        "byline",
-        "slugline",
-    }
+class NewsAPIFeedSearchArgs(NewsApiSearchRequestArgs):
+    allowed_exclude_fields: ClassVar[set[str]] = allowed_exclude_fields
 
-    def prefill_search_query(self, search, req=None, lookup=None):
-        """Generate the search query instance
+    exclude_ids: list[str] = Field(default_factory=list)
 
-        :param newsroom.search.SearchQuery search: The search query instance
-        :param eve.utils.ParsedRequest req: The parsed in request instance from the endpoint
-        :param dict lookup: The parsed in lookup dictionary from the endpoint
+    @field_validator("exclude_ids", mode="before")
+    def validate_exclude_ids(cls, value: list[str] | str) -> list[str]:
+        if isinstance(value, str):
+            return value.split(",")
+
+        return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_not_allowed_feed_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """
+        Some fields from the parent class are not allowed in feed's case
         """
 
-        super().prefill_search_query(search, req, lookup)
+        restricted_fields = ["page", "page_size", "sort"]
+        for field in restricted_fields:
+            if field in values:
+                raise UnexpectedParameterError(desc=f"Unexpected parameter ({field})")
 
-        if search.args.get("exclude_ids"):
-            search.args["exclude_ids"] = search.args["exclude_ids"].split(",")
+        return values
 
-        try:
-            search.args["max_results"] = int(search.args.get("max_results") or 25)
-        except ValueError:
-            raise BadParameterValueError("Max Results must be a number")
 
-        search.args["size"] = search.args["max_results"]
+def apply_exclude_ids(request: NewshubSearchRequest[NewsAPIFeedSearchArgs]):
+    if request.args.exclude_ids:
+        request.search.query.must_not.append({"terms": {"_id": request.args.exclude_ids}})
 
-    def apply_filters(self, search):
-        """Generate and apply the different search filters
 
-        :param newsroom.search.SearchQuery search: the search query instance
-        """
+default_news_feed_filters = [apply_exclude_ids] + default_search_filters
 
-        super().apply_filters(search)
 
-        if search.args.get("exclude_ids"):
-            search.query["bool"]["must_not"].append({"terms": {"_id": search.args["exclude_ids"]}})
+class NewsAPIFeedSearchService(NewsApiSearchServiceAsync):
+    search_args_class = NewsAPIFeedSearchArgs
+    filters = cast(list[SearchFilterFunction], default_news_feed_filters)
 
-    def on_fetched(self, doc):
-        self._enhance_hateoas(doc)
-        super().on_fetched(doc)
+    def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
+        super().build_hateoas(req, resp, search_req)
 
-    def _enhance_hateoas(self, doc):
-        doc.setdefault("_links", {})
-        doc["_links"]["parent"] = {"title": "Home", "href": "/"}
-        # Remove the next and last page references
-        doc["_links"].pop("last", None)
-        doc["_links"].pop("next", None)
+        resp.body["_links"].pop("last", None)
+        resp.body["_links"].pop("next", None)
+        resp.body["_meta"].pop("page", None)
 
-        doc.setdefault("_meta", {})
-        doc["_meta"].pop("page", None)
+        self._hateoas_set_next_page_links(resp, search_req)
 
-        self._hateoas_set_item_links(doc)
-        self._hateoas_set_next_page_links(doc)
-
-    def _hateoas_set_item_links(self, doc):
-        for item in doc.get("_items") or []:
-            doc_id = str(item["_id"])
-            item.setdefault("_links", {})
-            item["_links"]["self"] = {
-                "href": "news/item/{}".format(doc_id),
-                "title": "News Item",
-            }
-            item.pop("_updated", None)
-            item.pop("_created", None)
-            item.pop("_etag", None)
-
-    def _hateoas_set_next_page_links(self, doc):
-        args = request.args.to_dict()
+    def _hateoas_set_next_page_links(self, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
+        doc = resp.body
+        query_params = search_req.args.to_dict(flatten_lists=True)
 
         if doc["_meta"]["total"] > 0:
             desc_items = list(reversed(doc.get("_items") or []))
-            last_datetime = desc_items[0].get("versioncreated").strftime("%Y-%m-%dT%H:%M:%S")
+            last_datetime = desc_items[0].get("versioncreated")
             exclude_ids = []
 
             for item in desc_items:
-                if item.get("versioncreated").strftime("%Y-%m-%dT%H:%M:%S") != last_datetime:
+                if item.get("versioncreated") != last_datetime:
                     break
 
                 exclude_ids.append(item.get("_id"))
 
-            args["exclude_ids"] = ",".join(exclude_ids)
-            args["start_date"] = last_datetime
+            parsed_datetime = parse_iso_date(last_datetime)
+            assert parsed_datetime is not None
+            query_params["start_date"] = parsed_datetime.strftime("%Y-%m-%d")
 
-            doc["_links"]["next_page"] = {
-                "title": "News Feed",
-                "href": "{}?{}".format(
-                    # request.path,
-                    "news/feed",
-                    "&".join(["{}={}".format(key, args[key]) for key in sorted(args.keys())]),
-                ),
-            }
+            args = f"?{urlencode(query_params)}" if query_params else ""
+            doc["_links"]["next_page"] = {"title": "News Feed", "href": f"news/feed{args}"}
         else:
-            doc["_links"]["next_page"] = doc["_links"]["self"] = {
-                "title": "News Feed",
-                "href": "{}?{}".format(
-                    # request.path,
-                    "news/feed",
-                    "&".join(["{}={}".format(key, args[key]) for key in sorted(args.keys())]),
-                ),
-            }
+            args = f"?{urlencode(query_params)}" if query_params else ""
+            doc["_links"]["next_page"] = doc["_links"]["self"] = {"title": "News Feed", "href": f"news/feed{args}"}

@@ -1,22 +1,26 @@
 import pytest
-import werkzeug.exceptions
+
+from pydantic import ValidationError
+from bson import ObjectId
 
 from newsroom.auth.saml import get_userdata
+from newsroom.companies import CompanyServiceAsync, CompanyResource
+from tests.core.utils import create_entries_for, update_entries_for
 
 
-def test_user_data_with_matching_company(app):
+async def test_user_data_with_matching_company(app):
     company = {
         "name": "test",
         "auth_domains": ["example.com"],
     }
-    app.data.insert("companies", [company])
+    await create_entries_for("companies", [company])
 
     saml_data = {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": ["Foo"],
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": ["Bar"],
     }
 
-    with app.test_request_context():
+    async with app.test_request_context("/login/saml"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
         assert user_data.get("user_type") == "public"
@@ -26,40 +30,40 @@ def test_user_data_with_matching_company(app):
         assert user_data.get("user_type") == "internal"
 
 
-def test_user_data_with_matching_preconfigured_client(app, client):
+async def test_user_data_with_matching_preconfigured_client(app, client):
     company = {
         "name": "test",
         "auth_domains": ["samplecomp"],
     }
 
-    app.data.insert("companies", [company])
+    await create_entries_for("companies", [company])
 
     saml_data = {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": ["Foo"],
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": ["Bar"],
     }
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
-        assert 404 == resp.status_code
+    resp = await client.get("/login/samplecomp")
+    assert 404 == resp.status_code
 
+    async with app.test_request_context("/login/saml"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert "company" not in user_data
 
     app.config["SAML_CLIENTS"] = ["samplecomp"]
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
+    async with app.test_client() as c:
+        resp = await c.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)
         assert user_data.get("company") == company["_id"]
         assert user_data.get("user_type") == "public"
 
-    app.data.update("companies", company["_id"], {"internal": True}, company)
+    await update_entries_for("companies", company["_id"], {"internal": True}, company)
 
-    with app.test_client() as c:
-        resp = c.get("/login/samplecomp")
+    async with app.test_client() as c:
+        resp = await c.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)
@@ -67,26 +71,46 @@ def test_user_data_with_matching_preconfigured_client(app, client):
         assert user_data.get("user_type") == "internal"
 
 
-def test_get_userdata_without_first_last_name(app):
+async def test_get_userdata_without_first_last_name(app):
     saml_data = {
         "http://schemas.microsoft.com/identity/claims/displayname": ["Foo Bar"],
     }
 
-    with app.test_request_context():
+    async with app.test_request_context("/"):
         user_data = get_userdata("foo@example.com", saml_data)
         assert "Foo" == user_data["first_name"]
         assert "Bar" == user_data["last_name"]
 
 
-def test_company_auth_domains(app):
-    app.data.insert("companies", [{"name": "test", "auth_domains": ["example.com"]}])
-    assert app.data.find_one("companies", req=None, auth_domains="example.com") is not None
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "test2", "auth_domains": ["example.com"]}])
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "TEST2", "auth_domains": ["EXAMPLE.COM"]}])
-    app.data.insert("companies", [{"name": "test3", "auth_domains": []}])
-    app.data.insert("companies", [{"name": "test4", "auth_domains": ["foo.com", "bar.com"]}])
-    assert app.data.find_one("companies", req=None, auth_domains="bar.com") is not None
-    with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "test6", "auth_domains": ["unique.com", "example.com"]}])
+async def test_company_auth_domains(app, client):
+    service = CompanyServiceAsync()
+
+    await service.create([CompanyResource(id=ObjectId(), name="test", auth_domains=["example.com"])])
+
+    def assert_unique_domain_error(validation_error):
+        errors = validation_error.value.errors()
+        assert errors[0]["type"] == "unique"
+        assert errors[0]["loc"] == ("auth_domains",)
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="test2", auth_domains=["example.com"])])
+    assert_unique_domain_error(error)
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="TEST2", auth_domains=["EXAMPLE.COM"])])
+    assert_unique_domain_error(error)
+
+    companies = await service.create(
+        [
+            CompanyResource(id=ObjectId(), name="test3", auth_domains=[]),
+            CompanyResource(id=ObjectId(), name="test4", auth_domains=["foo.com", "bar.com"]),
+        ]
+    )
+
+    with pytest.raises(ValidationError) as error:
+        await service.create([CompanyResource(id=ObjectId(), name="test6", auth_domains=["unique.com", "example.com"])])
+    assert_unique_domain_error(error)
+
+    with pytest.raises(ValidationError) as error:
+        await service.update(companies[0].id, dict(auth_domains=["unique.com", "example.com"]))
+    assert_unique_domain_error(error)

@@ -1,104 +1,93 @@
-from flask import json, url_for
+from quart import json, url_for
 from bson import ObjectId
+
+from newsroom.types import UserRole, CompanyResource
+from newsroom.companies import CompanyServiceAsync as CompanyService
 from newsroom.tests.users import test_login_succeeds_for_admin
 from newsroom.tests.fixtures import COMPANY_1_ID
-from superdesk import get_resource_service
 
-from newsroom.user_roles import UserRole
+from newsroom.users.service import UsersService
 from tests.utils import logout
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id, find_one_for
 
 
-def test_delete_company_deletes_company_and_users(client):
-    test_login_succeeds_for_admin(client)
+async def test_delete_company_deletes_company_and_users(client):
+    await test_login_succeeds_for_admin(client)
     # Register a new company
-    response = client.post(
+    response = await client.post(
         "/companies/new",
-        data=json.dumps(
-            {
-                "phone": "2132132134",
-                "sd_subscriber_id": "12345",
-                "name": "Press 2 Co.",
-                "is_enabled": True,
-                "contact_name": "Tom",
-            }
-        ),
-        content_type="application/json",
+        json={
+            "phone": "2132132134",
+            "sd_subscriber_id": "12345",
+            "name": "Press 2 Co.",
+            "is_enabled": True,
+            "contact_name": "Tom",
+        },
     )
 
     assert response.status_code == 201
-    company = get_resource_service("companies").find_one(req=None, name="Press 2 Co.")
+    company: CompanyResource = await CompanyService().find_one(name="Press 2 Co.")
 
     # Register a user for the company
-    response = client.post(
+    response = await client.post(
         "/users/new",
-        data={
+        form={
             "email": "newuser@abc.org",
             "first_name": "John",
             "last_name": "Doe",
             "password": "abc",
             "phone": "1234567",
-            "company": ObjectId(company["_id"]),
+            "company": company.id,
             "user_type": "public",
         },
     )
     assert response.status_code == 201
 
-    response = client.delete("/companies/{}".format(str(company["_id"])))
+    response = await client.delete("/companies/{}".format(company.id))
     assert response.status_code == 200
 
-    company = get_resource_service("companies").find_one(req=None, _id=str(company["_id"]))
-    assert company is None
-    user = get_resource_service("users").find_one(req=None, email="newuser@abc.org")
+    user = await UsersService().find_one(email="newuser@abc.org")
+    company = await CompanyService().find_by_id(company.id)
+
     assert user is None
+    assert company is None
 
 
-def test_company_name_is_unique(client):
-    test_login_succeeds_for_admin(client)
+async def test_company_name_is_unique(client):
+    await test_login_succeeds_for_admin(client)
     # Register a new company
-    response = client.post(
+    response = await client.post(
         "/companies/new",
-        data=json.dumps(
-            {
-                "phone": "2132132134",
-                "sd_subscriber_id": "12345",
-                "name": "Press 2 Co.",
-                "is_enabled": True,
-                "contact_name": "Tom",
-            }
-        ),
-        content_type="application/json",
+        json={
+            "phone": "2132132134",
+            "sd_subscriber_id": "12345",
+            "name": "Press 2 Co.",
+            "is_enabled": True,
+            "contact_name": "Tom",
+        },
     )
 
     assert response.status_code == 201
-    company_id = json.loads(response.get_data()).get("_id")
+    company_id = json.loads(await response.get_data()).get("_id")
     assert company_id
 
-    duplicate_response = client.post(
-        "/companies/new",
-        data=json.dumps(
-            {
-                "name": "PRESS 2 Co.",
-            }
-        ),
-        content_type="application/json",
-    )
+    duplicate_response = await client.post("/companies/new", json={"name": "PRESS 2 Co."})
 
     assert duplicate_response.status_code == 400
-    assert json.loads(duplicate_response.get_data()).get("name") == "Company already exists"
+    assert json.loads(await duplicate_response.get_data()).get("name") == "Value must be unique"
 
 
-def test_get_company_users(client):
-    test_login_succeeds_for_admin(client)
-    resp = client.post(
+async def test_get_company_users(client):
+    await test_login_succeeds_for_admin(client)
+    resp = await client.post(
         "companies/new",
-        data=json.dumps({"name": "Test"}),
-        content_type="application/json",
+        json={"name": "Test"},
     )
-    company_id = json.loads(resp.get_data()).get("_id")
+    company_id = json.loads(await resp.get_data()).get("_id")
     assert company_id
-    resp = client.post(
+    resp = await client.post(
         "users/new",
-        data={
+        form={
             "company": company_id,
             "first_name": "foo",
             "last_name": "bar",
@@ -107,22 +96,22 @@ def test_get_company_users(client):
             "user_type": "public",
         },
     )
-    assert resp.status_code == 201, resp.get_data().decode("utf-8")
-    resp = client.get("companies/%s/users" % company_id)
-    assert resp.status_code == 200, resp.get_data().decode("utf-8")
-    users = json.loads(resp.get_data())
+    assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
+    resp = await client.get("/companies/%s/users" % company_id)
+    assert resp.status_code == 200, (await resp.get_data()).decode("utf-8")
+    users = json.loads(await resp.get_data())
     assert 1 == len(users)
     assert "foo" == users[0].get("first_name"), users[0].keys()
 
 
-def test_save_company_permissions(client, app):
-    logout(client)
+async def test_save_company_permissions(client, app):
+    await logout(client)
     sports_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
-                "_id": "p-1",
+                "_id": ObjectId(),
                 "name": "Sport",
                 "description": "sport product",
                 "companies": [COMPANY_1_ID],
@@ -135,61 +124,57 @@ def test_save_company_permissions(client, app):
                 "description": "news product",
                 "is_enabled": True,
                 "product_type": "wire",
-                "product_type": "wire",
             },
         ],
     )
 
-    test_login_succeeds_for_admin(client)
-    client.post(
+    await test_login_succeeds_for_admin(client)
+    await client.post(
         f"companies/{COMPANY_1_ID}",
-        data=json.dumps(
-            {
-                "archive_access": True,
-                "sections": {"wire": True},
-                "products": [{"_id": sports_id, "section": "wire"}],
-            }
-        ),
-        content_type="application/json",
+        json={
+            "archive_access": True,
+            "sections": {"wire": True},
+            "products": [{"_id": sports_id, "section": "wire"}],
+        },
     )
 
-    updated = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    updated = await find_one_by_id("companies", COMPANY_1_ID)
     assert updated["sections"]["wire"]
     assert not updated["sections"].get("agenda")
     assert updated["archive_access"]
     assert updated["products"] == [{"section": "wire", "seats": 0, "_id": sports_id}]
 
     # available by default
-    resp = client.get(url_for("agenda.index"))
+    resp = await client.get(url_for("agenda.index"))
     assert resp.status_code == 200
 
     # set company with wire only
-    user = app.data.find_one("users", req=None, first_name="admin")
+    user = await find_one_for("users", first_name="admin")
     assert user
-    app.data.update("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
+    await update_entries_for("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
 
     # refresh session with new type
-    logout(client)
-    test_login_succeeds_for_admin(client)
+    await logout(client)
+    await test_login_succeeds_for_admin(client)
 
     # test section protection
-    resp = client.get(url_for("agenda.index"))
+    resp = await client.get(url_for("agenda.index"))
     assert resp.status_code == 403
 
 
-def test_company_ip_whitelist_validation(client):
+async def test_company_ip_whitelist_validation(client):
     new_company = {"name": "Test", "allowed_ip_list": ["wrong"]}
-    test_login_succeeds_for_admin(client)
-    resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
+    await test_login_succeeds_for_admin(client)
+    resp = await client.post("companies/new", json=new_company)
     assert resp.status_code == 400
 
 
-def test_company_auth_domains(client):
+async def test_company_auth_domains(client):
     new_company = {"name": "Test", "auth_domains": ["example.com"]}
-    resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
+    resp = await client.post("companies/new", json=new_company)
     assert resp.status_code == 201
 
     new_company = {"name": "Test 2", "auth_domains": ["example.com"]}
-    resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
+    resp = await client.post("companies/new", json=new_company)
     assert resp.status_code == 400
-    assert resp.json.get("auth_domains") == "Value is already used"
+    assert (await resp.get_json()).get("auth_domains") == "Value must be unique"

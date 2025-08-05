@@ -1,7 +1,8 @@
 import os
-import flask
 
-from newsroom.auth import get_user
+from newsroom.flask import send_from_directory
+
+from newsroom.commands.cli import commands_blueprint
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
@@ -37,7 +38,8 @@ from newsroom.template_filters import (
     format_event_datetime,
 )
 from newsroom.template_loaders import LocaleTemplateLoader
-from newsroom.notifications.notifications import get_initial_notifications
+from newsroom.notifications import get_initial_notifications
+
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
 from newsroom.settings import SettingsApp
@@ -56,10 +58,11 @@ class NewsroomWebApp(BaseNewsroomApp):
         app.run()
     """
 
+    dashboards: list[dict]
+
     INSTANCE_CONFIG = "settings.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
-        self.download_formatters = {}
         self.sections = []
         self.sidenavs = []
         self.settings_apps = []
@@ -149,7 +152,13 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(format_event_datetime)
         self.add_template_global(get_ga_user_properties)
 
-        self.context_processor(lambda: {"auth_user": get_user()})
+        def get_user_for_template():
+            from newsroom.auth.utils import get_user_or_none_from_request
+
+            user = get_user_or_none_from_request(None)
+            return {"auth_user": user.to_dict() if user else None}
+
+        self.context_processor(get_user_for_template)
 
         self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 
@@ -162,34 +171,23 @@ class NewsroomWebApp(BaseNewsroomApp):
     def _setup_assets(self):
         NewsroomWebpack(self)
 
+    def _get_current_object(self):
+        # TODO-ASYNC: many tests break because of this method being missing
+        # leaving here just to reduce the noise. We will remove it later
+        return self
+
     def _setup_theme(self):
         self.add_url_rule(
             self.static_url_path.replace("static", "theme") + "/<path:filename>",
             endpoint="theme",
+            host=getattr(self, "static_host", None),
             view_func=self.send_theme_file,
         )
 
-    def download_formatter(self, _format, formatter, name, types, assets=None):
-        """Register new download formatter.
-
-        :param _format: format id
-        :param formatter: formatter class, extending :class:`newsroom.formatter.BaseFormatter` class.
-        :param name: human readable name
-        :param types: list of supported types, eg. ``['wire', 'agenda']``
-        :param types: list of supported assets, eg. ``['picture']``
-        """
-        self.download_formatters[_format] = {
-            "format": _format,
-            "formatter": formatter,
-            "name": name,
-            "types": types,
-            "assets": assets,
-        }
-
-    def send_theme_file(self, filename):
+    async def send_theme_file(self, filename):
         if os.path.exists(os.path.join(self.theme_folder, filename)):
-            return flask.send_from_directory(self.theme_folder, filename)
-        return self.send_static_file(filename)
+            return await send_from_directory(self.theme_folder, filename)
+        return await self.send_static_file(filename)
 
     def section(self, _id, name, group, search_type=None):
         """Define new app section.
@@ -209,9 +207,9 @@ class NewsroomWebApp(BaseNewsroomApp):
 
             @blueprint.route('/foo')
             @section('foo')
-            def example():
+            async def example():
                 # user company has section foo enabled
-                return flask.render_template('example_index.html)
+                return await flask.render_template('example_index.html)
 
         You can also specify ``section`` param in sidenav and it will filter out
         menu items with sections which are not enabled for company.
@@ -281,7 +279,7 @@ class NewsroomWebApp(BaseNewsroomApp):
             )
         )
 
-    def dashboard(self, _id, name, cards=[]):
+    def dashboard(self, _id, name, cards=None):
         """Define new dashboard
 
         :param _id: id of the dashboard
@@ -289,8 +287,13 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param cards: list of cards id related to the dashboard to
         populate the drop down in dashboard config.
         """
-        self.dashboards.append({"_id": _id, "name": name, "cards": cards})
+        self.dashboards.append({"_id": _id, "name": name, "cards": cards or []})
 
 
-def get_app(config=None, **kwargs):
-    return NewsroomWebApp(__name__, config=config, **kwargs)
+def get_app(config=None, **kwargs) -> NewsroomWebApp:
+    app = NewsroomWebApp(__name__, config=config, **kwargs)
+
+    # register newsroom commands group
+    app.register_blueprint(commands_blueprint)
+
+    return app

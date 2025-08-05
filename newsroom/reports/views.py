@@ -1,65 +1,100 @@
+from pydantic import BaseModel
+from inspect import isawaitable
 from io import StringIO
 import csv
 
-from flask import session, jsonify, render_template, abort, current_app as newsroom_app
-from flask_babel import gettext, current_app as app
+from quart_babel import gettext
 
-from newsroom.decorator import account_manager_or_company_admin_only
-from newsroom.reports import blueprint
+from superdesk.core import get_current_app, get_app_config
+from superdesk.core.types import Request, Response
+from superdesk.core.web import EndpointGroup
+from superdesk.flask import render_template
+from newsroom.auth import auth_rules
+from newsroom.auth.utils import get_user_from_request
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
 
 
-@blueprint.route("/reports/print/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-def print_reports(report):
+class RouteArguments(BaseModel):
+    report: str
+
+
+blueprint = EndpointGroup("reports", __name__)
+
+
+@blueprint.endpoint(
+    "/reports/print/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def print_reports(args: RouteArguments, params: None, request: Request):
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     data = func()
-    return render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
+    if isawaitable(data):
+        data = await data
+    return await render_template("reports_print.html", setting_type="print_reports", data=data, report=report)
 
 
-@blueprint.route("/reports/company_reports", methods=["GET"])
-@account_manager_or_company_admin_only
-def company_reports():
+@blueprint.endpoint(
+    "/reports/company_reports", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def company_reports(request: Request):
     companies = list(query_resource("companies"))
+    user = get_user_from_request(request)
     data = {
         "companies": companies,
-        "sections": newsroom_app.sections,
-        "api_enabled": app.config.get("NEWS_API_ENABLED", False),
-        "current_user_type": session.get("user_type"),
+        "sections": get_current_app().as_any().sections,
+        "api_enabled": get_app_config("NEWS_API_ENABLED", False),
+        "current_user_type": user.user_type,
     }
-    return render_template("company_reports.html", setting_type="company_reports", data=data)
+    return await render_template("company_reports.html", setting_type="company_reports", data=data)
 
 
-@blueprint.route("/reports/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-def get_report(report):
+@blueprint.endpoint(
+    "/reports/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def get_report(args: RouteArguments, params: None, request: Request) -> Response:
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     results = func()
-    return jsonify(results), 200
+    if isawaitable(results):
+        results = await results
+    return Response(results)
 
 
-@blueprint.route("/reports/export/<report>", methods=["GET"])
-@account_manager_or_company_admin_only
-def export_reports(report):
+@blueprint.endpoint(
+    "/reports/export/<string:report>", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def export_reports(args: RouteArguments, params: None, request: Request):
+    report = args.report
+    if not report:
+        return await request.abort(400, gettext("Report not specified"))
+
     reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
-        abort(400, gettext("Unknown report {}".format(report)))
+        return await request.abort(400, gettext("Unknown report {}".format(report)))
 
     rows = func()
+    if isawaitable(rows):
+        rows = await rows
     data = StringIO()
     writer = csv.writer(data, dialect="excel")
 
@@ -68,7 +103,7 @@ def export_reports(report):
 
     csv_file = data.getvalue().encode("utf-8")
 
-    response = newsroom_app.response_class(response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True)
+    response = get_current_app().response_class(response=csv_file, status=200, mimetype="text/csv")
 
     response.content_length = len(csv_file)
     response.headers["Content-Type"] = "text/csv"

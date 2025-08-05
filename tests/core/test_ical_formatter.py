@@ -3,12 +3,12 @@ import copy
 from datetime import datetime
 
 import icalendar
-from flask import json
+from quart import json
 
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
-from newsroom.utils import get_entity_or_404
 from newsroom.agenda.formatters import iCalFormatter
 from .test_push_events import test_event
+from tests.core.utils import find_one_by_id
 
 event = copy.deepcopy(test_event)
 event["ednote"] = "ed note"
@@ -22,9 +22,9 @@ event["dates"]["recurring_rule"] = {
 }
 
 
-def test_ical_formatter_item(client, app, mocker):
-    client.post("/push", data=json.dumps(event), content_type="application/json")
-    parsed = get_entity_or_404(event["guid"], "agenda")
+async def test_ical_formatter_item(client, app, mocker):
+    await client.post("/push", json=event)
+    parsed = await find_one_by_id("agenda", event["guid"])
     formatter = iCalFormatter()
 
     assert formatter.format_filename(parsed).endswith("new-press-conference.ical")
@@ -33,7 +33,7 @@ def test_ical_formatter_item(client, app, mocker):
         "newsroom.agenda.formatters.ical_formatter.utcnow",
         return_value=datetime(2018, 7, 30, 11, 9, 0),
     )
-    ical = formatter.format_item(parsed, item_type="agenda")
+    ical = await formatter.format_item(parsed, item_type="agenda")
 
     cal = icalendar.cal.Calendar.from_ical(ical)
     assert cal["version"] == "2.0"
@@ -56,17 +56,17 @@ def test_ical_formatter_item(client, app, mocker):
     assert vevent["rrule"].to_ical() == b"FREQ=DAILY;COUNT=3;INTERVAL=1"
 
 
-def test_ical_formatter_failing():
+async def test_ical_formatter_failing(client, app):
     with open(
         os.path.join(os.path.dirname(__file__), "../fixtures", "agenda_fixture.json"),
         "r",
     ) as fixture:
         item = json.load(fixture)
     formatter = iCalFormatter()
-    formatter.format_item(item, item_type="agenda")
+    await formatter.format_item(item, item_type="agenda")
 
 
-def test_onclusive_all_day():
+async def test_onclusive_all_day():
     event = {
         "name": "test",
         "dates": {
@@ -76,12 +76,12 @@ def test_onclusive_all_day():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART;VALUE=DATE:20240101" in output
     assert "DTEND;VALUE=DATE:20240104" in output
 
 
-def test_onclusive_no_end_time():
+async def test_onclusive_no_end_time():
     event = {
         "name": "test",
         "dates": {
@@ -91,12 +91,12 @@ def test_onclusive_no_end_time():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
-    assert "DTSTART;VALUE=DATE-TIME:20240101T100000Z" in output
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
+    assert "DTSTART:20240101T100000Z" in output
     assert "DTEND;VALUE=DATE:20240104" in output
 
 
-def test_onclusive_multiday():
+async def test_onclusive_multiday():
     event = {
         "name": "test",
         "dates": {
@@ -106,6 +106,6 @@ def test_onclusive_multiday():
         },
     }
     formatter = iCalFormatter()
-    output = formatter.format_item(event, item_type="agenda").decode("utf-8")
+    output = (await formatter.format_item(event, item_type="agenda")).decode("utf-8")
     assert "DTSTART;VALUE=DATE:20241118" in output
     assert "DTEND;VALUE=DATE:20241121" in output

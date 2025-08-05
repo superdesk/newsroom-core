@@ -1,21 +1,28 @@
+from typing import Any
+from io import BytesIO, StringIO
 import os
 import logging
-import tempfile
 from binascii import hexlify
+from collections import OrderedDict
+from datetime import date
 
-from PyRTF.Elements import Document, Section, LINE
+from quart_babel import lazy_gettext
+from PyRTF.Elements import Document, Section, LINE, StyleSheet
 from PyRTF.document.paragraph import Paragraph
 from PyRTF.document.character import TEXT
 from PyRTF.object.picture import Image
 from PyRTF.document.base import RawCode
 from werkzeug.utils import secure_filename
-from superdesk.utc import utcnow, utc_to_local
-from flask import current_app as app
 
+from superdesk.core import get_app_config, get_current_app
+from superdesk.utc import utcnow, utc_to_local
+
+from newsroom.types import MonitoringProfileResourceModel
 from newsroom.wire import url_for_wire
 from newsroom.monitoring.utils import get_keywords_in_text
-from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
+
+from .base_monitoring_formatter import BaseMonitoringFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -154,12 +161,21 @@ class LogoImage(Image):
         raise Exception("Invalid JPEG, end of stream reached")
 
 
-class MonitoringRTFFormatter(BaseFormatter):
+class MonitoringRTFFormatter(BaseMonitoringFormatter):
+    format_id = "monitoring_rtf"
+    name = lazy_gettext("RTF")
+
     FILE_EXTENSION = "rtf"
     MIMETYPE = "application/rtf"
 
-    def format_item(self, item, styles, monitoring_profile, section):
-        keywords = get_keywords_in_text(item.get("body_str"), (monitoring_profile or {}).get("keywords", []))
+    def _format_item(
+        self,
+        item: dict[str, Any],
+        styles: StyleSheet,
+        monitoring_profile: MonitoringProfileResourceModel,
+        section: Section,
+    ) -> None:
+        keywords = get_keywords_in_text(item.get("body_str") or "", monitoring_profile.keywords)
 
         p2 = Paragraph(styles.ParagraphStyles.Normal)
         p2.append(LINE, TEXT("Headline: {}".format(item.get("headline")), bold=True))
@@ -173,7 +189,7 @@ class MonitoringRTFFormatter(BaseFormatter):
         for line in body_lines:
             p3.append(line, LINE, LINE)
 
-        if monitoring_profile["alert_type"] == "linked_text":
+        if monitoring_profile.alert_type == "linked_text":
             p3.append(
                 LINE,
                 LINE,
@@ -186,16 +202,19 @@ class MonitoringRTFFormatter(BaseFormatter):
         section.append(p2)
         section.append(p3)
 
-    def format_filename(self, item):
+    def format_filename(self, item: dict[str, Any] | None) -> str:
         attachment_filename = "%s-monitoring-export.rtf" % utcnow().strftime("%Y%m%d%H%M%S")
         return secure_filename(attachment_filename)
 
-    def get_monitoring_file(self, date_items_dict, monitoring_profile=None):
-        _file = tempfile.NamedTemporaryFile()
+    async def get_monitoring_file(
+        self,
+        date_items_dict: OrderedDict[date, list[dict[str, Any]]],
+        monitoring_profile: MonitoringProfileResourceModel,
+    ) -> BytesIO:
         if not date_items_dict:
-            return _file
+            return BytesIO()
 
-        current_date = utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()).strftime("%d/%m/%Y")
+        current_date = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow()).strftime("%d/%m/%Y")
         doc = Document()
         section = Section()
         ss = doc.StyleSheet
@@ -216,8 +235,8 @@ class MonitoringRTFFormatter(BaseFormatter):
         p1 = Paragraph(ss.ParagraphStyles.Heading1)
         p1.append(
             "{} Monitoring: {} ({})".format(
-                app.config.get("MONITORING_REPORT_NAME", "Newsroom"),
-                monitoring_profile["name"],
+                get_app_config("MONITORING_REPORT_NAME", "Newsroom"),
+                monitoring_profile.name,
                 current_date,
             )
         )
@@ -228,10 +247,14 @@ class MonitoringRTFFormatter(BaseFormatter):
             date_p.append(LINE, d.strftime("%d/%m/%Y"))
             section.append(date_p)
             for item in date_items_dict[d]:
-                self.format_item(item, ss, monitoring_profile, section)
+                self._format_item(item, ss, monitoring_profile, section)
 
         doc.Sections.append(section)
-        app.customize_rtf_file(doc)
+        get_current_app().as_any().customize_rtf_file(doc)
 
-        doc.write(_file.name)
-        return _file
+        # PyRTF expects a string file-like object, otherwise fails
+        # So create a StringIO for it, then convert it to UTF-8 BytesIO
+        buffer = StringIO()
+        doc.write(buffer)
+        buffer.seek(0)
+        return BytesIO(buffer.read().encode("utf-8"))

@@ -4,12 +4,12 @@ from ..fixtures import items, init_items, init_auth, init_company  # noqa
 from ..utils import post_json, get_json
 
 
-def test_general_settings(client, app):
+async def test_general_settings(client, app):
     app.general_setting("foo", "Foo", default="bar")
     assert "bar" == get_setting("foo")
-    post_json(client, "/settings/general_settings", {"foo": "baz"})
+    await post_json(client, "/settings/general_settings", {"foo": "baz"})
     assert "baz" == get_setting("foo")
-    post_json(client, "/settings/general_settings", {"foo": ""})
+    await post_json(client, "/settings/general_settings", {"foo": ""})
     assert "bar" == get_setting("foo")
 
     # without key returns all settings with metadata
@@ -18,37 +18,37 @@ def test_general_settings(client, app):
     assert "bar" == get_setting()["foo"]["default"]
 
 
-def test_boolean_settings(client, app):
+async def test_boolean_settings(client, app):
     app.general_setting("foo", "Foo", default=False)
     assert get_setting("foo") is False
-    post_json(client, "/settings/general_settings", {"foo": True})
+    await post_json(client, "/settings/general_settings", {"foo": True})
     assert get_setting("foo") is True
-    post_json(client, "/settings/general_settings", {"foo": False})
+    await post_json(client, "/settings/general_settings", {"foo": False})
     assert get_setting("foo") is False
-    post_json(client, "/settings/general_settings", {"foo": None})
+    await post_json(client, "/settings/general_settings", {"foo": None})
     assert get_setting("foo") is False
 
     app.general_setting("bar", "Bar", default=True)
     assert get_setting("bar") is True
-    post_json(client, "/settings/general_settings", {"bar": False})
+    await post_json(client, "/settings/general_settings", {"bar": False})
     assert get_setting("bar") is False
-    post_json(client, "/settings/general_settings", {"bar": True})
+    await post_json(client, "/settings/general_settings", {"bar": True})
     assert get_setting("bar") is True
-    post_json(client, "/settings/general_settings", {"foo": None})
+    await post_json(client, "/settings/general_settings", {"foo": None})
     assert get_setting("bar") is True
 
 
-def test_news_only_filter(client, app):
+async def test_news_only_filter(client, app):
     query = get_setting("news_only_filter")
     assert query is None
 
     # reset default filter
     app.config["NEWS_ONLY_FILTER"] = []
 
-    _items = get_json(client, "/wire/search?newsOnly=1")["_items"]
+    _items = (await get_json(client, "/wire/search?newsOnly=1"))["_items"]
     assert len(_items) == 3
 
-    post_json(client, "/settings/general_settings", {"news_only_filter": "type:text"})
+    await post_json(client, "/settings/general_settings", {"news_only_filter": "type:text"})
 
-    _items = get_json(client, "/wire/search?newsOnly=1")["_items"]
+    _items = (await get_json(client, "/wire/search?newsOnly=1"))["_items"]
     assert len(_items) == 0

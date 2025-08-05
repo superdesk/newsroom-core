@@ -1,39 +1,51 @@
+from typing import Any
+from datetime import datetime
+
 import csv
 import io
 import arrow
-
-from datetime import datetime
-from typing import List, Dict, Any, Union, Tuple, Optional
-from flask import current_app as app
+from quart_babel import lazy_gettext
 from werkzeug.utils import secure_filename
+
+from superdesk.core import get_app_config
+
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 from newsroom.utils import parse_dates
-from newsroom.formatter import BaseFormatter
 from newsroom.agenda.utils import get_filtered_subject
 
 
 class CSVFormatter(BaseFormatter):
+    format_id = "Csv"
+    name = lazy_gettext("CSV")
+    sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
+
     VERSION = "1.0"
     PRODID = "Newshub"
     FILE_EXTENSION = "csv"
     MIMETYPE = "text/csv"
+    BULK_MIMETYPE = "text/csv"
     MULTI = True
 
-    def format_item(self, item, item_type=None):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
         event_item = self.format_event(item)
         return self.serialize_to_csv([event_item])
 
-    def format_events(self, items: List[Dict[str, Any]], item_type: Union[str, None] = None) -> Tuple[bytes, str]:
+    async def format_items(
+        self, items: list[dict[str, Any]], item_type: str | None = None
+    ) -> tuple[bytes | io.BytesIO, str | None]:
         formatted_events = []
         for item in items:
             parse_dates(item)
             formatted_events.append(self.format_event(item))
         return self.serialize_to_csv(formatted_events), secure_filename(
-            f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-{'multi'}.{self.FILE_EXTENSION}"
+            f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-multi.{self.FILE_EXTENSION}"
         )
 
-    def serialize_to_csv(self, items: List[Dict[str, Any]]) -> bytes:
+    def serialize_to_csv(self, items: list[dict[str, Any]]) -> bytes:
         csv_string = io.StringIO()
-        fieldnames: List[str] = list(items[0].keys())
+        fieldnames: list[str] = list(items[0].keys())
         csv_writer: csv.DictWriter = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
         for item in items:
@@ -42,8 +54,8 @@ class CSVFormatter(BaseFormatter):
         csv_string.seek(0)  # Reset the buffer position
         return csv_string.getvalue().encode("utf-8-sig")
 
-    def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
-        subj_schemas = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES", [])
+    def format_event(self, item: dict[str, Any]) -> dict[str, Any]:
+        subj_schemas = get_app_config("AGENDA_CSV_SUBJECT_SCHEMES", [])
         event = item.get("event", {})
         event["subject"] = get_filtered_subject(event.get("subject", []), subj_schemas)
         return {
@@ -60,9 +72,9 @@ class CSVFormatter(BaseFormatter):
             "Website": event.get("links")[0] if event.get("links") else "",
             "Category": self.format_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
-            "Organization name": event.get("event_contact_info")[0].get("organisation", " ")
-            if event.get("event_contact_info")
-            else "",
+            "Organization name": (
+                event.get("event_contact_info")[0].get("organisation", " ") if event.get("event_contact_info") else ""
+            ),
             "Contact": self.format_contact_info(item),
             "Coverage type": self.format_coverage(item, "coverage_type"),
             "Coverage status": self.format_coverage(item, "coverage_status"),
@@ -72,13 +84,13 @@ class CSVFormatter(BaseFormatter):
         """Make sure dates are datetime instances."""
         return arrow.get(value).datetime
 
-    def format_date(self, item: Dict[str, Any], date_type: str) -> str:
+    def format_date(self, item: dict[str, Any], date_type: str) -> str:
         date_obj = self.datetime(item.get("dates", {}).get(date_type))
         if date_obj:
             return date_obj.strftime("%Y-%m-%d")
         return ""
 
-    def format_time(self, item: Dict[str, Any]) -> str:
+    def format_time(self, item: dict[str, Any]) -> str:
         date_obj = item.get("dates", {})
         if date_obj.get("all_day"):
             return ""
@@ -87,7 +99,7 @@ class CSVFormatter(BaseFormatter):
         else:
             return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')}-{self.datetime(date_obj.get('end')).strftime('%H:%M:%S')}"
 
-    def format_location(self, item: Dict[str, Any], field: str) -> str:
+    def format_location(self, item: dict[str, Any], field: str) -> str:
         """
         format location info
         """
@@ -96,11 +108,11 @@ class CSVFormatter(BaseFormatter):
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
-    def format_list(self, item: Dict[str, Any], key: str, language: Optional[str] = None) -> str:
+    def format_list(self, item: dict[str, Any], key: str, language: str | None = None) -> str:
         values = [get_translated_name(v, language) for v in item.get(key, [])]
         return ",".join(list(filter(bool, values)))
 
-    def format_contact_info(self, item: Dict[str, Any]) -> str:
+    def format_contact_info(self, item: dict[str, Any]) -> str:
         """
         format contact information
         """
@@ -118,7 +130,7 @@ class CSVFormatter(BaseFormatter):
                 return ",".join(list(filter(bool, contact_values)))
         return ""
 
-    def format_coverage(self, item: Dict[str, Any], field: str) -> str:
+    def format_coverage(self, item: dict[str, Any], field: str) -> str:
         """
         format coverage information
         """
@@ -130,7 +142,7 @@ class CSVFormatter(BaseFormatter):
         return ",".join(value)
 
 
-def get_translated_name(value: Dict[str, Any], language: Optional[str] = None) -> str:
+def get_translated_name(value: dict[str, Any], language: str | None = None) -> str:
     """
     Get translation for the given language
     """

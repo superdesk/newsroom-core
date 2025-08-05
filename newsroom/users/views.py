@@ -1,45 +1,65 @@
 import re
 import json
+
 from copy import deepcopy
-import flask
+from typing import Any, Dict, Optional, Annotated
+from pydantic import BaseModel, field_validator, AliasChoices, Field
+
 from bson import ObjectId
-from flask import jsonify, current_app as app
-from flask_babel import gettext
-from superdesk import get_resource_service
+from quart_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 
-from newsroom.user_roles import UserRole
-from newsroom.auth import get_user_by_email, get_company, get_user_required
+from superdesk.core.types import Request, Response
+from superdesk.core import get_current_app, get_app_config
+from superdesk.core.types import SearchRequest
+from superdesk.core.resources.fields import ObjectId as ObjectIdField
+
+from newsroom.types import CompanyProduct, UserResourceModel, UserAuthResourceModel, UserRole
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
-    add_token_data,
-    is_current_user_admin,
     is_current_user,
-    is_current_user_account_mgr,
-    is_current_user_company_admin,
     get_company_auth_provider,
+    get_user_from_request,
+    get_company_from_request,
+    add_token_data,
 )
+from newsroom.auth import auth_rules
 from newsroom.settings import get_setting
-from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
-    get_user_company_name,
     get_company_sections_monitoring_data,
 )
-from newsroom.notifications.notifications import get_notifications_with_items
+from newsroom.notifications import get_notifications_with_items, NotificationsService
 from newsroom.topics import get_user_topics
-from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
     COMPANY_ADMIN_ALLOWED_UPDATES,
     COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES,
     USER_PROFILE_UPDATES,
 )
-from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
+from newsroom.utils import (
+    get_json_or_400_async,
+    query_resource,
+    get_vocabulary,
+)
 from newsroom.monitoring.views import get_monitoring_for_company
+from newsroom.ui_config_async import UiConfigResourceService
+
+from .service import UsersService, UsersAuthService
+from .module import users_endpoints
+
+
+class RouteArguments(BaseModel):
+    user_id: str
+
+
+class NotificationRouteArguments(RouteArguments):
+    notification_id: str
 
 
 def get_settings_data():
+    app = get_current_app().as_any()
+
     return {
         "users": list(query_resource("users")),
         "companies": list(query_resource("companies")),
@@ -50,195 +70,215 @@ def get_settings_data():
     }
 
 
-def get_view_data():
-    user = get_user_required()
-    company = get_company(user)
+async def get_view_data():
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
     auth_provider = get_company_auth_provider(company)
-    rv = {
-        "user": user if user else None,
-        "company": str(company["_id"]) if company else "",
-        "topics": get_user_topics(user["_id"]) if user else [],
-        "companyName": get_user_company_name(user),
+    ui_config_service = UiConfigResourceService()
+    user_as_dict = user.to_dict()
+
+    view_data = {
+        "user": user_as_dict,
+        "company": company.id if company else "",
+        "topics": await get_user_topics(user.id) if user else [],
+        "companyName": company.name if company else "",
         "locators": get_vocabulary("locators"),
-        "monitoring_list": get_monitoring_for_company(user),
-        "ui_configs": {config["_id"]: config for config in query_resource("ui_config")},
-        "groups": app.config.get("WIRE_GROUPS", []),
+        "ui_configs": await ui_config_service.get_all_config(),
+        "groups": get_app_config("WIRE_GROUPS", []),
         "authProviderFeatures": dict(auth_provider.features),
     }
 
-    if app.config.get("ENABLE_MONITORING"):
-        rv["monitoring_list"] = get_monitoring_for_company(user)
+    if get_app_config("ENABLE_MONITORING"):
+        view_data["monitoring_list"] = await get_monitoring_for_company(user)
 
-    rv.update(get_company_sections_monitoring_data(company, user))
+    view_data.update(await get_company_sections_monitoring_data(company, user))
 
-    return rv
-
-
-@blueprint.route("/myprofile", methods=["GET"])
-@login_required
-def user_profile():
-    return flask.render_template("user_profile.html", data=get_view_data())
+    return view_data
 
 
-@blueprint.route("/users/search", methods=["GET"])
-@account_manager_or_company_admin_only
-def search():
-    lookup = {}
+class WhereParam(BaseModel):
+    company: ObjectIdField | None = None
+    products_id: Annotated[
+        ObjectIdField | None, Field(validation_alias=AliasChoices("products_id", "products._id"))
+    ] = None
+
+
+class ObjectIdListModel(BaseModel):
+    ids: Optional[str] = None
+
+    @field_validator("ids", mode="after")
+    def split_and_convert_ids(cls, value):
+        if isinstance(value, str):
+            return [ObjectId(id_str) for id_str in value.split(",")]
+        return value
+
+
+class SearchArgs(ObjectIdListModel):
+    q: Optional[str] = None
+    sort: Optional[str] = None
+    where: Optional[WhereParam] = None
+
+    @field_validator("where", mode="before")
+    def parse_where(cls, value):
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+
+@users_endpoints.endpoint("/users/search", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only])
+async def search(args: None, params: SearchArgs, request: Request) -> Response:
+    lookup: Dict[str, Any] = {}
     sort = None
-    if flask.request.args.get("q"):
-        regex = re.compile(re.escape(flask.request.args.get("q")), re.IGNORECASE)
+
+    if params.q:
+        regex = re.compile(re.escape(params.q), re.IGNORECASE)
         lookup = {"$or": [{"first_name": regex}, {"last_name": regex}, {"email": regex}]}
 
-    if flask.request.args.get("ids"):
-        lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
+    if params.ids:
+        lookup = {"_id": {"$in": params.ids}}
 
-    if flask.request.args.get("sort"):
-        sort = flask.request.args.get("sort")
+    if params.sort:
+        sort = params.sort
 
-    where_param = flask.request.args.get("where")
+    where_param = params.where
+
     if where_param:
-        try:
-            where = json.loads(where_param)
-            if where.get("company"):
-                lookup["company"] = where["company"]
-            if where.get("products._id"):
-                lookup["products._id"] = where["products._id"]
-        except json.JSONDecodeError as e:
-            return jsonify({"error": "Invalid 'where' parameter. JSON decoding failed: {}".format(str(e))}), 400
-    if is_current_user_company_admin():
-        # Make sure this request only searches for the current users company
-        company = get_company()
+        if where_param.company:
+            lookup["company"] = where_param.company
+        if where_param.products_id:
+            lookup["products._id"] = where_param.products_id
 
-        if company is None:
-            flask.abort(401)
+    # Make sure this request only searches for the current users company
+    user = get_user_from_request(request)
+    if user.is_company_admin():
+        company = get_company_from_request(request)
+        if company:
+            lookup["company"] = company.id
+        else:
+            await request.abort(401)
 
-        lookup["company"] = company["_id"]
+    mongo_cursor = await UsersService().find(SearchRequest(where=lookup, sort=sort, max_results=250))
+    users = await mongo_cursor.to_list_raw()
 
-    users = list(query_resource("users", lookup=lookup, sort=sort))
-    return jsonify(users), 200
+    return Response(users)
 
 
-@blueprint.route("/users/new", methods=["POST"])
-@account_manager_or_company_admin_only
-def create():
-    form = UserForm()
-    if form.validate():
-        if not _is_email_address_valid(form.email.data):
-            return jsonify({"email": [gettext("Email address is already in use")]}), 400
+@users_endpoints.endpoint("/users/new", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only])
+async def create(request: Request) -> Response:
+    form = await UserForm.create_form()
 
-        new_user = get_updates_from_form(form, on_create=True)
-        user_is_company_admin = is_current_user_company_admin()
-        if user_is_company_admin:
-            company = get_company()
-            if company is None:
-                flask.abort(401)
+    if await form.validate():
+        creation_data = get_updates_from_form(form, on_create=True)
+        new_user = UserAuthResourceModel.from_dict(creation_data)
+        current_user = get_user_from_request(request)
+        if current_user.is_company_admin():
+            company_from_admin = get_company_from_request(request)
+            if not company_from_admin:
+                return await request.abort(401)
 
             # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
-            new_user["company"] = company["_id"]
-            new_user["user_type"] = UserRole.PUBLIC.value
+            new_user.company = company_from_admin.id
+            new_user.user_type = UserRole.PUBLIC
         elif form.company.data:
-            new_user["company"] = ObjectId(form.company.data)
-        elif new_user["user_type"] != "administrator":
-            return (
-                jsonify({"company": [gettext("Company is required for non administrators")]}),
-                400,
-            )
+            new_user.company = ObjectId(form.company.data)
+        elif new_user.user_type != "administrator":
+            return Response({"company": [gettext("Company is required for non administrators")]}, 400)
 
-        # Flask form won't accept default value if any form data was passed in the request.
-        # So, we need to set this explicitly here.
-        new_user["receive_email"] = True
-        new_user["receive_app_notifications"] = True
+        new_user.receive_email = True
+        new_user.receive_app_notifications = True
 
-        company = get_company(new_user)
+        company = await new_user.get_company()
         auth_provider = get_company_auth_provider(company)
-
         if auth_provider.features["verify_email"]:
             add_token_data(new_user)
 
-        ids = get_resource_service("users").post([new_user])
+        new_users = await UsersAuthService().create([new_user])
 
         if auth_provider.features["verify_email"]:
-            send_token(new_user, token_type="new_account", update_token=False)
+            await send_token(new_user, token_type="new_account", update_token=False)
 
-        return jsonify({"success": True, "_id": ids[0]}), 201
-    return jsonify(form.errors), 400
+        return Response({"success": True, "_id": new_users[0].id}, 201)
+
+    return Response(form.errors, 400)
 
 
-@blueprint.route("/users/<_id>/resend_invite", methods=["POST"])
-@account_manager_or_company_admin_only
-def resent_invite(_id):
-    user = find_one("users", _id=ObjectId(_id))
-    company = get_company()
-    user_is_company_admin = is_current_user_company_admin()
-    auth_provider = get_company_auth_provider(get_company(user))
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/resend_invite", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def resent_invite(args: RouteArguments, params: None, request: Request) -> Response:
+    # TODO: cover with tests all the cases in this view
+    user = await UsersAuthService().find_by_id(args.user_id)
+    company = get_company_from_request(request)
+    current_user = get_user_from_request(request)
+    user_is_company_admin = current_user.is_company_admin()
+
+    user_company = await user.get_company()
+    if not user_company:
+        await request.abort(403)
+
+    assert user_company
+
+    auth_provider = get_company_auth_provider(user_company)
 
     if not user:
-        return NotFound(gettext("User not found"))
-    elif user.get("is_validated"):
-        return jsonify({"is_validated": gettext("User is already validated")}), 400
-    elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
+        raise NotFound(gettext("User not found"))
+    elif user.is_validated:
+        return Response({"is_validated": gettext("User is already validated")}, 400)
+    elif user_is_company_admin and (company is None or user.company != company.id):
         # Company admins can only resent invites for members of their company only
-        flask.abort(403)
+        await request.abort(403)
     elif not auth_provider.features["verify_email"]:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
-        flask.abort(403)
+        await request.abort(403)
 
-    send_token(user, token_type="new_account")
-    return jsonify({"success": True}), 200
+    await send_token(user, token_type="new_account")
 
-
-def _is_email_address_valid(email):
-    existing_user = get_user_by_email(email)
-    return not existing_user
+    return Response({"success": True})
 
 
-@blueprint.route("/users/<_id>", methods=["GET", "POST"])
-@login_required
-def edit(_id):
-    user_is_company_admin = is_current_user_company_admin()
-    user_is_admin = is_current_user_admin()
-    user_is_account_mgr = is_current_user_account_mgr()
+@users_endpoints.endpoint("/users/<string:user_id>", methods=["GET", "POST"])
+async def edit(args: RouteArguments, params: None, request: Request) -> Response:
+    current_user = get_user_from_request(request)
+    user_is_company_admin = current_user.is_company_admin()
+    user_is_admin = current_user.is_admin()
+    user_is_account_mgr = current_user.is_account_manager()
     user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
-    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(_id):
-        flask.abort(401)
+    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(
+        args.user_id, request
+    ):
+        await request.abort(401)
 
-    user = find_one("users", _id=ObjectId(_id))
-    company = get_company()
+    user = await UsersService().find_by_id(args.user_id)
+    company = get_company_from_request(request)
 
-    if user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
-        flask.abort(403)
+    if user_is_company_admin and (company is None or user.company != company.id):
+        await request.abort(403)
 
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
-    etag = flask.request.headers.get("If-Match")
-    if etag and user["_etag"] != etag:
-        return flask.abort(412)
+    etag = request.get_header("If-Match")
+    if etag and user.etag != etag:
+        await request.abort(412)
 
-    if flask.request.method == "POST":
-        form = UserForm(user=user)
-        if form.validate_on_submit():
-            if form.email.data != user["email"] and not _is_email_address_valid(form.email.data):
-                return (
-                    jsonify({"email": [gettext("Email address is already in use")]}),
-                    400,
-                )
-            elif not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
-                return (
-                    jsonify({"company": [gettext("Company is required for non administrators")]}),
-                    400,
-                )
+    if request.method == "POST":
+        form = await UserForm.create_form()
+
+        if await form.validate_on_submit():
+            if not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
+                return Response({"company": [gettext("Company is required for non administrators")]}, 400)
 
             updates = get_updates_from_form(form)
 
-            if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
-                flask.abort(401)
+            if not user_is_admin and updates.get("user_type", "") != (user.user_type or ""):
+                await request.abort(401)
 
             allowed_fields = None
             if user_is_non_admin:
                 allowed_fields = USER_PROFILE_UPDATES
             elif user_is_company_admin:
+                # TODO-ASYNC: adjust when `get_setting` is migrated to async
                 allowed_fields = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
                     if not get_setting("allow_companies_to_manage_products")
@@ -250,13 +290,15 @@ def edit(_id):
                     if field not in allowed_fields:
                         updates.pop(field, None)
 
-            get_resource_service("users").patch(ObjectId(_id), updates=updates)
-            return jsonify({"success": True}), 200
-        return jsonify(form.errors), 400
-    return jsonify(user), 200
+            await UsersService().update(args.user_id, updates)
+            return Response({"success": True})
+
+        return Response(form.errors, 400)
+
+    return Response(user)
 
 
-def get_updates_from_form(form: UserForm, on_create=False):
+def get_updates_from_form(form: UserForm, on_create=False) -> Dict[str, Any]:
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
@@ -265,7 +307,8 @@ def get_updates_from_form(form: UserForm, on_create=False):
             updates.pop("sections")  # will be populated later based on company
         elif updates.get("sections") is not None:
             updates["sections"] = {
-                section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+                section["_id"]: section["_id"] in (form.sections.data or [])
+                for section in get_current_app().as_any().sections
             }
 
     if updates.get("products") is not None:
@@ -274,64 +317,67 @@ def get_updates_from_form(form: UserForm, on_create=False):
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
         }
         updates["products"] = [
-            {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+            CompanyProduct(_id=product["_id"], section=product["product_type"]) for product in products.values()  # type: ignore
         ]
+
     return updates
 
 
-@blueprint.route("/users/<_id>/profile", methods=["POST"])
-@login_required
-def edit_user_profile(_id):
-    if not is_current_user(_id):
-        flask.abort(403)
-
-    user_id = ObjectId(_id)
-    user = find_one("users", _id=user_id)
-
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/profile",
+    methods=["POST"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def edit_user_profile(args: RouteArguments, params: None, request: Request) -> Response:
+    user = await UsersService().find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
-    form = UserForm(user=user)
-    if form.validate_on_submit():
+    form = await UserForm.create_form(user=user.to_dict())
+    if await form.validate_on_submit():
         updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
-        get_resource_service("users").patch(user_id, updates=updates)
-        return jsonify({"success": True}), 200
-    return jsonify(form.errors), 400
+        await UsersService().update(args.user_id, updates)
+        return Response({"success": True})
+
+    return Response(form.errors, 400)
 
 
-@blueprint.route("/users/<_id>/notification_schedules", methods=["POST"])
-@login_required
-def edit_user_notification_schedules(_id):
-    if not is_current_user(_id):
-        flask.abort(403)
-
-    user_id = ObjectId(_id)
-    user = find_one("users", _id=user_id)
-
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notification_schedules",
+    methods=["POST"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def edit_user_notification_schedules(args: RouteArguments, params: None, request: Request) -> Response:
+    user: Optional[UserResourceModel] = await UsersService().find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
-    data = get_json_or_400()
+    data = await get_json_or_400_async(request)
 
-    updates = {"notification_schedule": deepcopy(user.get("notification_schedule") or {})}
+    updates: Dict[str, Any] = {"notification_schedule": {}}
+    if user.notification_schedule:
+        user_dict = user.to_dict()
+        updates["notification_schedule"] = deepcopy(user_dict.get("notification_schedule") or {})
+
     updates["notification_schedule"].update(data)
-    get_resource_service("users").patch(user_id, updates=updates)
-    return jsonify({"success": True}), 200
+
+    await UsersService().update(args.user_id, updates)
+    return Response({"success": True})
 
 
-@blueprint.route("/users/<_id>/validate", methods=["POST"])
-@admin_only
-def validate(_id):
-    return _resend_token(_id, token_type="validate")
+@users_endpoints.endpoint("/users/<string:user_id>/validate", methods=["POST"], auth=[auth_rules.admin_only])
+async def validate(args: RouteArguments, params: None, request: None) -> Response:
+    return await _resend_token(args.user_id, token_type="validate")
 
 
-@blueprint.route("/users/<_id>/reset_password", methods=["POST"])
-@account_manager_or_company_admin_only
-def resend_token(_id):
-    return _resend_token(_id, token_type="reset_password")
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/reset_password", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def resend_token(args: RouteArguments, params: None, request: None) -> Response:
+    return await _resend_token(args.user_id, token_type="reset_password")
 
 
-def _resend_token(user_id, token_type):
+async def _resend_token(user_id: str | None, token_type: str) -> Response:
     """
     Sends a new token for a given user_id
     :param user_id: Id of the user to send the token
@@ -339,68 +385,82 @@ def _resend_token(user_id, token_type):
     :return:
     """
     if not user_id:
-        return BadRequest(gettext("User id not provided"))
+        raise BadRequest(gettext("User id not provided"))
 
-    user = find_one("users", _id=ObjectId(user_id))
-
+    user = await UsersAuthService().find_by_id(user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
-    if send_token(user, token_type):
-        return jsonify({"success": True}), 200
+    assert user
 
-    return jsonify({"message": "Token could not be sent"}), 400
+    if await send_token(user, token_type):
+        return Response({"success": True})
+
+    return Response({"message": "Token could not be sent"}, 400)
 
 
-@blueprint.route("/users/<_id>", methods=["DELETE"])
-@account_manager_or_company_admin_only
-def delete(_id):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>", methods=["DELETE"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def delete(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes the user by given id"""
-    get_resource_service("users").delete_action({"_id": ObjectId(_id)})
-    return jsonify({"success": True}), 200
+    service = UsersService()
+    user = await service.find_by_id(args.user_id)
+    await service.delete(user)
+
+    return Response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/notifications", methods=["GET"])
-@login_required
-def get_notifications(user_id):
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications",
+    methods=["GET"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def get_notifications() -> Response:
+    return Response(await get_notifications_with_items())
 
-    return jsonify(get_notifications_with_items()), 200
 
-
-@blueprint.route("/users/<user_id>/notifications", methods=["DELETE"])
-@login_required
-def delete_all(user_id):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications",
+    methods=["DELETE"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def delete_all(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes all notification by given user id"""
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
 
-    get_resource_service("notifications").delete_action({"user": ObjectId(user_id)})
-    return jsonify({"success": True}), 200
+    await NotificationsService().delete_many({"user": ObjectId(args.user_id)})
+
+    return Response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/notifications/<notification_id>", methods=["DELETE"])
-@login_required
-def delete_notification(user_id, notification_id):
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/notifications/<string:notification_id>",
+    methods=["DELETE"],
+    auth=[auth_rules.url_arg_must_be_current_user("user_id")],
+)
+async def delete_notification(args: NotificationRouteArguments, params: None, request: Request) -> Response:
     """Deletes the notification by given id"""
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
 
-    get_resource_service("notifications").delete_action({"_id": notification_id})
-    return jsonify({"success": True}), 200
+    service = NotificationsService()
+    original = await service.find_by_id(args.notification_id)
+    if not original:
+        await request.abort(404)
+    await NotificationsService().delete(original)
+
+    return Response({"success": True})
 
 
-@blueprint.route("/users/<user_id>/approve", methods=["POST"])
-@account_manager_or_company_admin_only
-def approve_user(user_id):
-    users_service = get_resource_service("users")
-    user = users_service.find_one(req=None, _id=ObjectId(user_id))
+@users_endpoints.endpoint(
+    "/users/<string:user_id>/approve", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+)
+async def approve_user(args: RouteArguments, params: None, request: Request) -> Response:
+    users_service = UsersAuthService()
+    user = await users_service.find_by_id(args.user_id)
     if not user:
-        return NotFound(gettext("User not found"))
+        raise NotFound(gettext("User not found"))
 
-    if user.get("is_approved"):
-        return jsonify({"error": gettext("User is already approved")}), 403
+    if user.is_approved:
+        return Response({"error": gettext("User is already approved")}, 403)
 
-    users_service.approve_user(user)
-    return jsonify({"success": True}), 200
+    await users_service.approve_user(user)
+    return Response({"success": True})

@@ -1,20 +1,58 @@
+from typing import Any, cast, TypedDict
 from copy import deepcopy
 
-from flask import abort, request
-from flask_babel import gettext
+from quart_babel import gettext
 
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
+from superdesk.flask import abort, request
 from superdesk import get_resource_service
 from superdesk.utc import utc_to_local
 
-from newsroom.wire.search import items_query
-from newsroom.agenda.agenda import get_date_filters
+from newsroom.types import SectionEnum
+from newsroom.search.types import BaseSearchRequestArgs, NewshubSearchRequest
+from newsroom.search.filters import apply_section_filter
+from newsroom.wire.filters import apply_item_type_filter as apply_wire_type_filter
+from newsroom.wire import WireItemService
+from newsroom.agenda.filters import get_date_filters, apply_item_type_filter as apply_agenda_type_filter
+from newsroom.agenda import AgendaItemService
+from newsroom.history_async import HistoryService
+
 from newsroom.utils import query_resource, MAX_TERMS_SIZE
 
 
 CHUNK_SIZE = 100
 
 
-def get_items(args):
+async def get_query_source(args: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
+    search_request = NewshubSearchRequest[BaseSearchRequestArgs](section=SectionEnum(args["section"]))
+    query = search_request.search.query
+
+    if args.get("genre"):
+        query.filter.append({"terms": {"genre.code": [genre for genre in args["genre"]]}})
+
+    await apply_section_filter(search_request)
+
+    if args["section"] == SectionEnum.AGENDA:
+        # Set ``featured`` to True, so we don't add filters for Event, Planning, Combined type filter
+        search_request.args.featured = True
+        apply_agenda_type_filter(search_request)
+    else:
+        apply_wire_type_filter(search_request)
+
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_from"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
+    if date_range.get("gt") or date_range.get("lt"):
+        query.filter.append({"range": {"versioncreated": date_range}})
+
+    return search_request.search.generate_query_dict(source)
+
+
+async def get_items(args):
     """Get all the news items for the date and filters provided
 
     For performance reasons, returns an iterator that yields an array of CHUNK_SIZE
@@ -24,52 +62,45 @@ def get_items(args):
     if not args.get("section"):
         abort(400, gettext("Must provide a section for this report"))
 
-    source = {
-        "query": items_query(True),
-        "size": CHUNK_SIZE,
-        "from": 0,
-        "sort": [{"versioncreated": "asc"}],
-        "_source": [
-            "_resource",
-            "headline",
-            "place",
-            "subject",
-            "service",
-            "versioncreated",
-            "anpa_take_key",
-            "source",
-        ],
-    }
+    source = await get_query_source(
+        args,
+        {
+            "size": CHUNK_SIZE,
+            "from": 0,
+            "sort": [{"versioncreated": "asc"}],
+            "_source": [
+                "_resource",
+                "headline",
+                "place",
+                "subject",
+                "service",
+                "versioncreated",
+                "anpa_take_key",
+                "source",
+            ],
+        },
+    )
 
-    must_terms = []
-    if args.get("genre"):
-        must_terms.append({"terms": {"genre.code": [genre for genre in args["genre"]]}})
-
-    args["date_to"] = args["date_from"]
-    date_range = get_date_filters(args)
-    if date_range.get("gt") or date_range.get("lt"):
-        must_terms.append({"range": {"versioncreated": date_range}})
-
-    if len(must_terms) > 0:
-        source["query"]["bool"]["filter"] += must_terms
-
-    # Apply the section filters
-    section = args["section"]
-    get_resource_service("section_filters").apply_section_filter(source["query"], section)
+    service = AgendaItemService() if args["section"] == SectionEnum.AGENDA else WireItemService()
 
     while True:
-        results = get_resource_service(section if section == "agenda" else f"{section}_search").search(source)
-        items = list(results)
+        cursor = await service.search(source)
+        items = await cursor.to_list()
 
         if not len(items):
             break
 
         source["from"] += CHUNK_SIZE
+        yield [item.to_dict() for item in items]
 
-        yield items
+
+class ItemAggregation(TypedDict):
+    total: int
+    actions: dict[str, int]
+    companies: list[str]
 
 
-def get_aggregations(args, ids):
+async def get_aggregations(args: dict[str, Any], ids: list[str]) -> dict[str, ItemAggregation]:
     """Get action and company aggregations for the items provided"""
 
     if not args.get("section"):
@@ -98,8 +129,8 @@ def get_aggregations(args, ids):
         },
     }
 
-    results = get_resource_service("history").fetch_history(source)
-    aggs = (results.get("hits") or {}).get("aggregations") or {}
+    results = cast(ElasticsearchResourceCursorAsync, await HistoryService().search(source))
+    aggs = (results.hits or {}).get("aggregations") or {}
     buckets = (aggs.get("items") or {}).get("buckets") or []
 
     return {
@@ -114,42 +145,34 @@ def get_aggregations(args, ids):
     }
 
 
-def get_facets(args):
+async def get_facets(args):
     """Get aggregations for genre and companies using the date range and section
 
     This is used to populate the dropdown filters in the front-end
     """
 
-    args["date_to"] = args["date_from"]
-    date_range = get_date_filters(args)
+    section = args["section"]
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_from"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
 
-    def get_genres():
+    async def get_genres():
         """Get the list of genres from the news items"""
 
-        query = items_query(True)
-        must_terms = []
-        source = {}
-
-        if date_range.get("gt") or date_range.get("lt"):
-            must_terms.append({"range": {"versioncreated": date_range}})
-
-        if len(must_terms) > 0:
-            query["bool"]["filter"] += must_terms
-
-        source.update(
+        source = await get_query_source(
+            args,
             {
-                "query": query,
                 "size": 0,
                 "aggs": {"genres": {"terms": {"field": "genre.code", "size": MAX_TERMS_SIZE}}},
-            }
+            },
         )
 
-        # Apply the section filters
-        section = args["section"]
-        get_resource_service("section_filters").apply_section_filter(source["query"], section)
-
-        results = get_resource_service(section if section == "agenda" else f"{section}_search").search(source)
-
+        service = AgendaItemService() if args["section"] == SectionEnum.AGENDA else WireItemService()
+        results = cast(ElasticsearchResourceCursorAsync, await service.search(source))
         buckets = ((results.hits.get("aggregations") or {}).get("genres") or {}).get("buckets") or []
 
         return [genre["key"] for genre in buckets]
@@ -157,7 +180,7 @@ def get_facets(args):
     def get_companies():
         """Get the list of companies from the action history"""
 
-        must_terms = [{"term": {"section": args["section"]}}]
+        must_terms = [{"term": {"section": section}}]
         if date_range.get("gt") or date_range.get("lt"):
             must_terms.append({"range": {"_created": date_range}})
 
@@ -174,7 +197,7 @@ def get_facets(args):
 
         return [company["key"] for company in buckets]
 
-    return {"genres": get_genres(), "companies": get_companies()}
+    return {"genres": await get_genres(), "companies": get_companies()}
 
 
 def export_csv(args, results):
@@ -263,7 +286,7 @@ def export_csv(args, results):
     return rows
 
 
-def get_content_activity_report():
+async def get_content_activity_report():
     """Entrypoint for generating the data for the ContentActivity report"""
 
     args = deepcopy(request.args.to_dict())
@@ -280,13 +303,13 @@ def get_content_activity_report():
     if args.get("aggregations"):
         # This request is for populating the dropdown filters
         # for genre and companies
-        return get_facets(args)
+        return await get_facets(args)
 
     response = {"results": [], "name": gettext("Content activity")}
 
-    for items in get_items(args):
+    async for items in get_items(args):
         item_ids = [item.get("_id") for item in items]
-        aggs = get_aggregations(args, item_ids)
+        aggs = await get_aggregations(args, item_ids)
 
         for item in items:
             item_id = item["_id"]

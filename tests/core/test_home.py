@@ -1,35 +1,35 @@
-from flask import session as server_session
+from bson import ObjectId
 
 from newsroom.wire.views import get_home_data
 from newsroom.tests.fixtures import PUBLIC_USER_ID
 
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
-def test_personal_dashboard_data(client, app, company_products):
-    with app.test_request_context():
-        server_session["user"] = str(PUBLIC_USER_ID)
-        server_session["user_type"] = "public"
 
-        user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
-        assert user
+async def test_personal_dashboard_data(client, app, company_products):
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
+    assert user
 
-        topics = [
-            {"name": "label", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
-        ]
+    topics = [
+        {"_id": ObjectId(), "label": "fooo", "query": "weather", "user": PUBLIC_USER_ID, "topic_type": "wire"},
+    ]
 
-        app.data.insert("topics", topics)
+    await create_entries_for("topics", topics)
 
-        app.data.update(
-            "users",
-            PUBLIC_USER_ID,
-            {
-                "dashboards": [
-                    {"name": "test d", "type": "4x4", "topic_ids": [topic["_id"] for topic in topics]},
-                ]
-            },
-            user,
-        )
+    await update_entries_for(
+        "users",
+        PUBLIC_USER_ID,
+        {
+            "dashboards": [
+                {"name": "test d", "type": "4x4", "topic_ids": [topic["_id"] for topic in topics]},
+            ]
+        },
+        user,
+    )
 
-        data = get_home_data()
+    async with app.test_request_context("/") as request:
+        request.session["user"] = str(PUBLIC_USER_ID)
+        data = await get_home_data()
 
     assert "personalizedDashboards" in data
     dashboard_data = data["personalizedDashboards"][0]

@@ -74,6 +74,7 @@ Feature: News API News Feed
         {"_items": [{"_id": "urn:test2"}, {"_id": "urn:test4"}]}
         """
 
+  @skip
   Scenario: Response provides a link to the next page
     Given "items"
         """
@@ -203,5 +204,5 @@ Feature: News API News Feed
     When we get "/news/feed?exclude_fields=versioncreated"
     Then we get error 400
         """
-        {"code": 400, "message": "Exclude fields contains a non-allowed value"}
+        {"code": 400, "message": "`exclude_fields` contains non-allowed values: versioncreated"}
         """

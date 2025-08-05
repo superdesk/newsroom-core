@@ -1,4 +1,4 @@
-from flask import json
+from quart import json
 from time import sleep
 from datetime import datetime, timedelta
 from eve.utils import ParsedRequest
@@ -8,85 +8,66 @@ from newsroom.mongo_utils import (
     index_elastic_from_mongo,
     index_elastic_from_mongo_from_timestamp,
 )
-from newsroom.wire.search import (
-    WireSearchResource,
-    get_aggregations as get_wire_aggregations,
-)
+
+from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
+from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.commands import fix_topic_nested_filters
 
 from newsroom.tests.conftest import reset_elastic
 from ..fixtures import items, init_items, init_auth, init_company  # noqa
+from tests.core.utils import create_entries_for, delete_entries_for, find_one_by_id
 
 
-def remove_elastic_index(app):
-    # remove the elastic index
-    indices = "%s*" % app.config["CONTENTAPI_ELASTICSEARCH_INDEX"]
-    es = app.data.elastic.es
-    es.indices.delete(indices, ignore=[404])
-
-
-def test_item_detail(app, client):
-    remove_elastic_index(app)
-    app.data.init_elastic(app)
-    sleep(1)
-    index_elastic_from_mongo()
-    sleep(1)
-
-    resp = client.get("/wire/tag:foo")
+async def test_item_detail(app, client):
+    resp = await client.get("/wire/tag:foo")
     assert resp.status_code == 200
-    html = resp.get_data().decode("utf-8")
+    html = (await resp.get_data()).decode("utf-8")
     assert "Amazon Is Opening More Bookstores" in html
 
-    resp = client.get("/wire/%s/versions" % items[1]["_id"])
-    data = json.loads(resp.get_data())
+    resp = await client.get("/wire/%s/versions" % items[1]["_id"])
+    data = json.loads(await resp.get_data())
     assert 2 == len(data["_items"])
     assert "tag:weather" == data["_items"][0]["_id"]
 
-    resp = client.get("/wire/search")
+    resp = await client.get("/wire/search")
     assert resp.status_code == 200
-    data = json.loads(resp.get_data())
+    data = json.loads(await resp.get_data())
     assert 3 == len(data["_items"])
 
 
-def test_index_from_mongo_hours_from(app, client):
-    remove_elastic_index(app)
-    app.data.init_elastic(app)
-    sleep(1)
+async def test_index_from_mongo_hours_from(app, client):
+    await reset_elastic(app)
     index_elastic_from_mongo(hours=24)
-    sleep(1)
 
-    resp = client.get("/wire/tag:foo")
+    resp = await client.get("/wire/tag:foo")
     assert resp.status_code == 200
-    html = resp.get_data().decode("utf-8")
+    html = (await resp.get_data()).decode("utf-8")
     assert "Amazon Is Opening More Bookstores" in html
 
-    resp = client.get("/wire/search")
+    resp = await client.get("/wire/search")
     assert resp.status_code == 200
-    data = json.loads(resp.get_data())
+    data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
 
 
-def test_index_from_mongo_collection(app, client):
-    remove_elastic_index(app)
-    app.data.init_elastic(app)
-    sleep(1)
+async def test_index_from_mongo_collection(app, client):
+    await reset_elastic(app)
     index_elastic_from_mongo(collection="items")
-    sleep(1)
 
-    resp = client.get("/wire/tag:foo")
+    resp = await client.get("/wire/tag:foo")
     assert resp.status_code == 200
-    html = resp.get_data().decode("utf-8")
+    html = (await resp.get_data()).decode("utf-8")
     assert "Amazon Is Opening More Bookstores" in html
 
-    resp = client.get("/wire/search")
+    resp = await client.get("/wire/search")
     assert resp.status_code == 200
-    data = json.loads(resp.get_data())
+    data = json.loads(await resp.get_data())
     assert 3 == len(data["_items"])
 
 
-def test_index_from_mongo_from_timestamp(app, client):
-    app.data.remove("items")
+async def test_index_from_mongo_from_timestamp(app, client):
+    await delete_entries_for("items")
     sorted_items = [
         {
             "_id": "tag:foo-1",
@@ -99,10 +80,8 @@ def test_index_from_mongo_from_timestamp(app, client):
         {"_id": "urn:bar-3", "_created": datetime.now() - timedelta(hours=3)},
     ]
 
-    app.data.insert("items", sorted_items)
-    remove_elastic_index(app)
-    app.data.init_elastic(app)
-    sleep(1)
+    await create_entries_for("items", sorted_items)
+    await reset_elastic(app)
     assert 0 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
     timestamp = (datetime.now() - timedelta(hours=3, minutes=5)).strftime("%Y-%m-%dT%H:%M")
@@ -115,7 +94,7 @@ def test_index_from_mongo_from_timestamp(app, client):
     assert 6 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
 
-def test_fix_topic_nested_filters(app, client):
+async def test_fix_topic_nested_filters(app, admin):
     app.config["WIRE_GROUPS"].extend(
         [
             {
@@ -141,10 +120,10 @@ def test_fix_topic_nested_filters(app, client):
     app.config["WIRE_GROUPS"] = [
         config_group for config_group in app.config["WIRE_GROUPS"] if config_group["field"] != "subject"
     ]
-    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], get_wire_aggregations())
-    reset_elastic(app)
+    init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], _get_wire_aggregations())
+    await reset_elastic(app)
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -171,7 +150,7 @@ def test_fix_topic_nested_filters(app, client):
         ],
     )
     topic_id = ObjectId()
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
@@ -189,10 +168,9 @@ def test_fix_topic_nested_filters(app, client):
         ],
     )
 
-    with app.test_request_context():
-        fix_topic_nested_filters()
+    await fix_topic_nested_filters()
 
-    updated_topic = app.data.find_one("topics", None, topic_id)
+    updated_topic = await find_one_by_id("topics", topic_id)
 
     assert "subject" not in updated_topic["filter"]
     assert len(updated_topic["filter"]["distribution"]) == 2

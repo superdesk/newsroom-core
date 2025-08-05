@@ -18,7 +18,7 @@ from newsroom.tests.users import ADMIN_USER_ID
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
-from flask import g
+from quart import g
 from datetime import datetime, timedelta
 from urllib import parse
 from unittest import mock

@@ -1,15 +1,20 @@
 import os
 import logging
-import flask
 import jinja2
+import traceback
 
 from elasticsearch.exceptions import RequestError as ElasticRequestError
+from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
+
+from newsroom.exceptions import AuthorizationError
+from newsroom.utils import parse_validation_error
+from superdesk.flask import Config, jsonify, g
 from superdesk.errors import SuperdeskApiError
+from superdesk.utc import utcnow
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
-from superdesk.utc import utcnow
 from newsroom.template_filters import (
     datetime_short,
     datetime_long,
@@ -33,8 +38,8 @@ class NewsroomNewsAPI(BaseNewsroomApp):
     INSTANCE_CONFIG = "settings_newsapi.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
-        if not hasattr(self, "settings"):
-            self.settings = flask.Config(".")
+        if not getattr(self, "settings", None):
+            self.settings = Config(".")
 
         if config and config.get("BEHAVE"):
             # ``superdesk.tests.update_config`` adds ``planning`` to ``INSTALLED_APPS``
@@ -85,7 +90,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
 
     def setup_error_handlers(self):
         def json_error(err):
-            return flask.jsonify(err), err["code"]
+            return jsonify(err), err["code"]
 
         def handle_werkzeug_errors(err):
             return json_error(
@@ -96,16 +101,16 @@ class NewsroomNewsAPI(BaseNewsroomApp):
                 }
             )
 
-        def superdesk_api_error(err):
+        def superdesk_api_error(err: SuperdeskApiError):
             return json_error(
                 {
                     "error": err.message or "",
-                    "message": err.payload,
+                    "message": getattr(err, "payload", ""),
                     "code": err.status_code or 500,
                 }
             )
 
-        def assertion_error(err):
+        def assertion_error(err: AssertionError):
             return json_error(
                 {
                     "error": err.args[0] if err.args else 1,
@@ -114,14 +119,40 @@ class NewsroomNewsAPI(BaseNewsroomApp):
                 }
             )
 
-        def base_exception_error(err):
+        def authorization_error_handler(err: AuthorizationError):
+            """Handles NewsAPI Authorization errors"""
+            return json_error(
+                {
+                    "code": err.code,
+                    "error": err.title or err.message,
+                    "message": err.message,
+                }
+            )
+
+        def validation_error_handler(err: ValidationError):
+            """Handles Pydantic validation errors."""
+            error_details = parse_validation_error(err)
+
+            return json_error(
+                {
+                    "code": 400,
+                    "error": "Bad Request",
+                    "message": "One or more fields did not pass validation.",
+                    "details": error_details,
+                }
+            )
+
+        def base_exception_error(err: Exception):
             if type(err) is ElasticRequestError and err.error == "search_phase_execution_exception":
                 return json_error({"error": 1, "message": "Invalid search query", "code": 400})
+
+            # let's log the error so it doesn't get completely swallowed by the handler
+            logger.error(traceback.format_exc())
 
             return json_error(
                 {
                     "error": err.args[0] if err.args else 1,
-                    "message": str(err),
+                    "message": str(err) or "Internal Server Error",
                     "code": 500,
                 }
             )
@@ -130,9 +161,12 @@ class NewsroomNewsAPI(BaseNewsroomApp):
             self.register_error_handler(cls, handle_werkzeug_errors)
 
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
+        self.register_error_handler(AuthorizationError, authorization_error_handler)
+        self.register_error_handler(ValidationError, validation_error_handler)
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(Exception, base_exception_error)
 
+    # TODO-ASYNC: Method signature removed in `develop` branch, investigate
     def settings_app(self, *args, **kwargs):
         pass
 
@@ -142,17 +176,17 @@ def get_app(config=None, **kwargs):
 
     @app.after_request
     def after_request(response):
-        if flask.g.get("rate_limit_requests"):
+        if g.get("rate_limit_requests"):
             response.headers.add(
                 "X-RateLimit-Remaining",
-                app.config.get("RATE_LIMIT_REQUESTS") - flask.g.get("rate_limit_requests"),
+                app.config.get("RATE_LIMIT_REQUESTS") - g.get("rate_limit_requests"),
             )
             response.headers.add("X-RateLimit-Limit", app.config.get("RATE_LIMIT_REQUESTS"))
 
-            if flask.g.get("rate_limit_expiry"):
+            if g.get("rate_limit_expiry"):
                 response.headers.add(
                     "X-RateLimit-Reset",
-                    (flask.g.get("rate_limit_expiry") - utcnow()).seconds,
+                    (g.get("rate_limit_expiry") - utcnow()).seconds,
                 )
         return response
 

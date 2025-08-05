@@ -1,10 +1,12 @@
-from flask import current_app as app
+import click
 
-from .manager import manager
+from superdesk.core import get_current_app
+from .cli import newsroom_cli
 
 
-@manager.option("-r", "--resource", dest="resource")
-@manager.option("-s", "--requests-per-second", dest="requests_per_second", type=int)
+@newsroom_cli.command("elastic_reindex")
+@click.option("-r", "--resource", required=True, help="Resource to reindex")
+@click.option("-s", "--requests-per-second", default=1000, type=int, help="Number of requests per second")
 def elastic_reindex(resource, requests_per_second=1000):
     assert resource in ("items", "agenda", "history")
-    return app.data.elastic.reindex(resource, requests_per_second=requests_per_second)
+    return get_current_app().data.elastic.reindex(resource, requests_per_second=requests_per_second)

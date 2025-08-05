@@ -18,5 +18,8 @@
     "build": "webpack --mode production --progress",
     "start": "webpack-dev-server --mode development --progress --host 0.0.0.0",
     "start-client-server": "http-server dist -p 8080 -s"
+  },
+  "volta": {
+    "node": "14.21.3"
   }
 }

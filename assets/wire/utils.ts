@@ -255,12 +255,14 @@ export function isPreformatted(item: any) {
 /**
  * Test if other item versions should be visible
  *
- * @param {Object} item
- * @param {bool} next toggle if checking for next or previous versions
- * @return {Boolean}
+ * @param {IArticle} item - The article to check for versions
+ * @param {boolean} [next] - Toggle if checking for next or previous versions
+ * @return {boolean} - True if versions should be visible
  */
-export function showItemVersions(item: any, next?: any) {
-    return !isKilled(item) && (next || item.ancestors && item.ancestors.length);
+export function showItemVersions(item: IArticle, next?: boolean): boolean {
+    const hasNextOrAncestors = Boolean(next || (item.ancestors?.length ?? 0));
+
+    return !isKilled(item) && hasNextOrAncestors;
 }
 
 /**

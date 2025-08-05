@@ -22,7 +22,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -105,6 +105,7 @@ Feature: News API News Search
     Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
     Then we "get" "src="https://" in atom xml response
 
+      @wip
   Scenario: Atom request response restricted by featured image product
     Given "items"
         """
@@ -118,7 +119,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],

@@ -34,8 +34,8 @@ class EditMonitoringProfile extends React.Component<any, any> {
     }
 
     handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
-        if (event.target.name === 'users' && get(this.props, 'item.company')) {
+        this.setState({activeTab: event.target.title});
+        if (event.target.title === 'users' && get(this.props, 'item.company')) {
             this.props.fetchCompanyUsers(this.props.item.company);
         }
     }

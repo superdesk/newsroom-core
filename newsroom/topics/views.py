@@ -1,75 +1,80 @@
-import flask
-
 from bson import ObjectId
-from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, url_for
+from typing import Optional
+from pydantic import BaseModel
 
-from newsroom.types import Topic
-from newsroom.topics import blueprint
-from newsroom.topics.topics import get_user_topics as _get_user_topics, auto_enable_user_emails
-from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required
-from newsroom.utils import get_json_or_400, get_entity_or_404
+from superdesk.utc import utcnow
+from superdesk.core import json, get_app_config
+from superdesk.flask import url_for
+from superdesk.core.types import Request, Response
+
+from newsroom.types import Topic, TopicResourceModel, UserResourceModel, UserRole
 from newsroom.email import send_user_email
-from newsroom.notifications import (
-    push_user_notification,
-    push_company_notification,
-    save_user_notifications,
-    UserNotification,
+from newsroom.auth import auth_rules
+
+from .topics_async import get_user_topics, auto_enable_user_emails, topic_endpoints, TopicService
+
+from newsroom.utils import get_json_or_400
+from newsroom import notifications
+from newsroom.users.service import UsersService
+
+
+class RouteArguments(BaseModel):
+    user_id: Optional[str] = None
+    topic_id: Optional[str] = None
+
+
+@topic_endpoints.endpoint(
+    "/users/<string:user_id>/topics", methods=["GET"], auth=[auth_rules.url_arg_must_be_current_user("user_id")]
 )
-
-
-@blueprint.route("/users/<_id>/topics", methods=["GET"])
-@login_required
-def get_topics(_id):
+async def get_topics(args: RouteArguments, params: None, request: Request) -> Response:
     """Returns list of followed topics of given user"""
-    if flask.session["user"] != str(_id):
-        flask.abort(403)
-    return jsonify({"_items": _get_user_topics(_id)}), 200
+    topics = await get_user_topics(args.user_id)
+    return Response({"_items": topics})
 
 
-@blueprint.route("/users/<_id>/topics", methods=["POST"])
-@login_required
-def post_topic(_id):
+@topic_endpoints.endpoint(
+    "/users/<string:user_id>/topics", methods=["POST"], auth=[auth_rules.url_arg_must_be_current_user("user_id")]
+)
+async def post_topic(request: Request) -> Response:
     """Creates a user topic"""
-    user = get_user()
-    if str(user["_id"]) != str(_id):
-        flask.abort(403)
 
-    topic = get_json_or_400()
-    topic["user"] = user["_id"]
-    topic["company"] = user.get("company")
+    topic = await get_json_or_400()
+    topic.update(
+        dict(
+            user=request.user.id,
+            company=request.user.company,
+            # `_created` needs to be set otherwise there is a clash given `TopicResourceModel` and
+            # the base `ResourceModel` both have the same member (`created`). Without this
+            # `created_filter` does not get converted/saved
+            _created=utcnow(),
+        )
+    )
 
-    for subscriber in topic.get("subscribers") or []:
-        subscriber["user_id"] = ObjectId(subscriber["user_id"])
-
-    ids = get_resource_service("topics").post([topic])
-
-    auto_enable_user_emails(topic, {}, user)
+    new_topics = await TopicService().create([topic])
+    await auto_enable_user_emails(topic, None, request.user)
 
     if topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user["_id"]))
+        notifications.push_company_notification("topic_created", user_id=str(request.user.id))
     else:
-        push_user_notification("topic_created")
-    return jsonify({"success": True, "_id": ids[0]}), 201
+        notifications.push_user_notification("topic_created")
+
+    return Response({"success": True, "_id": new_topics[0].id}, 201)
 
 
-@blueprint.route("/topics/my_topics", methods=["GET"])
-@login_required
-def get_list_my_topics():
-    return jsonify(_get_user_topics(get_user_id())), 200
+@topic_endpoints.endpoint("/topics/my_topics", methods=["GET"])
+async def get_list_my_topics(request: Request) -> Response:
+    topics = await get_user_topics(request.user.id)
+    return Response(topics)
 
 
-@blueprint.route("/topics/<topic_id>", methods=["POST"])
-@login_required
-def update_topic(topic_id):
+@topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["POST"])
+async def update_topic(args: RouteArguments, params: None, request: Request) -> Response:
     """Updates a followed topic"""
-    data = get_json_or_400()
-    current_user = get_user(required=True)
-    original = get_resource_service("topics").find_one(req=None, _id=ObjectId(topic_id))
+    data = await get_json_or_400()
+    original = await TopicService().find_by_id(args.topic_id)
 
-    if not can_edit_topic(original, current_user):
-        abort(403)
+    if not can_edit_topic(original, request.user):
+        await request.abort(403)
 
     updates: Topic = {
         "label": data.get("label"),
@@ -77,7 +82,7 @@ def update_topic(topic_id):
         "created": data.get("created"),
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
-        "company": current_user.get("company"),
+        "company": request.user.company,
         "subscribers": data.get("subscribers") or [],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
@@ -87,121 +92,105 @@ def update_topic(topic_id):
     for subscriber in updates["subscribers"]:
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
-    if (
-        original
-        and updates.get("is_global") != original.get("is_global")
-        and original.get("folder") == updates.get("folder")
-    ):
+    if original and updates.get("is_global") != original.is_global and original.folder == updates.get("folder"):
         # reset folder when going from company to user and vice versa
         updates["folder"] = None
 
-    response = get_resource_service("topics").patch(id=ObjectId(topic_id), updates=updates)
+    await TopicService().update(args.topic_id, updates)
 
-    auto_enable_user_emails(updates, original, current_user)
+    topic = await TopicService().find_by_id(args.topic_id)
 
-    if response.get("is_global") or updates.get("is_global", False) != original.get("is_global", False):
-        push_company_notification("topics")
+    await auto_enable_user_emails(updates, original, request.user)
+
+    if topic.is_global or updates.get("is_global", False) != original.is_global:
+        notifications.push_company_notification("topics")
     else:
-        push_user_notification("topics")
-    return jsonify({"success": True}), 200
+        notifications.push_user_notification("topics")
+
+    return Response({"success": True})
 
 
-@blueprint.route("/topics/<topic_id>", methods=["DELETE"])
-@login_required
-def delete(topic_id):
+@topic_endpoints.endpoint("/topics/<string:topic_id>", methods=["DELETE"])
+async def delete(args: RouteArguments, params: None, request: Request) -> Response:
     """Deletes a followed topic by given id"""
-    current_user = get_user(required=True)
-    original = get_resource_service("topics").find_one(req=None, _id=ObjectId(topic_id))
+    service = TopicService()
+    original = await service.find_by_id(args.topic_id)
 
-    if not can_edit_topic(original, current_user):
-        abort(403)
+    if not can_edit_topic(original, request.user):
+        await request.abort(403)
 
-    get_resource_service("topics").delete_action({"_id": ObjectId(topic_id)})
-    if original.get("is_global"):
-        push_company_notification("topics")
+    await service.delete(original)
+
+    if original.is_global:
+        notifications.push_company_notification("topics")
     else:
-        push_user_notification("topics")
-    return jsonify({"success": True}), 200
+        notifications.push_user_notification("topics")
+
+    return Response({"success": True})
 
 
-def can_user_manage_topic(topic, user):
-    """
-    Checks if the topic can be managed by the provided user
-    """
-    return (
-        topic.get("is_global")
-        and str(topic.get("company")) == str(user.get("company"))
-        and (user.get("user_type") == "administrator" or user.get("manage_company_topics"))
-    )
-
-
-def can_edit_topic(topic, user):
+def can_edit_topic(topic: TopicResourceModel, user: UserResourceModel) -> bool:
     """
     Checks if the topic can be edited by the user
     """
-    user_ids = [user.get("id") for user in topic.get("users") or []]
-    if topic and (str(topic.get("user")) == str(user["_id"]) or str(user["_id"]) in user_ids):
-        return True
-    return can_user_manage_topic(topic, user)
+    return str(topic.user) == str(user.id) or (
+        topic.is_global
+        and str(topic.company) == str(user.company)
+        and (user.user_type == UserRole.ADMINISTRATOR or user.manage_company_topics)
+    )
 
 
-def is_user_or_company_topic(topic, user):
-    """Checks if the topic is owned by the user or global to the users company"""
-
-    if topic.get("user") == user.get("_id"):
-        return True
-    elif topic.get("company") and topic.get("is_global", False):
-        return user.get("company") == topic.get("company")
-    return False
-
-
-def get_topic_url(topic):
+def get_topic_url(topic: TopicResourceModel):
     url_params = {}
-    if topic.get("query"):
-        url_params["q"] = topic.get("query")
-    if topic.get("filter"):
-        url_params["filter"] = json.dumps(topic.get("filter"))
-    if topic.get("navigation"):
-        url_params["navigation"] = json.dumps(topic.get("navigation"))
-    if topic.get("created"):
-        url_params["created"] = json.dumps(topic.get("created"))
-    if topic.get("advanced"):
-        url_params["advanced"] = json.dumps(topic["advanced"])
+    topic_dict = topic.to_dict()
+    if topic_dict.get("query"):
+        url_params["q"] = topic_dict["query"]
+    if topic_dict.get("filter"):
+        url_params["filter"] = json.dumps(topic_dict["filter"])
+    if topic_dict.get("navigation"):
+        url_params["navigation"] = json.dumps(topic_dict["navigation"])
+    if topic_dict.get("created"):
+        url_params["created"] = json.dumps({field: value for field, value in topic_dict["created"].items() if value})
+    if topic_dict.get("advanced"):
+        url_params["advanced"] = json.dumps({field: value for field, value in topic_dict["advanced"].items() if value})
 
-    section = topic.get("topic_type")
     return url_for(
-        "wire.wire" if section == "wire" else f"{section}.index",
+        "wire.wire" if topic.topic_type == "wire" else f"{topic.topic_type}.index",
         _external=True,
         **url_params,
     )
 
 
-@blueprint.route("/topic_share", methods=["POST"])
-@login_required
-def share():
-    current_user = get_user(required=True)
-    data = get_json_or_400()
+@topic_endpoints.endpoint("/topic_share", methods=["POST"])
+async def share(request: Request) -> Response:
+    data = await get_json_or_400()
     assert data.get("users")
     assert data.get("items")
-    topic = get_entity_or_404(data.get("items")["_id"], "topics")
+
+    user_service = UsersService()
+    topic = await TopicService().find_by_id(data.get("items")["_id"])
+    if not topic:
+        return await request.abort(404)
+
     for user_id in data["users"]:
-        user = get_resource_service("users").find_one(req=None, _id=user_id)
-        if not user or not user.get("email"):
+        user = await user_service.find_by_id(user_id)
+        if not user or not user.email:
             continue
 
+        user_dict = user.to_dict()
         topic_url = get_topic_url(topic)
-        save_user_notifications(
+        await notifications.save_user_notifications(
             [
-                UserNotification(
-                    user=user["_id"],
+                dict(
+                    user=user.id,
                     action="share",
                     resource="topic",
-                    item=topic["_id"],
+                    item=topic.id,
                     data=dict(
                         shared_by=dict(
-                            _id=current_user["_id"],
-                            first_name=current_user["first_name"],
-                            last_name=current_user["last_name"],
+                            _id=request.user.id,
+                            first_name=request.user.first_name,
+                            last_name=request.user.last_name,
                         ),
                         url=topic_url,
                     ),
@@ -209,16 +198,16 @@ def share():
             ]
         )
         template_kwargs = {
-            "recipient": user,
-            "sender": current_user,
-            "topic": topic,
+            "recipient": user_dict,
+            "sender": request.user.to_dict(),
+            "topic": topic.to_dict(),
             "url": topic_url,
             "message": data.get("message"),
-            "app_name": app.config["SITE_NAME"],
+            "app_name": get_app_config("SITE_NAME"),
         }
-        send_user_email(
-            user,
+        await send_user_email(
+            user_dict,
             template="share_topic",
             template_kwargs=template_kwargs,
         )
-    return jsonify(), 201
+    return Response({"success": True}, 201)

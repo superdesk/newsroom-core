@@ -1,6 +1,4 @@
 from newsroom.commands import *  # noqa
-from newsroom.commands.manager import manager
+from newsroom.web.factory import get_app
 
-
-if __name__ == "__main__":
-    manager.run()
+app = get_app()

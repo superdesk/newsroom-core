@@ -1,37 +1,33 @@
-from datetime import datetime, timedelta
-from newsroom.utils import query_resource
-from content_api.commands import RemoveExpiredItems
+from datetime import timedelta
+
+from superdesk.utc import utcnow
+from newsroom.wire import WireItemService
+from newsroom.commands.remove_expired import remove_expired
+
+from tests.core.utils import create_entries_for, delete_entries_for
 
 
-def test_remove_expired_items(app):
+async def test_remove_expired_items(app):
+    now = utcnow()
     items = [
-        {"_id": "expired", "_updated": datetime.utcnow(), "expiry": datetime.utcnow() - timedelta(days=1)},
-        {
-            "_id": "expired2",
-            "_updated": datetime.utcnow() - timedelta(days=1),
-            "expiry": datetime.utcnow() - timedelta(days=1),
-        },
-        {"_id": "expired3", "_updated": datetime.utcnow() - timedelta(days=800)},
-        {"_id": "not-expired", "_updated": datetime.utcnow(), "expiry": datetime.utcnow() + timedelta(days=90)},
-        {
-            "_id": "not-expired2",
-            "_updated": datetime.utcnow() - timedelta(800),
-            "expiry": datetime.utcnow() + timedelta(days=1),
-        },
+        {"_id": "expired", "_updated": now, "expiry": now - timedelta(days=1)},
+        {"_id": "expired2", "_updated": now - timedelta(days=1), "expiry": now - timedelta(days=1)},
+        {"_id": "expired3", "_updated": now - timedelta(days=800)},
+        {"_id": "not-expired", "_updated": now, "expiry": now + timedelta(days=90)},
+        {"_id": "not-expired2", "_updated": now - timedelta(800), "expiry": now + timedelta(days=1)},
     ]
 
-    app.data.remove("items")
-    app.data.insert("items", items)
+    await delete_entries_for("items")
+    await create_entries_for("items", items)
 
-    assert query_resource("items").count() == len(items)
+    service = WireItemService()
+    assert await service.count(use_mongo=True) == len(items)
 
     app.config.update({"CONTENT_API_EXPIRY_DAYS": 500})
-    RemoveExpiredItems().run()
+    await remove_expired(None)
 
-    cursor = query_resource("items")
-    ids = [doc["_id"] for doc in cursor]
-    assert 2 == cursor.count(), ids
+    ids = [doc.id async for doc in service.get_all()]
+    assert 2 == await service.count(use_mongo=True), ids
 
-    ids = [doc["_id"] for doc in cursor]
     assert "not-expired" in ids
     assert "not-expired2" in ids

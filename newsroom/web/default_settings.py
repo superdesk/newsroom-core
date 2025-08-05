@@ -8,7 +8,7 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.default_settings import (  # noqa
     VERSION,
@@ -51,6 +51,8 @@ from superdesk.default_settings import (  # noqa
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
+    SENTRY_TRACES_SAMPLE_RATE,
+    SENTRY_PROFILES_SAMPLE_RATE,
     CACHE_URL,
 )
 
@@ -107,7 +109,7 @@ PUSH_KEY = os.environ.get("PUSH_KEY", "").encode()
 DEFAULT_TIMEZONE = os.environ.get("DEFAULT_TIMEZONE")
 
 if DEFAULT_TIMEZONE is None:
-    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+    DEFAULT_TIMEZONE = tzlocal.get_localzone_name()
 
 if not DEFAULT_TIMEZONE:
     raise ValueError("DEFAULT_TIMEZONE is empty")
@@ -115,29 +117,7 @@ if not DEFAULT_TIMEZONE:
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
-    "newsroom.wire",
-    "newsroom.auth.views",
-    "newsroom.users",
-    "newsroom.companies",
-    "newsroom.design",
-    "newsroom.history",
-    "newsroom.push",
-    "newsroom.topics",
-    "newsroom.upload",
-    "newsroom.notifications",
-    "newsroom.products",
-    "newsroom.section_filters",
-    "newsroom.navigations",
-    "newsroom.cards",
-    "newsroom.reports",
-    "newsroom.public",
-    "newsroom.agenda",
-    "newsroom.settings",
     "newsroom.news_api.api_tokens",
-    "newsroom.monitoring",
-    "newsroom.oauth_clients",
-    "newsroom.auth_server.oauth2",
-    "newsroom.company_admin",
 ]
 
 CORE_APPS = [
@@ -152,32 +132,55 @@ CORE_APPS = [
     "newsroom.companies",
     "newsroom.wire",
     "newsroom.topics",
-    "newsroom.upload",
     "newsroom.history",
-    "newsroom.ui_config",
-    "newsroom.notifications",
-    "newsroom.products",
     "newsroom.section_filters",
-    "newsroom.navigations",
-    "newsroom.cards",
     "newsroom.reports",
-    "newsroom.public",
     "newsroom.agenda",
-    "newsroom.settings",
     "newsroom.photos",
     "newsroom.media_utils",
     "newsroom.news_api",
     "newsroom.news_api.api_tokens",
-    "newsroom.news_api.api_audit",
     "newsroom.monitoring",
     "newsroom.company_expiry_alerts",
     "newsroom.oauth_clients",
-    "newsroom.auth_server.client",
     "newsroom.email_templates",
-    "newsroom.company_admin",
     "newsroom.search",
-    "newsroom.notifications.send_scheduled_notifications",
+    "newsroom.notifications.commands",
 ]
+
+ASYNC_AUTH_CLASS = "newsroom.auth.session_auth:NewshubSessionAuth"
+
+MODULES = [
+    "newsroom.auth.views",
+    "newsroom.settings",
+    "newsroom.ui_config_async",
+    "newsroom.oauth_clients",
+    "newsroom.companies",
+    "newsroom.assets",
+    "newsroom.users",
+    "newsroom.topics",
+    "newsroom.section_filters",
+    "newsroom.cards.module",
+    "newsroom.navigations",
+    "newsroom.notifications",
+    "newsroom.topics_folders",
+    "newsroom.push",
+    "newsroom.history_async",
+    "newsroom.wire.module",
+    "newsroom.company_admin",
+    "newsroom.public",
+    "newsroom.agenda.module",
+    "newsroom.products",
+    "newsroom.design",
+    "newsroom.auth_server.client",
+    "newsroom.reports",
+    "newsroom.monitoring.module",
+    "newsroom.news_api.api_audit",
+    "newsroom.mgmt_api.mgmt_api_docs",
+]
+
+ASYNC_POPULATE_HATEOAS = False
+ASYNC_RESPOND_NESTED_VALIDATION_ERRORS = False
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"
@@ -220,12 +223,11 @@ PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "ht
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
 # Flask Limiter Settings
-RATELIMIT_ENABLED = True
-RATELIMIT_STRATEGY = "fixed-window"
+QUART_RATE_LIMITER_ENABLED = True
 
 # Cache Settings
 # https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
-CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")  # in-memory cache
+CACHE_TYPE = os.environ.get("CACHE_TYPE", "redis")  # Redis cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
@@ -469,7 +471,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
     },
     "newsroom:send_scheduled_notifications": {
-        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "task": "newsroom.notifications.commands.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
         "options": {"expires": 5 * 60 - 1},
     },
@@ -484,13 +486,13 @@ NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 # Enables the application of product filtering to image references in the API and ATOM responses
 NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", "false"))
 
-ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
+ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
-    "analyze_wildcard": False
+    "analyze_wildcard": False,
 }
 
 # count above 10k
-ELASTICSEARCH_TRACK_TOTAL_HITS = True
+CONTENTAPI_ELASTICSEARCH_TRACK_TOTAL_HITS = True
 
 ELASTICSEARCH_FIX_QUERY = False
 
@@ -845,7 +847,6 @@ NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
 #: .. versionadded: 2.8
 #:
 AGENDA_TIME_FILTERS = [
-    {"name": lazy_gettext("Selected day"), "query": ""},
     {"name": lazy_gettext("Today"), "query": "now/d"},
     {
         "name": lazy_gettext("This Week"),

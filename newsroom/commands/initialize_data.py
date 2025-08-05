@@ -1,14 +1,14 @@
+import click
 import pathlib
 import logging
 import elasticsearch.exceptions
 
 from collections import OrderedDict
 
-from apps.prepopulate.app_initialize import (
-    AppInitializeWithDataCommand as _AppInitializeWithDataCommand,
-)
+from superdesk.core import get_current_app
+from apps.prepopulate.app_initialize import import_file
+from .cli import newsroom_cli
 
-from .manager import app, manager
 from .elastic_rebuild import elastic_rebuild
 
 
@@ -23,9 +23,10 @@ __entities__: OrderedDict = OrderedDict(
 )
 
 
-class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
-    def run(self, entity_name=None, force=False, init_index_only=False):
+class AppInitializeWithDataCommand:
+    async def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info("Starting data initialization")
+        app = get_current_app()
 
         data_paths = [
             path
@@ -38,15 +39,16 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
 
         # create indexes in mongo
         app.init_indexes()
+
         # put mapping to elastic
         try:
-            app.data.init_elastic(app)
+            await app.data.init_elastic(app)
         except elasticsearch.exceptions.TransportError as err:
             logger.error("Error when initializing elastic %s", err)
 
             if app.config.get("REBUILD_ELASTIC_ON_INIT_DATA_ERROR"):
                 logger.warning("Can't update the mapping, running elastic_rebuild command now.")
-                elastic_rebuild()
+                await elastic_rebuild()
             else:
                 logger.warning("Can't update the mapping, please run elastic_rebuild command.")
 
@@ -64,7 +66,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
                 (file_name, index_params, do_patch) = __entities__[name]
                 for path in data_paths:
                     if path.joinpath(file_name).exists():
-                        self.import_file(name, path, file_name, index_params, do_patch, force)
+                        import_file(name, path, file_name, index_params, do_patch, force)
                         break
             except KeyError:
                 continue
@@ -76,31 +78,29 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         return 0
 
 
-@manager.option(
+@newsroom_cli.command("initialize_data")
+@click.option(
     "-n",
-    "--entity_name",
-    dest="entity_name",
-    action="append",
+    "--entity-name",
+    multiple=True,
     required=False,
     help="entity(ies) to initialize",
 )
-@manager.option(
+@click.option(
     "-f",
     "--force",
-    dest="force",
-    action="store_true",
+    is_flag=True,
     required=False,
     help="if True, update item even if it has been modified by user",
 )
-@manager.option(
+@click.option(
     "-i",
     "--init-index-only",
-    dest="init_index_only",
-    action="store_true",
+    is_flag=True,
     required=False,
     help="if True, it only initializes index only",
 )
-def initialize_data(entity_name=None, path=None, force=False, init_index_only=False):
+async def initialize_data(entity_name, force, init_index_only):
     """Initialize application with predefined data for various entities.
 
     Loads predefined data (users, ui_config, email_templates, etc..) for instance.
@@ -120,7 +120,7 @@ def initialize_data(entity_name=None, path=None, force=False, init_index_only=Fa
 
     """
     cmd = AppInitializeWithDataCommand()
-    cmd.run(
+    await cmd.run(
         entity_name=entity_name,
         force=force,
         init_index_only=init_index_only,

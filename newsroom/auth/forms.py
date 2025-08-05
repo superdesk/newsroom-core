@@ -1,10 +1,12 @@
-from flask_wtf import FlaskForm, RecaptchaField
-from flask_babel import lazy_gettext
+from quart_wtf import QuartForm
+from quart_babel import lazy_gettext
 from wtforms import StringField, PasswordField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
+from .recaptcha import RecaptchaField, validate_recaptcha_request
 
-class SignupForm(FlaskForm):
+
+class SignupForm(QuartForm):
     company_sizes = [("0-10", "0-10"), ("11-100", "11-100"), (">100", ">100")]
     occupations = [
         ("Editor", lazy_gettext("Editor")),
@@ -34,20 +36,23 @@ class SignupForm(FlaskForm):
     consent = BooleanField(lazy_gettext("I agree to"), validators=[])
     recaptcha = RecaptchaField()
 
+    async def async_validators_recaptcha(self, _field):
+        await validate_recaptcha_request()
 
-class LoginForm(FlaskForm):
-    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
+
+class LoginForm(QuartForm):
+    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64)])
     password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
     remember_me = BooleanField(lazy_gettext("Remember Me"), validators=[])
     firebase_status = StringField("firebase_status", validators=[])  # for firebase status code
 
 
-class TokenForm(FlaskForm):
-    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
+class TokenForm(QuartForm):
+    email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64)])
     firebase_status = StringField("firebase_status", validators=[])  # for firebase status code
 
 
-class ResetPasswordForm(FlaskForm):
+class ResetPasswordForm(QuartForm):
     match_password2 = [
         DataRequired(),
         Length(min=8),

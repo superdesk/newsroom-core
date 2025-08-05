@@ -1,25 +1,28 @@
 import os
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 import arrow
 from bson.objectid import ObjectId
-import flask
 import hashlib
 import logging
+from enum import Enum
 
-from flask import current_app as app
 from eve.utils import str_to_date
-from flask_babel import format_time, format_date, format_datetime, get_locale, lazy_gettext
-from flask_babel.speaklater import LazyString
+
+from quart_babel import format_time, format_date, format_datetime, get_locale, lazy_gettext
+from quart_babel.speaklater import LazyString
+
 from jinja2.utils import htmlsafe_json_dumps  # type: ignore
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import session, url_for
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
-from newsroom.auth import get_company
-from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
-from enum import Enum
 
-from newsroom.types import User
-from newsroom.user_roles import UserRole
+from newsroom.types import UserRole, UserResourceModel, User
+from newsroom.gettext import get_session_timezone
+
+from .template_loaders import template_locale
 
 
 logger = logging.getLogger(__name__)
@@ -36,11 +39,11 @@ class ScheduleType(Enum):
 def get_client_format(key) -> Optional[str]:
     locale = str(get_locale())
     try:
-        return app.config["CLIENT_LOCALE_FORMATS"][locale][key]
+        return get_app_config("CLIENT_LOCALE_FORMATS")[locale][key]
     except KeyError:
         pass
     try:
-        return app.config["CLIENT_LOCALE_FORMATS"][app.config["DEFAULT_LANGUAGE"]][key]
+        return get_app_config("CLIENT_LOCALE_FORMATS")[get_app_config("DEFAULT_LANGUAGE")][key]
     except KeyError:
         pass
     return None
@@ -59,10 +62,12 @@ def to_json(value):
         value = str(value)
     if isinstance(value, ObjectId):
         value = str(value)
-    return htmlsafe_json_dumps(obj=value, dumper=app.json_encoder().dumps)
+
+    app = get_current_app().as_any()
+    return htmlsafe_json_dumps(obj=value, dumps=app.json_encoder().dumps)
 
 
-def parse_date(datetime: Union[str, datetime]) -> datetime:
+def parse_date(datetime: str | datetime) -> datetime:
     """Return datetime instance for datetime."""
     if isinstance(datetime, str):
         try:
@@ -75,7 +80,7 @@ def parse_date(datetime: Union[str, datetime]) -> datetime:
     return datetime
 
 
-def get_schedule_type(start: datetime, end: Optional[datetime], all_day: bool, no_end_time: bool) -> ScheduleType:
+def get_schedule_type(start: datetime, end: datetime | None, all_day: bool, no_end_time: bool) -> ScheduleType:
     """
     Determine the schedule type based on event start and end times.
 
@@ -122,10 +127,8 @@ def format_event_datetime(item: dict) -> str:
         return ""
 
     tz = date_info.get("tz", get_session_timezone())
-    try:
-        # Set the session timezone
-        set_session_timezone(tz)
-
+    # Set the session timezone
+    with template_locale(timezone=tz):
         start = parse_date(date_info.get("start"))
         end = parse_date(date_info.get("end")) if date_info.get("end") else None
         all_day = date_info.get("all_day")
@@ -168,19 +171,15 @@ def format_event_datetime(item: dict) -> str:
                 tz=tz,
             )
 
-    finally:
-        # clear session timezone
-        clear_session_timezone()
-
 
 def datetime_short(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_SHORT"])
+        return format_datetime(parse_date(datetime), get_app_config("DATETIME_FORMAT_SHORT"))
 
 
 def datetime_long(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_LONG"])
+        return format_datetime(parse_date(datetime), get_app_config("DATETIME_FORMAT_LONG"))
 
 
 def date_header(datetime):
@@ -190,12 +189,12 @@ def date_header(datetime):
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), app.config["TIME_FORMAT_SHORT"])
+        return format_time(parse_date(datetime), get_app_config("TIME_FORMAT_SHORT"))
 
 
 def date_short(datetime):
     if datetime:
-        return format_date(parse_date(datetime), app.config["DATE_FORMAT_SHORT"])
+        return format_date(parse_date(datetime), get_app_config("DATE_FORMAT_SHORT"))
 
 
 def notification_time(datetime):
@@ -235,21 +234,22 @@ def char_count(html):
 def is_admin(user=None):
     if user:
         return user.get("user_type") == "administrator"
-    return flask.session.get("user_type") == "administrator"
+    return session.get("user_type") == "administrator"
 
 
-def is_admin_or_internal(user=None):
+def is_admin_or_internal(user: UserResourceModel | User | dict[str, Any] | None = None) -> bool:
     allowed_user_types = ["administrator", "internal", "account_management"]
     if user:
-        return user.get("user_type") in allowed_user_types
-    return flask.session.get("user_type") in allowed_user_types
+        user_type = user.user_type if isinstance(user, UserResourceModel) else user.get("user_type")
+        return user_type in allowed_user_types
+    return session.get("user_type") in allowed_user_types
 
 
 def newsroom_config():
     port = int(os.environ.get("PORT", "5000"))
     return {
         "websocket": os.environ.get("NEWSROOM_WEBSOCKET_URL", "ws://localhost:%d" % (port + 100,)),
-        "client_config": flask.current_app.config["CLIENT_CONFIG"],
+        "client_config": get_app_config("CLIENT_CONFIG"),
     }
 
 
@@ -267,6 +267,7 @@ def sidenavs(blueprint=None):
         return not nav.get("blueprint") or not blueprint or nav["blueprint"] == blueprint
 
     locale = str(get_locale())
+    app = get_current_app().as_any()
 
     return [
         nav
@@ -280,10 +281,11 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
-    from newsroom.auth.utils import get_user_sections, get_user
+    from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request, get_user_sections
 
-    user = get_user()
-    sections = get_user_sections(user)
+    user = get_user_or_none_from_request(None)
+    company = get_company_or_none_from_request(None)
+    sections = get_user_sections(user, company)
     navs = sidenavs(blueprint)
     if sections:
         return [nav for nav in navs if section_allowed(nav, sections)]
@@ -303,7 +305,7 @@ def sidenavs_by_group(group=0, blueprint=None):
 def is_user_type_allowed(allowed_user_types, user=None):
     if user:
         return user.get("user_type") in allowed_user_types
-    return flask.session.get("user_type") in allowed_user_types
+    return session.get("user_type") in allowed_user_types
 
 
 def is_admin_or_account_manager(user=None):
@@ -315,14 +317,15 @@ def is_admin_manager_or_company_admin(user=None):
 
 
 def is_company_admin(user=None):
-    return (user.get("user_type") if user else flask.session.get("user_type")) == UserRole.COMPANY_ADMIN.value
+    return (user.get("user_type") if user else session.get("user_type")) == UserRole.COMPANY_ADMIN.value
 
 
 def authorized_settings_apps(user=None):
+    app = get_current_app().as_any()
     if is_admin(user):
         return app.settings_apps
     if is_admin_or_account_manager(user):
-        return [app for app in app.settings_apps if app.allow_account_mgr]
+        return [settings_app for settings_app in app.settings_apps if app.allow_account_mgr]
     return []
 
 
@@ -332,6 +335,7 @@ def get_multi_line_message(message):
 
 
 def get_theme_file(filename):
+    app = get_current_app().as_any()
     for folder in app._theme_folders:
         file = os.path.realpath(os.path.join(folder, filename))
         if os.path.exists(file):
@@ -347,13 +351,15 @@ def theme_url(filename):
     file = get_theme_file(filename)
     assert file
     if not file:  # this should not really happen
-        return flask.url_for("theme", filename=filename)
+        return url_for("theme", filename=filename)
+
+    app = get_current_app().as_any()
     if _hash_cache.get(file) is None or app.debug:
         hash = hashlib.md5()
         with open(file, "rb") as f:
             hash.update(f.read())
         _hash_cache[file] = hash.hexdigest()
-    return flask.url_for(
+    return url_for(
         "theme",
         filename=filename,
         h=_hash_cache.get(file, int(datetime.now().timestamp())),
@@ -398,12 +404,15 @@ def get_item_category_names(item: Dict[str, Any]) -> str:
     return ", ".join([category["name"] for category in item["service"]])
 
 
-def get_ga_user_properties(user: User) -> Dict[str, str]:
+def get_ga_user_properties() -> Dict[str, str]:
+    from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request
+
+    user = get_user_or_none_from_request(None)
     if not user:
         return {}
-    company = get_company(user)
+    company = get_company_or_none_from_request(None)
     return {
-        "company": (company.get("name") if company else "") or "none",
-        "user": f"{user['first_name']} {user['last_name'][:1]}".strip(),
-        "user_internal_id": str(user.get("_id") or ""),  # user_id is reserved name
+        "company": (company.name if company else "") or "none",
+        "user": f"{user.first_name} {user.last_name[:1]}".strip(),
+        "user_internal_id": str(user.id),
     }

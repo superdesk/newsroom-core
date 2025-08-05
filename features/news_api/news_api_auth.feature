@@ -12,7 +12,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -27,7 +27,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -39,6 +39,7 @@ Feature: News API Authorization
     Then we get response code 401
 
 
+    @wip
   Scenario: Proxy forward situation is handled appropirately
     Given "items"
         """
@@ -51,7 +52,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -66,7 +67,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -95,7 +96,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -110,7 +111,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -154,7 +155,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],

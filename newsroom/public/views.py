@@ -1,72 +1,85 @@
 from typing import List, Dict
 
+from pydantic import BaseModel
 from werkzeug.utils import secure_filename
-from flask import render_template, current_app as app
 
-from superdesk import get_resource_service
+from superdesk.flask import render_template
+from superdesk.core.web import EndpointGroup
+from superdesk.core import get_current_app, get_app_config
+
 from newsroom.auth.utils import is_valid_session
-
-from newsroom.types import DashboardCard, Article
-from newsroom.public import blueprint
-from newsroom.utils import query_resource
+from newsroom.types import Article, CardResourceModel
 from newsroom.wire.items import get_items_for_dashboard
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.cards import CardsResourceService
 
 PUBLIC_DASHBOARD_CONFIG_CACHE_KEY = "public-dashboard-config"
 PUBLIC_DASHBOARD_CARDS_CACHE_KEY = "public-dashboard-cards"
 PUBLIC_DASHBOARD_ITEMS_CACHE_KEY = "public-dashboard-items"
 
+public_endpoints = EndpointGroup("public", __name__)
 
-def get_public_dashboard_config():
+
+async def get_public_dashboard_config():
+    app = get_current_app().as_any()
     if app.cache.get(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
+    ui_config_service = UiConfigResourceService()
 
-    config = get_resource_service("ui_config").get_section_config("home")
+    config = await ui_config_service.get_section_config("home")
     app.cache.set(
-        PUBLIC_DASHBOARD_CONFIG_CACHE_KEY, config, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
+        PUBLIC_DASHBOARD_CONFIG_CACHE_KEY, config, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return config
 
 
-def get_public_items_by_cards() -> Dict[str, List[Article]]:
+async def get_public_items_by_cards() -> Dict[str, List[Article]]:
+    app = get_current_app().as_any()
     if app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
 
-    items_by_card = get_items_for_dashboard(get_public_cards(), True, True)
+    items_by_card = await get_items_for_dashboard(await get_public_cards(), True, True)
     app.cache.set(
-        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
+        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return items_by_card
 
 
-def get_public_cards() -> List[DashboardCard]:
+async def get_public_cards() -> List[CardResourceModel]:
+    app = get_current_app().as_any()
     if app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY):
         return app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
 
-    cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
-    app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
+    cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
+    app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
 
     return cards
 
 
-@blueprint.route("/page/<path:template>")
-def page(template):
-    return render_template("page-{template}.html".format(template=secure_filename(template)))
+class PageArgs(BaseModel):
+    template: str
 
 
-def render_public_dashboard():
-    return render_template(
+@public_endpoints.endpoint("/page/<path:template>")
+async def page(args: PageArgs, _p: None, _r: None):
+    template = secure_filename(args.template)
+    return await render_template(f"page-{template}.html")
+
+
+async def render_public_dashboard():
+    return await render_template(
         "public_dashboard.html",
         data={
-            "cards": get_public_cards(),
-            "ui_config": get_public_dashboard_config(),
-            "items_by_card": get_public_items_by_cards(),
-            "groups": app.config.get("WIRE_GROUPS", []),
+            "cards": [card.to_dict() for card in await get_public_cards()],
+            "ui_config": await get_public_dashboard_config(),
+            "items_by_card": await get_public_items_by_cards(),
+            "groups": get_app_config("WIRE_GROUPS", []),
         },
     )
 
 
-@blueprint.route("/public/card_items")
-def public_card_items():
-    if not is_valid_session() and not app.config.get("PUBLIC_DASHBOARD"):
+@public_endpoints.endpoint("/public/card_items")
+async def public_card_items():
+    if not await is_valid_session() and not get_app_config("PUBLIC_DASHBOARD"):
         return {"_items": []}
-    return {"_items": get_public_items_by_cards()}
+    return {"_items": await get_public_items_by_cards()}

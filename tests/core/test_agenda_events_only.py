@@ -1,9 +1,11 @@
 from bson import ObjectId
-from flask import json
+from quart import json
 from pytest import fixture
 from copy import deepcopy
+
 from newsroom.notifications import get_user_notifications
-from tests.core.utils import add_company_products
+from newsroom.tests import markers
+from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -11,9 +13,10 @@ from tests.fixtures import (  # noqa: F401
     init_agenda_items,
     init_auth,
     PUBLIC_USER_ID,
+    PUBLIC_USER_NAME,
     COMPANY_1_ID,
 )
-from tests.utils import post_json, mock_send_email
+from tests.utils import post_json, mock_send_email, login_public
 from .test_push_events import test_event, test_planning
 from unittest import mock
 
@@ -22,25 +25,25 @@ NAV_2 = ObjectId("5e65964bf5db68883df561c1")
 
 
 @fixture(autouse=True)
-def set_events_only_company(app):
-    company = app.data.find_one("companies", None, _id=COMPANY_1_ID)
+async def set_events_only_company(app):
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company is not None
     updates = {
         "events_only": True,
-        "section": {"wire": True, "agenda": True},
+        "sections": {"wire": True, "agenda": True},
         "is_enabled": True,
     }
-    app.data.update("companies", COMPANY_1_ID, updates, company)
-    company = app.data.find_one("companies", None, _id=COMPANY_1_ID)
+    await update_entries_for("companies", COMPANY_1_ID, updates, company)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company.get("events_only") is True
-    user = app.data.find_one("users", None, _id=PUBLIC_USER_ID)
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
     assert user is not None
-    app.data.update("users", PUBLIC_USER_ID, {"is_enabled": True, "receive_email": True}, user)
+    await update_entries_for("users", PUBLIC_USER_ID, {"is_enabled": True, "receive_email": True}, user)
 
 
 @fixture
-def agenda_products(app):
-    app.data.insert(
+async def agenda_products(app):
+    await create_entries_for(
         "navigations",
         [
             {
@@ -58,7 +61,7 @@ def agenda_products(app):
         ],
     )
 
-    add_company_products(
+    await add_company_products(
         app,
         COMPANY_1_ID,
         [
@@ -80,27 +83,19 @@ def agenda_products(app):
     )
 
 
-def test_item_json(client):
-    # public user
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
-
-    resp = client.get("/agenda/urn:conference?format=json")
-    data = json.loads(resp.get_data())
-    assert "headline" in data
+async def test_item_json(client):
+    await login_public(client)
+    resp = await client.get("/agenda/urn:conference?format=json")
+    data = json.loads(await resp.get_data())
+    assert "slugline" in data
     assert "planning_items" not in data
     assert "coverages" not in data
 
 
-def test_search(client, app, agenda_products):
-    # public user
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
-
-    resp = client.get("/agenda/search")
-    data = json.loads(resp.get_data())
+async def test_search(client, app, agenda_products):
+    await login_public(client)
+    resp = await client.get("/agenda/search")
+    data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
     assert "urgency" not in data["_aggregations"]
@@ -109,8 +104,8 @@ def test_search(client, app, agenda_products):
     assert "planning_items" not in data["_items"][0]
     assert "coverages" not in data["_items"][0]
 
-    resp = client.get(f"/agenda/search?navigation={NAV_1}")
-    data = json.loads(resp.get_data())
+    resp = await client.get(f"/agenda/search?navigation={NAV_2}")
+    data = json.loads(await resp.get_data())
     assert 1 == len(data["_items"])
     assert "_aggregations" in data
     assert "urgency" not in data["_aggregations"]
@@ -120,8 +115,8 @@ def test_search(client, app, agenda_products):
     assert "coverages" not in data["_items"][0]
 
 
-def set_watch_products(app):
-    app.data.insert(
+async def set_watch_products(app):
+    await create_entries_for(
         "navigations",
         [
             {
@@ -133,11 +128,11 @@ def set_watch_products(app):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
-                "_id": "12",
+                "_id": ObjectId(),
                 "name": "product test",
                 "query": "press",
                 "companies": [COMPANY_1_ID],
@@ -149,17 +144,17 @@ def set_watch_products(app):
     )
 
 
+@markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_watched_event_sends_notification_for_event_update(client, app, mocker):
+async def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
-    post_json(client, "/push", event)
-    set_watch_products(app)
+    await post_json(client, "/push", event)
+    await set_watch_products(app)
 
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
+    await login_public(client)
 
-    post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    response = await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    assert response.status_code == 200, await response.get_data(as_text=True)
 
     # update comes in
     event["state"] = "rescheduled"
@@ -169,10 +164,10 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
         "tz": "Australia/Sydney",
     }
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        post_json(client, "/push", event)
-    notifications = get_user_notifications(PUBLIC_USER_ID)
+        await post_json(client, "/push", event)
+    notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - updated" in str(outbox[0])
@@ -188,27 +183,25 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]["user"] == PUBLIC_USER_ID
 
 
-# @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
+async def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
-    set_watch_products(app)
-    post_json(client, "/push", event)
+    await set_watch_products(app)
+    await post_json(client, "/push", event)
 
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
+    await login_public(client)
 
-    post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
     # update the event for unpost
     event["pubstatus"] = "cancelled"
     event["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        post_json(client, "/push", event)
-    notifications = get_user_notifications(PUBLIC_USER_ID)
+        await post_json(client, "/push", event)
+    notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - updated" in str(outbox[0])
@@ -225,24 +218,21 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
+async def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
-    post_json(client, "/push", event)
-    set_watch_products(app)
+    await post_json(client, "/push", event)
+    await set_watch_products(app)
 
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
-
-    post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    await login_public(client)
+    await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
     # planning comes in
     planning = deepcopy(test_planning)
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        post_json(client, "/push", planning)
-    notifications = get_user_notifications(PUBLIC_USER_ID)
+        await post_json(client, "/push", planning)
+    notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
     assert len(notifications) == 0
@@ -250,27 +240,25 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
+async def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
-    set_watch_products(app)
-    post_json(client, "/push", event)
-    post_json(client, "/push", planning)
+    await set_watch_products(app)
+    await post_json(client, "/push", event)
+    await post_json(client, "/push", planning)
 
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
+    await login_public(client)
 
-    post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
     # update the planning for cancel
     planning["pubstatus"] = "cancelled"
     planning["state"] = "cancelled"
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        post_json(client, "/push", planning)
-    notifications = get_user_notifications(PUBLIC_USER_ID)
+        await post_json(client, "/push", planning)
+    notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
     assert len(notifications) == 0
@@ -278,18 +266,16 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
+async def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
-    set_watch_products(app)
-    post_json(client, "/push", event)
-    post_json(client, "/push", planning)
+    await set_watch_products(app)
+    await post_json(client, "/push", event)
+    await post_json(client, "/push", planning)
 
-    with client.session_transaction() as session:
-        session["user"] = PUBLIC_USER_ID
-        session["user_type"] = "public"
+    await login_public(client)
 
-    post_json(client, "/agenda_watch", {"items": [event["guid"]]})
+    await post_json(client, "/agenda_watch", {"items": [event["guid"]]})
 
     # update the planning with an added coverage
     planning["coverages"].append(
@@ -302,7 +288,7 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
                 "ednote": "ed note here",
                 "scheduled": "2018-05-29T10:51:52+0000",
             },
-            "coverage_status": {
+            "news_coverage_status": {
                 "name": "coverage intended",
                 "label": "Planned",
                 "qcode": "ncostat:int",
@@ -313,10 +299,10 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
         }
     )
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        post_json(client, "/push", planning)
-    notifications = get_user_notifications(PUBLIC_USER_ID)
+        await post_json(client, "/push", planning)
+    notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
     assert len(notifications) == 0

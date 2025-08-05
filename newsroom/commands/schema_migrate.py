@@ -1,14 +1,17 @@
-from flask import current_app as app
+import click
+
+from superdesk.core import get_current_app, get_app_config
 from superdesk.lock import lock, unlock
 from superdesk.commands.rebuild_elastic_index import RebuildElasticIndex
 from newsroom import SCHEMA_VERSIONS
-from .manager import manager
+from .cli import newsroom_cli
 
 
 VERSION_ID = "schema_version"
 
 
-@manager.command
+@newsroom_cli.command("schema_migrate")
+@click.argument("resource_name", required=False)
 def schema_migrate(resource_name=None):
     """Migrate elastic schema if needed, should be triggered on every deploy.
 
@@ -21,9 +24,11 @@ def schema_migrate(resource_name=None):
     Example:
     ::
 
-        $ python manage.py schema:migrate
+        $ python manage.py schema_migrate
 
     """
+
+    # TODO-ASYNC: Revisit when "wire" and "agenda" are migrated to async
 
     lock_name = "schema_migrate"
 
@@ -39,7 +44,7 @@ def schema_migrate(resource_name=None):
 
 def _resource_schema_migrate(resource: str):
     resource_schema_version = get_schema_version(resource)
-    newsroom_schema_version = app.config.get(f"{resource.upper()}_SCHEMA_VERSION", SCHEMA_VERSIONS.get(resource))
+    newsroom_schema_version = get_app_config(f"{resource.upper()}_SCHEMA_VERSION", SCHEMA_VERSIONS.get(resource))
 
     if resource_schema_version < newsroom_schema_version:
         print(f"Update {resource} schema from version {resource_schema_version} to {newsroom_schema_version}")
@@ -51,7 +56,7 @@ def _resource_schema_migrate(resource: str):
 
 def _get_version_db():
     """Get db used for storing version information."""
-    return app.data.mongo.pymongo().db["newsroom"]
+    return get_current_app().data.mongo.pymongo().db["newsroom"]
 
 
 def get_schema_version(resource: str) -> int:

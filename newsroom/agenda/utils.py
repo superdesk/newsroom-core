@@ -1,15 +1,16 @@
 from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
-from flask import current_app as app
-from flask_babel import gettext
+from quart_babel import gettext
+
+from superdesk.core import get_app_config
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
-from newsroom.template_filters import time_short, parse_date, format_datetime
 from newsroom.gettext import get_session_locale
-from newsroom.utils import query_resource
 from newsroom.notifications import push_notification
+from newsroom.companies.companies_async import CompanyService
+from newsroom.template_filters import time_short, parse_date, format_datetime
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = "_time_to_be_confirmed"
@@ -93,7 +94,7 @@ def get_coverage_scheduled(coverage):
 
 
 def get_coverage_content_type_name(coverage, language):
-    coverage_types = app.config["COVERAGE_TYPES"]
+    coverage_types = get_app_config("COVERAGE_TYPES")
     content_type = coverage.get("coverage_type") or coverage.get("planning", {}).get("g2_content_type", "")
     coverage_type = coverage_types.get(content_type, {})
     locale = (language or get_session_locale() or "en").lower()
@@ -102,7 +103,7 @@ def get_coverage_content_type_name(coverage, language):
 
 
 def get_display_date_from_string(datetime_str):
-    return format_datetime(parse_date(datetime_str), app.config["AGENDA_EMAIL_LIST_DATE_FORMAT"])
+    return format_datetime(parse_date(datetime_str), get_app_config("AGENDA_EMAIL_LIST_DATE_FORMAT"))
 
 
 def get_coverage_publish_time(coverage):
@@ -251,9 +252,11 @@ def remove_restricted_coverage_info(items):
             remove_planning_info(item)
 
         item["coverages"] = [
-            coverage
-            if coverage_is_completed(coverage)
-            else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+            (
+                coverage
+                if coverage_is_completed(coverage)
+                else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+            )
             for coverage in item.get("coverages") or []
         ]
 
@@ -261,9 +264,11 @@ def remove_restricted_coverage_info(items):
             remove_planning_info(plan)
 
             plan["coverages"] = [
-                coverage
-                if coverage_is_completed(coverage)
-                else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+                (
+                    coverage
+                    if coverage_is_completed(coverage)
+                    else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+                )
                 for coverage in plan.get("coverages") or []
             ]
             for coverage in plan["coverages"]:
@@ -275,10 +280,9 @@ def remove_restricted_coverage_info(items):
     return items
 
 
-def push_agenda_item_notification(name, item, **kwargs):
-    restricted_companies = [
-        item["_id"] for item in query_resource("companies", lookup={"restrict_coverage_info": True})
-    ]
+async def push_agenda_item_notification(name, item, **kwargs):
+    cursor = await CompanyService().search({"restrict_coverage_info": True})
+    restricted_companies = [item["_id"] for item in await cursor.to_list_raw()]
 
     if not len(restricted_companies):
         push_notification(name, item=item, **kwargs)

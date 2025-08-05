@@ -1,8 +1,4 @@
-import superdesk
+from superdesk.core.module import Module
+from .views import news_api_search_endpoints
 
-from .resource import NewsAPISearchResource
-from .service import NewsAPISearchService
-
-
-def init_app(app):
-    superdesk.register_resource("news/search", NewsAPISearchResource, NewsAPISearchService, _app=app)
+module = Module(name="newsroom.news_api.search", endpoints=[news_api_search_endpoints])

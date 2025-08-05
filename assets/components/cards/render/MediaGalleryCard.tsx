@@ -31,10 +31,10 @@ const getMediaPanel = (item: IArticle, picture: IArticle | null, openItem: any, 
 };
 
 const MediaGalleryCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
-    const {items, title, id, openItem, isActive, cardId} = props;
+    const {items, title, id, openItem, isActive, cardId, kind} = props;
 
     return (
-        <CardRow title={title} id={id} isActive={isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
+        <CardRow title={title} id={id} isActive={isActive} kind={kind} onMoreNewsClicked={props.onMoreNewsClicked}>
             {items.map((item: any) => getMediaPanel(item, getPicture(item), openItem, cardId))}
         </CardRow>
     );

@@ -1,15 +1,20 @@
 from copy import deepcopy
-from flask import json, Config
+import asyncio
+import logging
 
+from superdesk.flask import Config
+from superdesk.tests import setup_notification, set_placeholder
 from superdesk.tests.steps import get_prefixed_url
-from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 
+from newsroom.types import UserAuthResourceModel, CompanyResource
+from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 from newsroom.web.factory import get_app
 from newsroom.web.default_settings import CORE_APPS, BLUEPRINTS
-from newsroom.agenda.agenda import aggregations as agenda_aggs
+from newsroom.agenda.filters import aggregations as agenda_aggs
 from tests.search.fixtures import USERS, COMPANIES
 
 
+logger = logging.getLogger(__name__)
 orig_agenda_aggs = deepcopy(agenda_aggs)
 
 
@@ -18,6 +23,16 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(before_scenario_async(context, scenario))
+    except Exception as e:
+        # Make sure exceptions raised are printed to the console
+        logger.exception(e)
+        raise e
+
+
+async def before_scenario_async(context, scenario):
     if "skip" in scenario.tags:
         scenario.skip("Marked with @skip")
         return
@@ -43,6 +58,7 @@ def before_scenario(context, scenario):
             "MONGO_DBNAME": "newsroom_behave",
             "CONTENTAPI_MONGO_DBNAME": "newsroom_behave",
             "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
+            "CELERY_TASK_ALWAYS_EAGER": True,
             "AGENDA_GROUPS": [
                 {
                     "field": "sttdepartment",
@@ -80,25 +96,29 @@ def before_scenario(context, scenario):
     drop_mongo(config)
 
     context.app = get_app(config=config, testing=True)
-    with context.app.app_context():
-        reset_elastic(context.app)
+    async with context.app.app_context():
+        await reset_elastic(context.app)
+        context.app.cache.clear()
 
     context.headers = [("Content-Type", "application/json"), ("Origin", "localhost")]
     context.client = context.app.test_client()
 
     if scenario.status != "skipped":
+        if "notification" in scenario.tags:
+            setup_notification(context)
+
         if "auth" in scenario.tags:
-            setup_users(context)
-            login_user(context, scenario)
+            await setup_users(context)
+            await login_user(context, scenario)
 
 
-def setup_users(context):
-    with context.app.test_request_context():
-        context.app.data.insert("companies", COMPANIES)
-        context.app.data.insert("users", USERS)
+async def setup_users(context):
+    async with context.app.test_request_context("/login"):
+        await CompanyResource.get_service().create(COMPANIES)
+        await UserAuthResourceModel.get_service().create(USERS)
 
 
-def login_user(context, scenario):
+async def login_user(context, scenario):
     data = None
 
     if "admin" in scenario.tags:
@@ -110,10 +130,13 @@ def login_user(context, scenario):
     if data:
         url = "/login"
 
-        with context.app.test_request_context():
-            response = context.client.post(
-                get_prefixed_url(context.app, url),
-                data=json.dumps(data),
-                headers=context.headers,
-            )
-            assert response.status_code == 302, response.status_code
+        response = await context.client.post(
+            get_prefixed_url(context.app, url),
+            form=data,
+            headers=context.headers,
+        )
+        assert response.status_code == 302, response.status_code
+
+        # Get the logged-in user and add its ID to ``CONTEXT_USER_ID`` for use in behave tests
+        user = await UserAuthResourceModel.get_service().find_one(email=data["email"])
+        set_placeholder(context, "CONTEXT_USER_ID", str(user.id))

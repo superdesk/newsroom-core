@@ -1,9 +1,9 @@
-from typing import Optional, List
+from typing import Optional, Union
+
 from bson import ObjectId
+from superdesk.core.resources.cursor import ResourceCursorAsync
 
-from newsroom.types import Company
-
-from newsroom.utils import query_resource
+from newsroom.types import Company, CompanyProduct, CompanyResource, UserResourceModel
 
 
 def restrict_coverage_info(company: Optional[Company]) -> bool:
@@ -12,22 +12,61 @@ def restrict_coverage_info(company: Optional[Company]) -> bool:
     return False
 
 
-def get_company_section_names(company: Company) -> List[str]:
-    return sorted([section for section, enabled in company.get("sections", {}).items() if enabled])
+def get_company_section_names(company: Company) -> list[str]:
+    sections = company.get("sections") or {}
+    return sorted([section for section, enabled in sections.items() if enabled])
 
 
-def get_company_product_ids(company: Company) -> List[ObjectId]:
+def get_company_product_ids(company: Company) -> list[Optional[ObjectId]]:
     return sorted(
         [
-            product.get("_id")
-            for product in company.get("products", [])
+            ObjectId(product.get("_id"))
+            for product in company.get("products") or []
             if product.get("section") and (company.get("sections") or {}).get(product["section"]) is True
         ],
         key=lambda o: str(o),
     )
 
 
-def get_companies_id_by_product(product_id: str) -> List[str]:
+def get_updated_sections(updates, original, company: Optional[CompanyResource]) -> dict[str, bool]:
+    sections: dict[str, bool] = {}
+    if "sections" in updates:
+        sections = updates["sections"] or {}
+    elif "sections" in original:
+        sections = original["sections"] or {}
+
+    if not company:
+        return sections
+
+    company_section_names = get_company_section_names(company.to_dict())
+    return {section: enabled and section in company_section_names for section, enabled in sections.items()}
+
+
+def get_updated_products(updates, original, company: Optional[CompanyResource]) -> list[CompanyProduct]:
+    products: list[CompanyProduct] = []
+    if "products" in updates:
+        products = updates["products"] or []
+    elif "products" in original:
+        products = original["products"] or []
+
+    # Make sure the products are of the correct type
+    products = [CompanyProduct(**product) if isinstance(product, dict) else product for product in products]
+
+    if not company:
+        return products
+
+    company_dict = company.to_dict()
+    company_section_names = get_company_section_names(company_dict)
+    company_product_ids = get_company_product_ids(company_dict)
+
+    return [
+        product
+        for product in products
+        if product.section in company_section_names and product._id in company_product_ids
+    ]
+
+
+async def get_companies_id_by_product(product_id: str) -> list[str]:
     """
     Get company IDs based on product ID.
 
@@ -37,9 +76,27 @@ def get_companies_id_by_product(product_id: str) -> List[str]:
     Returns:
         List[str]: A list of company IDs associated with the specified product.
     """
-    companies = list(query_resource("companies"))
+    from newsroom.companies import CompanyServiceAsync
+
+    companies = await CompanyServiceAsync().get_all_raw_as_list()
     return [
         str(company["_id"])
         for company in companies
         if any(prod["_id"] == ObjectId(product_id) for prod in company.get("products", []))
     ]
+
+
+async def get_users_by_company(company_id: Union[str, ObjectId]) -> ResourceCursorAsync["UserResourceModel"]:
+    """
+    Get all the users for the given company ID.
+
+    Parameters:
+        company_id (str | ObjectId): The ID of the company
+
+    Returns:
+        ResourceCursorAsync[UserResourceModel]: A result cursor of users that belong to the given company (if any)
+    """
+
+    from newsroom.users.service import UsersService
+
+    return await UsersService().search(lookup={"company": ObjectId(company_id)})

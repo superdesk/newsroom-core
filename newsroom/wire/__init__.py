@@ -1,18 +1,24 @@
-import superdesk
+from quart_babel import lazy_gettext
 
-from flask import Blueprint, url_for
-from flask_babel import lazy_gettext
-from content_api.items.resource import code_mapping
+import superdesk
+from superdesk.flask import url_for
 
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.search.config import init_nested_aggregation
+
 from . import utils
+from .filters import WireSearchRequestArgs
+from .service import WireSearchServiceAsync, WireItemService
+
+__all__ = [
+    "WireSearchServiceAsync",
+    "WireItemService",
+    "WireSearchRequestArgs",
+]
 
 
-blueprint = Blueprint("wire", __name__)
-
-from . import views  # noqa
+WIRE_NESTED_SEARCH_FIELDS = ["subject"]
 
 
 def url_for_wire(item, _external=True, section="wire", **kwargs):
@@ -28,7 +34,6 @@ def url_for_wire(item, _external=True, section="wire", **kwargs):
 
 
 def init_app(app: BaseNewsroomApp):
-    _update_items_schema(app)
     superdesk.register_resource("wire_search", WireSearchResource, WireSearchService, _app=app)
 
     app.section("wire", app.config["WIRE_SECTION"], "wire")
@@ -61,33 +66,6 @@ def init_app(app: BaseNewsroomApp):
         blueprint="wire",
         badge="saved-items-count",
     )
-
-    from .formatters import (
-        TextFormatter,
-        NITFFormatter,
-        NewsMLG2Formatter,
-        JsonFormatter,
-        PictureFormatter,
-    )
-
-    app.download_formatter(
-        "text",
-        TextFormatter(),
-        lazy_gettext("Plain Text"),
-        ["wire", "agenda"],
-        ["text"],
-    )
-    app.download_formatter("nitf", NITFFormatter(), "NITF", ["wire"], ["text"])
-    app.download_formatter("newsmlg2", NewsMLG2Formatter(), "NewsMLG2", ["wire"], ["text"])
-    app.download_formatter("json", JsonFormatter(), "Json", ["agenda"], ["text"])
-    if app.config.get("ALLOW_PICTURE_DOWNLOAD", True):
-        app.download_formatter(
-            "picture",
-            PictureFormatter(),
-            lazy_gettext("Story Image"),
-            ["wire"],
-            ["picture"],
-        )
 
     app.add_template_global(utils.get_picture, "get_picture")
     app.add_template_global(utils.get_caption, "get_caption")
@@ -151,20 +129,9 @@ def init_app(app: BaseNewsroomApp):
         ],
     )
 
-    init_nested_aggregation(WireSearchResource, app.config.get("WIRE_GROUPS", []), app.config["WIRE_AGGS"])
-
-
-def _update_items_schema(app: BaseNewsroomApp):
-    app.config["DOMAIN"]["items"]["schema"].update(
-        {
-            "products": {"type": "list", "mapping": code_mapping},
-            "subject": {
-                "type": "list",
-                "mapping": {
-                    "type": "nested",
-                    "include_in_parent": True,
-                    "properties": code_mapping["properties"],
-                },
-            },
-        }
+    init_nested_aggregation(
+        "items",
+        WIRE_NESTED_SEARCH_FIELDS,
+        app.config.get("WIRE_GROUPS", []),
+        app.config["WIRE_AGGS"],
     )

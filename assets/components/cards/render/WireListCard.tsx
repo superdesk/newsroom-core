@@ -116,7 +116,7 @@ interface IWireListCardProps extends ICardProps {
 
 const WireListCardComponent: React.ComponentType<IWireListCardProps> = (props: IWireListCardProps) => {
     return (
-        <CardRow title={props.title} id={props.id} isActive={props.isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
+        <CardRow title={props.title} id={props.id} isActive={props.isActive} kind={props.kind} onMoreNewsClicked={props.onMoreNewsClicked}>
             {props.items.map((item: IArticle) => (
                 <WireListPanel
                     key={item._id}

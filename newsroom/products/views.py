@@ -1,92 +1,93 @@
 import re
-from typing import List
+from typing import Tuple
 
-import flask
-from bson import ObjectId
-from flask import jsonify, current_app
-from flask_babel import gettext
-from superdesk import get_resource_service
+from bson import ObjectId, errors
+from pydantic import BaseModel
+from quart_babel import gettext
 
-from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
-from newsroom.products import blueprint
-from newsroom.products.products import get_products_by_company
-from newsroom.types import Product, ProductRef
-from newsroom.utils import (
-    get_json_or_400,
-    get_entity_or_404,
-    set_original_creator,
-    set_version_creator,
-    query_resource,
+from superdesk.core.web import EndpointGroup
+from superdesk.core.types import Request, Response
+
+from newsroom.auth import auth_rules
+from newsroom.core import get_current_wsgi_app
+from newsroom.types import ProductResourceModel, CompanyProduct
+from newsroom.utils import get_json_or_400_async
+from newsroom.products.service import ProductsService
+from newsroom.navigations import get_navigations_as_list
+from newsroom.companies.companies_async import CompanyService
+from newsroom.types.company import CompanyResource
+
+products_endpoints = EndpointGroup("products_views", __name__)
+
+
+async def get_settings_data():
+    app = get_current_wsgi_app()
+    return {
+        "products": await ProductsService().get_all_raw_as_list(),
+        "navigations": await get_navigations_as_list(),
+        "companies": await CompanyService().get_all_raw_as_list(),
+        "sections": [s for s in app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
+    }
+
+
+def get_product_ref(product: ProductResourceModel, seats=0) -> CompanyProduct:
+    return CompanyProduct(
+        _id=product.id,
+        section=product.product_type,
+        seats=seats,
+    )
+
+
+class SearchParams(BaseModel):
+    q: str | None = None
+
+
+class ProductsArgs(BaseModel):
+    product_id: str
+
+
+@products_endpoints.endpoint("/products", methods=["GET"], auth=[auth_rules.admin_only])
+async def index():
+    products = await ProductsService().get_all_raw_as_list()
+    return Response(products)
+
+
+@products_endpoints.endpoint(
+    "/products/search", methods=["GET"], auth=[auth_rules.account_manager_or_company_admin_only]
 )
-
-
-def get_settings_data():
-    return {
-        "products": list(query_resource("products")),
-        "navigations": list(query_resource("navigations")),
-        "companies": list(query_resource("companies")),
-        "sections": [s for s in current_app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
-    }
-
-
-def get_product_ref(product: Product, seats=0) -> ProductRef:
-    assert "_id" in product
-    return {
-        "_id": product["_id"],
-        "section": product.get("product_type") or "wire",
-        "seats": seats or 0,
-    }
-
-
-@blueprint.route("/products", methods=["GET"])
-@admin_only
-def index():
-    lookup = None
-    if flask.request.args.get("q"):
-        lookup = flask.request.args.get("q")
-    products = list(query_resource("products", lookup=lookup))
-    return jsonify(products), 200
-
-
-@blueprint.route("/products/search", methods=["GET"])
-@account_manager_or_company_admin_only
-def search():
-    lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+async def search(_a: None, params: SearchParams, _r: None):
+    lookup = {}
+    if params.q:
+        regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
         lookup = {"name": regex}
-    products = list(query_resource("products", lookup=lookup))
-    return jsonify(products), 200
+
+    search_cursor = await ProductsService().search(lookup)
+    products = await search_cursor.to_list_raw()
+
+    return Response(products)
 
 
-def validate_product(product):
-    if not product.get("name"):
-        return jsonify({"name": gettext("Name not found")}), 400
+async def parse_objectid_or_abort(request: Request, value: str | ObjectId) -> ObjectId:
+    try:
+        return ObjectId(value)
+    except errors.InvalidId:
+        return await request.abort(400, f"The provided value '{value}' is not a valid ID.")
 
 
-@blueprint.route("/products/new", methods=["POST"])
-@admin_only
-def create():
-    product = get_json_or_400()
-
-    validation = validate_product(product)
-    if validation:
-        return validation
-
-    if product.get("navigations"):
-        product["navigations"] = [
-            ObjectId(get_entity_or_404(_id, "navigations")["_id"]) for _id in product.get("navigations")
-        ]
-    set_original_creator(product)
-    ids = get_resource_service("products").post([product])
-    return jsonify({"success": True, "_id": ids[0]}), 201
+@products_endpoints.endpoint("/products/new", methods=["POST"], auth=[auth_rules.admin_only])
+async def create(request: Request):
+    creation_data = await get_json_or_400_async(request)
+    products = await ProductsService().create([creation_data])
+    return Response({"success": True, "_id": products[0].id}, 201)
 
 
-@blueprint.route("/products/<id>", methods=["POST"])
-@admin_only
-def edit(id):
-    get_entity_or_404(ObjectId(id), "products")
-    data = get_json_or_400()
+@products_endpoints.endpoint("/products/<string:product_id>", methods=["POST"], auth=[auth_rules.admin_only])
+async def edit(args: ProductsArgs, _p: None, request: Request):
+    product = await ProductsService().find_by_id(args.product_id)
+    if not product:
+        await request.abort(404, gettext("Product not found"))
+
+    data = await get_json_or_400_async(request)
     updates = {
         "name": data.get("name"),
         "description": data.get("description"),
@@ -97,64 +98,112 @@ def edit(id):
         "product_type": data.get("product_type", "wire"),
     }
 
-    validation = validate_product(updates)
-    if validation:
-        return validation
-
-    set_version_creator(updates)
-    get_resource_service("products").patch(id=ObjectId(id), updates=updates)
-    return jsonify({"success": True}), 200
+    await ProductsService().update(args.product_id, updates)
+    return Response({"success": True})
 
 
-@blueprint.route("/products/<id>/companies", methods=["POST"])
-@account_manager_only
-def update_companies(id):
-    updates = flask.request.get_json()
-    product = get_entity_or_404(id, "products")
-    selected_companies = updates.get("companies") or []
-    for company in get_resource_service("companies").get_all():
-        update_company = False
-        if "products" in company:
-            company_products: List[ProductRef] = company["products"].copy()
-        else:
-            company_products = [get_product_ref(p) for p in get_products_by_company(company)]
-            update_company = True
-        if str(company["_id"]) in selected_companies:
-            for ref in company_products:
-                if str(ref["_id"]) == id:
-                    break
-            else:
-                company_products.append(get_product_ref(product))
-                update_company = True
-        else:
-            for ref in company_products:
-                if str(ref["_id"]) == id:
-                    company_products = [p for p in company_products if str(p["_id"]) != id]
-                    update_company = True
-        if update_company:
-            sections = company.get("sections") or {}
-            for product in company_products:
-                sections.setdefault(product["section"], True)
-            get_resource_service("companies").patch(
-                company["_id"], updates={"products": company_products, "sections": sections}
-            )
-    return jsonify({"success": True}), 200
+async def update_company_products(
+    company: CompanyResource, product_id: ObjectId, selected_companies: list[ObjectId], product_ref: CompanyProduct
+) -> Tuple[list[CompanyProduct], bool]:
+    """
+    Updates the company's product list by either adding or removing a product reference.
+
+    Returns:
+        Tuple[List[ProductRef], bool]: A tuple where the first element is the of company products,
+        and the second element is a boolean indicating whether an update is required.
+    """
+
+    if company.id in selected_companies:
+        return add_product_to_company(company, product_id, product_ref)
+    else:
+        return remove_product_from_company(company, product_id)
 
 
-@blueprint.route("/products/<id>/navigations", methods=["POST"])
-@admin_only
-def update_navigations(id):
-    updates = flask.request.get_json()
+def add_product_to_company(
+    company: CompanyResource, product_id: ObjectId, product_ref: CompanyProduct
+) -> Tuple[list[CompanyProduct], bool]:
+    """
+    Adds a product to the company's product list if it doesn't already exist.
+    """
+    if not product_in_company(company, product_id):
+        company_products = company.products.copy()
+        company_products.append(product_ref)
+        return company_products, True
+    return company.products, False
+
+
+def product_in_company(company: CompanyResource, product_id: ObjectId) -> bool:
+    """
+    Checks if a product is already in a given Company products list.
+    """
+    for product in company.products:
+        if product._id == product_id:
+            return True
+    return False
+
+
+def remove_product_from_company(company: CompanyResource, product_id: ObjectId) -> Tuple[list[CompanyProduct], bool]:
+    """
+    Removes a product from the company's product list if it exists.
+
+    Returns:
+        A tuple with the list of products of the company and a boolean to indicate if an update is
+        required or not.
+    """
+    company_products = [product for product in company.products if product._id != product_id]
+    is_update_required = len(company_products) != len(company.products)
+
+    return company_products, is_update_required
+
+
+def update_company_sections(company: CompanyResource, company_products: list[CompanyProduct]) -> dict[str, bool]:
+    sections = company.sections
+    for product in company_products:
+        sections.setdefault(product.section, True)
+    return sections
+
+
+@products_endpoints.endpoint(
+    "/products/<string:product_id>/companies", methods=["POST"], auth=[auth_rules.account_manager_only]
+)
+async def update_companies(args: ProductsArgs, _p: None, request: Request):
+    product = await ProductsService().find_by_id(args.product_id)
+    if not product:
+        await request.abort(404, gettext("Product not found"))
+
+    updates = await request.get_json()
+    selected_companies = [await parse_objectid_or_abort(request, x) for x in updates.get("companies", [])]
+    product_ref = get_product_ref(product)
+
+    async for company in CompanyService().get_all():
+        company_products, update_required = await update_company_products(
+            company, ObjectId(args.product_id), selected_companies, product_ref
+        )
+
+        if update_required:
+            company_sections = update_company_sections(company, company_products)
+            await CompanyService().update(company.id, {"products": company_products, "sections": company_sections})
+
+    return Response({"success": True})
+
+
+@products_endpoints.endpoint(
+    "/products/<string:product_id>/navigations", methods=["POST"], auth=[auth_rules.admin_only]
+)
+async def update_navigations(args: ProductsArgs, _p: None, request: Request):
+    updates = await request.get_json()
     if updates.get("navigations"):
         updates["navigations"] = [ObjectId(nav_id) for nav_id in updates["navigations"]]
-    get_resource_service("products").patch(id=ObjectId(id), updates=updates)
-    return jsonify({"success": True}), 200
+    await ProductsService().update(args.product_id, updates)
+    return Response({"success": True})
 
 
-@blueprint.route("/products/<id>", methods=["DELETE"])
-@admin_only
-def delete(id):
+@products_endpoints.endpoint("/products/<string:product_id>", methods=["DELETE"], auth=[auth_rules.admin_only])
+async def delete(args: ProductsArgs, _p: None, request: Request):
     """Deletes the products by given id"""
-    get_entity_or_404(ObjectId(id), "products")
-    get_resource_service("products").delete_action({"_id": ObjectId(id)})
-    return jsonify({"success": True}), 200
+    product = await ProductsService().find_by_id(args.product_id)
+    if not product:
+        await request.abort(404, gettext("Product not found"))
+
+    await ProductsService().delete(product)
+    return Response({"success": True})

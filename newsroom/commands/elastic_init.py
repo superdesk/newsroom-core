@@ -1,8 +1,9 @@
-from .manager import app, manager
+from newsroom.core import get_current_wsgi_app
+from .cli import newsroom_cli
 
 
-@manager.command
-def elastic_init():
+@newsroom_cli.command("elastic_init")
+async def elastic_init():
     """Init elastic index.
 
     It will create index and put mapping. It should run only once so locks are in place.
@@ -14,4 +15,5 @@ def elastic_init():
         $ python manage.py elastic_init
 
     """
-    app.data.init_elastic(app)
+    app = get_current_wsgi_app()
+    await app.data.init_elastic(app)

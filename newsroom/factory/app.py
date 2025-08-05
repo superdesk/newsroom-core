@@ -10,45 +10,39 @@ import re
 import pathlib
 import importlib
 
-import eve
-import flask
-import newsroom
-import sentry_sdk
-
 from flask_mail import Mail
 from flask_caching import Cache
+from elasticapm.contrib.flask import ElasticAPM
+from pydantic import ValidationError
 from eve.io.mongo import ensure_mongo_indexes
+
+from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.json_utils import SuperdeskJSONEncoder, SuperdeskFlaskJSONProvider
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
-from elasticapm.contrib.flask import ElasticAPM
-from sentry_sdk.integrations.flask import FlaskIntegration
+from superdesk.factory.app import SuperdeskEve
 
-from newsroom.auth import SessionAuth
+import newsroom
+from newsroom.auth.eve_auth import SessionAuth
 from newsroom.exceptions import AuthorizationError
-from newsroom.utils import is_json_request
+from newsroom.utils import is_json_request, parse_validation_error
 from newsroom.gettext import setup_babel
 
 
 NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
-class BaseNewsroomApp(eve.Eve):
+class BaseNewsroomApp(SuperdeskEve):
     """The base Newsroom app class"""
 
     SERVICE_NAME = "Newsroom"
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
-
-    def __getattr__(self, name):
-        if name.startswith("on_"):
-            return super(BaseNewsroomApp, self).__getattr__(name)
-        raise AttributeError("type object '%s' has no attribute '%s'" % (self.__class__.__name__, name))
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -71,8 +65,10 @@ class BaseNewsroomApp(eve.Eve):
         if config is None:
             config = {}
 
+        self.json_provider_class = SuperdeskFlaskJSONProvider
+
         super(BaseNewsroomApp, self).__init__(
-            import_name,
+            import_name=import_name,
             data=self.DATALAYER,
             auth=self.AUTH_SERVICE,
             template_folder=os.path.join(NEWSROOM_DIR, "templates"),
@@ -81,6 +77,7 @@ class BaseNewsroomApp(eve.Eve):
             settings=config,
             **kwargs,
         )
+
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
 
@@ -102,6 +99,8 @@ class BaseNewsroomApp(eve.Eve):
 
         if not self.config.get("TESTING"):
             configure_logging(self.config.get("LOG_CONFIG_FILE"))
+
+        self.async_app.start()
 
     def load_app_default_config(self):
         """
@@ -141,12 +140,10 @@ class BaseNewsroomApp(eve.Eve):
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))
 
         if self.config.get("TRANSLATIONS_PATH"):
-            self.config["BABEL_TRANSLATION_DIRECTORIES"] = ";".join(
-                [
-                    str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
-                    str(self.config["TRANSLATIONS_PATH"]),
-                ]
-            )
+            self.config["BABEL_TRANSLATION_DIRECTORIES"] = [
+                str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
+                str(self.config["TRANSLATIONS_PATH"]),
+            ]
 
         # avoid events on this
         self.babel_tzinfo = None
@@ -178,17 +175,17 @@ class BaseNewsroomApp(eve.Eve):
 
     def setup_error_handlers(self):
         def assertion_error(err):
-            return flask.jsonify({"error": err.args[0] if err.args else 1}), 400
+            return jsonify({"error": err.args[0] if err.args else 1}), 400
 
-        def render_404(err):
-            if flask.request and is_json_request(flask.request):
-                return flask.jsonify({"code": 404}), 404
-            return flask.render_template("404.html"), 404
+        async def render_404(err):
+            if request and is_json_request(request):
+                return jsonify({"code": 404}), 404
+            return await render_template("404.html"), 404
 
-        def render_403(err):
-            if flask.request and is_json_request(flask.request):
+        async def render_403(err):
+            if request and is_json_request(request):
                 return (
-                    flask.jsonify(
+                    jsonify(
                         {
                             "code": 403,
                             "error": str(err),
@@ -197,20 +194,44 @@ class BaseNewsroomApp(eve.Eve):
                     ),
                     403,
                 )
-            return flask.render_template("403.html"), 403
+            return await render_template("403.html"), 403
 
         def superdesk_api_error(err):
             error_code = err.status_code or 500
-            return flask.jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
+            return (
+                jsonify({"error": err.message or "", "message": getattr(err, "payload", {}), "code": error_code}),
+                error_code,
+            )
 
-        def authorization_error(err: AuthorizationError):
-            return flask.render_template("authorization_error.html", message=err.message), err.code
+        async def authorization_error(err: AuthorizationError):
+            if request and is_json_request(request):
+                return jsonify(dict(title=err.title or "Error", message=err.message, code=err.code)), err.code
+
+            return await render_template("authorization_error.html", message=err.message, title=err.title), err.code
+
+        def handle_validation_error(error: ValidationError):
+            """
+            Gets the ValidationException error raised from Core framework's models/services, parses and returns it
+            to the client in a valid json format.
+            """
+            self.logger.exception("Validation Error", exc_info=error)
+            errors = parse_validation_error(error)
+            return jsonify(errors), 400
+
+        async def handle_any_exception(error: Exception):
+            self.logger.exception("An unhandled exception was raised", exc_info=error)
+            if request and is_json_request(request):
+                return jsonify({"error": str(error), "code": 500}), 500
+            else:
+                return await render_template("500.html"), 500
 
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
         self.register_error_handler(AuthorizationError, authorization_error)
+        self.register_error_handler(ValidationError, handle_validation_error)
+        self.register_error_handler(Exception, handle_any_exception)
 
     def general_setting(
         self,
@@ -233,8 +254,8 @@ class BaseNewsroomApp(eve.Eve):
             "client_setting": client_setting,
         }
 
-        if flask.g:  # reset settings cache
-            flask.g.settings = None
+        if g:  # reset settings cache
+            g.settings = None
 
     def setup_apm(self):
         if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
@@ -261,13 +282,6 @@ class BaseNewsroomApp(eve.Eve):
         elif "<regex(" in settings.get("url"):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
 
-    def setup_sentry(self):
-        if self.config.get("SENTRY_DSN"):
-            sentry_sdk.init(
-                dsn=self.config["SENTRY_DSN"],
-                integrations=[FlaskIntegration()],
-            )
-
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
             if re.search(r"-(dev|demo|test|staging)", self.config["CLIENT_URL"]):
@@ -279,3 +293,4 @@ class BaseNewsroomApp(eve.Eve):
     def init_indexes(self):
         for resource in self.config["DOMAIN"]:
             ensure_mongo_indexes(self, resource)
+        self.async_app.mongo.create_indexes_for_all_resources()

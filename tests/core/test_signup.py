@@ -1,25 +1,29 @@
 from unittest import mock
 
-from flask import url_for
+from quart import url_for
 
-from newsroom.types import CompanyType, Country
-from newsroom.auth import get_auth_user_by_email
-from tests.utils import mock_send_email
+from newsroom.types import CompanyType, Country, SectionEnum, CompanyProduct
+from newsroom.users import UsersAuthService
+from newsroom.companies.companies_async import CompanyService
+
+from tests.utils import get_user_by_email, mock_send_email
+from tests.core.utils import create_entries_for, find_one_for
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_new_user_signup_sends_email(app, client):
+async def test_new_user_signup_sends_email(app, client):
+    company_service = CompanyService()
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
-    product_ids = app.data.insert(
+    product_ids = await create_entries_for(
         "products", [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
     )
     with app.mail.record_messages() as outbox:
         # Sign up
-        response = client.post(
+        response = await client.post(
             url_for("auth.signup"),
-            data={
+            form={
                 "email": "newuser@abc.org",
                 "first_name": "John",
                 "last_name": "Doe",
@@ -45,31 +49,31 @@ def test_new_user_signup_sends_email(app, client):
         assert "News Media" in outbox[0].body
 
     # Test that the new Company has been created
-    new_company = app.data.find_one("companies", req=None, name="News Press Co.")
+    new_company = await company_service.find_one(name="News Press Co.")
     assert new_company is not None
-    assert new_company["contact_name"] == "John Doe"
-    assert new_company["contact_email"] == "newuser@abc.org"
-    assert new_company["phone"] == "1234567"
-    assert new_company["country"] == "AUS"
-    assert new_company["company_type"] == "news_media"
-    assert new_company["is_enabled"] is False
-    assert new_company["is_approved"] is False
-    assert new_company["sections"] == {
+    assert new_company.contact_name == "John Doe"
+    assert new_company.contact_email == "newuser@abc.org"
+    assert new_company.phone == "1234567"
+    assert new_company.country == "AUS"
+    assert new_company.company_type == "news_media"
+    assert new_company.is_enabled is False
+    assert new_company.is_approved is False
+    assert new_company.sections == {
         "wire": True,
         "agenda": True,
         "news_api": True,
         "monitoring": True,
     }
-    assert new_company["products"] == [
-        {
-            "_id": product_ids[0],
-            "section": "wire",
-            "seats": 0,
-        }
+    assert new_company.products == [
+        CompanyProduct(
+            _id=product_ids[0],
+            section=SectionEnum.WIRE,
+            seats=0,
+        )
     ]
 
     # Test that the new User has been created
-    new_user = app.data.find_one("users", req=None, email="newuser@abc.org")
+    new_user = await find_one_for("users", email="newuser@abc.org")
     assert new_user is not None
     assert new_user["first_name"] == "John"
     assert new_user["last_name"] == "Doe"
@@ -77,7 +81,7 @@ def test_new_user_signup_sends_email(app, client):
     assert new_user["phone"] == "1234567"
     assert new_user["role"] == "Other"
     assert new_user["country"] == "AUS"
-    assert new_user["company"] == new_company["_id"]
+    assert new_user["company"] == new_company.id
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False
@@ -89,12 +93,12 @@ def test_new_user_signup_sends_email(app, client):
     }
 
 
-def test_new_user_signup_fails_if_fields_not_provided(client, app):
+async def test_new_user_signup_fails_if_fields_not_provided(client, app):
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     # Register a new account
-    response = client.post(
+    response = await client.post(
         url_for("auth.signup"),
-        data={
+        form={
             "email": "newuser@abc.org",
             "email2": "newuser@abc.org",
             "phone": "1234567",
@@ -102,7 +106,7 @@ def test_new_user_signup_fails_if_fields_not_provided(client, app):
             "password2": "abc",
         },
     )
-    txt = response.get_data(as_text=True)
+    txt = await response.get_data(as_text=True)
     assert "company: This field is required" in txt
     assert "company_size: This field is required" in txt
     assert "name: This field is required" in txt
@@ -111,16 +115,16 @@ def test_new_user_signup_fails_if_fields_not_provided(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_approve_company_and_users(app, client):
+async def test_approve_company_and_users(app, client):
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
 
     # Sign up a new Company & User
     with app.mail.record_messages():
-        response = client.post(
+        response = await client.post(
             url_for("auth.signup"),
-            data={
+            form={
                 "email": "john@doe.org",
                 "first_name": "John",
                 "last_name": "Doe",
@@ -135,39 +139,41 @@ def test_approve_company_and_users(app, client):
         assert response.status_code == 200
 
     # Test the Company & User are not enabled nor approved
-    new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+    new_company = await find_one_for("companies", name="Doe Press Co.")
     assert new_company["is_enabled"] is False
     assert new_company["is_approved"] is False
-    new_user = app.data.find_one("users", req=None, email="john@doe.org")
+
+    new_user = await get_user_by_email("john@doe.org")
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False
 
     # Approve the new Company and it's associated User
     with app.mail.record_messages() as outbox:
-        response = client.post(url_for("companies.approve_company", company_id=str(new_company["_id"])), data={})
+        response = await client.post(url_for("companies.approve_company", company_id=str(new_company["_id"])))
         assert response.status_code == 200
 
         # Test the Company & User are now enabled and approved, but not yet validated
-        new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+        new_company = await find_one_for("companies", name="Doe Press Co.")
         assert new_company["is_enabled"] is True
         assert new_company["is_approved"] is True
-        new_user = app.data.find_one("users", req=None, email="john@doe.org")
+
+        new_user = await get_user_by_email("john@doe.org")
         assert new_user["is_enabled"] is True
         assert new_user["is_approved"] is True
         assert new_user["is_validated"] is False
 
         # Test that the account activation email was sent
-        auth_user = get_auth_user_by_email("john@doe.org")
+        auth_user = await UsersAuthService().get_by_email("john@doe.org")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["john@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user["token"] in outbox[0].body
+        assert auth_user.token in outbox[0].body
 
     # Sign up another user for the same company
-    response = client.post(
+    response = await client.post(
         url_for("auth.signup"),
-        data={
+        form={
             "email": "jane@doe.org",
             "first_name": "Jane",
             "last_name": "Doe",
@@ -182,40 +188,40 @@ def test_approve_company_and_users(app, client):
     assert response.status_code == 200
 
     # Test the Company is enabled and approved, but new User is not
-    new_company = app.data.find_one("companies", req=None, name="Doe Press Co.")
+    new_company = await find_one_for("companies", name="Doe Press Co.")
     assert new_company["is_enabled"] is True
     assert new_company["is_approved"] is True
-    new_user = app.data.find_one("users", req=None, email="jane@doe.org")
+    new_user = await find_one_for("users", email="jane@doe.org")
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False
 
     # Approve the new User
     with app.mail.record_messages() as outbox:
-        response = client.post(url_for("users.approve_user", user_id=str(new_user["_id"])), data={})
+        response = await client.post(url_for("users_views.approve_user", user_id=str(new_user["_id"])))
         assert response.status_code == 200
 
         # Test the new User is now enabled and approved, but not yet validated
-        new_user = app.data.find_one("users", req=None, email="jane@doe.org")
+        new_user = await get_user_by_email("jane@doe.org")
         assert new_user["is_enabled"] is True
         assert new_user["is_approved"] is True
         assert new_user["is_validated"] is False
 
         # Test that the account activation email was sent
-        auth_user = get_auth_user_by_email("jane@doe.org")
+        auth_user = await UsersAuthService().get_by_email("jane@doe.org")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["jane@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user["token"] in outbox[0].body
+        assert auth_user.token in outbox[0].body
 
 
-def test_signup_not_enabled_without_config(client, app):
+async def test_signup_not_enabled_without_config(client, app):
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = ""
 
-    response = client.get(url_for("auth.signup"))
+    response = await client.get(url_for("auth.signup"))
     assert response.status_code == 404
 
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "foo"
 
-    response = client.get(url_for("auth.signup"))
+    response = await client.get(url_for("auth.signup"))
     assert response.status_code == 200

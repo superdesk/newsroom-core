@@ -38,7 +38,7 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('set', 'user_properties', {{ get_ga_user_properties(auth_user) | tojson }});
+    gtag('set', 'user_properties', {{ get_ga_user_properties() | tojson }});
 
     let configParams = {};
     {% if session.get('user') %}

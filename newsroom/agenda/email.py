@@ -1,3 +1,5 @@
+from superdesk.core import get_app_config
+from newsroom.types import UserResourceModel, AgendaItem
 from newsroom.email import send_template_email, send_user_email
 from newsroom.utils import (
     get_agenda_dates,
@@ -8,25 +10,23 @@ from newsroom.utils import (
 )
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
-from newsroom.auth import get_company
-from flask import current_app as app
 
 
-def send_coverage_notification_email(user, agenda, wire_item):
+async def send_coverage_notification_email(user, agenda, wire_item):
     if user.get("receive_email"):
         template_kwargs = dict(
             agenda=agenda,
             item=wire_item,
             section="agenda",
         )
-        send_user_email(
+        await send_user_email(
             user,
             template="agenda_new_coverage_email",
             template_kwargs=template_kwargs,
         )
 
 
-def send_agenda_notification_email(
+async def send_agenda_notification_email(
     user,
     agenda,
     message,
@@ -57,14 +57,14 @@ def send_agenda_notification_email(
             time_updated=time_updated,
             coverage_modified=coverage_modified,
         )
-        send_user_email(
+        await send_user_email(
             user,
             template="agenda_updated_email",
             template_kwargs=template_kwargs,
         )
 
 
-def send_coverage_request_email(user, message, item):
+async def send_coverage_request_email(user: UserResourceModel, message: str, item: AgendaItem) -> None:
     """
     Forms and sends coverage request email
     :param user: User that makes the request
@@ -80,30 +80,29 @@ def send_coverage_request_email(user, message, item):
     recipients = general_settings.get("values").get("coverage_request_recipients").split(",")
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for_agenda({"_id": item["_id"]}, _external=True)
-    name = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    email = user.get("email")
+    url = url_for_agenda({"_id": item.id}, _external=True)
+    name = f"{user.first_name} {user.last_name}"
+    email = user.email
 
     # send coverage request email copy to current User.
-    cc = [email] if app.config.get("COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER") else []
+    cc = [email] if get_app_config("COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER") else []
 
-    item_name = item.get("name") or item.get("slugline")
-    user_company = get_company(user)
-    if user_company:
-        user_company = user_company.get("name")
+    item_name = item.name or item.slugline
+    user_company = await user.get_company()
+    company_name = user_company.name if user_company else None
 
     template_kwargs = dict(
         name=name,
         email=email,
         message=message,
         url=url,
-        company=user_company,
+        company=company_name,
         recipients=recipients,
         item_name=item_name,
-        item=item,
+        item=item.to_dict(),
     )
 
-    send_template_email(
+    await send_template_email(
         to=recipients,
         cc=cc,
         template="coverage_request_email",

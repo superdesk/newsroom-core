@@ -1,6 +1,6 @@
 from newsroom.gettext import get_session_locale
 
 
-def test_get_session_locale(app):
-    with app.test_request_context("/test"):
+async def test_get_session_locale(app):
+    async with app.app_context():
         assert "en" == get_session_locale()

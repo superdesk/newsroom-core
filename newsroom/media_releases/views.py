@@ -1,14 +1,15 @@
-import flask
 import logging
-from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
-from superdesk import get_resource_service
 
+from superdesk.flask import render_template, jsonify, request
+
+from newsroom.types import SectionEnum
+from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.formatters import get_formatters_id_and_names
 from newsroom.media_releases import blueprint
-from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, section
-from newsroom.wire.search import get_bookmarks_count
+from .search import MediaReleasesSearchServiceAsync
 from newsroom.wire.views import (
     update_action_list,
     get_previous_versions,
@@ -16,101 +17,112 @@ from newsroom.wire.views import (
 )
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
+from newsroom.ui_config_async import UiConfigResourceService
 
 logger = logging.getLogger(__name__)
 
 
-def get_view_data():
+async def get_view_data():
     """Get the view data"""
-    user = get_user()
+    user = get_user_from_request(None)
+    company = get_company_from_request(None)
+    ui_config_service = UiConfigResourceService()
     return {
-        "user": str(user["_id"]) if user else None,
-        "company": str(user["company"]) if user and user.get("company") else None,
+        "user": user.to_dict(),
+        "company": str(company.id) if company else None,
         "navigations": [],
-        "formats": [
-            {"format": f["format"], "name": f["name"]} for f in app.download_formatters.values() if "wire" in f["types"]
-        ],
-        "saved_items": get_bookmarks_count(user["_id"], "media_releases"),
+        "formats": get_formatters_id_and_names(SectionEnum.WIRE),
+        "saved_items": await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "media_releases",
-        "ui_config": get_resource_service("ui_config").get_section_config("media_releases"),
+        "ui_config": await ui_config_service.get_section_config("media_releases"),
     }
 
 
 @blueprint.route("/media_releases")
 @login_required
 @section("media_releases")
-def index():
-    return flask.render_template("media_releases_index.html", data=get_view_data())
+async def index():
+    data = await get_view_data()
+    return await render_template("media_releases_index.html", data=data)
 
 
 @blueprint.route("/media_releases/search")
 @login_required
 @section("media_releases")
-def search():
-    response = get_internal("media_releases_search")
-    return send_response("media_releases_search", response)
+async def search():
+    response = await get_internal("media_releases_search")
+    return await send_response("media_releases_search", response)
 
 
 @blueprint.route("/bookmarks_media_releases")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("media_releases_bookmarks.html", data=data)
+    return await render_template("media_releases_bookmarks.html", data=data)
 
 
 @blueprint.route("/media_releases_bookmark", methods=["POST", "DELETE"])
 @login_required
-def bookmark():
+async def bookmark():
     """Bookmark an item.
 
     Stores user id into item.bookmarks array.
     Uses mongodb to update the array and then pushes updated array to elastic.
     """
-    data = get_json_or_400()
+    data = await get_json_or_400()
     assert data.get("items")
-    update_action_list(data.get("items"), "bookmarks", item_type="items")
-    user_id = get_user_id()
-    push_user_notification("saved_items", count=get_bookmarks_count(user_id, "media_releases"))
-    return flask.jsonify(), 200
+    await update_action_list(data.get("items"), "bookmarks", item_type="items")
+    push_user_notification(
+        "saved_items",
+        count=await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
+    )
+    return jsonify(), 200
 
 
 @blueprint.route("/media_releases/<_id>/copy", methods=["POST"])
 @login_required
-def copy(_id):
+async def copy(_id):
     item_type = get_type()
     get_entity_or_404(_id, item_type)
-    update_action_list([_id], "copies", item_type=item_type)
-    return flask.jsonify(), 200
+    await update_action_list([_id], "copies", item_type=item_type)
+    return jsonify(), 200
 
 
 @blueprint.route("/media_releases/<_id>/versions")
 @login_required
-def versions(_id):
+async def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
-    return flask.jsonify({"_items": items})
+    return jsonify({"_items": items})
 
 
 @blueprint.route("/media_releases/<_id>")
 @login_required
-def item(_id):
-    item = get_entity_or_404(_id, "items")
-    set_permissions(item, "media_releases")
-    display_char_count = get_resource_service("ui_config").get_section_config("media_releases").get("char_count", False)
-    if is_json_request(flask.request):
-        return flask.jsonify(item)
-    if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
-    previous_versions = get_previous_versions(item)
-    if "print" in flask.request.args:
+async def item(_id):
+    media_release_service = MediaReleasesSearchServiceAsync()
+    media_release_item = await media_release_service.service.find_by_id(_id)
+    if not media_release_item:
+        await request.abort(404)
+
+    await set_permissions(media_release_item, service=media_release_service)
+
+    ui_config_service = UiConfigResourceService()
+    config = await ui_config_service.get_section_config(SectionEnum.MEDIA_RELEASES)
+    display_char_count = config.get("char_count", False)
+    if is_json_request(request):
+        return jsonify(media_release_item.to_dict())
+    if not media_release_item.user_has_access:
+        return await render_template("wire_item_access_restricted.html", item=media_release_item.to_dict())
+    previous_versions = await get_previous_versions(media_release_item)
+    if "print" in request.args:
         template = "wire_item_print.html"
-        update_action_list([_id], "prints", force_insert=True)
+        await update_action_list([_id], "prints", force_insert=True)
     else:
         template = "wire_item.html"
-    return flask.render_template(
+    return await render_template(
         template,
-        item=item,
+        item=media_release_item.to_dict(),
         previous_versions=previous_versions,
         display_char_count=display_char_count,
     )

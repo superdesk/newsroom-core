@@ -1,13 +1,11 @@
 from typing import Dict, Any, List
-from flask import json
-from flask.testing import FlaskClient
+from quart import json
+from quart.testing import QuartClient
 
 from newsroom.factory.app import BaseNewsroomApp
-from newsroom.agenda.agenda import AgendaResource, aggregations as agenda_aggregations
-from newsroom.wire.search import (
-    WireSearchResource,
-    get_aggregations as get_wire_aggregations,
-)
+from newsroom.agenda.filters import aggregations as agenda_aggregations
+from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
+from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import deep_get
 from newsroom.tests.conftest import reset_elastic
@@ -68,7 +66,7 @@ test_wire_item_1 = {
     "genre": [{"name": "News", "code": "news"}],
     "subject": [
         {
-            "qcode": "1523",
+            "code": "1523",
             "name": "Test Subject",
         }
     ],
@@ -83,10 +81,10 @@ test_wire_item_2 = {
     "genre": [{"name": "News", "code": "news"}],
     "subject": [
         {
-            "qcode": "1523",
+            "code": "1523",
             "name": "Test Subject",
         },
-        {"qcode": "abcd", "name": "Sporting Event", "scheme": "distribution"},
+        {"code": "abcd", "name": "Sporting Event", "scheme": "distribution"},
     ],
 }
 
@@ -95,7 +93,7 @@ def get_agg_keys(data: Dict[str, Any], path: str) -> List[str]:
     return [bucket.get("key") for bucket in deep_get(data, f"_aggregations.{path}.buckets", [])]
 
 
-def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
+async def test_default_agenda_groups_config(app: BaseNewsroomApp, client: QuartClient):
     """Tests the default config (disabled nested search groups)"""
 
     assert len(app.config["AGENDA_GROUPS"]) == 4
@@ -109,13 +107,15 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
     assert agenda_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 200}}
 
     # Test search agenda_aggregations
-    client.post("/push", data=json.dumps(test_event_1), content_type="application/json")
-    resp = client.get("/agenda/search")
-    data = json.loads(resp.get_data())
+    response = await client.post("/push", json=test_event_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    resp = await client.get("/agenda/search")
+    data = json.loads(await resp.get_data())
     assert get_agg_keys(data, "subject") == ["Sports", "Test Subject"]
 
 
-def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
+async def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: QuartClient):
     """Tests custom config, enabling nested search groups"""
 
     app.config["AGENDA_GROUPS"].append(
@@ -130,8 +130,8 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
             },
         }
     )
-    init_nested_aggregation(AgendaResource, app.config["AGENDA_GROUPS"], agenda_aggregations)
-    reset_elastic(app)
+    init_nested_aggregation("agenda", ["subject"], app.config["AGENDA_GROUPS"], agenda_aggregations)
+    await reset_elastic(app)
 
     # Test if the Eve & agenda_aggregations config has been updated
 
@@ -180,21 +180,25 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     }
 
     # Test search agenda_aggregations
-    client.post("/push", data=json.dumps(test_event_1), content_type="application/json")
-    client.post("/push", data=json.dumps(test_event_2), content_type="application/json")
-    resp = client.get("/agenda/search")
-    data = json.loads(resp.get_data())
+    response = await client.post("/push", json=test_event_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    response = await client.post("/push", json=test_event_2)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    resp = await client.get("/agenda/search")
+    data = json.loads(await resp.get_data())
     assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject", "Sports"]
     assert get_agg_keys(data, "sttdepartment.sttdepartment_filtered.sttdepartment") == ["Sports"]
 
     # Search using the new search group, ``sttdepartment==Sports``
-    resp = client.get("/agenda/search?filter=%7B%22sttdepartment%22%3A%5B%22Sports%22%5D%7D")
-    data = json.loads(resp.get_data())
+    resp = await client.get("/agenda/search?filter=%7B%22sttdepartment%22%3A%5B%22Sports%22%5D%7D")
+    data = json.loads(await resp.get_data())
     assert len(data["_items"]) == 1, [item["_id"] for item in data["_items"]]
     assert data["_items"][0]["_id"] == "event2"
 
 
-def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
+async def test_default_wire_groups_config(app: BaseNewsroomApp, client: QuartClient):
     """Tests the default wire config (disabled nested search groups)"""
 
     assert len(app.config["WIRE_GROUPS"]) == 5
@@ -206,16 +210,22 @@ def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     assert "urgency" in group_fields
     assert "place" in group_fields
 
-    wire_aggregations = get_wire_aggregations()
+    wire_aggregations = _get_wire_aggregations()
     assert wire_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 20}}
 
-    client.post("/push", data=json.dumps(test_wire_item_1), content_type="application/json")
-    res = client.get("/wire/search")
-    data = json.loads(res.get_data())
+    response = await client.post("/push", json=test_wire_item_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    res = await client.get("/wire/search?aggs=1")
+    data = json.loads(await res.get_data())
+    from pprint import pprint
+
+    pprint(data["_aggregations"])
+    pprint(data["_items"])
     assert get_agg_keys(data, "subject") == ["Test Subject"]
 
 
-def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
+async def test_custom_wire_groups_config(app: BaseNewsroomApp, client: QuartClient):
     """Tests custom wire config, enabling nested search groups"""
 
     app.config["WIRE_GROUPS"].append(
@@ -225,9 +235,9 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
             "nested": {"parent": "subject", "field": "scheme", "value": "distribution"},
         }
     )
-    wire_aggregations = get_wire_aggregations()
-    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], wire_aggregations)
-    reset_elastic(app)
+    wire_aggregations = _get_wire_aggregations()
+    init_nested_aggregation("items", WIRE_NESTED_SEARCH_FIELDS, app.config["WIRE_GROUPS"], wire_aggregations)
+    await reset_elastic(app)
 
     # Test generated/modified aggregation configs
     # Parent field
@@ -253,16 +263,20 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     }
 
     # Test search wire_aggregations
-    client.post("/push", data=json.dumps(test_wire_item_1), content_type="application/json")
-    client.post("/push", data=json.dumps(test_wire_item_2), content_type="application/json")
-    resp = client.get("/wire/search")
-    data = json.loads(resp.get_data())
+    response = await client.post("/push", json=test_wire_item_1)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    response = await client.post("/push", json=test_wire_item_2)
+    assert response.status_code == 200, await response.get_data(as_text=True)
+
+    resp = await client.get("/wire/search?aggs=1")
+    data = json.loads(await resp.get_data())
 
     assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject"]
     assert get_agg_keys(data, "distribution.distribution_filtered.distribution") == ["Sporting Event"]
 
     # Search using the new search group, ``distribution==Sporting Event``
-    resp = client.get("/wire/search?filter=%7B%22distribution%22%3A%5B%22Sporting%20Event%22%5D%7D")
-    data = json.loads(resp.get_data())
+    resp = await client.get("/wire/search?aggs=1&filter=%7B%22distribution%22%3A%5B%22Sporting%20Event%22%5D%7D")
+    data = json.loads(await resp.get_data())
     assert len(data["_items"]) == 1
     assert data["_items"][0]["_id"] == "foo2"

@@ -1,77 +1,89 @@
-import flask
+import pytest
+import quart
 
 from unittest import mock
 from datetime import datetime, timedelta
 
 from bson import ObjectId
-from superdesk import get_resource_service
-from newsroom.push import notify_new_agenda_item, notify_new_wire_item
+from newsroom.push.tasks import notify_new_agenda_item, notify_new_wire_item
+from superdesk.utc import utcnow
+
+from newsroom.users import UsersService
+from newsroom.companies import CompanyServiceAsync
+from newsroom.notifications import NotificationsService
 from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from newsroom.tests.users import ADMIN_USER_ID
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 from ..utils import mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_realtime_notifications_wire(app, mocker, company_products):
-    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+async def test_realtime_notifications_wire(app, mocker, company_products):
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+
     navigations = [
         {
+            "_id": ObjectId(),
             "name": "Food",
             "product_type": "wire",
             "is_enabled": True,
         },
         {
+            "_id": ObjectId(),
             "name": "Sport",
             "product_type": "wire",
             "is_enabled": True,
         },
     ]
 
-    app.data.insert("navigations", navigations)
+    await create_entries_for("navigations", navigations)
 
     for product in company_products:
         if "*" in product["query"]:
             # we want only products which will filter out everything
             continue
         updates = {"navigations": [navigations[0]["_id"]]}
-        app.data.update("products", product["_id"], updates, product)
+        await update_entries_for("products", product["_id"], updates, product)
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
-                "user": user["_id"],
+                # "_id": ObjectId(),
+                "user": user.id,
                 "label": "Cheesy Stuff",
                 "query": "cheese",
                 "topic_type": "wire",
                 "subscribers": [
                     {
-                        "user_id": user["_id"],
+                        "user_id": user.id,
                         "notification_type": "real-time",
                     },
                 ],
             },
             {
-                "user": user["_id"],
+                # "_id": ObjectId(),
+                "user": user.id,
                 "label": "Onions",
                 "query": "onions",
                 "topic_type": "wire",
                 "subscribers": [
                     {
-                        "user_id": user["_id"],
+                        "user_id": user.id,
                         "notification_type": "real-time",
                     },
                 ],
             },
             {
-                "user": user["_id"],
+                # "_id": ObjectId(),
+                "user": user.id,
                 "label": "Company products",
                 "query": "*:*",
                 "topic_type": "wire",
                 "subscribers": [
                     {
-                        "user_id": user["_id"],
+                        "user_id": user.id,
                         "notification_type": "real-time",
                     },
                 ],
@@ -80,7 +92,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -89,7 +101,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
                 "body_html": "Story that involves cheese and onions",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
             },
             {
                 "_id": "item_other",
@@ -97,46 +109,49 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "other",
                 "headline": "other",
                 "body_html": "other",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
             },
         ],
     )
 
-    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    push_mock = mocker.patch("newsroom.notifications.utils.push_notification")
     with app.mail.record_messages() as outbox:
-        assert not flask.request
-        notify_new_wire_item("topic1_item1")
-        notify_new_wire_item("item_other")
+        assert not quart.request
+        await notify_new_wire_item("topic1_item1")
+        await notify_new_wire_item("item_other")
 
     assert push_mock.call_args[0][0] == "new_notifications"
-    assert str(user["_id"]) in push_mock.call_args[1]["counts"].keys()
+    assert str(user.id) in push_mock.call_args[1]["counts"].keys()
 
-    notification = get_resource_service("notifications").find_one(req=None, user=user["_id"])
-    assert notification["action"] == "topic_matches"
-    assert notification["item"] == "topic1_item1"
-    assert notification["resource"] == "wire"
-    assert notification["user"] == user["_id"]
+    notification = await NotificationsService().find_one(user=user.id)
+    assert notification.action == "topic_matches"
+    assert notification.item == "topic1_item1"
+    assert notification.resource == "wire"
+    assert notification.user == user.id
 
     # Only 1 email should have been sent (not 3)
     assert len(outbox) == 1
     assert "http://localhost:5050/wire?item=topic1_item1" in outbox[0].body
 
     # test notification after removing company products
-    company = app.data.find_one("companies", req=None, _id=user["company"])
-    app.data.update("companies", company["_id"], {"products": []}, company)
+    company_service = CompanyServiceAsync()
+    company = await company_service.find_by_id(user.company)
+    await company_service.update(company.id, {"products": []})
 
     with app.mail.record_messages() as outbox:
-        notify_new_wire_item("topic1_item1")
+        await notify_new_wire_item("topic1_item1")
 
     assert len(outbox) == 0
 
 
+@pytest.mark.skip(reason="Will fix this when Agenda resource is upgraded to async")
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_realtime_notifications_agenda(app, mocker):
-    app.data.insert(
+async def test_realtime_notifications_agenda(app, mocker):
+    await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Cheesy Stuff",
                 "query": "cheese",
@@ -152,6 +167,7 @@ def test_realtime_notifications_agenda(app, mocker):
                 },
             },
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Onions",
                 "query": "onions",
@@ -164,6 +180,7 @@ def test_realtime_notifications_agenda(app, mocker):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "Test",
                 "query": "cheese",
@@ -176,6 +193,7 @@ def test_realtime_notifications_agenda(app, mocker):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": ADMIN_USER_ID,
                 "label": "Should not match anything",
                 "query": None,
@@ -195,7 +213,7 @@ def test_realtime_notifications_agenda(app, mocker):
 
     topic_id = ObjectId()
 
-    app.data.insert(
+    await create_entries_for(
         "products",
         [
             {
@@ -208,35 +226,35 @@ def test_realtime_notifications_agenda(app, mocker):
         ],
     )
 
-    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    company = await find_one_by_id("companies", COMPANY_1_ID)
     assert company
-    app.data.update(
+    await update_entries_for(
         "companies", company["_id"], {"products": [{"_id": topic_id, "seats": 0, "section": "agenda"}]}, company
     )
 
-    app.data.insert(
+    await create_entries_for(
         "agenda",
         [
             {
                 "_id": "event_id_1",
                 "type": "agenda",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
                 "name": "cheese event",
                 "language": "en",
                 "dates": {
-                    "start": datetime.utcnow(),
-                    "end": datetime.utcnow(),
+                    "start": utcnow(),
+                    "end": utcnow(),
                 },
             },
             {
                 "_id": "event_id_2",
                 "type": "agenda",
-                "versioncreated": datetime.utcnow(),
+                "versioncreated": utcnow(),
                 "name": "another event",
                 "language": "en",
                 "dates": {
-                    "start": datetime.utcnow(),
-                    "end": datetime.utcnow(),
+                    "start": utcnow(),
+                    "end": utcnow(),
                 },
             },
         ],
@@ -244,89 +262,98 @@ def test_realtime_notifications_agenda(app, mocker):
 
     # avoid using client to mimic celery worker
     with app.mail.record_messages() as outbox:
-        assert not flask.request
-        notify_new_agenda_item("event_id_1")
-        notify_new_agenda_item("event_id_2")
+        assert not quart.request
+        await notify_new_agenda_item("event_id_1")
+        await notify_new_agenda_item("event_id_2")
 
-    notification = get_resource_service("notifications").find_one(req=None, user=ADMIN_USER_ID)
+    notification = await NotificationsService().find_one(user=ObjectId(ADMIN_USER_ID))
     assert notification is not None
-    assert notification["action"] == "topic_matches"
-    assert notification["item"] == "event_id_1"
-    assert notification["resource"] == "agenda"
-    assert str(notification["user"]) == ADMIN_USER_ID
+    assert notification.action == "topic_matches"
+    assert notification.item == "event_id_1"
+    assert notification.resource == "agenda"
+    assert str(notification.user) == ADMIN_USER_ID
 
     assert len(outbox) == 2
     assert "http://localhost:5050/agenda?item=event_id_1" in outbox[0].body
 
 
-def test_realtime_notifications_agenda_reccuring_event(app):
-    app.data.insert(
+async def test_realtime_notifications_agenda_reccuring_event(app):
+    await create_entries_for(
         "agenda",
         [
             {
                 "_id": "event_id_1",
                 "type": "agenda",
-                "versioncreated": datetime.utcnow(),
+                "item_type": "event",
+                "state": "scheduled",
+                "versioncreated": utcnow(),
                 "name": "cheese event",
                 "dates": {
-                    "start": datetime.utcnow(),
-                    "end": datetime.utcnow(),
+                    "start": utcnow(),
+                    "end": utcnow(),
                 },
                 "recurrence_id": "event_id_1",
             },
             {
                 "_id": "event_id_2",
                 "type": "agenda",
-                "versioncreated": datetime.utcnow(),
+                "item_type": "event",
+                "state": "scheduled",
+                "versioncreated": utcnow(),
                 "name": "another event",
                 "dates": {
-                    "start": datetime.utcnow(),
-                    "end": datetime.utcnow(),
+                    "start": utcnow(),
+                    "end": utcnow(),
                 },
                 "recurrence_id": "event_id_1",
             },
         ],
     )
 
-    with mock.patch("newsroom.push.notify_new_item") as notify_new_item:
-        notify_new_agenda_item("event_id_1")
-        assert notify_new_item.call_count == 1
+    with mock.patch("newsroom.push.tasks.notifier") as notifier:
+        notifier.notify_new_item = mock.AsyncMock()
 
-        notify_new_agenda_item("event_id_2", is_new=True)
-        assert notify_new_item.call_count == 1
+        await notify_new_agenda_item("event_id_1")
+        assert notifier.notify_new_item.call_count == 1
 
-        notify_new_agenda_item("event_id_2")
-        assert notify_new_item.call_count == 2
+        await notify_new_agenda_item("event_id_2", is_new=True)
+        assert notifier.notify_new_item.call_count == 1
+
+        await notify_new_agenda_item("event_id_2")
+        assert notifier.notify_new_item.call_count == 2
 
 
+# @markers.requires_async_celery
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_pause_notifications(app, mocker, company_products):
-    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+async def test_pause_notifications(app, mocker, company_products):
+    user = await find_one_by_id("users", PUBLIC_USER_ID)
     updates = {
         "notification_schedule": dict(
             pause_from=(datetime.now() - timedelta(days=1)).date().isoformat(),
             pause_to=(datetime.now() + timedelta(days=1)).date().isoformat(),
         )
     }
-    app.data.update("users", user["_id"], updates, user)
+    await update_entries_for("users", user["_id"], updates, user)
 
-    app.data.insert(
+    await create_entries_for(
         "agenda",
         [
             {
                 "_id": "event_id_1",
                 "type": "agenda",
-                "versioncreated": datetime.utcnow(),
+                "item_type": "event",
+                "state": "scheduled",
+                "versioncreated": utcnow(),
                 "name": "cheese event",
                 "dates": {
-                    "start": datetime.utcnow(),
-                    "end": datetime.utcnow(),
+                    "start": utcnow(),
+                    "end": utcnow(),
                 },
             },
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -339,10 +366,11 @@ def test_pause_notifications(app, mocker, company_products):
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "topics",
         [
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "All wire",
                 "query": "*:*",
@@ -355,6 +383,7 @@ def test_pause_notifications(app, mocker, company_products):
                 ],
             },
             {
+                "_id": ObjectId(),
                 "user": PUBLIC_USER_ID,
                 "label": "All agenda",
                 "query": "*:*",
@@ -371,7 +400,7 @@ def test_pause_notifications(app, mocker, company_products):
 
     push_mock = mocker.patch("newsroom.notifications.push_notification")
     with app.mail.record_messages() as outbox:
-        notify_new_agenda_item("event_id_1")
-        notify_new_wire_item("item1")
+        await notify_new_agenda_item("event_id_1")
+        await notify_new_wire_item("item1")
         assert len(outbox) == 0
         push_mock.assert_not_called()

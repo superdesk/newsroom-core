@@ -6,7 +6,7 @@ import tempfile
 from newsroom.template_loaders import LocaleTemplateLoader, set_template_locale
 
 
-def test_load_template_with_locale():
+async def test_load_template_with_locale():
     template_data = {
         "test.html": "default template",
         "test.fr.html": "fr template",

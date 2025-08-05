@@ -1,25 +1,44 @@
-from behave import then, when
-from flask import json
-from wooper.expect import expect_status_in
+from base64 import b64encode
 
+from behave import then, when, given
+from behave.api.async_step import async_run_until_complete
+from eve.methods.common import parse
+from authlib.jose import jwt
+from authlib.jose.errors import BadSignatureError
+
+from superdesk import get_resource_service
+from superdesk.core import json, get_current_async_app
 from superdesk.tests.steps import (
     assert_200,
     get_json_data,
     apply_placeholders,
     get_prefixed_url,
     set_placeholder,
+    is_user_resource,
 )
 from newsroom.utils import deep_get
+from tests.core.utils import create_entries_for
 
 
-def assert_ok(response):
-    expect_status_in(response, [200, 201])
+async def expect_status_in(response, codes):
+    assert response.status_code in [
+        int(code) for code in codes
+    ], "expected on of {expected}, got {code}, reason={reason}".format(
+        code=response.status_code,
+        expected=codes,
+        reason=(await response.get_data()).decode("utf-8"),
+    )
+
+
+async def assert_ok(response):
+    await expect_status_in(response, [200, 201])
 
 
 @then("we get the following order")
-def step_impl_ordered_list(context):
-    assert_200(context.response)
-    response_data = (get_json_data(context.response) or {}).get("_items")
+@async_run_until_complete
+async def step_impl_ordered_list(context):
+    await assert_200(context.response)
+    response_data = ((await get_json_data(context.response)) or {}).get("_items")
     ids = [item["_id"] for item in response_data]
     expected_order = json.loads(context.text)
 
@@ -27,48 +46,54 @@ def step_impl_ordered_list(context):
 
 
 @when('we get json from "{url}"')
-def step_impl_get_json_array_from_url(context, url):
+@async_run_until_complete
+async def step_impl_get_json_array_from_url(context, url):
     url = apply_placeholders(context, url)
-    context.response = context.client.get(
-        get_prefixed_url(context.app, url),
-        headers=[header for header in context.headers if header[0] != "Content-Type"],
-    )
+    async with context.app.test_request_context(url):
+        context.response = await context.client.get(
+            get_prefixed_url(context.app, url),
+            headers=[header for header in context.headers if header[0] != "Content-Type"],
+        )
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @when('we post form to "{url}"')
-def step_impl_when_post_form_to_url(context, url):
+@async_run_until_complete
+async def step_impl_when_post_form_to_url(context, url):
     url = apply_placeholders(context, url)
     data = json.loads(apply_placeholders(context, context.text))
-    context.response = context.client.post(
+    context.response = await context.client.post(
         get_prefixed_url(context.app, url),
-        data={key: json.dumps(val) for key, val in data.items()},
+        form={key: json.dumps(val) for key, val in data.items()},
         headers=[header for header in context.headers if header[0] != "Content-Type"],
     )
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @when('we post json to "{url}"')
-def step_impl_when_post_json_to_url(context, url):
+@async_run_until_complete
+async def step_impl_when_post_json_to_url(context, url):
     url = apply_placeholders(context, url)
     data = apply_placeholders(context, context.text)
-    context.response = context.client.post(url, data=data, headers=context.headers)
+    context.response = await context.client.post(url, data=data, headers=context.headers)
 
-    assert_ok(context.response)
+    await assert_ok(context.response)
 
 
 @then('we store "{tag}" with item id')
-def step_impl_store_response_item_id(context, tag):
-    data = get_json_data(context.response)
+@async_run_until_complete
+async def step_impl_store_response_item_id(context, tag):
+    data = await get_json_data(context.response)
     set_placeholder(context, tag, data.get("_id"))
 
 
 @then("we get aggregations")
-def step_impl_get_aggregations(context):
-    assert_200(context.response)
-    response_aggs = (get_json_data(context.response) or {}).get("_aggregations")
+@async_run_until_complete
+async def step_impl_get_aggregations(context):
+    await assert_200(context.response)
+    response_aggs = ((await get_json_data(context.response)) or {}).get("_aggregations")
     expected_aggs = json.loads(context.text)
 
     for key, val in expected_aggs.items():
@@ -77,26 +102,37 @@ def step_impl_get_aggregations(context):
 
 
 @when('we login with email "{email}" and password "{password}"')
-def when_we_login_as_user(context, email, password):
-    with context.app.test_request_context():
-        context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
-        response = context.client.post(
+@async_run_until_complete
+async def when_we_login_as_user(context, email, password):
+    async with context.app.test_request_context("/login"):
+        await context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
+        response = await context.client.post(
             get_prefixed_url(context.app, "/login"),
-            data=json.dumps(
-                dict(
-                    email=email,
-                    password=password,
-                )
+            form=dict(
+                email=email,
+                password=password,
             ),
             headers=context.headers,
         )
         assert response.status_code == 302, response.status_code
 
 
+@when("we logout")
+@async_run_until_complete
+async def when_we_logout(context):
+    async with context.app.test_request_context("/login"):
+        response = await context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
+        assert response.status_code == 302, response.status_code
+
+
 @then("we get products assigned to items")
-def then_we_get_users_with_products(context):
+@async_run_until_complete
+async def then_we_get_users_with_products(context):
     data = json.loads(apply_placeholders(context, context.text))
-    list_items = get_json_data(context.response)
+    try:
+        list_items = await get_json_data(context.response)
+    except Exception:
+        assert False, await context.response.get_data(as_text=True)
     if not isinstance(list_items, list):
         list_items = [list_items]
     for user in list_items:
@@ -127,8 +163,82 @@ def then_we_get_users_with_products(context):
         if "sections" in user_data:
             expected_sections = user_data.get("sections") or []
             actual_sections = [name for name, value in (user.get("sections") or {}).items() if value]
+
             assert sorted(actual_sections) == sorted(expected_sections), (
                 "sections do not match\n"
                 f"expected_sections: {expected_sections}\n"
                 f"actual_sections: {user.get('sections')}"
             )
+
+
+async def delete_entries_for(resource: str):
+    """
+    Attemps to delete everything from an resource. First tries with async, otherwise it falls back to
+    sync resources.
+    """
+    app = get_current_async_app()
+    if not is_user_resource(resource):
+        try:
+            await app.resources.get_resource_service(resource).delete_many({})
+        except KeyError:
+            get_resource_service(resource).delete_action()
+
+
+@given('newsroom "{resource}"')
+@async_run_until_complete
+async def step_impl_given_newsroom_resource(context, resource):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        items = [parse(item, resource) for item in json.loads(context.text)]
+        await delete_entries_for(resource)
+        await create_entries_for(resource, items)
+
+        context.data = items
+        context.resource = resource
+
+        try:
+            setattr(context, resource, items[-1])
+        except KeyError:
+            pass
+
+
+@when('we do OAuth2 with id "{client_id}" and password "{password}"')
+@async_run_until_complete
+async def step_impl_when_do_oauth2(context, client_id, password):
+    client_id_str = apply_placeholders(context, client_id)
+    password_str = apply_placeholders(context, password)
+    encoded_user_pass = b64encode(b"%s:%s" % (client_id_str.encode(), password_str.encode())).decode("ascii")
+    headers = [
+        ("Content-Type", "multipart/form-data"),
+        ("Authorization", f"Basic {encoded_user_pass}"),
+    ]
+    context.response = await context.client.post(
+        get_prefixed_url(context.app, "/api/auth_server/token"),
+        form={"grant_type": "client_credentials"},
+        headers=headers,
+    )
+
+
+@then("we get a valid oauth2 access token")
+@async_run_until_complete
+async def step_impl_then_we_get_access_token(context):
+    assert context.response.status_code == 200
+    resp = json.loads(await context.response.get_data())
+    assert set(resp).issuperset({"expires_in", "token_type", "access_token"})
+    # we now validate JWT signature and payload
+
+    # we first try to decode with a bad secret, it must fail
+    try:
+        jwt.decode(resp["access_token"], "BAD_SECRET")
+    except BadSignatureError:
+        pass
+    else:
+        raise Exception("jwt.decode should raise an error with wrong secret")
+
+    # and now we try with the right secret, it should work this time
+    claims = jwt.decode(resp["access_token"], context.app.config["AUTH_SERVER_SHARED_SECRET"])
+
+    # we validate the payload
+    claims.validate()
+
+    # and check that we get expected keys
+    assert set(claims).issuperset({"client_id", "iss", "iat", "exp"})

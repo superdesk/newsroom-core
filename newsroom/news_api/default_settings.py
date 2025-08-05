@@ -24,18 +24,26 @@ CORE_APPS = [
     "newsroom.news_api.items",
     "content_api.items_versions",
     "newsroom.news_api.section_filters",
-    "newsroom.news_api.products",
-    "newsroom.news_api.formatters",
     "newsroom.news_api.news",
-    "newsroom.news_api.news.item.item",
+    "newsroom.history",
+]
+
+MODULES = [
+    "newsroom.assets.module",
+    "newsroom.companies",
+    "newsroom.history_async",
+    # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
+    ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
+    "newsroom.wire.module",
+    "newsroom.section_filters",
+    "newsroom.news_api.news.assets",
+    "newsroom.news_api.news.atom",
     "newsroom.news_api.news.search",
     "newsroom.news_api.news.feed",
-    "newsroom.products",
     "newsroom.news_api.api_audit",
-    "newsroom.news_api.news.assets.assets",
-    "newsroom.upload",
-    "newsroom.news_api.news.atom.atom",
-    "newsroom.history",
+    "newsroom.news_api.news.item.item",
+    "newsroom.products",
+    "newsroom.news_api.products",
 ]
 
 INSTALLED_APPS = []
@@ -55,3 +63,9 @@ CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBN
 FILTER_AGGREGATIONS = False
 ELASTIC_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ELASTICSEARCH_FIX_QUERY = False
+
+# Disable upload endpoint from ``newsroom.assets.module``,
+# as NewsAPI will implement a custom one
+ASSETS_REGISTER_UPLOAD_ENDPOINT = False
+
+ASYNC_AUTH_CLASS = "newsroom.news_api.api_tokens.auth:CompanyTokenAuth"

@@ -1,18 +1,19 @@
-from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
+import click
 
-from .manager import manager
+from newsroom.notifications.commands import SendScheduledNotificationEmails
+from .cli import newsroom_cli
 
 
-@manager.option(
+@newsroom_cli.command("send_scheduled_notifications")
+@click.option(
     "-i",
     "--ignore-schedule",
-    dest="force",
+    "force",
+    is_flag=True,
     required=False,
-    action="store_true",
-    help="Runs a schedule if one has not been run for that users schedule",
+    help="Runs a schedule if one has not been run for that user's schedule",
 )
-@manager.command
-def send_scheduled_notifications(force=False):
+async def send_scheduled_notifications(force=False):
     """
     Send scheduled notifications
 
@@ -21,4 +22,4 @@ def send_scheduled_notifications(force=False):
 
         $ python manage.py send_scheduled_notifications
     """
-    SendScheduledNotificationEmails().run(force)
+    await SendScheduledNotificationEmails().run(force)
