@@ -1,8 +1,10 @@
 import base64
 
+import json
 from pydantic import field_validator
 from quart_babel import gettext
 from werkzeug.exceptions import NotFound
+from bson.errors import InvalidId
 
 from superdesk.core import get_app_config
 from superdesk.core.types import BaseModel, Request, Response
@@ -119,9 +121,25 @@ async def update_schedule(args: MonitoringIdUrlArg, params: None, request: Reque
     return Response({"success": True})
 
 
+class MonitoringSearchParams(BaseModel):
+    where: str | None = None
+
+
 @monitoring_endpoints.endpoint("/monitoring/all", methods=["GET"])
-async def search_all() -> Response:
-    monitoring_list = [monitoring async for monitoring in MonitoringProfileService().get_all_raw()]
+async def search_all(args: None, params: MonitoringSearchParams, request: Request) -> Response:
+    lookup: dict = {}
+    where_param = params.where
+    if where_param:
+        try:
+            where = json.loads(where_param)
+            if where.get("company"):
+                lookup["company"] = ObjectId(where["company"])
+        except json.JSONDecodeError as e:
+            return Response({"error": f"Invalid 'where' parameter. JSON decoding failed: {str(e)}"}, 400)
+        except InvalidId as e:
+            return Response({"error": f"Invalid 'company' ID: {str(e)}"}, 400)
+
+    monitoring_list = [monitoring async for monitoring in MonitoringProfileService().get_all_raw(lookup)]
     return Response(monitoring_list)
 
 

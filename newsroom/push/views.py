@@ -106,6 +106,11 @@ async def push(request: Request):
         await request.abort(503)
 
     try:
+        logger.info(
+            "received item id=%s %s",
+            item.get("guid") or item.get("_id"),
+            item.get("headline") or item.get("name") or item.get("slugline") or "",
+        )
         await signals.push.send(item)
 
         item_type = item.get("type")

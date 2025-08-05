@@ -5,6 +5,7 @@ from lxml import etree
 from typing_extensions import Unpack
 from typing import List, Optional, Dict, Any, Union, TypedDict
 
+from quart import has_request_context
 from quart_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
@@ -142,7 +143,11 @@ async def send_email(
         "sender_name": sender_name or get_app_config("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
-    await _send_email.apply_async(kwargs=kwargs)
+
+    if has_request_context():  # don't block request
+        await _send_email.apply_async(kwargs=kwargs)
+    else:  # running in celery worker already
+        await _send_email.apply(kwargs=kwargs, throw=False)
 
 
 async def send_new_signup_email(company: Company, user: User, is_new_company: bool):

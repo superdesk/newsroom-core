@@ -3,6 +3,8 @@ from typing import Any, Optional
 from copy import deepcopy
 from datetime import timedelta
 
+import elasticapm
+
 from superdesk.types import Item
 from superdesk.utc import utcnow
 from superdesk.core import get_app_config
@@ -78,14 +80,15 @@ class Publisher:
         fix_hrefs(doc)
         logger.debug("publishing %s", doc["guid"])
         app = get_current_wsgi_app()
-        for assoc in doc.get("associations", {}).values():
-            if assoc:
-                assoc.setdefault("subscribers", [])
-                app.generate_renditions(assoc)
+        with elasticapm.capture_span("generate_renditions"):
+            for assoc in doc.get("associations", {}).values():
+                if assoc:
+                    assoc.setdefault("subscribers", [])
+                    app.generate_renditions(assoc)
 
-        # If there is a function defined that generates renditions for embedded images call it.
-        if getattr(app, "generate_embed_renditions", None):
-            app.generate_embed_renditions(doc)
+            # If there is a function defined that generates renditions for embedded images call it.
+            if getattr(app, "generate_embed_renditions", None):
+                app.generate_embed_renditions(doc)
 
         try:
             if doc.get("coverage_id"):
