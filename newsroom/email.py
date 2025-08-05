@@ -147,7 +147,7 @@ async def send_email(
     if has_request_context():  # don't block request
         await _send_email.apply_async(kwargs=kwargs)
     else:  # running in celery worker already
-        await _send_email.apply(kwargs=kwargs, throw=False)
+        await _send_email(**kwargs)
 
 
 async def send_new_signup_email(company: Company, user: User, is_new_company: bool):
