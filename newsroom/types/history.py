@@ -15,4 +15,5 @@ class HistoryResourceModel(NewshubResourceModel):
     item: Keyword
     version: str
     section: Keyword
+    monitoring: Annotated[ObjectIdField | None, keyword_mapping(), validate_data_relation_async("monitoring")] = None
     extra_data: dict[str, Any] | None = None

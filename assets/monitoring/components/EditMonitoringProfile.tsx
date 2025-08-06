@@ -139,6 +139,15 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                         onChange={onChange}
                                         error={getError('company')} />
 
+                                    <TextInput
+                                        name='email'
+                                        label={gettext('Email Address')}
+                                        value={item.email || ''}
+                                        onChange={onChange}
+                                        error={getError('email')}
+                                        description={gettext('Optional comma seperated list of email addresses')}
+                                    />
+
                                     <TextAreaInput
                                         name='query'
                                         label={gettext('Query')}
@@ -175,7 +184,8 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                         value={item.format_type || 'monitoring_pdf'}
                                         options={[
                                             {value: 'monitoring_pdf', text: 'PDF'},
-                                            {value: 'monitoring_rtf', text: 'RTF'}
+                                            {value: 'monitoring_rtf', text: 'RTF'},
+                                            {value: 'monitoring_email', text: 'Email'}
                                         ]}
                                         onChange={onChange}
                                         error={getError('format_type')} />

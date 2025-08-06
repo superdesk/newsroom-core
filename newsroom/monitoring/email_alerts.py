@@ -9,10 +9,12 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import base64
+import os
 from datetime import datetime, timedelta
 import logging
 from urllib.parse import urlparse
 from dataclasses import dataclass
+from typing import Dict, Any, List
 
 from superdesk.core import get_app_config, get_current_app, get_current_async_app
 from superdesk.core.resources.cursor import ResourceCursorAsync
@@ -20,17 +22,18 @@ from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
-from newsroom.types import MonitoringProfileResourceModel
+from newsroom.types import MonitoringProfileResourceModel, UserResourceModel
 from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
-from newsroom.email import send_user_email
+from newsroom.email import send_user_email, send_template_email, EmailAttachment, EmailKwargs
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.utils import parse_date_str
 from newsroom.search.types import NewshubSearchRequest
+from newsroom.history_async import HistoryService
 
 from .service import MonitoringProfileService
 from .search import MonitoringSearchService, MonitoringSearchRequestArgs
-from .utils import get_monitoring_file, truncate_article_body
+from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
 
 
 logger = logging.getLogger(__name__)
@@ -41,6 +44,56 @@ class AlertMonitoringDataEntry:
     w_lists: list[MonitoringProfileResourceModel]
     created_from: str
     created_from_time: str
+
+
+async def send_email_alert(
+    items: list[Dict[str, Any]],
+    monitoring_profile: MonitoringProfileResourceModel,
+    users: List[UserResourceModel],
+    general_settings: Dict[str, Any],
+) -> None:
+    """
+    Send an email immediate alert with the details in the body of the email. If a logo image is set in the
+    monitoring_report_logo_path settings it will be attached to the email and can be referenced in the
+    monitoring_export.html template as <img src="CID:logo" />
+    :param items:
+    :param monitoring_profile:
+    :param users: List of users to receive the email alert
+    :param general_settings: Dictionary of setting passed to avoid having to read them again
+    :return:
+    """
+
+    # If there is only one story to send and the headline is to be used as the subject
+    if monitoring_profile.headline_subject and len(items) == 1:
+        monitoring_profile.subject = items[0].get("headline", monitoring_profile.subject or monitoring_profile.name)
+
+    data = {
+        "date_items_dict": get_date_items_dict(items),
+        "monitoring_profile": monitoring_profile,
+        "current_date": utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow()).strftime("%d/%m/%Y"),
+        "monitoring_report_name": get_app_config("MONITORING_REPORT_NAME", "Newsroom"),
+    }
+
+    # Attach logo to email if defined
+    kwargs: EmailKwargs = {}
+    if general_settings and general_settings["values"].get("monitoring_report_logo_path"):
+        image_filename = general_settings["values"].get("monitoring_report_logo_path")
+        if os.path.exists(image_filename):
+            with open(image_filename, "rb") as img:
+                bts = base64.b64encode(img.read())
+                logo: EmailAttachment = {
+                    "file": bts,
+                    "file_name": "logo{}".format(os.path.splitext(image_filename)[1]),
+                    "file_desc": "Logo",
+                    "content_type": "image/{}".format(os.path.splitext(image_filename)[1].replace(".", "")),
+                    "headers": {"Content-ID": "logo"},
+                }
+                kwargs["attachments_info"] = [logo]
+    if monitoring_profile.email:
+        to_list = [t.strip() for t in monitoring_profile.email.split(",")]
+        await send_template_email(to=to_list, template="monitoring_export", template_kwargs=data, cc=None, **kwargs)
+    for user in users:
+        await send_user_email(user, template="monitoring_export", template_kwargs=data, **kwargs)
 
 
 class MonitoringEmailAlerts:
@@ -249,6 +302,29 @@ class MonitoringEmailAlerts:
                 alert_monitoring["four"].w_lists.append(profile)
                 return
 
+    async def already_sent(self, item: Dict[str, Any], profile: MonitoringProfileResourceModel) -> bool:
+        #     """
+        #     Checks the history for this item/version being sent by the profile already
+        #     :param item:
+        #     :param profile:
+        #     :return: True if any matching found
+        #     """
+        version_to_query = item.get("version") or item.get("_current_version", "")
+        lookup = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"term": {"action": "email"}},
+                        {"term": {"item": item.get("_id")}},
+                        {"term": {"version": version_to_query}},
+                        {"term": {"monitoring": profile.id}},
+                        {"term": {"company": profile.company}},
+                    ]
+                }
+            }
+        }
+        return (await HistoryService().count(lookup=lookup)) > 0
+
     async def send_alerts(
         self,
         monitoring_list: list[MonitoringProfileResourceModel],
@@ -279,13 +355,21 @@ class MonitoringEmailAlerts:
                 # then we default it to ``monitoring_pdf``
                 monitoring_data.format_type = "monitoring_pdf"
 
-            if monitoring_data.users and len(monitoring_data.users):
-                users = await users_service.find_items_by_ids(monitoring_data.users)
+            if (monitoring_data.users and len(monitoring_data.users)) or monitoring_data.email:
+                users: List[UserResourceModel] = []
+                if monitoring_data.users and len(monitoring_data.users):
+                    users = await users_service.find_items_by_ids(monitoring_data.users)
                 company = (
                     await companies_service.find_by_id(monitoring_data.company) if monitoring_data.company else None
                 )
                 if company is None:
                     logger.exception(f"Company {monitoring_data.company} not found!")
+                    continue
+
+                if not company.is_enabled:
+                    logger.warning(
+                        f'Company "{monitoring_data.company}" for profile "{monitoring_data.name}" is disabled!'
+                    )
                     continue
 
                 search_request = NewshubSearchRequest(
@@ -299,7 +383,8 @@ class MonitoringEmailAlerts:
                 )
                 cursor = await MonitoringSearchService().search(search_request)
                 items = await cursor.to_list_raw()
-
+                # remove any items that have already been sent
+                items[:] = [item for item in items if not await self.already_sent(item, monitoring_data)]
                 template_kwargs = {"profile": monitoring_data.to_dict()}
 
                 if items:
@@ -311,26 +396,47 @@ class MonitoringEmailAlerts:
                             }
                         )
                         truncate_article_body(items, monitoring_data)
-                        monitoring_file = await get_monitoring_file(monitoring_data, items)
-                        attachment = base64.b64encode(monitoring_file.read())
-                        formatter = get_formatter(monitoring_data.format_type)
-
-                        for user in users:
-                            await send_user_email(
-                                user,
-                                template="monitoring_email",
-                                template_kwargs=template_kwargs,
-                                attachments_info=[
-                                    {
-                                        "file": attachment,
-                                        "file_name": formatter.format_filename(None),
-                                        "content_type": "application/{}".format(formatter.FILE_EXTENSION),
-                                        "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
-                                            monitoring_data.name
-                                        ),
-                                    }
-                                ],
-                            )
+                        if monitoring_data.format_type == "monitoring_email":
+                            await send_email_alert(items, monitoring_data, users, general_settings)
+                        else:
+                            kwargs: EmailKwargs = {}
+                            monitoring_file = await get_monitoring_file(monitoring_data, items)
+                            attachment = base64.b64encode(monitoring_file.read())
+                            formatter = get_formatter(monitoring_data.format_type)
+                            attachments_info: EmailAttachment = {
+                                "file": attachment,
+                                "file_name": formatter.format_filename(None),
+                                "content_type": "application/{}".format(formatter.FILE_EXTENSION),
+                                "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
+                                    monitoring_data.name
+                                ),
+                                "headers": {},
+                            }
+                            kwargs["attachments_info"] = [attachments_info]
+                            if monitoring_data.email:
+                                to_list = [t.strip() for t in monitoring_data.email.split(",")]
+                                await send_template_email(
+                                    to=to_list,
+                                    template="monitoring_email",
+                                    template_kwargs=template_kwargs,
+                                    cc=None,
+                                    **kwargs,
+                                )
+                            for user in users:
+                                await send_user_email(
+                                    user,
+                                    template="monitoring_email",
+                                    template_kwargs=template_kwargs,
+                                    **kwargs,
+                                )
+                        await HistoryService().create_history_record(
+                            items,
+                            action="email",
+                            user_id=None,
+                            company_id=monitoring_data.company,
+                            section="monitoring",
+                            monitoring_id=monitoring_data.id,
+                        )
                     except Exception:
                         logger.exception(
                             f"{self.log_msg} Error processing monitoring profile {monitoring_data.name} for company {company.name}."

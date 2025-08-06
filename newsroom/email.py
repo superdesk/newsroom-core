@@ -102,7 +102,9 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     for a in attachments_info:
         try:
             content = base64.b64decode(a["file"])
-            decoded_attachments.append(Attachment(a["file_name"], a["content_type"], data=content))
+            decoded_attachments.append(
+                Attachment(a["file_name"], a["content_type"], headers=a.get("headers"), data=content)
+            )
         except Exception as e:
             logger.error("Error attaching {} file to mail. Receipient(s): {}. Error: {}".format(a["file_desc"], to, e))
 
@@ -247,6 +249,7 @@ class EmailAttachment(TypedDict):
     file_name: str
     content_type: str
     file_desc: str
+    headers: Dict[str, str]
 
 
 class EmailKwargs(TypedDict, total=False):
@@ -268,7 +271,7 @@ async def send_user_email(
     """Send an email to Newsroom user, respecting user's email preferences."""
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
 
-    if not user_dict.get("receive_email") and not ignore_preferences:
+    if (not user_dict.get("receive_email") and not ignore_preferences) or (not user_dict.get("is_enabled")):
         # If this is a user in the system, and has emails disabled
         # then skip this recipient
         return

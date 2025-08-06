@@ -1,4 +1,5 @@
 from .service import MonitoringProfileService
+from os import path
 
 __all__ = ["MonitoringProfileService"]
 
@@ -27,7 +28,6 @@ def init_app(app):
     )
 
     app.add_template_global(get_keywords_in_text, "get_keywords_in_text")
-
-    # TODO-ASYNC: Removed in `develop` branch, investigate
-    # theme_folder = getattr(app, "theme_folder", None) or path.join(app.config["SERVER_PATH"], "theme")
-    # app.add_template_global(theme_folder, "monitoring_image_path")
+    # Add the theme path in order to be able to reference logo images in templates
+    theme_folder = getattr(app, "theme_folder", None) or path.join(app.config["SERVER_PATH"], "theme")
+    app.add_template_global(theme_folder, "monitoring_image_path")

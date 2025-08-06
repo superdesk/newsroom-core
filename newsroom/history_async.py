@@ -33,6 +33,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
         user_id: ObjectId | None,
         company_id: ObjectId | None,
         section: str = "wire",
+        monitoring_id: ObjectId | None = None,
     ):
         now = utcnow()
 
@@ -45,6 +46,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
                 "item": str(item["_id"]),
                 "version": str(item.get("version", item.get("_current_version"))),
                 "section": section,
+                "monitoring": monitoring_id,
             }
 
         transformed_docs = [transform(doc) for doc in docs]

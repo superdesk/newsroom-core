@@ -1,9 +1,11 @@
 from datetime import datetime
 from enum import Enum, unique
+from typing import Annotated, Optional
 
 from superdesk.core.resources import Dataclass
 from superdesk.core.resources.fields import ObjectId
 from newsroom.core.resources import NewshubResourceModel
+from superdesk.core.resources.validators import validate_email
 
 
 @unique
@@ -27,6 +29,7 @@ class MonitoringProfileResourceModel(NewshubResourceModel):
     subject: str | None = None
     description: str | None = None
     company: ObjectId | None = None
+    email: Annotated[Optional[str], validate_email(multi=True)] = None
     query: str | None = None
     alert_type: str | None = None
     is_enabled: bool = True
