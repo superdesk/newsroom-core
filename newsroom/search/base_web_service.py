@@ -68,6 +68,7 @@ class BaseWebSearchService(
         company: CompanyResource | None,
         query: ESQuery | None = None,
         args: SearchArgsType | None = None,
+        include_updated: bool = False,
     ) -> ESQuery | None:
         """Generate an elasticsearch query, based on topic, user and company
 
@@ -99,6 +100,7 @@ class BaseWebSearchService(
             web_request=None,
             args=args or self.search_args_class(),
             search=deepcopy(query) if query is not None else ESQuery(),
+            include_updated=include_updated,
         )
 
         prefill_filter_params: list[SearchFilterFunction] = [
@@ -176,7 +178,7 @@ class BaseWebSearchService(
             aggs: dict[str, Any] = {"topics": {"filters": {"filters": {}}}}
 
             # There will be one base search for a user with aggs for user topics
-            search = await self.get_topic_items_query(None, user, company, query=query)
+            search = await self.get_topic_items_query(None, user, company, query=query, include_updated=True)
             if not search:
                 continue
 
@@ -189,7 +191,7 @@ class BaseWebSearchService(
                     continue
                 topics_checked.add(topic.id)
 
-                topic_query = await self.get_topic_items_query(topic, None, None)
+                topic_query = await self.get_topic_items_query(topic, None, None, include_updated=True)
                 if not topic_query:
                     continue
 

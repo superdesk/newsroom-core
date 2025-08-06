@@ -102,6 +102,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
                 "headline": "Demo Article",
                 "body_html": "Story that involves cheese and onions",
                 "versioncreated": utcnow(),
+                "nextversion": "update",
             },
             {
                 "_id": "item_other",
@@ -120,6 +121,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
         await notify_new_wire_item("topic1_item1")
         await notify_new_wire_item("item_other")
 
+    push_mock.assert_called_once()
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user.id) in push_mock.call_args[1]["counts"].keys()
 
