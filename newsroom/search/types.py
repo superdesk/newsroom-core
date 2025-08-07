@@ -366,6 +366,9 @@ class NewshubSearchRequest(Generic[SearchArgsType]):
     #: The list of topics to use when constructing the elasticsearch query
     topic: TopicResourceModel | None = None
 
+    #: Match also updated items
+    include_updated: bool | None = None
+
 
 #: Function callable type for use with search filters
 SearchFilterFunction = Callable[[NewshubSearchRequest], Awaitable[None] | None]

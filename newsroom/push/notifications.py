@@ -156,6 +156,7 @@ class NotificationManager:
                                         ids=[item["_id"]],
                                         es_highlight=True,
                                     ),
+                                    include_updated=True,
                                 )
                                 cursor = await wire_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
