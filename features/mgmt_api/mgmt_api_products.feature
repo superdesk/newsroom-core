@@ -12,7 +12,8 @@ Feature: Management API - Products
             "name": "A fishy Product",
             "description": "a product for those interested in fish",
             "query": "fish",
-            "product_type": "agenda"
+            "product_type": "agenda",
+            "sd_product_id": "sports"
         }]
         """
         Then we get response code 201
@@ -47,11 +48,14 @@ Feature: Management API - Products
         """
         {"_items": [
             {
+                "_id": "#products._id#",
+                "is_enabled": true,
                 "name": "A fishy Product",
                 "description": "new description",
                 "query": "fish",
                 "product_type": "agenda",
-                "seats": 5
+                "seats": 5,
+                "sd_product_id": "sports"
             }
         ]}
         """
