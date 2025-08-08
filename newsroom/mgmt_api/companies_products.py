@@ -88,11 +88,14 @@ async def get_company_products_endpoint(args: CompanyProductRouteArguments, para
         product_data = await ProductsService().find_by_id(ObjectId(product._id))
         if product_data:
             item = {
+                "_id": product_data.id,
                 "name": product_data.name,
                 "description": product_data.description,
                 "query": product_data.query,
                 "product_type": product_data.product_type,
                 "seats": product.seats or 0,
+                "is_enabled": product_data.is_enabled,
+                "sd_product_id": product_data.sd_product_id,
                 "_links": {"self": {"href": f"/companies/{company.id}/products/{product._id}"}},
             }
             products_data.append(item)
