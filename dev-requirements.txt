@@ -517,7 +517,7 @@ types-python-dateutil==2.9.0.20250708
     # via
     #   -r mypy-requirements.txt
     #   arrow
-types-pytz==2025.2.0.20250516
+types-pytz==2025.2.0.20250809
     # via
     #   -r mypy-requirements.txt
     #   quart-babel
