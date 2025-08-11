@@ -50,6 +50,8 @@ authlib==1.4.1
     # via superdesk-core
 babel==2.17.0
     # via quart-babel
+backports-asyncio-runner==1.2.0
+    # via pytest-asyncio
 bcrypt==4.2.1
     # via superdesk-core
 behave==1.2.6
@@ -373,7 +375,7 @@ pytest==8.4.1
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
-pytest-asyncio==0.26.0
+pytest-asyncio==1.1.0
     # via -r dev-requirements.in
 pytest-cov==6.2.1
     # via -r dev-requirements.in
@@ -480,9 +482,9 @@ six==1.17.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v3.0.0-alpha.5
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@release/3.0
     # via -r requirements.txt
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v3.0.0-alpha.1
+superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@release/3.0
     # via -r requirements.txt
 svglib==1.5.1
     # via xhtml2pdf
