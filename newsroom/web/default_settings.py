@@ -177,6 +177,7 @@ MODULES = [
     "newsroom.monitoring.module",
     "newsroom.news_api.api_audit",
     "newsroom.mgmt_api.mgmt_api_docs",
+    "newsroom.system",
 ]
 
 ASYNC_POPULATE_HATEOAS = False
