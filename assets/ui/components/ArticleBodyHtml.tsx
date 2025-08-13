@@ -89,7 +89,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         const bodyHtml = (item.es_highlight?.body_html ?? '').length > 0 ?
             item.es_highlight?.body_html[0] :
             item.body_html;
-        
+
         if (this.bodyRef.current == null) {
             return false;
         }
@@ -152,10 +152,6 @@ function _updateImageEmbedSources(html: string, item: IArticle): HTMLElement {
         return container.body;
     }
 
-    // Create a DOM node tree from the supplied html
-    // We can then efficiently find and update the image sources
-    let imageSourcesUpdated = false;
-
     container
         .querySelectorAll('img, video, audio')
         .forEach((mediaTag: any) => {
@@ -172,7 +168,6 @@ function _updateImageEmbedSources(html: string, item: IArticle): HTMLElement {
             if (originalMediaId) {
                 // We now have the Original Rendition's ID
                 // Use that to update the `src` attribute to use Newshub's Web API
-                imageSourcesUpdated = true;
                 mediaTag.src = `/assets/${originalMediaId}`;
             }
         });
@@ -182,9 +177,60 @@ function _updateImageEmbedSources(html: string, item: IArticle): HTMLElement {
 
 function _getBodyElement(bodyHtml: string, item: IArticle): HTMLElement {
     const output = _updateImageEmbedSources(formatHTML(bodyHtml), item);
+
+    // let's take care of embeds case by case
+    replaceFlourishEmbeds(output);
+
     const prepareWirePreview = extensions.prepareWirePreview ?? ((element) => element);
     return prepareWirePreview(
         output,
         item,
     );
+}
+
+const resizeScript = `
+    <script>
+        (function () {
+            function getHeight() {
+                const doc = document.documentElement;
+                return Math.max(doc?.scrollHeight || 0, document.body?.scrollHeight || 0);
+            }
+
+            function resize() {
+                if (window.frameElement) {
+                    window.frameElement.style.height = Math.max(100, getHeight()) + 'px';
+                }
+            }
+
+            window.addEventListener('load', resize);
+            if ('ResizeObserver' in window)
+                new ResizeObserver(resize).observe(document.body);
+        })();
+    </script>
+`;
+
+
+function replaceFlourishEmbeds(root: HTMLElement) {
+    root.querySelectorAll<HTMLElement>('.flourish-embed[data-src]').forEach((el) => {
+        const dataSrc = el.getAttribute('data-src');
+
+        if (!dataSrc || !/^(visualisation|story)\/\d+$/.test(dataSrc)) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.border = '0';
+
+        const embedHtml = el.outerHTML;
+        iframe.srcdoc = `
+            <!doctype html>
+            <html>
+            <body>
+                ${embedHtml}
+                ${resizeScript}
+            </body>
+            </html>
+        `;
+
+        el.replaceWith(iframe);
+    });
 }
