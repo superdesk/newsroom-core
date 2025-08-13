@@ -15,7 +15,7 @@ with open(requirements_txt_path, "r") as r:
 
 setup(
     name="Newsroom-Core",
-    version="3.0.0-rc.6",
+    version="3.0.0-rc.7",
     description="Newsroom Core library",
     author="Sourcefabric",
     url="https://github.com/superdesk/newsroom-core",
