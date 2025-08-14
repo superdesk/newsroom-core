@@ -90,14 +90,24 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
 
             loaded.push(url);
 
-            if (url.includes('twitter.com/') && window.twttr != null) {
-                window.twttr.widgets.load();
-                return;
-            }
-
-            if (url.includes('instagram.com/') && window.instgrm != null) {
-                window.instgrm.Embeds.process();
-                return;
+            try {
+                const parsedUrl = new URL(url, window.location.origin);
+                if (
+                    (parsedUrl.host === 'twitter.com' || parsedUrl.host === 'www.twitter.com') &&
+                    window.twttr != null
+                ) {
+                    window.twttr.widgets.load();
+                    return;
+                }
+                if (
+                    (parsedUrl.host === 'instagram.com' || parsedUrl.host === 'www.instagram.com') &&
+                    window.instgrm != null
+                ) {
+                    window.instgrm.Embeds.process();
+                    return;
+                }
+            } catch (e) {
+                throw new URIError(`Invalid script url: ${url}. ${e}`);
             }
 
             if (url.startsWith('http')) {
