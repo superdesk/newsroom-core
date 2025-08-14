@@ -48,14 +48,78 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
 
     componentDidMount() {
         if (this.renderPreview()) {
+            this.loadIframely();
+            this.executeScripts();
             document.addEventListener('copy', this.copyClicked);
             document.addEventListener('click', this.clickClicked);
         }
     }
 
+    componentDidUpdate() {
+        this.loadIframely();
+        this.executeScripts();
+    }
+
     componentWillUnmount() {
         document.removeEventListener('copy', this.copyClicked);
         document.removeEventListener('click', this.clickClicked);
+    }
+
+    loadIframely() {
+        const html = this.props.item.body_html;
+
+        if (window.iframely && html && html.includes('iframely')) {
+            window.iframely.load();
+        }
+    }
+
+    executeScripts() {
+        const tree = this.bodyRef.current;
+        const loaded: Array<string> = [];
+
+        if (tree == null) {
+            return;
+        }
+
+        tree.querySelectorAll('script').forEach((s) => {
+            let url = s.getAttribute('src');
+
+            if (!url || loaded.includes(url)) {
+                return;
+            }
+
+            loaded.push(url);
+
+            if (url.includes('twitter.com/') && window.twttr != null) {
+                window.twttr.widgets.load();
+                return;
+            }
+
+            if (url.includes('instagram.com/') && window.instgrm != null) {
+                window.instgrm.Embeds.process();
+                return;
+            }
+
+            if (url.startsWith('http')) {
+                // change https?:// to // so it uses schema of the client
+                url = url.substring(url.indexOf(':') + 1);
+            }
+
+            const script = document.createElement('script');
+
+            script.src = url;
+            script.async = true;
+
+            script.onload = () => {
+                document.body.removeChild(script);
+            };
+
+            script.onerror = () => {
+                throw new URIError(`The script ${url} didn't load.`);
+            };
+
+            document.body.appendChild(script);
+        });
     }
 
     static getDerivedStateFromError(error: any): IState {
