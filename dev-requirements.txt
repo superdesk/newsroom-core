@@ -457,7 +457,7 @@ requests==2.32.4
     #   wooper
 requests-oauthlib==2.0.0
     # via python-twitter
-responses==0.25.7
+responses==0.25.8
     # via -r dev-requirements.in
 rsa==4.9.1
     # via
