@@ -66,6 +66,15 @@ class SubscriberActivity extends React.Component<any, any> {
                 name: 'download'
             },
             {
+                name: 'download audio'
+            },
+            {
+                name: 'download video'
+            },
+            {
+                name: 'download picture'
+            },
+            {
                 name: 'copy'
             },
             {
@@ -142,7 +151,7 @@ class SubscriberActivity extends React.Component<any, any> {
 
     render() {
         const {results, print, reportParams, toggleFilterAndQuery} = this.props;
-        const headers = [gettext('Company'), gettext('Section'), gettext('Item'), gettext('Action'), gettext('User'), gettext('Time')];
+        const headers = [gettext('Company'), gettext('Section'), gettext('Item'), gettext('Published'), gettext('Place'), gettext('Slugline'), gettext('Takekey'), gettext('Service'), gettext('Subject'), gettext('Action'), gettext('User'), gettext('Time')];
         const list = get(results, 'length', 0) > 0 ? results.map((item: any) =>
             <tr key={item._id}>
                 <td>{item.company}</td>
@@ -151,12 +160,30 @@ class SubscriberActivity extends React.Component<any, any> {
                     {get(item, 'item.item_href', null) &&
                         <a href={get(item, 'item.item_href', '#')} target="_blank">{get(item, 'item.item_text')}</a>}
                     {!get(item, 'item.item_href') && <span>{get(item, 'item.item_text')}</span>}
+                    {get(item, 'association.href', null) &&
+                        ' / '
+                    }
+                    {get(item, 'association.href', null) &&
+                        <a href={get(item, 'association.href', '#')}
+                            target="_blank">{get(item, 'association.text')}</a>}
                 </td>
+                <td>{fullDate(get(item, 'item.published'))}</td>
+                <td>{get(item, 'item.place')}</td>
+                <td>{get(item, 'item.slugline')}</td>
+                <td>{get(item, 'item.anpa_take_key')}</td>
+                <td>{get(item, 'item.service')}</td>
+                <td>{get(item, 'item.subject')}</td>
                 <td>{item.action}</td>
                 <td>{item.user}</td>
                 <td>{fullDate(item.versioncreated)}</td>
             </tr>
         ) : ([(<tr key='no_data_row'>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td>{gettext('No Data')}</td>
@@ -190,12 +217,11 @@ class SubscriberActivity extends React.Component<any, any> {
                 selectDate={this.onEndDateChange}
                 activeDate={get(reportParams, 'date_to') || moment()} />)
         ];
-        // Commented out currently until there is a workaround for pagination with export/print.
-        /* filterNodes.push(<span
+        filterNodes.push(<button
             key='subscriver_activity_export'
-            className="nh-button nh-button--secondary ms-2"
+            className="nh-button nh-button--secondary ms-auto me-3"
             type="button"
-            onClick={() => {this.props.fetchReport(REPORTS['subscriber-activity'], false, true);}}>Export to CSV</span>); */
+            onClick={() => {this.props.fetchReport(REPORTS['subscriber-activity'], false, true);}}>Export to CSV</button>);
 
         const filterSection = (<div key='report_filters' className="align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda">{filterNodes}</div>);
 
