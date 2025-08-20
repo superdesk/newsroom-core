@@ -54,7 +54,13 @@ def fix_translation_value(items: list[dict]) -> list[dict]:
 
     for item in items:
         if not isinstance(item.get("translations"), dict):
+            # Remove any ``translations`` that aren't a dict
             item.pop("translations", None)
+        else:
+            for key in list(item["translations"].keys()):
+                if not isinstance(item["translations"][key], dict):
+                    # Remove any ``translations` entries that aren't a dict
+                    item["translations"].pop(key, None)
 
     return items
 

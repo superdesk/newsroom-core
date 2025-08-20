@@ -1494,3 +1494,53 @@ async def test_push_set_photo_coverage_href_async(client, app):
         assert response.status_code == 200
         parsed = await find_one_by_id("agenda", planning["guid"])
         assert "/async/photo/Vivid Photos" == parsed["coverages"][0]["deliveries"][0]["delivery_href"]
+
+
+async def test_push_malformed_cv_translations(client, app):
+    async def _test_cv_translations(resource, test_item, field):
+        test_item[field] = [
+            {
+                "code": "n",
+                "qcode": "n",
+                "name": "Weather",
+                "translations": {
+                    "name": {"fr-CA": "Météo"},
+                    "0": "[",
+                    "1": "o",
+                    "2": "b",
+                    "3": "j",
+                    "4": "e",
+                    "5": "c",
+                    "6": "t",
+                    "7": " ",
+                    "8": "O",
+                    "9": "b",
+                    "10": "j",
+                    "11": "e",
+                    "12": "c",
+                    "13": "t",
+                    "14": "]",
+                },
+            },
+        ]
+        response = await client.post("/push", json=test_item)
+        assert response.status_code == 200
+        parsed = await find_one_by_id(resource, test_item["guid"])
+        assert parsed["service"][0]["name"] == "Weather"
+        assert parsed["service"][0]["translations"] == {"name": {"fr-CA": "Météo"}}
+
+    await _test_cv_translations("agenda", deepcopy(test_event), "anpa_category")
+    await _test_cv_translations("agenda", deepcopy(test_planning), "anpa_category")
+    await _test_cv_translations("items", deepcopy(text_item), "service")
+
+
+async def test_push_item_with_invalid_state(client, app):
+    async def _test_item_state(test_item):
+        test_item["state"] = "draft"
+        response = await client.post("/push", json=test_item)
+        assert response.status_code == 200
+        parsed = await find_one_by_id("agenda", test_item["guid"])
+        assert parsed["state"] == "scheduled"
+
+    await _test_item_state(deepcopy(test_event))
+    await _test_item_state(deepcopy(test_planning))
