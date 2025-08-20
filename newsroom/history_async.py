@@ -143,7 +143,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             abort(404)
         company = get_company_or_none_from_request(None)
         if not company:
-            logger.warning(f"Failed to find company to log api media download")
+            logger.warning("Failed to find company to log api media download")
         action = "download " + association.get("type")
         entry = {
             "action": action,
