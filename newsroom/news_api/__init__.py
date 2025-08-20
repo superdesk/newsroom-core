@@ -19,3 +19,10 @@ def init_app(app):
         ),  # noqa
         default=app.config.get("NEWS_API_TIME_LIMIT_DAYS", 0),
     )
+    app.general_setting(
+        "news_api_allowed_renditions",
+        lazy_gettext("Image renditions the API can serve"),
+        weight=600,
+        description=lazy_gettext("A comma seperated list of the renditions that the API will return"),
+        default=app.config.get("NEWS_API_ALLOWED_RENDITIONS", ""),
+    )

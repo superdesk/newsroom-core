@@ -75,11 +75,10 @@ class NewsAPIFeedSearchService(NewsApiSearchServiceAsync):
         query_params = search_req.args.to_dict(flatten_lists=True)
 
         if doc["_meta"]["total"] > 0:
-            desc_items = list(reversed(doc.get("_items") or []))
-            last_datetime = desc_items[0].get("versioncreated")
+            items = list(doc.get("_items") or [])
+            last_datetime = items[0].get("versioncreated")
             exclude_ids = []
-
-            for item in desc_items:
+            for item in items:
                 if item.get("versioncreated") != last_datetime:
                     break
 
@@ -87,7 +86,8 @@ class NewsAPIFeedSearchService(NewsApiSearchServiceAsync):
 
             parsed_datetime = parse_iso_date(last_datetime)
             assert parsed_datetime is not None
-            query_params["start_date"] = parsed_datetime.strftime("%Y-%m-%d")
+            query_params["start_date"] = parsed_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+            query_params["exclude_ids"] = ",".join(exclude_ids)
 
             args = f"?{urlencode(query_params)}" if query_params else ""
             doc["_links"]["next_page"] = {"title": "News Feed", "href": f"news/feed{args}"}

@@ -1,12 +1,9 @@
 from quart_babel import lazy_gettext
 
-from newsroom.auth.utils import get_company_or_none_from_request
-from newsroom.news_api.utils import (
-    remove_internal_renditions,
-    check_association_permission,
-)
-from newsroom.products.products import get_products_by_company
+from newsroom.news_api.utils import remove_internal_renditions, update_embed_urls, set_association_links
 from .ninjs import NINJSFormatter
+from .utils import remove_unpermissioned_embeds
+from ...types import SectionEnum
 
 
 class NINJSFormatter2(NINJSFormatter):
@@ -16,14 +13,14 @@ class NINJSFormatter2(NINJSFormatter):
 
     format_id = "ninjs2"
     name = lazy_gettext("Ninjs v2")
+    # No sections this is an API only format
+    sections = []
 
     def __init__(self):
         self.direct_copy_properties += ("associations",)
 
-    def _transform_to_ninjs(self, item):
-        company = get_company_or_none_from_request(None)
-        # TODO-ASYNC: replace then formatters are async
-        products = get_products_by_company(company.to_dict() if company else None)
-        if not check_association_permission(item, products):
-            item.pop("associations", None)
-        return remove_internal_renditions(super()._transform_to_ninjs(item))
+    async def _transform_to_ninjs(self, item):
+        await remove_unpermissioned_embeds(item, section=SectionEnum.NEWS_API)
+        update_embed_urls(item)
+        set_association_links(item)
+        return remove_internal_renditions(await super()._transform_to_ninjs(item))

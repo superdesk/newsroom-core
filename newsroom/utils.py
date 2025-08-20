@@ -3,11 +3,14 @@ import regex
 import superdesk
 from asyncio import gather
 from functools import reduce
+
+import re
+from lxml import html as lxml_html
 from pydantic import ValidationError
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Callable
 from pymongo.cursor import Cursor as MongoCursor
 
 from bson import ObjectId
@@ -20,7 +23,7 @@ from superdesk.core.types import Request
 from superdesk.core import json, get_current_app, get_app_config, get_current_async_app
 from superdesk.flask import abort, request, g, url_for, Request as FlaskRequest
 from superdesk.json_utils import try_cast
-from superdesk.etree import parse_html
+from superdesk.etree import parse_html, to_string
 from superdesk.text_utils import get_text
 from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 
@@ -702,3 +705,86 @@ async def get_user_and_company_dicts(
         current_request.storage.request.set("user_company_dicts", (users, companies))
 
     return current_request.storage.request.get("user_company_dicts")
+
+
+def update_embeds_in_body(
+    item: dict[str, Any],
+    update_image: Optional[Callable[[dict[str, Any], lxml_html.HtmlElement, str], bool]] = None,
+    update_audio: Optional[Callable[[dict[str, Any], lxml_html.HtmlElement, str], bool]] = None,
+    update_video: Optional[Callable[[dict[str, Any], lxml_html.HtmlElement, str], bool]] = None,
+):
+    """
+    Scans the story body for editor3 embeds and calls the appropriate passed function for each embed type.
+     The functions should expect the item, element and the number associated with the association
+    :param item:
+    :param update_image:
+    :param update_audio:
+    :param update_video:
+    :return:
+    """
+    regex = re.compile(' EMBED START (?:Image|Video|Audio) {id: "editor_([0-9]+)')
+    body_updated = False
+    root_elem = lxml_html.fromstring(item.get("body_html", "<p></p>") or "<p></p>")
+    comments = root_elem.xpath("//comment()")
+    for comment in comments:
+        m = regex.search(comment.text)
+        if m and m.group(1):
+            # Assumes the sibling of the Embed Image comment is the figure tag containing the image
+            figure_elem = comment.xpath("following-sibling::figure[1]")
+            if not figure_elem:
+                continue  # No figure element found after the comment
+            figure_elem = figure_elem[0]
+            if figure_elem is not None and figure_elem.tag == "figure":
+                elem = figure_elem.find("./img")
+                if elem is not None and update_image:
+                    body_updated = update_image(item, elem, m.group(1)) or body_updated
+                    continue
+                elem = figure_elem.find("./audio")
+                if elem is not None and update_audio:
+                    body_updated = update_audio(item, elem, m.group(1)) or body_updated
+                    continue
+                elem = figure_elem.find("./video")
+                if elem is not None and update_video:
+                    body_updated = update_video(item, elem, m.group(1)) or body_updated
+    if body_updated:
+        item["body_html"] = to_string(root_elem, method="html")
+
+
+def remove_all_embeds(item: dict[str, Any], remove_by_class: bool = True, remove_media_embeds: bool = True) -> bool:
+    """
+    Remove the all embeds from the body of the article, including any divs with the embed_block attribute
+    :param item:
+    :param remove_by_class: If true removes any divs that have the embed-block class, should remove such things as
+    embedded tweets
+    :param remove_media_embeds: Remove any figure tags if the passed value is true
+    :return:
+    """
+    original_body_html = item.get("body_html")
+    if not original_body_html:
+        return False  # No body to process, so no changes made
+
+    root_elem = lxml_html.fromstring(original_body_html)
+
+    if remove_by_class:
+        embed_blocks = root_elem.xpath('//div[contains(concat(" ", @class, " "), " embed-block ")]')
+        if embed_blocks:
+            for embed in embed_blocks:
+                parent = embed.getparent()
+                if parent is not None:
+                    parent.remove(embed)
+
+    if not remove_media_embeds:
+        item["body_html"] = to_string(root_elem, encoding="unicode", method="html")
+        return True
+
+    # clean all the embedded figures from the html, it will remove the comments as well
+    cleaner = lxml_html.clean.Cleaner(add_nofollow=False, kill_tags=["figure"])
+    cleaned_xhtml = cleaner.clean_html(root_elem)
+
+    # remove the associations relating to the embeds
+    kill_keys = [key for key in item.get("associations", {}) if key.startswith("editor_")]
+    for key in kill_keys:
+        item.get("associations", {}).pop(key, None)
+
+    item["body_html"] = to_string(cleaned_xhtml, encoding="unicode", method="html")
+    return True
