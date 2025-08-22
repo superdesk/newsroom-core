@@ -11,6 +11,7 @@ from superdesk.utc import utcnow
 
 from ..fixtures import (  # noqa: F401
     items,
+    item_ids,
     init_items,
     init_auth,
     agenda_items,
@@ -20,7 +21,6 @@ from .test_push import upload_binary
 from newsroom.history_async import HistoryService
 from newsroom.tests import test_utils
 
-items_ids = [item["_id"] for item in items[:2]]
 item = items[:2][0]
 
 
@@ -141,18 +141,18 @@ async def test_download_single(client, app):
 
 async def test_wire_download(client, app):
     await setup_image(client, app)
-    _file = await test_utils.download_zip_file(items_ids, client, wire_formats[0]["format"], "wire")
+    _file = await test_utils.download_zip_file(client, item_ids, client, wire_formats[0]["format"], "wire")
     with zipfile.ZipFile(_file) as zf:
         assert wire_formats[0]["filename"] in zf.namelist()
         content = zf.open(wire_formats[0]["filename"]).read()
         if wire_formats[0].get("test_content"):
             wire_formats[0]["test_content"](content)
     history, count = app.data.find("history", None, None)
-    assert (len(items_ids)) == count
+    assert (len(item_ids)) == count
     assert "download" == history[0]["action"]
     assert history[0].get("user")
     assert history[0].get("versioncreated") + timedelta(seconds=2) >= utcnow()
-    assert history[0].get("item") in items_ids
+    assert history[0].get("item") in item_ids
     assert history[0].get("version")
     assert history[0].get("company") is None
     assert history[0].get("section") == "wire"

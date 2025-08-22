@@ -97,6 +97,7 @@ items = [
         "service": [{"code": "c", "name": "Service C"}],
     },
 ]
+item_ids = [item["_id"] for item in items[:2]]
 
 agenda_items = [
     {
