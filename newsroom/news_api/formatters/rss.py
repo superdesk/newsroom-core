@@ -143,7 +143,6 @@ class RSSFormatter:
 
         byline = item.get("byline")
         if byline:
-            # name = item.get("byline")
             if (
                 item.get("source")
                 and not get_app_config("COPYRIGHT_HOLDER", "").lower() == item.get("source", "").lower()
