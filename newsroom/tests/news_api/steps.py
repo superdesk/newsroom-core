@@ -10,8 +10,15 @@ from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 
 @when("we save API token")
 def step_save_token(context):
-    context.headers.append(("Authorization", f"Token {context.news_api_tokens.get('_id')}"))
+    token = context.news_api_tokens.get("_id")
+    context.headers.append(("Authorization", f"Token {token}"))
+    set_placeholder(context, "API_TOKEN", token)
     return
+
+
+@when("we remove API token")
+def step_remove_token(context):
+    context.headers[:] = [h for h in context.headers if h[0] != "Authorization"]
 
 
 @when('we set header "{name}" to value "{value}"')
@@ -56,6 +63,20 @@ async def we_get_text_in_atom_xml_response(context, get, text):
         body = await context.response.get_data()
         tree = lxml.etree.fromstring(body)
         assert "{http://www.w3.org/2005/Atom}feed" == tree.tag
+        body = await context.response.get_data(as_text=True)
+        if get == "get":
+            assert text in body, f"{text} not in {body}"
+        else:
+            assert text not in body, f"{text} found in {body}"
+
+
+@then('we "{get}" "{text}" in rss xml response')
+@async_run_until_complete
+async def we_get_text_in_rss_xml_response(context, get, text):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        body = await context.response.get_data()
+        tree = lxml.etree.fromstring(body)
+        assert "rss" == tree.tag, tree.tag
         body = await context.response.get_data(as_text=True)
         if get == "get":
             assert text in body, f"{text} not in {body}"

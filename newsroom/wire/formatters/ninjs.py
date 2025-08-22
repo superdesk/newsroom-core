@@ -53,11 +53,11 @@ class NINJSFormatter(BaseFormatter):
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         item = item.copy()
-        ninjs = self._transform_to_ninjs(item)
+        ninjs = await self._transform_to_ninjs(item)
 
         return str.encode(json.dumps(ninjs, default=json_serialize_datetime_objectId), "utf-8")
 
-    def _transform_to_ninjs(self, item):
+    async def _transform_to_ninjs(self, item: dict[str, Any]) -> dict[str, Any]:
         ninjs = {
             "guid": item.get("_id"),
             "version": str(item.get("version", 1)),

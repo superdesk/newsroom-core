@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from superdesk.default_settings import strtobool
 from newsroom.web.default_settings import (  # noqa
     env,
     ELASTICSEARCH_URL,
@@ -9,6 +10,7 @@ from newsroom.web.default_settings import (  # noqa
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
 )
 
+SITE_NAME = env("SITE_NAME", "NEWSHUB")
 NEWSAPI_URL = env("NEWSAPI_URL", "http://localhost:5400")
 server_url = urlparse(NEWSAPI_URL)
 URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or "api/v1"
@@ -38,6 +40,7 @@ MODULES = [
     "newsroom.section_filters",
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
+    "newsroom.news_api.news.rss",
     "newsroom.news_api.news.search",
     "newsroom.news_api.news.feed",
     "newsroom.news_api.api_audit",
@@ -69,3 +72,7 @@ ELASTICSEARCH_FIX_QUERY = False
 ASSETS_REGISTER_UPLOAD_ENDPOINT = False
 
 ASYNC_AUTH_CLASS = "newsroom.news_api.api_tokens.auth:CompanyTokenAuth"
+
+NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", False))
+
+EMBED_PRODUCT_FILTERING = strtobool(env("EMBED_PRODUCT_FILTERING", False))

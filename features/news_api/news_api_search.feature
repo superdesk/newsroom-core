@@ -14,8 +14,8 @@ Feature: News API News Search
   Scenario: Simple query string request for fish
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}]
         """
     Given "products"
         """
@@ -32,15 +32,15 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
 
   Scenario: Simple start date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
@@ -57,16 +57,16 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a aardvark that could not swim"}
+         {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}
      ]}
      """
 
   Scenario: Simple start and end date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
-        {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "#DATE-3#" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>", "versioncreated": "#DATE-3#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
@@ -83,16 +83,16 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a quokka who could swim"}
+         {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"}
      ]}
      """
 
   Scenario: Absolute start and end date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "2018-11-09 03:48:39.000Z" },
-        {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "2018-11-11 03:48:39.000Z" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "2018-11-13 03:48:39.000Z" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "2018-11-09 03:48:39.000Z" },
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>", "versioncreated": "2018-11-11 03:48:39.000Z" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "2018-11-13 03:48:39.000Z" }]
         """
     Given "products"
         """
@@ -109,24 +109,24 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a quokka who could swim"}
+         {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"}
      ]}
      """
     When we get "news/search?start_date=2018-11-11&include_fields=body_html"
     Then we get list with 2 items
     """
      {"_items": [
-        {"body_html": "Once upon a time there was a quokka who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}
      ]}
      """
     When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney&include_fields=body_html"
     Then we get list with 3 items
     """
      {"_items": [
-        {"body_html": "Once upon a time there was a quokka who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"},
-        {"body_html": "Once upon a time there was a fish who could swim"}
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
     When we get "news/search?start_date=2018-11-12T01:48:38&end_date=2018-11-12T02:48:40"
@@ -139,9 +139,9 @@ Feature: News API News Search
   Scenario: Can sort results
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#" },
-        {"body_html": "One", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
@@ -158,18 +158,18 @@ Feature: News API News Search
     Then we get list ordered by versioncreated with 3 items
     """
      {"_items": [
-        {"body_html": "Five"},
-        {"body_html": "Three"},
-        {"body_html": "One"}
+        {"body_html": "<p>Five</p>"},
+        {"body_html": "<p>Three</p>"},
+        {"body_html": "<p>One</p>"}
      ]}
      """
 
   Scenario: include fields
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
-        {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
     Given "products"
         """
@@ -186,9 +186,9 @@ Feature: News API News Search
     Then we get list with 3 items
     """
      {"_items": [
-        {"body_html": "One"},
-        {"body_html": "Three"},
-        {"body_html": "Five"}
+        {"body_html": "<p>One</p>"},
+        {"body_html": "<p>Three</p>"},
+        {"body_html": "<p>Five</p>"}
      ]}
      """
 
@@ -210,15 +210,15 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=now-10d&include_fields=headline"
+    When we get "news/search?start_date=now-10d&include_fields=slugline"
     Then we get response code 400
 
   Scenario: exclude fields
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
-        {"body_html": "One", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
         """
     Given "products"
         """

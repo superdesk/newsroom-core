@@ -26,7 +26,6 @@ class CSVFormatter(BaseFormatter):
     FILE_EXTENSION = "csv"
     MIMETYPE = "text/csv"
     BULK_MIMETYPE = "text/csv"
-    MULTI = True
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
         event_item = self.format_event(item)

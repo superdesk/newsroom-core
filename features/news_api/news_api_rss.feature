@@ -1,4 +1,4 @@
-Feature: News API Atom Feed
+Feature: News API RSS Feed
 
   Background: Initial setup
     Given "companies"
@@ -11,7 +11,7 @@ Feature: News API Atom Feed
         """
     When we save API token
 
-  Scenario: Simple atom request response restricted by product
+  Scenario: Simple rss request response restricted by product
     Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
@@ -30,12 +30,12 @@ Feature: News API Atom Feed
         "product_type": "news_api"
         }]
         """
-    When we get "atom"
+    When we get "rss"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "don't get" "<title><![CDATA[headline 2]]></title>" in atom xml response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "don't get" "<title><![CDATA[headline 2]]></title>" in rss xml response
 
-  Scenario: Simple atom request
+  Scenario: Simple rss request
         Given "products"
         """
         [{"name": "A fishy Product",
@@ -85,12 +85,12 @@ Feature: News API Atom Feed
         }},
          "firstpublished": "#DATE-1#", "versioncreated": "#DATE#"}]
         """
-    When we get "atom"
+    When we get "rss"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in atom xml response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in rss xml response
 
-  Scenario: Simple atom request with embedded image
+  Scenario: Simple rss request with embedded image
     Given "products"
         """
         [{"name": "A fishy Product",
@@ -143,29 +143,29 @@ Feature: News API Atom Feed
         }},
          "firstpublished": "#DATE-1#", "versioncreated": "#DATE#"}]
         """
-    When we get "atom"
+    When we get "rss"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
-    Then we "get" "src="http://" in atom xml response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in rss xml response
+    Then we "get" "src="http://" in rss xml response
     When we remove API token
-    When we get "atom"
+    When we get "rss"
     Then we get error 401
     """
     {"message": "Authorization token missing."}
     """
-    When we get "atom?token=#API_TOKEN#"
+    When we get "rss?token=#API_TOKEN#"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
-    Then we "get" "src="http://" in atom xml response
-    When we get "atom/#API_TOKEN#"
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in rss xml response
+    Then we "get" "src="http://" in rss xml response
+    When we get "rss/#API_TOKEN#"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
-    Then we "get" "src="http://" in atom xml response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in rss xml response
+    Then we "get" "src="http://" in rss xml response
 
-  Scenario: Atom request response restricted by featured image product
+  Scenario: RSS request response restricted by featured image product
     Given "items"
         """
         [{"body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
@@ -186,7 +186,7 @@ Feature: News API Atom Feed
         "product_type": "news_api"
         },
         {"name": "A fishy superdesk product",
-        "description": "a superdesk product restricting images in the atom feed",
+        "description": "a superdesk product restricting images in the rss feed",
         "companies" : [
           "#companies._id#"
         ],
@@ -195,7 +195,7 @@ Feature: News API Atom Feed
         }
         ]
         """
-    When we get "atom"
+    When we get "rss"
     Then we get OK response
-    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "don't get" "<media:credit>nothing to see</media:credit>" in atom xml response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in rss xml response
+    Then we "don't get" "<media:credit>nothing to see</media:credit>" in rss xml response
