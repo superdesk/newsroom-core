@@ -28,7 +28,6 @@ class BaseFormatter:
     BULK_MIMETYPE = "application/zip"
     FILE_EXTENSION = None
     MEDIATYPE = "text"
-    MULTI = False
     MULTI_ZIP = False
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
