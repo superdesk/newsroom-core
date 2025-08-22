@@ -1,4 +1,4 @@
-Feature: News API News Search
+Feature: News API Atom Feed
 
   Background: Initial setup
     Given "companies"
@@ -90,7 +90,6 @@ Feature: News API News Search
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in atom xml response
 
-      @wip
   Scenario: Simple atom request with embedded image
     Given "products"
         """
