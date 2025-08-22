@@ -2,7 +2,6 @@ from typing import Any
 from urllib.parse import urlencode
 
 from pydantic import AliasChoices
-from werkzeug.datastructures import ImmutableMultiDict
 
 from content_api.errors import UnexpectedParameterError
 from superdesk.flask import request as flask_request
@@ -70,7 +69,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         those coming from the request. If any unknown found, it raises an error
         """
         model = self.search_args_class()
-        url_args: ImmutableMultiDict = flask_request.args
+        url_args: set[str] = set(flask_request.args.keys()) - {"token"}
         allowed_fields = set(model.model_fields.keys())
 
         for field, info in model.model_fields.items():
@@ -81,7 +80,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
             else:
                 allowed_fields.add(info.alias or field)
 
-        unknown_fields = set(url_args.keys()) - allowed_fields
+        unknown_fields = url_args - allowed_fields
         if unknown_fields:
             raise UnexpectedParameterError(desc=f"Unexpected parameter(s): {', '.join(unknown_fields)}")
 

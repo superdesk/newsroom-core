@@ -90,6 +90,7 @@ Feature: News API News Search
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in atom xml response
 
+      @wip
   Scenario: Simple atom request with embedded image
     Given "products"
         """
@@ -115,6 +116,7 @@ Feature: News API News Search
         """
         [{"body_html": "<p>Once upon a time there was a fish who could swim</p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} -->",
         "headline": "headline 1",
+        "_id": "urn:test:item1",
         "byline": "S Smith", "pubstatus": "usable", "service" : [{"name" : "Australian General News", "code" : "a"}],
         "description_text": "summary",
         "associations" : {
@@ -147,8 +149,23 @@ Feature: News API News Search
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
     Then we "get" "src="http://" in atom xml response
+    When we remove API token
+    When we get "atom"
+    Then we get error 401
+    """
+    {"message": "Authorization token missing."}
+    """
+    When we get "atom?token=#API_TOKEN#"
+    Then we get OK response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
+    Then we "get" "src="http://" in atom xml response
+    When we get "atom/#API_TOKEN#"
+    Then we get OK response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
+    Then we "get" "src="http://" in atom xml response
 
-      @wip
   Scenario: Atom request response restricted by featured image product
     Given "items"
         """

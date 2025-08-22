@@ -10,8 +10,15 @@ from superdesk.tests.steps import apply_placeholders, json_match, get_json_data
 
 @when("we save API token")
 def step_save_token(context):
-    context.headers.append(("Authorization", f"Token {context.news_api_tokens.get('_id')}"))
+    token = context.news_api_tokens.get("_id")
+    context.headers.append(("Authorization", f"Token {token}"))
+    set_placeholder(context, "API_TOKEN", token)
     return
+
+
+@when("we remove API token")
+def step_remove_token(context):
+    context.headers[:] = [h for h in context.headers if h[0] != "Authorization"]
 
 
 @when('we set header "{name}" to value "{value}"')
