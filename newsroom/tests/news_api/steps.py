@@ -68,3 +68,17 @@ async def we_get_text_in_atom_xml_response(context, get, text):
             assert text in body, f"{text} not in {body}"
         else:
             assert text not in body, f"{text} found in {body}"
+
+
+@then('we "{get}" "{text}" in rss xml response')
+@async_run_until_complete
+async def we_get_text_in_rss_xml_response(context, get, text):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        body = await context.response.get_data()
+        tree = lxml.etree.fromstring(body)
+        assert "rss" == tree.tag, tree.tag
+        body = await context.response.get_data(as_text=True)
+        if get == "get":
+            assert text in body, f"{text} not in {body}"
+        else:
+            assert text not in body, f"{text} found in {body}"
