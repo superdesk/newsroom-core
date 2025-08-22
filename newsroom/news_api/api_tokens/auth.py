@@ -43,6 +43,11 @@ async def valid_IP_if_required_rule(request: Request) -> None:
     return None
 
 
+async def support_auth_token_in_url(request: Request) -> None:
+    """Flag to indicate this endpoint supports using the ``token`` in the URL"""
+    return None
+
+
 class CompanyTokenAuth(UserAuthProtocol):
     def get_token_from_request(self, request: Request) -> str | None:
         """
@@ -55,6 +60,14 @@ class CompanyTokenAuth(UserAuthProtocol):
             if auth.lower().startswith(("token", "bearer")):
                 return auth.split(" ")[1] if " " in auth else None
             return auth
+
+        supports_token_in_url = (
+            isinstance(request.endpoint.auth, list) and support_auth_token_in_url in request.endpoint.auth
+        ) or (isinstance(request.endpoint.auth, dict) and support_auth_token_in_url in request.endpoint.auth.values())
+        if supports_token_in_url:
+            token = request.get_url_arg("token") or request.get_view_args("token")
+            if token:
+                return token
 
         return None
 
