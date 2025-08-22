@@ -1,6 +1,9 @@
-from typing import Any, cast, List
+from typing import Any, cast, List, Set, Optional
 from datetime import datetime, timedelta
 import logging
+import re
+from lxml.html import HtmlElement
+from lxml import html as lxml_html
 
 from bson import ObjectId
 
@@ -9,12 +12,13 @@ from superdesk.core.types import Request, Response, SearchRequest, ESQuery
 from superdesk.core import get_app_config
 from superdesk.core.resources import AsyncResourceService
 from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
+from superdesk.etree import to_string
 
 from newsroom.types import SectionEnum, ProductResourceModel, UserResourceModel, CompanyResource, WireItem, Navigation
-from newsroom.auth.utils import get_user_or_none_from_request
+from newsroom.auth.utils import get_user_or_none_from_request, get_company_from_request
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.search.base_web_service import BaseWebSearchService
-from newsroom.products import get_products_by_navigation_async
+from newsroom.products import get_products_by_navigation_async, get_products_by_company_async
 from newsroom.search.utils import query_string
 from newsroom.search.filters import (
     apply_query_string,
@@ -167,6 +171,9 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
         matched_ids: list[str] = request.storage.request.get("matched_ids", [])
         if matched_ids:
             response.setdefault("_links", {})["matched_ids"] = matched_ids
+
+        if get_app_config("EMBED_PRODUCT_FILTERING", False):
+            await self.permission_media_embeds_in_response(response)
 
         return Response(response, 200, [("X-Total-Count", count)])
 
@@ -493,3 +500,71 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
                 exc,
                 exc_info=True,
             )
+
+    async def permission_media_embeds_in_response(self, response: dict[str, Any]):
+        """
+        Mark any embedded audio/visual media with an attribute in the response to block download if required
+        Only called if EMBED_PRODUCT_FILTERING is enabled
+        @param response:
+        @return:
+        """
+        items: List[Any] = response.get("_items", [])
+        if len(items) == 0:
+            return
+        company: Optional[CompanyResource] = get_company_from_request(None)
+        permitted_products: Set[str | None] = {
+            p.sd_product_id
+            for p in await get_products_by_company_async(company=company, product_type=SectionEnum.WIRE)
+            if p.sd_product_id and p.is_enabled
+        }
+
+        for doc in items:
+            self.permission_media(doc, permitted_products)
+
+    def permission_media(self, item: dict[str, Any], permitted_products: Set[str | None]):
+        """
+        Flags any Video or Audio embeds if they are not allowed to be downloaded
+        @param item:
+        @param permitted_products:
+        @return:
+        """
+        disable_download: List[str] = []
+        for key, embed_item in item.get("associations", {}).items():
+            if key and embed_item and key.startswith("editor_") and embed_item.get("type", "") in ["audio", "video"]:
+                # get the list of products that the embedded item matched in Superdesk
+                embed_products: Set[str | None] = {
+                    p.get("code") for p in ((item.get("associations") or {}).get(key) or {}).get("products", [])
+                }
+                if not (embed_products & permitted_products):
+                    disable_download.append(key)
+        if not disable_download:
+            return
+
+        highlighted: bool = False
+        root_elem: HtmlElement = None
+        if item.get("es_highlight", {}).get("body_html", ""):
+            root_elem = lxml_html.fromstring(item.get("es_highlight", {}).get("body_html", "")[0])
+            highlighted = True
+        else:
+            root_elem = lxml_html.fromstring(item.get("body_html", ""))
+        regex = re.compile(r" EMBED START (?:Video|Audio) {id: \"editor_([0-9]+)")
+        html_updated: bool = False
+        comments = root_elem.xpath("//comment()")
+        for comment in comments:
+            m = regex.search(comment.text)
+            # if we've found an Embed Start comment
+            if m and m.group(1):
+                figure = comment.getnext()
+                for elem in figure.iterchildren():
+                    if elem.tag in ["video", "audio"]:
+                        if "editor_" + m.group(1) in disable_download:
+                            elem.attrib["data-disable-download"] = "true"
+                    if elem.text and " EMBED END " in elem.text:
+                        break
+                html_updated = True
+
+        if html_updated:
+            if highlighted:
+                item["es_highlight"]["body_html"][0] = to_string(root_elem, method="html")
+            else:
+                item["body_html"] = to_string(root_elem, method="html")
