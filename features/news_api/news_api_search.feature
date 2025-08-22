@@ -590,3 +590,44 @@ Feature: News API News Search
         "associations": "__no_value__"}
         ]}
       """
+
+    Scenario: search by not allowed product raises error
+        Given "products"
+        """
+        [{
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
+        When we get "news/search?start_date=now-10d&products=111111111111111111111111"
+        Then we get response code 400
+
+    Scenario: search by empty product uses all company products
+        Given "products"
+        """
+        [{
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "NOT aardvark",
+            "product_type": "news_api"
+        }]
+        """
+        Given "items"
+        """
+        [{
+            "body_html": "Three aardvark story",
+            "versioncreated": "#DATE-3#",
+            "headline": "Headline 1",
+            "products": [
+                {"code": "#products._id#", "name": "A Product"},
+                {"code": "1234", "name": "Product b"}
+            ]
+        }]
+        """
+        When we get "news/search?start_date=now-10d&products="
+        Then we get OK response
+        Then we get list with 0 items
