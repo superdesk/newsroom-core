@@ -18,9 +18,8 @@ from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
 from superdesk.core.web import EndpointGroup
 from superdesk.utc import utcnow
 from superdesk.flask import abort
-from superdesk import get_resource_service
 
-from newsroom.types import HistoryResourceModel, UserResourceModel, SectionEnum
+from newsroom.types import HistoryResourceModel, UserResourceModel, SectionEnum, WireItem
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.core.resources.service import NewshubAsyncResourceService
 from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
@@ -85,7 +84,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
         return {"_items": docs, "hits": cursor.hits}
 
     async def create_media_history_record(
-        self, item: dict[str, Any], association_name: str, action: str, user: UserResourceModel, section: str
+        self, item: dict[str, Any], association_name: str, action: str | None, user: UserResourceModel, section: str
     ):
         """
         Log the download of an association belonging to an item
@@ -124,27 +123,32 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
         if not item_id:
             return
 
-        item = get_resource_service("items").find_one(req=None, _id=item_id)
+        item = await WireItem.get_service().find_by_id_raw(item_id)
         if not item:
             logger.warning(f"Failed find item to log api media download for {item_id} with media id {media_id}")
             abort(404)
 
-        found = False
         # Find the matching media in the item
+        media_name: str | None = None
+        media_item: dict | None = None
         for name, association in (item.get("associations") or {}).items():
             for rendition in item.get("associations", {}).get(name).get("renditions", {}):
                 if association.get("renditions", {}).get(rendition).get("media", "") == media_id:
-                    found = True
+                    media_name = name
+                    media_item = association
                     break
-            if found:
+            if media_item is not None:
                 break
-        if not found:
+
+        if not media_item or not media_name:
             logger.warning(f"Failed find rendition to log api media download for {item_id} with media id {media_id}")
             abort(404)
+
         company = get_company_or_none_from_request(None)
         if not company:
             logger.warning("Failed to find company to log api media download")
-        action = "download " + association.get("type")
+
+        action = "download " + media_item.get("type", "")  # type: ignore
         entry = {
             "action": action,
             "versioncreated": utcnow(),
@@ -152,7 +156,7 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
             "item": item.get("_id"),
             "version": item.get("version") if item.get("version") else item.get("_current_version", ""),
             "section": SectionEnum.NEWS_API.value,
-            "extra_data": {"association": name},
+            "extra_data": {"association": media_name},
         }
         try:
             await super().create([entry])
