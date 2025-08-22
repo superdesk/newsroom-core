@@ -8,7 +8,7 @@ from quart import url_for
 from newsroom.types import Product, UserResourceModel, CompanyResource
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
-from tests.core.utils import create_entries_for
+from .test_utils import create_entries_for
 
 from . import markers
 

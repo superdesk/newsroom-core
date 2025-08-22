@@ -82,7 +82,15 @@ def event_loop_policy(request):
     return CustomEventLoopPolicy()
 
 
+def use_config_file(file_path: str):
+    setattr(update_config, "_config_path", file_path)
+
+
 def update_config(conf):
+    config_path = getattr(update_config, "_config_path", None)
+    if config_path:
+        conf.from_pyfile(config_path)
+
     conf["CONTENTAPI_URL"] = "http://localhost:5400"
     conf["ELASTICSEARCH_INDEX"] = conf["CONTENTAPI_ELASTICSEARCH_INDEX"] = "newsroom_test"
     conf["MONGO_DBNAME"] = conf["CONTENTAPI_MONGO_DBNAME"] = "newsroom_test"

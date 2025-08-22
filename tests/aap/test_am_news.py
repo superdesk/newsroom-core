@@ -1,3 +1,4 @@
+from newsroom.tests.test_utils import download_zip_file
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -6,12 +7,7 @@ from tests.fixtures import (  # noqa: F401
     PUBLIC_USER_ID,
 )
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.core.test_download import (
-    wire_formats,
-    download_zip_file,
-    items_ids,
-    setup_image,
-)
+from tests.core.test_download import wire_formats, items_ids, setup_image
 from tests.core.test_push import get_signature_headers
 from newsroom.tests.users import ADMIN_USER_ID
 
