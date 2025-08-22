@@ -33,7 +33,7 @@ async def download(args: RouteArguments, params: RouteParams, request: Request):
     return response
 
 
-@assets_endpoints.endpoint("assets/<string:asset_id>", methods=["GET"], auth=False)
+@assets_endpoints.endpoint("assets/<string:asset_id>", methods=["GET"], auth=[support_auth_token_in_url])
 async def get_item(args: RouteArguments, params: RouteParams, request: Request):
     """
     Get media item via the assets endpoint
@@ -42,13 +42,6 @@ async def get_item(args: RouteArguments, params: RouteParams, request: Request):
     @param request:
     @return:
     """
-    auth = get_current_wsgi_app().auth
-    if not auth.authorized([], None, request.method):
-        if params.token:
-            if not auth.check_auth(params.token, allowed_roles=None, resource=None, method="GET"):
-                return auth.authenticate()
-        else:
-            return auth.authenticate()
 
     return await return_item(args, None, request)
 
