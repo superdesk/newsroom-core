@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-from newsroom.core import get_current_wsgi_app
 from superdesk.core.web import EndpointGroup
 from superdesk.core.types import Request
 from newsroom.history_async import HistoryService
