@@ -141,7 +141,7 @@ async def test_download_single(client, app):
 
 async def test_wire_download(client, app):
     await setup_image(client, app)
-    _file = await test_utils.download_zip_file(client, item_ids, client, wire_formats[0]["format"], "wire")
+    _file = await test_utils.download_zip_file(client, item_ids, wire_formats[0]["format"], "wire")
     with zipfile.ZipFile(_file) as zf:
         assert wire_formats[0]["filename"] in zf.namelist()
         content = zf.open(wire_formats[0]["filename"]).read()
