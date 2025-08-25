@@ -17,7 +17,7 @@ from superdesk.tests.steps import (
     is_user_resource,
 )
 from newsroom.utils import deep_get
-from tests.core.utils import create_entries_for
+from newsroom.tests.test_utils import create_entries_for
 
 
 async def expect_status_in(response, codes):

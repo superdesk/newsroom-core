@@ -1,3 +1,4 @@
+from newsroom.tests.test_utils import download_zip_file
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -6,12 +7,7 @@ from tests.fixtures import (  # noqa: F401
     PUBLIC_USER_ID,
 )
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.core.test_download import (
-    wire_formats,
-    download_zip_file,
-    items_ids,
-    setup_image,
-)
+from tests.core.test_download import wire_formats, item_ids, setup_image
 from tests.core.test_push import get_signature_headers
 from newsroom.tests.users import ADMIN_USER_ID
 
@@ -476,11 +472,11 @@ def test_download(client, app):
             if _format.get("test_content"):
                 _format["test_content"](content)
     history = app.data.find("history", None, None)
-    assert (len(wire_formats) * len(items_ids)) == history.count()
+    assert (len(wire_formats) * len(item_ids)) == history.count()
     assert "download" == history[0]["action"]
     assert history[0].get("user")
     assert history[0].get("versioncreated") + timedelta(seconds=2) >= utcnow()
-    assert history[0].get("item") in items_ids
+    assert history[0].get("item") in item_ids
     assert history[0].get("version")
     assert history[0].get("company") is None
     assert history[0].get("section") == "factcheck"

@@ -10,6 +10,7 @@ from newsroom.tests.fixtures import (  # noqa
     ADMIN_USER_ID,
     ADMIN_USER_EMAIL,
     items,
+    item_ids,
     agenda_items,
     init_items,
     init_agenda_items,
