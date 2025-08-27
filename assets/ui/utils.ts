@@ -1,5 +1,6 @@
 import {isEmpty} from 'lodash';
 import classNames from 'classnames';
+import videojs from 'video.js';
 
 const isNotEmpty = (x: any) => !isEmpty(x);
 
@@ -24,4 +25,25 @@ export function bem(block: any, element: any, modifier: any) {
     }
 
     return classes.join(' ');
+}
+
+export function processVideos(root: HTMLElement) {
+    const players: any[] = [];
+
+    root.querySelectorAll('video').forEach((element) => {
+        if (element.getAttribute('data-vjs-initialized')) return;
+
+        element.setAttribute('data-vjs-initialized', 'true');
+        element.classList.add('video-js', 'vjs-big-play-centered');
+
+        const player = videojs(element, {
+            controls: true,
+            preload: 'auto',
+            fluid: true,
+        });
+
+        players.push(player);
+    });
+
+    return () => players.forEach((player) => player.dispose());
 }

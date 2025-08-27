@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
 import {IArticle} from 'interfaces';
 import {extensions} from 'index';
+import {processVideos} from '../utils';
 
 function isLinkExternal(href: string) {
     try {
@@ -36,6 +37,7 @@ const getBodyElement = memoize<(html: string, item: IArticle) => HTMLElement>(_g
 
 class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     private bodyRef: React.RefObject<HTMLDivElement>;
+    private disposeVideos: (() => void) | null = null;
 
     constructor(props: any) {
         super(props);
@@ -50,6 +52,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         if (this.renderPreview()) {
             this.loadIframely();
             this.executeScripts();
+            this.applyVideoJS();
             document.addEventListener('copy', this.copyClicked);
             document.addEventListener('click', this.clickClicked);
         }
@@ -58,11 +61,13 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     componentDidUpdate() {
         this.loadIframely();
         this.executeScripts();
+        this.applyVideoJS();
     }
 
     componentWillUnmount() {
         document.removeEventListener('copy', this.copyClicked);
         document.removeEventListener('click', this.clickClicked);
+        this.disposeVideos?.();
     }
 
     loadIframely() {
@@ -178,6 +183,13 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         this.bodyRef.current.innerHTML = body.innerHTML;
 
         return true;
+    }
+
+    private applyVideoJS() {
+        this.disposeVideos?.();
+        if (this.bodyRef.current) {
+            this.disposeVideos = processVideos(this.bodyRef.current);
+        }
     }
 
     render() {
