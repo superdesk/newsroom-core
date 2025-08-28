@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
 import {IArticle} from 'interfaces';
 import {extensions} from 'index';
-import {setupVideoPlayers} from '../utils';
+import {setupVideoPlayers} from '../video-utils';
 
 function isLinkExternal(href: string) {
     try {
