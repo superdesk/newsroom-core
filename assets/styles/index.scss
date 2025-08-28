@@ -4218,3 +4218,7 @@ article.list {
 .tooltip {
     pointer-events: none;
 }
+
+video::-webkit-media-controls-panel {
+    display: none !important;
+}

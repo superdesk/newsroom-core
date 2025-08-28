@@ -27,11 +27,20 @@ export function bem(block: any, element: any, modifier: any) {
     return classes.join(' ');
 }
 
-export function processVideos(root: HTMLElement) {
+export function setupVideoPlayers(root: HTMLElement) {
     const players: any[] = [];
 
     root.querySelectorAll('video').forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
+        const disable = element.getAttribute('data-disable-download') === 'true';
+
+        if (disable) {
+            element.setAttribute('controlsList', 'nodownload');
+            element.addEventListener('contextmenu', e => e.preventDefault());
+            element.removeAttribute('controls');
+        } else {
+            element.setAttribute('controls', '');
+        }
 
         element.setAttribute('data-vjs-initialized', 'true');
         element.classList.add('video-js', 'vjs-big-play-centered');

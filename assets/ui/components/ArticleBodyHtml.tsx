@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
 import {IArticle} from 'interfaces';
 import {extensions} from 'index';
-import {processVideos} from '../utils';
+import {setupVideoPlayers} from '../utils';
 
 function isLinkExternal(href: string) {
     try {
@@ -52,7 +52,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         if (this.renderPreview()) {
             this.loadIframely();
             this.executeScripts();
-            this.applyVideoJS();
+            this.initializeVideoPlayers();
             document.addEventListener('copy', this.copyClicked);
             document.addEventListener('click', this.clickClicked);
         }
@@ -61,7 +61,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     componentDidUpdate() {
         this.loadIframely();
         this.executeScripts();
-        this.applyVideoJS();
+        this.initializeVideoPlayers();
     }
 
     componentWillUnmount() {
@@ -185,10 +185,10 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         return true;
     }
 
-    private applyVideoJS() {
+    private initializeVideoPlayers() {
         this.disposeVideos?.();
         if (this.bodyRef.current) {
-            this.disposeVideos = processVideos(this.bodyRef.current);
+            this.disposeVideos = setupVideoPlayers(this.bodyRef.current);
         }
     }
 
