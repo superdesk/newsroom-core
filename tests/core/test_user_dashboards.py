@@ -62,7 +62,10 @@ async def test_user_dashboards(app, client, public_user, public_company, company
     # reload user with dashboards
     public_user_instance = await UsersService().find_by_id(public_user["_id"])
 
-    dashboards = await get_personal_dashboards_data(public_user_instance, public_company_instance, [topic])
+    async with app.test_request_context("/") as test_request:
+        test_request.session["user"] = str(public_user["_id"])
+        dashboards = await get_personal_dashboards_data(public_user_instance, public_company_instance, [topic])
+
     assert 1 == len(dashboards)
     topic_items = dashboards[0]["topic_items"][0]["items"]
     assert 1 == len(topic_items)
