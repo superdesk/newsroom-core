@@ -1,4 +1,9 @@
 from typing import Any
+
+from bson import ObjectId
+
+from superdesk.flask import g
+
 from newsroom.types import (
     Company,
     Product,
@@ -8,6 +13,7 @@ from newsroom.types import (
     SectionEnum,
     UserResourceModel,
 )
+from newsroom.auth.utils import get_company_from_request, get_user_or_none_from_request
 from .service import ProductsService
 from ..utils import any_objectid_in_list
 
@@ -76,6 +82,38 @@ async def get_products_by_user_async(
         return await cursor.to_list()
 
     return []
+
+
+async def get_products_for_request_user_and_company(section: SectionEnum) -> list[ProductResourceModel]:
+    cache_key = f"request_products_{section}"
+    request_products: list[ProductResourceModel] | None = g.get(cache_key)
+    if request_products is not None:
+        return request_products
+
+    product_ids: list[ObjectId] = []
+    user = get_user_or_none_from_request(None)
+    if user is not None:
+        product_ids.extend([product._id for product in user.products or [] if product.section == section])
+
+    company = get_company_from_request(None)
+    if company is not None:
+        product_ids.extend(
+            [
+                product._id
+                for product in company.products or []
+                if product.section == section and (user is None or not product.seats)
+            ]
+        )
+
+    if len(product_ids):
+        lookup = get_products_lookup(product_ids, None)
+        cursor = await ProductsService().search(lookup)
+        request_products = await cursor.to_list()
+    else:
+        request_products = []
+
+    setattr(g, cache_key, request_products)
+    return request_products
 
 
 async def get_products_by_navigation_async(
