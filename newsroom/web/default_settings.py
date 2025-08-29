@@ -402,7 +402,6 @@ CLIENT_CONFIG = {
     },
     "agenda_sort_events_with_coverage_on_top": False,
     "collapsed_search_by_default": False,
-    "use_videojs": True,
 }
 
 # Enable rendering of the date in the base view

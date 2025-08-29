@@ -1,7 +1,6 @@
 import {isEmpty} from 'lodash';
 import classNames from 'classnames';
 import videojs from 'video.js';
-import {USE_VIDEOJS} from '../utils';
 
 const isNotEmpty = (x: any) => !isEmpty(x);
 
@@ -35,17 +34,13 @@ export function setupMediaPlayers(root: HTMLElement) {
         if (element.getAttribute('data-vjs-initialized')) return;
         const disable = element.getAttribute('data-disable-download') === 'true';
 
+        element.setAttribute('data-vjs-initialized', 'true');
+
         if (disable) {
             element.setAttribute('controlsList', 'nodownload');
             element.addEventListener('contextmenu', (e) => e.preventDefault());
             element.removeAttribute('controls');
-        } else {
-            element.setAttribute('controls', '');
-        }
 
-        element.setAttribute('data-vjs-initialized', 'true');
-
-        if (USE_VIDEOJS) {
             if (element instanceof HTMLVideoElement) {
                 element.classList.add('video-js', 'vjs-big-play-centered');
             } else if (element instanceof HTMLAudioElement) {
@@ -59,7 +54,7 @@ export function setupMediaPlayers(root: HTMLElement) {
             });
             players.push(player);
         } else {
-            // Use native HTML5 player - no additional setup needed
+            element.setAttribute('controls', '');
             players.push(null);
         }
     });
