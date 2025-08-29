@@ -9,6 +9,8 @@ module.exports = function(config) {
 
     config.set({
         files: [
+            // Load a simple video.js mock before tests
+            {pattern: 'node_modules/video.js/dist/video.js', included: true, served: true},
             'assets/tests.ts',
         ],
 
@@ -21,6 +23,9 @@ module.exports = function(config) {
             resolve: webpackConfig.resolve,
             devtool: 'inline-source-map',
             mode: 'development',
+            externals: {
+                'video.js': 'videojs',
+            },
         },
 
         webpackMiddleware: {
