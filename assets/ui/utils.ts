@@ -1,6 +1,7 @@
 import {isEmpty} from 'lodash';
 import classNames from 'classnames';
 import videojs from 'video.js';
+import {USE_VIDEOJS} from '../utils';
 
 const isNotEmpty = (x: any) => !isEmpty(x);
 
@@ -27,9 +28,10 @@ export function bem(block: any, element: any, modifier: any) {
     return classes.join(' ');
 }
 
-export function setupVideoPlayers(root: HTMLElement) {
+export function setupMediaPlayers(root: HTMLElement) {
     const players: any[] = [];
-    root.querySelectorAll('video').forEach((element) => {
+
+    root.querySelectorAll('video, audio').forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
         const disable = element.getAttribute('data-disable-download') === 'true';
 
@@ -42,15 +44,31 @@ export function setupVideoPlayers(root: HTMLElement) {
         }
 
         element.setAttribute('data-vjs-initialized', 'true');
-        element.classList.add('video-js', 'vjs-big-play-centered');
 
-        const player = videojs(element, {
-            controls: true,
-            preload: 'auto',
-            fluid: true,
-        });
-        players.push(player);
+        if (USE_VIDEOJS) {
+            if (element instanceof HTMLVideoElement) {
+                element.classList.add('video-js', 'vjs-big-play-centered');
+            } else if (element instanceof HTMLAudioElement) {
+                element.classList.add('video-js');
+            }
+
+            const player = videojs(element, {
+                controls: true,
+                preload: 'auto',
+                fluid: true,
+            });
+            players.push(player);
+        } else {
+            // Use native HTML5 player - no additional setup needed
+            players.push(null);
+        }
     });
 
-    return () => players.forEach((player) => player.dispose());
+    return () => {
+        players.forEach((player) => {
+            if (player && typeof player.dispose === 'function') {
+                player.dispose();
+            }
+        });
+    };
 }

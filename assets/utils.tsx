@@ -76,6 +76,7 @@ export const DISPLAY_AUTHOR_ROLE = getConfig('display_author_role', true);
 export const DISPLAY_AGENDA_FEATURED_STORIES_ONLY = getConfig('display_agenda_featured_stories_only', true);
 export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
 export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
+export const USE_VIDEOJS = getConfig('use_videojs', false);
 export const KEYCODES = {
     ENTER: 13,
     DOWN: 40,

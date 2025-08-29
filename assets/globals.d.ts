@@ -67,6 +67,7 @@ interface IClientConfig {
     show_default_time_frame_label?: boolean;
     agenda_default_filter_hide_planning: boolean;
     show_coverage_latest_version_only?: boolean;
+    use_videojs?: boolean;
 }
 
 interface Window {

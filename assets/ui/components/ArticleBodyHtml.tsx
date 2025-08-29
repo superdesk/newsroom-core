@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
 import {IArticle} from 'interfaces';
 import {extensions} from 'index';
-import {setupVideoPlayers} from '../utils';
+import {setupMediaPlayers} from '../utils';
 
 function isLinkExternal(href: string) {
     try {
@@ -188,7 +188,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     private initializeVideoPlayers() {
         this.disposeVideos?.();
         if (this.bodyRef.current) {
-            this.disposeVideos = setupVideoPlayers(this.bodyRef.current);
+            this.disposeVideos = setupMediaPlayers(this.bodyRef.current);
         }
     }
 
