@@ -37,7 +37,7 @@ const getBodyElement = memoize<(html: string, item: IArticle) => HTMLElement>(_g
 
 class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     private bodyRef: React.RefObject<HTMLDivElement>;
-    private disposeVideos: (() => void) | null = null;
+    private cleanupMediaPlayers: (() => void) | null = null;
 
     constructor(props: any) {
         super(props);
@@ -52,7 +52,7 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         if (this.renderPreview()) {
             this.loadIframely();
             this.executeScripts();
-            this.initializeVideoPlayers();
+            this.initializeMediaPlayers();
             document.addEventListener('copy', this.copyClicked);
             document.addEventListener('click', this.clickClicked);
         }
@@ -61,13 +61,13 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     componentDidUpdate() {
         this.loadIframely();
         this.executeScripts();
-        this.initializeVideoPlayers();
+        this.initializeMediaPlayers();
     }
 
     componentWillUnmount() {
         document.removeEventListener('copy', this.copyClicked);
         document.removeEventListener('click', this.clickClicked);
-        this.disposeVideos?.();
+        this.cleanupMediaPlayers?.();
     }
 
     loadIframely() {
@@ -185,10 +185,10 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         return true;
     }
 
-    private initializeVideoPlayers() {
-        this.disposeVideos?.();
+    private initializeMediaPlayers() {
+        this.cleanupMediaPlayers?.();
         if (this.bodyRef.current) {
-            this.disposeVideos = setupMediaPlayers(this.bodyRef.current);
+            this.cleanupMediaPlayers = setupMediaPlayers(this.bodyRef.current);
         }
     }
 
