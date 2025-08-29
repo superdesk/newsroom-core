@@ -17,6 +17,9 @@ export interface IService {
     code: string;
 }
 
+export type IEmbedPermissionUserAction = 'display' | 'download';
+export type IEmbedContentType = 'featuremedia' | 'video' | 'audio' | 'embed_code' | 'picture' | 'sd_product';
+
 export interface ICompany extends IResourceItem {
     name: string;
     url?: string;
@@ -48,4 +51,6 @@ export interface ICompany extends IResourceItem {
     auth_domains?: Array<string>;
     auth_provider?: IAuthProvider['_id']; // if not defined, system assumes a value of 'newshub'
     internal?: boolean;
+
+    embed_permissions?: {[key in IEmbedContentType]?: Array<IEmbedPermissionUserAction>};
 }
