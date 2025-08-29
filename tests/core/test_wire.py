@@ -31,6 +31,7 @@ from ..fixtures import (  # noqa: F401
     PUBLIC_USER_ID,
     PUBLIC_USER_EMAIL,
     COMPANY_1_ID,
+    ADMIN_USER_ID,
     ADMIN_USER_EMAIL,
 )
 from ..utils import get_json, get_admin_user_id, login, mock_send_email
@@ -85,65 +86,6 @@ async def setup_products(app):
                 "is_enabled": True,
             },
         ],
-    )
-
-
-async def setup_embeds(client, app):
-    media_id = str(ObjectId())
-    item = items[:2][0]
-    associations = {
-        "editor_1": {
-            "type": "video",
-            "renditions": {
-                "original": {
-                    "mimetype": "video/mp4",
-                    "href": "/assets/640ff0bdfb5122dcf06a6fc3",
-                    "media": media_id,
-                }
-            },
-            "mimetype": "video/mp4",
-            "products": [{"code": "123", "name": "Product A"}, {"code": "321", "name": "Product B"}],
-        },
-        "editor_0": {
-            "type": "audio",
-            "renditions": {
-                "original": {
-                    "mimetype": "audio/mp3",
-                    "href": "/assets/640feb9bfb5122dcf06a6f7c",
-                    "media": "640feb9bfb5122dcf06a6f7c",
-                }
-            },
-            "mimetype": "audio/mp3",
-            "products": [{"code": "999", "name": "NSW News"}],
-        },
-        "editor_3": None,
-    }
-
-    await update_entries_for(
-        "items",
-        item["_id"],
-        {
-            "associations": associations,
-            "body_html": '<p>Par 1</p><!-- EMBED START Audio {id: "editor_0"} --><figure>'
-            '<audio controls src="/assets/640feb9bfb5122dcf06a6f7c" alt="minns" '
-            'width="100%" height="100%"></audio>'
-            "<figcaption>minns</figcaption>"
-            "</figure>"
-            '<!-- EMBED END Audio {id: "editor_0"} -->'
-            "<p><br></p>"
-            "<p>Par 2</p>"
-            '<!-- EMBED START Video {id: "editor_1"} -->'
-            "<figure>"
-            '<video controls src="/assets/640ff0bdfb5122dcf06a6fc3" '
-            'alt="Scomo text" width="100%" height="100%">'
-            "</video>"
-            "<figcaption>Scomo whinging</figcaption>"
-            "</figure>"
-            '<!-- EMBED END Video {id: "editor_1"} -->'
-            "<p><br></p>Par 3<p></p>"
-            "<p>Par 4</p>",
-        },
-        item,
     )
 
 
@@ -776,7 +718,7 @@ async def test_search_by_products_and_filtered_by_embargoe(app, public_user):
 
         items = await wire_search.get_product_items_for_dashboard(product, 20)
         assert 1 == len(items)
-        assert items[0].headline == "china story"
+        assert items[0]["headline"] == "china story"
 
 
 async def test_wire_delete(client, app):
@@ -1116,20 +1058,3 @@ async def test_sorting_wire_items(app, client):
     assert json_data[0]["_id"] == "item3"
     assert json_data[1]["_id"] == "item2"
     assert json_data[2]["_id"] == "item1"
-
-
-async def test_embed_mark_disable_download(client, app):
-    app.config["EMBED_PRODUCT_FILTERING"] = True
-    user_id = get_admin_user_id(app)
-    user = await find_one_by_id("users", user_id)
-    await update_entries_for("users", user_id, {"company": COMPANY_1_ID}, user)
-    await add_company_products(
-        app,
-        COMPANY_1_ID,
-        [{"name": "product test", "sd_product_id": "123", "is_enabled": True, "product_type": "wire"}],
-    )
-    await setup_embeds(client, app)
-    resp = await client.get("/wire/search?type=wire")
-    data = json.loads(await resp.get_data())
-    assert "data-disable-download" in data["_items"][0]["body_html"]
-    assert data["_items"][0]["body_html"].count("data-disable-download") == 1

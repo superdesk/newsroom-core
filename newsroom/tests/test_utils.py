@@ -2,10 +2,12 @@ from typing import Any
 
 from io import BytesIO
 from bson import ObjectId
+from lxml import html as lxml_html
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
+from newsroom.types import EmbedPermissionUserAction
 from newsroom.core import get_current_wsgi_app
 
 
@@ -126,3 +128,42 @@ async def download_zip_file(client, items_ids, _format, section):
     )
     _file = BytesIO(await resp.get_data())
     return _file
+
+
+def test_embed_permissions(item: dict, tests: dict[str, list[EmbedPermissionUserAction]]) -> None:
+    from newsroom.wire.embeds import iterate_embeds
+
+    html = lxml_html.fromstring(item.get("body_html") or "")
+    embed_ids: list[str] = []
+    for comment, editor_id in iterate_embeds(html):
+        embed_ids.append(editor_id)
+        test = tests.get(editor_id)
+
+        if not test:
+            continue
+
+        assert EmbedPermissionUserAction.DISPLAY in test
+        association = (item.get("associations") or {}).get(editor_id)
+        assert association is not None
+        content_type = association.get("type")
+
+        if content_type in {"audio", "video"}:
+            if content_type == "video":
+                media_element = comment.getnext().find("./video")
+            else:
+                media_element = comment.getnext().find("./audio")
+
+            assert media_element is not None
+            if EmbedPermissionUserAction.DOWNLOAD in test:
+                assert media_element.attrib.get("data-disable-download") != "true"
+            else:
+                assert media_element.attrib.get("data-disable-download") == "true"
+
+    # Test embeds that should be shown/not shown
+    for embed_id, test in tests.items():
+        if EmbedPermissionUserAction.DISPLAY in test:
+            assert embed_id in embed_ids
+            assert (item.get("associations") or {}).get(embed_id)
+        else:
+            assert embed_id not in embed_ids
+            assert not (item.get("associations") or {}).get(embed_id)
