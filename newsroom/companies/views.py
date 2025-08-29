@@ -12,7 +12,7 @@ from superdesk.core.types import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
 
 from newsroom.auth import auth_rules
-from newsroom.types import AuthProviderConfig
+from newsroom.types import AuthProviderConfig, EmbedPermissionUserAction
 from newsroom.utils import get_public_user_data, get_json_or_400_async
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.products.service import ProductsService
@@ -107,6 +107,18 @@ def get_company_updates(data, original=None):
         "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
         "company_size": data.get("company_size") or original.get("company_size"),
         "referred_by": data.get("referred_by") or original.get("referred_by"),
+        "embed_permissions": (
+            data.get("embed_permissions")
+            or original.get("embed_permissions")
+            or {
+                "featuremedia": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
+                "video": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
+                "audio": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
+                "embed_code": [EmbedPermissionUserAction.DISPLAY],
+                "picture": [EmbedPermissionUserAction.DISPLAY],
+                "sd_product": [],
+            }
+        ),
     }
 
     # "seats" are not in CompanyResource
@@ -130,6 +142,12 @@ def get_company_updates(data, original=None):
         updates["expiry_date"] = datetime.strptime(str(data.get("expiry_date"))[:10], "%Y-%m-%d")
     else:
         updates["expiry_date"] = None
+
+    for embed_type in list((updates.get("embed_permissions") or {}).keys()):
+        # If the ``display`` permission is not allowed for this embed type,
+        # then remove all permissions (if they can't see it, they can't use it)
+        if EmbedPermissionUserAction.DISPLAY not in updates["embed_permissions"][embed_type]:
+            updates["embed_permissions"][embed_type] = []
 
     return updates
 
