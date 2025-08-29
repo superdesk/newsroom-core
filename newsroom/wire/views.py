@@ -71,8 +71,9 @@ from newsroom.history_async import HistoryService
 from newsroom.wire.formatters.utils import add_media
 
 from .items import get_items_for_dashboard
-from .service import WireSearchServiceAsync, WireItemService
+from .service import WireSearchServiceAsync
 from .formatters.picture import PictureFormatter
+from .embeds import apply_company_permissions_to_embeds
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -142,7 +143,7 @@ async def get_view_data() -> dict:
     }
 
 
-async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId | None):
+async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId | None) -> dict[str, list[dict]]:
     cache_key = "{}{}".format(HOME_ITEMS_CACHE_KEY, company_id or "")
     app = get_current_app().as_any()
     if app.cache.get(cache_key):
@@ -180,7 +181,7 @@ async def get_personal_dashboards_data(
 ) -> list[DashboardData]:
     card_type = get_card_type(get_app_config("PERSONAL_DASHBOARD_CARD_TYPE") or "4-picture-text")
 
-    async def get_topic_items(topic: TopicResourceModel):
+    async def get_topic_items(topic: TopicResourceModel) -> list[dict]:
         try:
             cursor = await WireSearchServiceAsync().search(
                 NewshubSearchRequest(
@@ -193,7 +194,9 @@ async def get_personal_dashboards_data(
                     topic=topic,
                 )
             )
-            return await cursor.to_list_raw()
+            topic_items = await cursor.to_list_raw()
+            await apply_company_permissions_to_embeds(topic_items, topic.topic_type)
+            return topic_items
         except AuthorizationError:
             return []
 
@@ -253,6 +256,7 @@ async def get_previous_versions(wire_item: WireItem) -> list[dict]:
             wire_item.ancestors, args=WireSearchRequestArgs(ignore_latest=True)
         )
         ancestors = await cursor.to_list_raw()
+        await apply_company_permissions_to_embeds(ancestors, SectionEnum.WIRE)
         return sorted(ancestors, key=itemgetter("versioncreated"), reverse=True)
     return []
 
@@ -523,32 +527,26 @@ class WireItemRouteArgs(BaseModel):
 async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Request) -> Response:
     """Endpoint to copy Wire OR Agenda item(s)"""
 
-    from newsroom.agenda import AgendaItemService
-
-    # Import here to prevent circular imports
-    from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
-
-    item_type = get_type()
-    service = AgendaItemService() if item_type == "agenda" else WireItemService()
-    item_to_copy = (await service.find_by_id(args.item_id)).to_dict()  # type: ignore[attr-defined]
     user = get_user_from_request(request)
-    company = get_company_from_request(request)
+    item_type = get_type()
 
+    if item_type == "agenda":
+        from newsroom.agenda import AgendaSearchServiceAsync
+
+        items = await AgendaSearchServiceAsync().get_items_for_action([args.item_id])
+    else:
+        items = await WireSearchServiceAsync().get_items_for_action([args.item_id])
+
+    item_to_copy = items[0] if len(items) else None
     if not item_to_copy:
-        await request.abort(404)
+        return await request.abort(404)
 
     template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
     locale = (get_session_locale() or "en").lower()
     template_name = get_language_template_name(template_filename, locale, "txt")
 
-    template_kwargs = {"item": item_to_copy}
+    template_kwargs: dict = {"item": item_to_copy}
     if item_type == "agenda":
-        if not is_admin_or_internal(user):
-            remove_fields_for_public_user(item_to_copy)
-
-        if company and company.restrict_coverage_info:
-            remove_restricted_coverage_info([item_to_copy])
-
         template_kwargs.update(
             {
                 "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
@@ -557,6 +555,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
                 "item": item_to_copy,
             }
         )
+
     copy_data = (await render_template(template_name, **template_kwargs)).strip()
 
     await update_action_list([args.item_id], "copies", item_type=item_type)
@@ -601,18 +600,20 @@ async def item_view_endpoint(
         return await request.abort(404)
 
     await set_permissions(wire_item, params.ignore_latest)
+    wire_item_dict = wire_item.to_dict()
+    await apply_company_permissions_to_embeds([wire_item_dict], params.type)
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("wire")
     display_char_count = config.get("char_count", False)
     if is_json_request(request):
-        return Response(wire_item)
+        return Response(wire_item_dict)
 
     if not wire_item.user_has_access:
-        return await render_template("wire_item_access_restricted.html", item=wire_item)
+        return await render_template("wire_item_access_restricted.html", item=wire_item_dict)
 
     previous_versions = await get_previous_versions(wire_item)
     template = "wire_item.html"
-    data = {"item": wire_item.to_dict()}
+    data = {"item": wire_item_dict}
     if params.print:
         if params.monitoring_profile:
             data.update(kwargs)
@@ -623,7 +624,7 @@ async def item_view_endpoint(
         await update_action_list([wire_item.id], "prints", force_insert=True)
         user = get_user_from_request(request)
         await HistoryService().create_history_record(
-            [wire_item.to_dict()], "print", user.id, user.company, params.type.value
+            [wire_item_dict], "print", user.id, user.company, params.type.value
         )
 
     return await render_template(
@@ -667,4 +668,5 @@ async def items(args: WireItemsRouteArgs, params: WireItemUrlParams, request: Re
         set_item_permission(wire_item, wire_item.id in allowed_ids)
         response.append(wire_item.to_dict())
 
+    await apply_company_permissions_to_embeds(response, params.type)
     return Response(response)
