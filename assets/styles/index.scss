@@ -4219,6 +4219,6 @@ article.list {
     pointer-events: none;
 }
 
-video::-webkit-media-controls-panel {
-    display: none !important;
+video[data-disable-download="true"]::-webkit-media-controls-panel {
+  display: none !important;
 }

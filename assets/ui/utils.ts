@@ -2,6 +2,7 @@ import {isEmpty} from 'lodash';
 import classNames from 'classnames';
 import videojs from 'video.js';
 
+type VjsPlayer = ReturnType<typeof videojs>;
 const isNotEmpty = (x: any) => !isEmpty(x);
 
 /**
@@ -28,18 +29,21 @@ export function bem(block: any, element: any, modifier: any) {
 }
 
 export function setupMediaPlayers(root: HTMLElement) {
-    const players: any[] = [];
+    const players: Array<VjsPlayer> = [];
 
     root.querySelectorAll('video, audio').forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
-        const disable = element.getAttribute('data-disable-download') === 'true';
 
+        const disable = element.getAttribute('data-disable-download') === 'true';
         element.setAttribute('data-vjs-initialized', 'true');
 
         if (disable) {
-            element.setAttribute('controlsList', 'nodownload');
-            element.addEventListener('contextmenu', (e) => e.preventDefault());
+            // Remove native controls everywhere on all major browsers
             element.removeAttribute('controls');
+            // Additional override for browsers that support controlsList
+            element.setAttribute('controlsList', 'nodownload');
+            // Disable right-click context menu on all browsers
+            element.addEventListener('contextmenu', (e) => e.preventDefault());
 
             if (element instanceof HTMLVideoElement) {
                 element.classList.add('video-js', 'vjs-big-play-centered');
@@ -54,8 +58,8 @@ export function setupMediaPlayers(root: HTMLElement) {
             });
             players.push(player);
         } else {
+            // Enable all native controls
             element.setAttribute('controls', '');
-            players.push(null);
         }
     });
 
