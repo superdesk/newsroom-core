@@ -13,6 +13,8 @@ import AuditInformation from 'components/AuditInformation';
 import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
+import {Button} from 'components/Button';
+import CloseButton from 'components/CloseButton';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
@@ -80,15 +82,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit {{monitoring}} Profile', window.sectionNames) }</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={onClose} />
                 </div>
                 <AuditInformation item={item} />
                 <ul className='nav nav-tabs'>
@@ -145,6 +139,15 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                         onChange={onChange}
                                         error={getError('company')} />
 
+                                    <TextInput
+                                        name='email'
+                                        label={gettext('Email Address')}
+                                        value={item.email || ''}
+                                        onChange={onChange}
+                                        error={getError('email')}
+                                        description={gettext('Optional comma seperated list of email addresses')}
+                                    />
+
                                     <TextAreaInput
                                         name='query'
                                         label={gettext('Query')}
@@ -181,7 +184,8 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                         value={item.format_type || 'monitoring_pdf'}
                                         options={[
                                             {value: 'monitoring_pdf', text: 'PDF'},
-                                            {value: 'monitoring_rtf', text: 'RTF'}
+                                            {value: 'monitoring_rtf', text: 'RTF'},
+                                            {value: 'monitoring_email', text: 'Email'}
                                         ]}
                                         onChange={onChange}
                                         error={getError('format_type')} />
@@ -201,16 +205,18 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                 </div>
 
                                 <div className='list-item__preview-footer'>
-                                    {item._id && <input
-                                        type='button'
-                                        className='nh-button nh-button--secondary'
-                                        value={gettext('Delete')}
-                                        onClick={onDelete} />}
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--primary'
-                                        value={gettext('Save')}
-                                        onClick={onSave} />
+                                    {item._id && (
+                                        <Button
+                                            text={gettext('Delete')}
+                                            variant='secondary'
+                                            onClick={onDelete}
+                                        />
+                                    )}
+                                    <Button
+                                        text={gettext('Save')}
+                                        variant='primary'
+                                        onClick={onSave}
+                                    />
                                 </div>
                             </form>
                         </div>

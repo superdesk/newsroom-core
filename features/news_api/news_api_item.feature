@@ -98,7 +98,8 @@ Feature: News API Item
           "#companies._id#"
         ],
         "sd_product_id": "12345",
-        "product_type": "news_api"
+        "product_type": "news_api",
+        "name": "news_api"
         }
         ]
         """

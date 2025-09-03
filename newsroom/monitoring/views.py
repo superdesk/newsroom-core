@@ -1,8 +1,10 @@
 import base64
 
+import json
 from pydantic import field_validator
 from quart_babel import gettext
 from werkzeug.exceptions import NotFound
+from bson.errors import InvalidId
 
 from superdesk.core import get_app_config
 from superdesk.core.types import BaseModel, Request, Response
@@ -74,6 +76,11 @@ def process_form_request(updates, request_updates, form):
     if "keywords" in request_updates:
         updates["keywords"] = request_updates["keywords"]
 
+    if "email" in request_updates:
+        updates["email"] = request_updates.get("email").replace(" ", "")
+        if updates["email"] == "":
+            updates["email"] = None
+
 
 async def get_monitoring_for_company(user: UserResourceModel | None):
     company = user.company if user else None
@@ -90,10 +97,16 @@ class MonitoringIdUrlArg(BaseModel):
 )
 async def update_users(args: MonitoringIdUrlArg, params: None, request: Request) -> Response:
     updates = await request.get_json()
-    if "users" not in updates:
-        return Response({"error": gettext("Users data not provided")}, 403)
+    profile = await MonitoringProfileService().find_by_id(args.profile_id)
+    if not profile:
+        return Response({"error": gettext("Profile not found")}, status=404)
 
-    updates["users"] = [user_id for user_id in updates["users"]]
+    if "users" not in updates:
+        return Response({"error": gettext("Users data not provided")}, status=403)
+
+    updates["users"] = [
+        u.id for u in (await UsersService().find_by_ids(updates["users"])) if u.company == profile.company
+    ]
     await MonitoringProfileService().update(args.profile_id, updates)
     return Response({"success": True})
 
@@ -119,9 +132,25 @@ async def update_schedule(args: MonitoringIdUrlArg, params: None, request: Reque
     return Response({"success": True})
 
 
+class MonitoringSearchParams(BaseModel):
+    where: str | None = None
+
+
 @monitoring_endpoints.endpoint("/monitoring/all", methods=["GET"])
-async def search_all() -> Response:
-    monitoring_list = [monitoring async for monitoring in MonitoringProfileService().get_all_raw()]
+async def search_all(args: None, params: MonitoringSearchParams, request: Request) -> Response:
+    lookup: dict = {}
+    where_param = params.where
+    if where_param:
+        try:
+            where = json.loads(where_param)
+            if where.get("company"):
+                lookup["company"] = ObjectId(where["company"])
+        except json.JSONDecodeError as e:
+            return Response({"error": f"Invalid 'where' parameter. JSON decoding failed: {str(e)}"}, 400)
+        except InvalidId as e:
+            return Response({"error": f"Invalid 'company' ID: {str(e)}"}, 400)
+
+    monitoring_list = [monitoring async for monitoring in MonitoringProfileService().get_all_raw(lookup)]
     return Response(monitoring_list)
 
 
@@ -329,6 +358,7 @@ async def share(request: Request) -> Response:
                     "file_name": formatter.format_filename(None),
                     "content_type": "application/{}".format(formatter.FILE_EXTENSION),
                     "file_desc": "Monitoring Report",
+                    "headers": {},
                 }
             ],
         )

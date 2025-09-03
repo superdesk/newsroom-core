@@ -204,7 +204,7 @@ Feature: Management API - Users
         }
         """
         Then we get response code 201
-    
+
     Scenario: Search case insensitive
         Given newsroom "users"
         """
@@ -229,3 +229,47 @@ Feature: Management API - Users
 
         When we get "/users?where={"email": "JohnCena@wwe.com"}"
         Then we get list with 1 items
+
+    Scenario: Search using $in
+        Given newsroom "users"
+        """
+        [
+            {
+                "first_name": "John",
+                "last_name": "Cena",
+                "email": "JohnCena@wwe.com",
+                "user_type": "administrator"
+            },
+            {
+                "first_name": "Alex",
+                "last_name": "Billiam",
+                "email": "alexbilliam@wwe.com",
+                "user_type": "administrator"
+            }
+        ]
+        """
+
+        When we get "/users?where={"email": {"$in": ["johncena@wwe.com", "foo@example.com"]}}"
+        Then we get list with 1 items
+
+    Scenario: Validate missing product
+        Given newsroom "companies"
+        """
+        [{"name": "zzz company"}]
+        """
+        When we post to "/users"
+        """
+        {
+            "first_name": "John",
+            "last_name": "Cena",
+            "email": "johncena@wwe.com",
+            "company": "#companies._id#",
+            "products": [
+                {"_id": "67cb0e0a158982f25bdbb4a1", "section": "agenda", "seats": 10}
+            ]
+        }
+        """
+        Then we get response code 400
+        """
+        {"_issues": {"exception": "product 67cb0e0a158982f25bdbb4a1 not found"}}
+        """

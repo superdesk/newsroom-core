@@ -1,4 +1,4 @@
-from typing import Any, Annotated
+from typing import Any, Annotated, cast
 from datetime import datetime
 import re
 
@@ -82,9 +82,20 @@ aggregations: dict[str, dict[str, Any]] = {
 }
 
 
+def get_default_page_size() -> int:
+    return cast(int, get_app_config("AGENDA_PAGE_SIZE", 250))
+
+
 class AgendaSearchRequestArgs(BaseSearchRequestArgs):
     #: The sorting that should be applied to this request
     sort: SortListParam = [("dates.start", 1)]
+
+    #: Pagination, the number of items to return per page
+    #: Overriding the default so we can use ``AGENDA_PAGE_SIZE`` config to provide the default
+    page_size: int = Field(
+        validation_alias=AliasChoices("page_size", "size", "max_results"),
+        default_factory=get_default_page_size,
+    )
 
     item_type: Annotated[AgendaItemType | None, Field(validation_alias=AliasChoices("item_type", "itemType"))] = None
     featured: bool = False
@@ -257,18 +268,19 @@ def apply_product_planning_filters(request: NewshubSearchRequest[AgendaSearchReq
 
 
 def apply_agenda_query_string(request: NewshubSearchRequest[AgendaSearchRequestArgs]) -> None:
-    if not request.args.q:
+    search_text = request.args.q.strip() if request.args.q else None
+    if not search_text:
         return
 
     q_dict: dict[str, Any] | None = None
     try:
-        q_dict = json.loads(request.args.q)
+        q_dict = json.loads(search_text)
     except ValueError:
         pass
 
-    if q_dict is None:
+    if not isinstance(q_dict, dict):
         # Normal query string query
-        query = query_string_for_section(SectionEnum.AGENDA, request.args.q)
+        query = query_string_for_section(SectionEnum.AGENDA, search_text)
         if request.args.item_type == AgendaItemType.EVENT:
             # Events Only
             request.search.query.filter.append(query)
@@ -280,7 +292,7 @@ def apply_agenda_query_string(request: NewshubSearchRequest[AgendaSearchRequestA
                             query,
                             nested_query(
                                 "planning_items",
-                                planning_items_query_string(request.args.q, nested=True),
+                                planning_items_query_string(search_text, nested=True),
                                 name="query",
                             ),
                         ],
@@ -658,4 +670,5 @@ default_agenda_filters: list[SearchFilterFunction] = [
     prefill_args_from_topic,
     prefill_item_type_arg,
     apply_agenda_date_filters,
+    apply_highlights,
 ] + filters_without_dates

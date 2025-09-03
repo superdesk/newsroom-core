@@ -2,6 +2,7 @@ import logging
 
 from typing import Any
 from bson import ObjectId
+import elasticapm
 
 from superdesk.core.types import SearchRequest
 
@@ -76,9 +77,11 @@ class NotificationManager:
             logger.exception(e)
             logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
+    @elasticapm.capture_span()
     async def notify_wire_topic_matches(
         self, item: dict[str, Any], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
     ) -> set[ObjectId]:
+        logger.info("Finding matching topics for wire item %s", item["_id"])
         topics = await get_topics_with_subscribers_async("wire")
         topic_matches = await WireSearchServiceAsync().get_matching_topics_for_item(
             item["_id"], topics, list(users.values()), companies
@@ -140,46 +143,48 @@ class NotificationManager:
                         # No need to send another
                         continue
                     else:
-                        users_with_realtime_subscription.add(user.id)
-                        if topic.topic_type == SectionEnum.WIRE:
-                            wire_service = WireSearchServiceAsync()
-                            query = await wire_service.get_topic_items_query(
-                                topic,
-                                user,
-                                company,
-                                args=WireSearchRequestArgs(
-                                    page_size=1,
-                                    ids=[item["_id"]],
-                                    es_highlight=True,
-                                ),
-                            )
-                            cursor = await wire_service.service.find(SearchRequest(elastic=query))
-                            items = await cursor.to_list_raw()
-                        else:
-                            agenda_service = AgendaSearchServiceAsync()
-                            query = await agenda_service.get_topic_items_query(
-                                topic,
-                                user,
-                                company,
-                                args=AgendaSearchRequestArgs(
-                                    page_size=1,
-                                    ids=[item["_id"]],
-                                    es_highlight=True,
-                                ),
-                            )
-                            cursor = await agenda_service.service.find(SearchRequest(elastic=query))
-                            items = await cursor.to_list_raw()
-                        highlighted_item = item
+                        with elasticapm.capture_span("notify_user"):
+                            users_with_realtime_subscription.add(user.id)
+                            if topic.topic_type == SectionEnum.WIRE:
+                                wire_service = WireSearchServiceAsync()
+                                query = await wire_service.get_topic_items_query(
+                                    topic,
+                                    user,
+                                    company,
+                                    args=WireSearchRequestArgs(
+                                        page_size=1,
+                                        ids=[item["_id"]],
+                                        es_highlight=True,
+                                    ),
+                                    include_updated=True,
+                                )
+                                cursor = await wire_service.service.find(SearchRequest(elastic=query))
+                                items = await cursor.to_list_raw()
+                            else:
+                                agenda_service = AgendaSearchServiceAsync()
+                                query = await agenda_service.get_topic_items_query(
+                                    topic,
+                                    user,
+                                    company,
+                                    args=AgendaSearchRequestArgs(
+                                        page_size=1,
+                                        ids=[item["_id"]],
+                                        es_highlight=True,
+                                    ),
+                                )
+                                cursor = await agenda_service.service.find(SearchRequest(elastic=query))
+                                items = await cursor.to_list_raw()
+                            highlighted_item = item
 
-                        if len(items) > 0:
-                            highlighted_item = items[0]
+                            if len(items) > 0:
+                                highlighted_item = items[0]
 
-                        await send_new_item_notification_email(
-                            user,
-                            topic.label,
-                            item=highlighted_item,
-                            section=section.value,
-                        )
+                            await send_new_item_notification_email(
+                                user,
+                                topic.label,
+                                item=highlighted_item,
+                                section=section.value,
+                            )
                 except Exception as e:
                     logger.exception(e)
                     # when there is an error for specific topic/subscriber continue
@@ -270,9 +275,11 @@ class NotificationManager:
             # Add the users for those sections and send the notification
             await _send_notification(section_id, await _get_users(section_id))
 
+    @elasticapm.capture_span()
     async def send_user_notification_emails(
         self, item: dict[str, Any], user_matches: set[ObjectId], users: dict[ObjectId, UserResourceModel], section: str
     ):
+        logger.info("Sending topic notifications for item %s", item["_id"])
         for user_id in user_matches:
             user = users.get(user_id)
             if not user:
@@ -283,9 +290,11 @@ class NotificationManager:
                 if user.receive_email:
                     await send_history_match_notification_email(user, item=item, section=section)
 
+    @elasticapm.capture_span()
     async def notify_agenda_topic_matches(
         self, item: dict[str, Any], users: dict[ObjectId, UserResourceModel], companies: dict[ObjectId, CompanyResource]
     ) -> set[ObjectId]:
+        logger.info("Finding matching topics for agenda item %s", item["_id"])
         topics = await get_topics_with_subscribers_async("agenda")
 
         topic_matches = await AgendaSearchServiceAsync().get_matching_topics_for_item(

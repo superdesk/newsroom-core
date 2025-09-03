@@ -40,6 +40,8 @@ class AgendaWorkflowState(str, Enum):
     CANCELLED = "cancelled"
     RESCHEDULED = "rescheduled"
     POSTPONED = "postponed"
+    INGESTED = "ingested"
+    ACTIVE = "active"
 
 
 class AgendaCVItem(Dataclass):
@@ -191,7 +193,7 @@ class CalendarItem(Dataclass):
     name: fields.Keyword
     schema: fields.Keyword | None = None
     is_active: bool = True
-    translations: dict[str, Any] | None = None
+    translations: dict[str, Any] | str | None = None
 
 
 class AgendaItem(ResourceModel, ModelWithVersions):

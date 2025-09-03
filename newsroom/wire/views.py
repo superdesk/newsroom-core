@@ -68,6 +68,7 @@ from newsroom.public.views import (
 from newsroom.assets import get_upload, get_media_file
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.history_async import HistoryService
+from newsroom.wire.formatters.utils import add_media
 
 from .items import get_items_for_dashboard
 from .service import WireSearchServiceAsync, WireItemService
@@ -199,13 +200,10 @@ async def get_personal_dashboards_data(
     async def _get_topic_data(topic_id: ObjectId):
         for topic in topics:
             if topic.id == topic_id:
-                topic_items = await get_topic_items(topic)
-                if topic_items:
-                    return {
-                        "_id": topic.id,
-                        "items": topic_items,
-                    }
-                break
+                return {
+                    "_id": topic.id,
+                    "items": await get_topic_items(topic) or [],
+                }
         return None
 
     async def _get_dashboard_data(dashboard: DashboardModel, dashboard_index: int):
@@ -350,9 +348,9 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
                 return await request.abort(404)
         else:
             with zipfile.ZipFile(_file, mode="w") as zf:
-                for item in items:
+                for zip_item in items:
                     try:
-                        media_id, file_extension = formatter.get_picture_rendition(item, item_type=item_type)
+                        media_id, file_extension = formatter.get_picture_rendition(zip_item, item_type=item_type)
                         file = await get_media_file(media_id)
                         if not file:
                             return await request.abort(404)
@@ -360,6 +358,15 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
                     except ValueError:
                         pass
             _file.seek(0)
+    elif formatter.MULTI_ZIP:
+        with zipfile.ZipFile(_file, mode="w") as zf:
+            for zip_item in items:
+                parse_dates(zip_item)
+                formatted_item = await formatter.format_item(zip_item, item_type=item_type)
+                await add_media(zf, zip_item)
+                zf.writestr(secure_filename(formatter.format_filename(zip_item)), formatted_item)
+        _file.seek(0)
+        mimetype = "application/zip"
     elif len(items) == 1:
         parse_dates(items[0])  # fix for old items
 
@@ -377,7 +384,7 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
         else:
             _file.write(file_data)
             _file.seek(0)
-        mimetype = "application/zip"
+        mimetype = formatter.BULK_MIMETYPE
         if filename is not None:
             attachment_filename = filename
 

@@ -27,6 +27,8 @@ default_allowed_include_fields = {
     "service",
     "genre",
     "associations",
+    "headline",
+    "extra",
 }
 
 # set of fields that are allowed to be excluded in the exclude_fields parameter

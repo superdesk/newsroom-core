@@ -1,3 +1,4 @@
+from inspect import isawaitable
 import logging
 
 from superdesk.utc import utcnow
@@ -63,7 +64,7 @@ class AgendaManager:
         def get_existing_coverage(id):
             return next((o for o in original_coverages if o["coverage_id"] == id), {})
 
-        def set_delivery(coverage, deliveries, orig_coverage=None):
+        async def set_delivery(coverage, deliveries, orig_coverage=None):
             cov_deliveries = []
             if coverage["coverage_type"] == "text":
                 for d in deliveries or []:
@@ -100,9 +101,10 @@ class AgendaManager:
 
                         try:
                             app = get_current_wsgi_app()
-                            cov_deliveries[0]["delivery_href"] = app.set_photo_coverage_href(
-                                coverage, planning_item, cov_deliveries
-                            )
+                            delivery_href = app.set_photo_coverage_href(coverage, planning_item, cov_deliveries)
+                            if isawaitable(delivery_href):
+                                delivery_href = await delivery_href
+                            cov_deliveries[0]["delivery_href"] = delivery_href
                         except Exception as e:
                             logger.exception(e)
                             logger.error(
@@ -151,7 +153,7 @@ class AgendaManager:
                     if TO_BE_CONFIRMED_FIELD in coverage:
                         new_coverage[TO_BE_CONFIRMED_FIELD] = coverage[TO_BE_CONFIRMED_FIELD]
 
-                    set_delivery(new_coverage, coverage.get("deliveries"), existing_coverage)
+                    await set_delivery(new_coverage, coverage.get("deliveries") or [], existing_coverage)
                     coverages.append(new_coverage)
 
                     if (coverage and not existing_coverage) or ((new_plan or {}).get("_id")) == planning_item.get(

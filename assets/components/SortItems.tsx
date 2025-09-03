@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 import {gettext} from 'utils';
+import {IconButton} from './IconButton';
 
 
 class SortItems extends React.Component<any, any> {
@@ -43,15 +44,17 @@ class SortItems extends React.Component<any, any> {
         const SortableItem = SortableElement(({item}: any) =>
             <li className="list-group-item">
                 <span>{item.text}</span>
-                <button type="button"
-                    className="icon-button icon-button--small float-end"
-                    aria-label={gettext('Close')}
+                <IconButton
+                    icon='close-thin'
+                    size='small'
+                    className='float-end'
+                    ariaLabel={gettext('Close')}
                     onClick={(e: any) => {
                         e.preventDefault();
                         e.stopPropagation();
                         this.onRemove(item);
-                    }}><i className="icon--close-thin"></i>
-                </button>
+                    }}
+                />
             </li>
         );
 

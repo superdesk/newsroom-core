@@ -141,14 +141,15 @@ def apply_date_range(request: NewshubSearchRequest) -> None:
 def apply_query_string(request: NewshubSearchRequest) -> None:
     """Applies query_string filter based on request args"""
 
-    if not request.args.q:
+    search_text = request.args.q.strip() if request.args.q else None
+    if not search_text:
         return
 
     fields_config_key = "AGENDA_SEARCH_FIELDS" if request.section == SectionEnum.AGENDA else "WIRE_SEARCH_FIELDS"
     fields = get_app_config(fields_config_key, ["*"])
     request.search.query.must.append(
         query_string(
-            request.args.q,
+            search_text,
             default_operator=request.args.default_operator,
             fields=fields,
         )
@@ -475,5 +476,6 @@ def validate_request(request: NewshubSearchRequest) -> None:
                 403, gettext(f"User does not have access to {request.section} section"), title=gettext("403. Forbidden")
             )
 
-    if request.args.page > 1000:
-        raise AuthorizationError(400, gettext("Page limit exceeded"), title=gettext("403. Forbidden"))
+    if request.args.page_size >= 1000 or (request.args.page - 1) * request.args.page_size >= 1000:
+        # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
+        raise BadParameterValueError(gettext("Page limit exceeded"))

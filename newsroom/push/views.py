@@ -51,7 +51,7 @@ async def handle_publish_planning(item):
         for events in item["related_events"]:
             await publisher.publish_planning_related_events(item, events)
 
-    # Prefer parent Event when sending notificaitons
+    # Prefer parent Event when sending notifications
     _id = event_id or plan_id
     await notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
 
@@ -81,7 +81,7 @@ async def handle_publish_planning_featured(item):
 
 
 def get_publish_handler(
-    item_type: Literal["event", "planning", "text", "planning_featured"]
+    item_type: Literal["event", "planning", "text", "planning_featured"],
 ) -> PublishHandlerFunc | None:
     handlers = {
         "event": handle_publish_event,
@@ -110,6 +110,11 @@ async def push(request: Request):
         await request.abort(503)
 
     try:
+        logger.info(
+            "received item id=%s %s",
+            item.get("guid") or item.get("_id"),
+            item.get("headline") or item.get("name") or item.get("slugline") or "",
+        )
         await signals.push.send(item)
 
         item_type = item.get("type")

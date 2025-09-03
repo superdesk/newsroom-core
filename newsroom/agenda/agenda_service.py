@@ -46,7 +46,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         """
         Sets agenda metadata from a given event
         """
-        from newsroom.push.utils import format_qcode_items, set_dates, get_event_dates
+        from newsroom.push.utils import format_qcode_items, set_dates, get_event_dates, fix_translation_value
 
         app = get_current_wsgi_app()
         if event.get("files"):
@@ -72,7 +72,7 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         agenda["definition_long"] = event.get("definition_long")
         agenda["version"] = event.get("version")
         agenda["versioncreated"] = event.get("versioncreated")
-        agenda["calendars"] = event.get("calendars")
+        agenda["calendars"] = fix_translation_value(event.get("calendars") or [])
         agenda["location"] = event.get("location", [])
         agenda["ednote"] = event.get("ednote")
         agenda["state_reason"] = event.get("state_reason")

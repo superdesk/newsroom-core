@@ -780,3 +780,6 @@ export function notificationsWillBePaused(pausedFrom: number, pausedTo: number):
 
     return pausedFrom > today && pausedTo > today;
 }
+
+// eslint-disable-next-line
+export const noop = () => {};

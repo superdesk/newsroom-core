@@ -25,9 +25,10 @@ class BaseFormatter:
     assets: list[FormatterAssetType] | None = None
 
     MIMETYPE = None
+    BULK_MIMETYPE = "application/zip"
     FILE_EXTENSION = None
     MEDIATYPE = "text"
-    MULTI = False
+    MULTI_ZIP = False
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
         raise NotImplementedError()
@@ -38,8 +39,8 @@ class BaseFormatter:
         items_file = BytesIO()
         with zipfile.ZipFile(items_file, mode="w") as zf:
             for item in items:
-                formatted_data = await self.format_item(item, item_type=item_type)
                 parse_dates(item)  # fix for old items
+                formatted_data = await self.format_item(item, item_type=item_type)
                 zf.writestr(
                     secure_filename(self.format_filename(item)),
                     formatted_data,

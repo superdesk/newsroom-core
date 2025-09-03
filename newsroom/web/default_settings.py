@@ -51,6 +51,8 @@ from superdesk.default_settings import (  # noqa
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
+    SENTRY_TRACES_SAMPLE_RATE,
+    SENTRY_PROFILES_SAMPLE_RATE,
     CACHE_URL,
 )
 
@@ -175,6 +177,7 @@ MODULES = [
     "newsroom.monitoring.module",
     "newsroom.news_api.api_audit",
     "newsroom.mgmt_api.mgmt_api_docs",
+    "newsroom.system",
 ]
 
 ASYNC_POPULATE_HATEOAS = False
@@ -490,7 +493,7 @@ ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS = {
 }
 
 # count above 10k
-ELASTICSEARCH_TRACK_TOTAL_HITS = True
+CONTENTAPI_ELASTICSEARCH_TRACK_TOTAL_HITS = True
 
 ELASTICSEARCH_FIX_QUERY = False
 

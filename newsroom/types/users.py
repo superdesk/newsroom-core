@@ -105,7 +105,7 @@ class UserResourceModel(NewshubResourceModel):
             return False
 
         timezone = pytz.timezone(self.notification_schedule.timezone or get_app_config("DEFAULT_TIMEZONE") or "UTC")
-        if self.notification_schedule.pause_from is not None and self.notification_schedule.pause_to is not None:
+        if self.notification_schedule.pause_from and self.notification_schedule.pause_to:
             now = datetime.now(timezone).date()
             pause_from_date = date.fromisoformat(self.notification_schedule.pause_from)
             pause_to_date = date.fromisoformat(self.notification_schedule.pause_to)
@@ -119,14 +119,10 @@ class UserResourceModel(NewshubResourceModel):
 
     @field_validator("locale", mode="before")
     @classmethod
-    def validate_locale(cls, value: str | None) -> str | None:
-        if value == "":
-            # If any empty value is supplied, change it to ``None`` instead
-            value = None
-
+    def validate_locale(cls, value: str | None) -> str:
         if value is not None and value not in get_app_config("LANGUAGES", []):
             raise SuperdeskApiError.badRequestError("Locale is not in configured list of locales.")
-        return value
+        return value or get_app_config("DEFAULT_LANGUAGE", "en")
 
     @model_validator(mode="before")
     @classmethod

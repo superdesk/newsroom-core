@@ -11,6 +11,7 @@ from superdesk.utc import utcnow
 
 from ..fixtures import (  # noqa: F401
     items,
+    item_ids,
     init_items,
     init_auth,
     agenda_items,
@@ -18,23 +19,9 @@ from ..fixtures import (  # noqa: F401
 )
 from .test_push import upload_binary
 from newsroom.history_async import HistoryService
-from tests.core.utils import update_entries_for
+from newsroom.tests import test_utils
 
-items_ids = [item["_id"] for item in items[:2]]
 item = items[:2][0]
-
-
-async def download_zip_file(client, _format, section):
-    now = utcnow()
-    payload = {"items": items_ids, "type": section, "format": _format}
-    resp = await client.post("/download", json=payload)
-    assert resp.status_code == 200
-    assert resp.mimetype == "application/zip"
-    assert resp.headers.get("Content-Disposition") == "attachment; filename={}-newsroom.zip".format(
-        now.strftime("%Y%m%d%H%M")
-    )
-    _file = io.BytesIO(await resp.get_data())
-    return _file
 
 
 def text_content_test(content):
@@ -77,27 +64,23 @@ def ical_agenda_content_test(content):
     assert cal
 
 
-def filename(filename, item):
-    return "%s-%s" % (item["versioncreated"].strftime("%Y%m%d%H%M"), filename)
-
-
 wire_formats = [
     {
         "format": "text",
         "mimetype": "text/plain",
-        "filename": filename("amazon-bookstore-opening.txt", item),
+        "filename": test_utils.get_download_filename("amazon-bookstore-opening.txt", item),
         "test_content": text_content_test,
     },
     {
         "format": "nitf",
         "mimetype": "application/xml",
-        "filename": filename("amazon-bookstore-opening.xml", item),
+        "filename": test_utils.get_download_filename("amazon-bookstore-opening.xml", item),
         "test_content": nitf_content_test,
     },
     {
         "format": "newsmlg2",
         "mimetype": "application/vnd.iptc.g2.newsitem+xml",
-        "filename": filename("amazon-bookstore-opening.xml", item),
+        "filename": test_utils.get_download_filename("amazon-bookstore-opening.xml", item),
         "test_content": newsmlg2_content_test,
     },
     {"format": "picture", "mimetype": "image/jpeg", "filename": "baseimage.jpg"},
@@ -139,7 +122,7 @@ async def setup_image(client, app):
             },
         }
     }
-    await update_entries_for("items", item["_id"], {"associations": associations}, item)
+    await test_utils.update_entries_for("items", item["_id"], {"associations": associations}, item)
 
 
 async def test_download_single(client, app):
@@ -158,18 +141,18 @@ async def test_download_single(client, app):
 
 async def test_wire_download(client, app):
     await setup_image(client, app)
-    _file = await download_zip_file(client, wire_formats[0]["format"], "wire")
+    _file = await test_utils.download_zip_file(client, item_ids, wire_formats[0]["format"], "wire")
     with zipfile.ZipFile(_file) as zf:
         assert wire_formats[0]["filename"] in zf.namelist()
         content = zf.open(wire_formats[0]["filename"]).read()
         if wire_formats[0].get("test_content"):
             wire_formats[0]["test_content"](content)
     history, count = app.data.find("history", None, None)
-    assert (len(items_ids)) == count
+    assert (len(item_ids)) == count
     assert "download" == history[0]["action"]
     assert history[0].get("user")
     assert history[0].get("versioncreated") + timedelta(seconds=2) >= utcnow()
-    assert history[0].get("item") in items_ids
+    assert history[0].get("item") in item_ids
     assert history[0].get("version")
     assert history[0].get("company") is None
     assert history[0].get("section") == "wire"
@@ -183,7 +166,7 @@ async def test_agenda_download(client, app):
     assert resp.mimetype == agenda_formats[0]["mimetype"]
     if agenda_formats[0].get("test_content"):
         agenda_formats[0]["test_content"](await resp.get_data())
-    assert resp.headers.get("content-disposition") == "attachment; filename=%s" % filename(
+    assert resp.headers.get("content-disposition") == "attachment; filename=%s" % test_utils.get_download_filename(
         agenda_formats[0]["filename"], agenda_items[0]
     )
     history, count = app.data.find("history", None, None)

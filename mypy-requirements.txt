@@ -8,4 +8,4 @@ types-requests<2.31.0.7  # https://github.com/python/typeshed/issues/10825
 types-tzlocal
 types-Werkzeug
 types-protobuf
-typing-extensions
+typing-extensions==4.14.1

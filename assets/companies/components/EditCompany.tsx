@@ -24,6 +24,9 @@ import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
+import {Label} from 'components/Label';
+import {Button} from 'components/Button';
+import CloseButton from 'components/CloseButton';
 
 interface IStateProps {
     company: ICompany;
@@ -164,32 +167,22 @@ class EditCompany extends React.Component<IProps, IState> {
             >
                 <div className='list-item__preview-header'>
                     <h3>{this.props.company.name}</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.cancelEdit}>
-                        <i className="icon--close-thin" aria-hidden='true' />
-                    </button>
+                    <CloseButton onClick={this.props.cancelEdit} />
                 </div>
                 <AuditInformation item={this.props.company} />
                 {this.props.company.is_approved !== false ? null : (
                     <div className="list-item__preview-toolbar">
                         <div className="list-item__preview-toolbar-left">
-                            <label className="label label--orange2 label--big label--rounded">
-                                {gettext('Pending')}
-                            </label>
+                            <Label text={gettext('Pending')} type='warning' size='big' style='translucent' />
                         </div>
                         <div className="list-item__preview-toolbar-right">
-                            <button
-                                type="submit"
-                                className="nh-button nh-button--tertiary nh-button--small"
-                                aria-label={gettext('Approve Company & Users')}
+                            <Button
+                                text={gettext('Approve Company & Users')}
+                                type='submit'
+                                variant='tertiary'
+                                size='small'
                                 onClick={this.approveCompany}
-                            >
-                                {gettext('Approve Company & Users')}
-                            </button>
+                            />
                         </div>
                     </div>
                 )}

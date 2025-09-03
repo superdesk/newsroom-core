@@ -1,27 +1,25 @@
 from typing import cast
-import io
-import csv
 from collections import defaultdict
 from copy import deepcopy
 
 from bson import ObjectId
 from quart_babel import gettext
-from werkzeug.utils import secure_filename
+from superdesk import get_app_config
 
 from superdesk.core import get_current_app
-from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync
-from superdesk.flask import abort, request, send_file
-import superdesk
-from superdesk.utc import utcnow
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync, ResourceCursorAsync
+from superdesk.flask import abort, request
+from superdesk.utc import utcnow, utc_to_local, get_date
 
-from newsroom.types import CompanyResource, NewsApiAuditResourceModel
+from newsroom.types import CompanyResource, NewsApiAuditResourceModel, AgendaItem, WireItem
+from newsroom.history_async import HistoryService
 from newsroom.auth.utils import get_company_from_request
 from newsroom.utils import (
     query_resource,
     get_entity_dict,
-    get_items_by_id,
     MAX_TERMS_SIZE,
 )
+from newsroom.companies.companies_async import CompanyService
 from newsroom.search.types import BaseSearchRequestArgs
 from newsroom.agenda.filters import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
@@ -31,7 +29,8 @@ from newsroom.topics.topics_async import TopicService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.users.service import UsersService
 from newsroom.products.service import ProductsService
-from newsroom.wire import WireSearchServiceAsync
+from newsroom.wire import WireSearchServiceAsync, WireSearchRequestArgs
+from newsroom.agenda.agenda_service import AgendaItemService
 from .content_activity import get_content_activity_report  # noqa
 
 
@@ -206,7 +205,6 @@ async def get_subscriber_activity_report():
     args = deepcopy(request.args.to_dict())
 
     # Elastic query
-    aggregations = {"action": {"terms": {"field": "action", "size": MAX_TERMS_SIZE}}}
     must_terms = []
     source = {}
 
@@ -222,7 +220,7 @@ async def get_subscriber_activity_report():
     date_range = get_date_filters(
         BaseSearchRequestArgs(
             start_date=args["date_from"],
-            end_date=args["date_from"],
+            end_date=args["date_to"],
             timezone_offset=args.get("timezone_offset"),
         )
     )
@@ -235,16 +233,22 @@ async def get_subscriber_activity_report():
 
     source["size"] = 25
     source["from"] = int(args.get("from", 0))
-    source["aggs"] = aggregations
 
-    if source["from"] >= 1000:
+    if source["from"] >= 5000:
         # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
         return abort(400)
 
-    # Get the results
-    results = superdesk.get_resource_service("history").fetch_history(source, args.get("export"))
-    docs = results["items"]
-    hits = results["hits"]
+    history_cursor = await HistoryService().search(source)
+    docs = await history_cursor.to_list_raw()
+    if args.get("export", "").lower() == "true":
+        while True:
+            source["from"] = len(docs)
+            history_cursor = await HistoryService().search(source)
+            next_items = await history_cursor.to_list_raw()
+            if next_items:
+                docs.extend(next_items)
+            else:
+                break
 
     # Enhance the results
     wire_ids = []
@@ -260,37 +264,96 @@ async def get_subscriber_activity_report():
         if doc.get("company"):
             company_ids.append(ObjectId(doc.get("company")))
         user_ids.append(ObjectId(doc.get("user")))
-    agenda_items = get_entity_dict(get_items_by_id(agenda_ids, "agenda"))
-    wire_items = get_entity_dict(get_items_by_id(wire_ids, "items"))
-    company_items = get_entity_dict(get_items_by_id(company_ids, "companies"), True)
-    user_items = get_entity_dict(get_items_by_id(user_ids, "users"), True)
+    # remove duplicates for efficiency
+    wire_ids = list(set(wire_ids))
+    agenda_ids = list(set(agenda_ids))
+
+    AGENDAITEM_CHUNK_SIZE: int = 100
+    agenda_items: dict[str, AgendaItem] = {}
+    for i in range(0, len(agenda_ids), AGENDAITEM_CHUNK_SIZE):
+        agenda_cursor: ResourceCursorAsync[AgendaItem] = await AgendaItemService().search(
+            {"_id": {"$in": agenda_ids[i : i + AGENDAITEM_CHUNK_SIZE]}}, use_mongo=True
+        )
+        agenda_items.update({agenda_item.id: agenda_item async for agenda_item in agenda_cursor})
+
+    # request the wire_items in chunks, in the case of export the list may be quite long
+    WIREITEM_CHUNK_SIZE: int = 100
+    wire_items: dict[str, WireItem] = {}
+    args = WireSearchRequestArgs(ignore_latest=True)
+    args.page_size = WIREITEM_CHUNK_SIZE
+    for i in range(0, len(wire_ids), WIREITEM_CHUNK_SIZE):
+        wire_cursor: ElasticsearchResourceCursorAsync[WireItem] = await WireSearchServiceAsync().get_items_by_id(
+            wire_ids[i : i + WIREITEM_CHUNK_SIZE], args=args
+        )
+        wire_items.update({wire_item.id: wire_item async for wire_item in wire_cursor})
+
+    company_items = {
+        str(company.id): company for company in await CompanyService().find_items_by_ids(list(set(company_ids)))
+    }
+    user_items = {str(user.id): user for user in await UsersService().find_items_by_ids(list(set(user_ids)))}
 
     def get_section_name(s):
         return next((sec for sec in get_current_app().as_any().sections if sec.get("_id") == s), {}).get("name")
 
     for doc in docs:
         if doc.get("item") in wire_items:
+            item_data = wire_items[doc["item"]]
             doc["item"] = {
-                "item_text": wire_items[doc["item"]].get("headline"),
-                "_id": wire_items[doc["item"]]["_id"],
+                "item_text": item_data.headline,
+                "_id": item_data.id,
                 "item_href": "/{}?item={}".format(
                     doc["section"] if doc["section"] != "news_api" else "wire",
                     doc["item"],
                 ),
+                "published": item_data.versioncreated,
+                "place": "\r\n".join([_p.name or "" for _p in item_data.place or []]),
+                "service": "\r\n".join([_s.name or "" for _s in item_data.service or []]),
+                "subject": "\r\n".join([_s.name or "" for _s in item_data.subject or []]),
+                "anpa_take_key": item_data.anpa_take_key,
+                "slugline": item_data.slugline,
             }
+            try:
+                if "download" in doc.get("action", "") and doc.get("extra_data") is not None:
+                    wire_item = wire_items.get(doc.get("item", {}).get("_id"))
+                    if wire_item:
+                        association_key = doc.get("extra_data", {}).get("association")
+                        association_detail = wire_item.associations.get(association_key, {})
+                        association_value = (
+                            gettext("Feature")
+                            if association_key == "featuremedia"
+                            else gettext("Embedded")
+                            if association_key and association_key.startswith("editor_")
+                            else ""
+                        )
+                        guid_value = association_detail.get("guid", "")
+                        doc["association"] = {
+                            "text": association_detail.get("headline", "N/A"),
+                            "href": "/assets/{}".format(
+                                association_detail.get("renditions", {}).get("original", {}).get("media", "")
+                            ),
+                            "type": association_detail.get("type"),  # get() here if type might be missing
+                            "reference": f"{association_value}:{guid_value}" if association_value or guid_value else "",
+                        }
+            except Exception:
+                pass
         elif doc.get("item") in agenda_items:
+            item_data = agenda_items[doc["item"]]
             doc["item"] = {
-                "item_text": (agenda_items[doc["item"]].get("name") or agenda_items[doc["item"]].get("slugline")),
-                "_id": agenda_items[doc["item"]]["_id"],
-                "item_href": "/agenda?item={}".format(doc["item"]),
+                "item_text": item_data.name or item_data.headline or item_data.slugline,
+                "_id": item_data.id,
+                "item_href": "/agenda?item={}".format(doc["item"]),  # doc["item"] is the original ID
+                "place": "\r\n".join([_p.name or "" for _p in item_data.place or []]),
+                "service": "\r\n".join([_s.name or "" for _s in item_data.service or []]),
+                "subject": "\r\n".join([_s.name or "" for _s in item_data.subject or []]),
+                "published": item_data.versioncreated,
             }
 
         if doc.get("company") in company_items:
-            doc["company"] = company_items[doc.get("company")].get("name")
+            doc["company"] = company_items[doc.get("company")].name
 
         if doc.get("user") in user_items:
             user = user_items[doc.get("user")]
-            doc["user"] = "{0} {1}".format(user.get("first_name"), user.get("last_name"))
+            doc["user"] = "{0} {1}".format(user.first_name, user.last_name)
 
         doc["section"] = get_section_name(doc["section"])
         doc["action"] = doc["action"].capitalize() if doc["action"].lower() != "api" else "API retrieval"
@@ -299,41 +362,49 @@ async def get_subscriber_activity_report():
         results = {
             "results": docs,
             "name": gettext("SubscriberActivity"),
-            "aggregations": hits.get("aggregations"),
         }
         return results
     else:
-        field_names = ["Company", "Section", "Item", "Action", "User", "Created"]
-        temp_file = io.StringIO()
-        attachment_filename = "%s.csv" % utcnow().strftime("%Y%m%d%H%M%S")
-        writer = csv.DictWriter(temp_file, delimiter=",", fieldnames=field_names)
-        writer.writeheader()
+        field_names = [
+            "Company",
+            "Section",
+            "Item",
+            "Action",
+            "User",
+            "Published",
+            "Place",
+            "Slugline",
+            "Takekey",
+            "Category",
+            "Subject",
+            "Reference",
+            "Created",
+        ]
+        rows = []
+        rows.append(field_names)
         for doc in docs:
-            row = {
-                "Company": doc.get("company"),
-                "Section": doc.get("section"),
-                "Item": (doc.get("item") or {})["item_text"],
-                "Action": doc.get("action"),
-                "User": doc.get("user"),
-                "Created": doc.get("versioncreated").strftime("%H:%M %d/%m/%y"),
-            }
-
-            writer.writerow(row)
-        temp_file.seek(0)
-        mimetype = "text/plain"
-        # Creating the byteIO object from the StringIO Object
-        mem = io.BytesIO()
-        mem.write(temp_file.getvalue().encode("utf-8"))
-        # seeking was necessary. Python 3.5.2, Flask 0.12.2
-        mem.seek(0)
-        temp_file.close()
-        attachment_filename = secure_filename(attachment_filename)
-        return send_file(
-            mem,
-            mimetype=mimetype,
-            attachment_filename=attachment_filename,
-            as_attachment=True,
-        )
+            item_value = doc.get("item")
+            row = [
+                doc.get("company", "") or "",
+                doc.get("section", "") or "",
+                item_value.get("item_text", "") if isinstance(item_value, dict) else (item_value or ""),
+                doc.get("action", "") or "",
+                doc.get("user", "N/A") or "",
+                utc_to_local(get_app_config("DEFAULT_TIMEZONE"), item_value.get("published")).strftime("%H:%M %d/%m/%y")
+                if isinstance(item_value, dict) and item_value.get("published")
+                else "",
+                item_value.get("place") or "" if isinstance(item_value, dict) else "",
+                item_value.get("slugline") or "" if isinstance(item_value, dict) else "",
+                item_value.get("anpa_take_key") or "" if isinstance(item_value, dict) else "",
+                item_value.get("service") or "" if isinstance(item_value, dict) else "",
+                item_value.get("subject") or "" if isinstance(item_value, dict) else "",
+                doc.get("association", {}).get("reference", "") or "",
+                utc_to_local(get_app_config("DEFAULT_TIMEZONE"), get_date(doc.get("versioncreated"))).strftime(
+                    "%H:%M %d/%m/%y"
+                ),
+            ]
+            rows.append(row)
+        return rows
 
 
 async def get_company_api_usage():

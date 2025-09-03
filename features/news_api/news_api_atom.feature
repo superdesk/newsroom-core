@@ -1,4 +1,4 @@
-Feature: News API News Search
+Feature: News API Atom Feed
 
   Background: Initial setup
     Given "companies"
@@ -36,6 +36,26 @@ Feature: News API News Search
     Then we "don't get" "<title><![CDATA[headline 2]]></title>" in atom xml response
 
   Scenario: Simple atom request
+        Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        },
+        {"name": "A pic product",
+        "decsription": "pic product",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "",
+        "sd_product_id": "1",
+        "product_type": "news_api"
+        }]
+        """
     Given "items"
         """
         [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "headline": "headline 1",
@@ -48,6 +68,7 @@ Feature: News API News Search
                 "version" : "1",
                 "byline" : "Mick Tsikas/AAP PHOTOS",
                 "body_text" : "QUESTION TIME ALT",
+                "products": [{"code": "1"}],
                 "renditions" : {
                     "16-9" : {
                         "href" : "/assets/5fc5dce16369ab07be3325fa",
@@ -70,19 +91,42 @@ Feature: News API News Search
     Then we "get" "<media:credit>Mick Tsikas/AAP PHOTOS</media:credit>" in atom xml response
 
   Scenario: Simple atom request with embedded image
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "decsription": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        },
+        {"name": "A pic product",
+        "decsription": "pic product",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "",
+        "sd_product_id": "1",
+        "product_type": "news_api"
+        }]
+        """
     Given "items"
         """
         [{"body_html": "<p>Once upon a time there was a fish who could swim</p><!-- EMBED START Image {id: \"editor_19\"} --><figure><img src=\"somthing\" alt=\"alt text\" id=\"editor_19\"<figcaption>Some caption</figcaption></figure><!-- EMBED END Image {id: \"editor_19\"} -->",
         "headline": "headline 1",
+        "_id": "urn:test:item1",
         "byline": "S Smith", "pubstatus": "usable", "service" : [{"name" : "Australian General News", "code" : "a"}],
         "description_text": "summary",
         "associations" : {
+            "featuremedia": {"products": [{"code": "1"}], "renditions": {"original": {}}},
             "editor_19" : {
                 "mimetype" : "image/jpeg",
                 "description_text" : "Deputy Prime Minister Michael McCormack during Question Time",
                 "version" : "1",
                 "byline" : "Mick Tsikas/AAP PHOTOS",
                 "body_text" : "QUESTION TIME ALT",
+                "products": [{"code": "1"}],
                 "renditions" : {
                     "16-9" : {
                         "href" : "/assets/5fc5dce16369ab07be3325fa",
@@ -103,9 +147,24 @@ Feature: News API News Search
     Then we get OK response
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
-    Then we "get" "src="https://" in atom xml response
+    Then we "get" "src="http://" in atom xml response
+    When we remove API token
+    When we get "atom"
+    Then we get error 401
+    """
+    {"message": "Authorization token missing."}
+    """
+    When we get "atom?token=#API_TOKEN#"
+    Then we get OK response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
+    Then we "get" "src="http://" in atom xml response
+    When we get "atom/#API_TOKEN#"
+    Then we get OK response
+    Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
+    Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
+    Then we "get" "src="http://" in atom xml response
 
-      @wip
   Scenario: Atom request response restricted by featured image product
     Given "items"
         """
@@ -114,7 +173,7 @@ Feature: News API News Search
          "associations": {"featuremedia": {"products": [{"code": "1234"}], "renditions": {"original": {}} }}},
         {"body_html": "Once upon a time there was a aardvark that could not swim", "headline": "headline 2",
         "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
-         "associations": {"featuremedia": {"products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
+         "associations": {"featuremedia": {"byline":"nothing to see", "products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
         """
     Given "products"
         """
@@ -139,4 +198,4 @@ Feature: News API News Search
     When we get "atom"
     Then we get OK response
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
-    Then we "don't get" "<title><![CDATA[headline 2]]></title>" in atom xml response
+    Then we "don't get" "<media:credit>nothing to see</media:credit>" in atom xml response

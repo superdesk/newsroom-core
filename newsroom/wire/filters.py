@@ -95,8 +95,8 @@ def apply_item_type_filter(request: NewshubSearchRequest) -> None:
         # This can happen when ``BaseSearchRequestArgs`` is used for search args
         ignore_latest = False
 
-    if not ignore_latest:
-        request.search.query.must_not.append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
+    if not ignore_latest and request.include_updated is not True:
+        request.search.query.must_not.append({"exists": {"field": "nextversion"}})
 
 
 def apply_bookmarks_query(request: NewshubSearchRequest) -> None:

@@ -1,11 +1,11 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import {mount} from 'enzyme';
 import CoverageItemStatus from '../components/CoverageItemStatus';
 
 import 'tests/setup';
 
 function setup(coverage: any) {
-    return shallow(<CoverageItemStatus coverage={coverage} />);
+    return mount(<CoverageItemStatus coverage={coverage} />);
 }
 
 describe('CoverageItemStatus', () => {
@@ -51,8 +51,8 @@ describe('CoverageItemStatus', () => {
             deliveries: [{delivery_state: 'in_progress'}]
         });
 
-        expect(wrapper.find('span.label--blue').length).toBe(1);
-        expect(wrapper.find('span.label--blue').text()).toBe('Update coming');
+        expect(wrapper.find('span.label--info').length).toBe(1);
+        expect(wrapper.find('span.label--info').text()).toBe('Update coming');
 
         wrapper = setup({
             workflow_status: 'completed',
@@ -62,7 +62,7 @@ describe('CoverageItemStatus', () => {
             ]
         });
 
-        expect(wrapper.find('span.label--blue').length).toBe(1);
-        expect(wrapper.find('span.label--blue').text()).toBe('Update coming');
+        expect(wrapper.find('span.label--info').length).toBe(1);
+        expect(wrapper.find('span.label--info').text()).toBe('Update coming');
     });
 });

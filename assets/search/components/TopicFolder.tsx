@@ -6,6 +6,7 @@ import {TopicFolderEditor} from './TopicFolderEditor';
 import {TopicFolderActions} from './TopicFolderActions';
 import {ITopicFolder} from 'interfaces';
 import {useDroppable} from '@dnd-kit/core';
+import {IconButton} from 'components/IconButton';
 
 const EDITING_OFF = 0;
 const EDITING_ON = 1;
@@ -92,24 +93,28 @@ export function TopicFolder({
                         'simple-card__group-header--ondragover': isOver,
                     })}
                 >
-                    {opened ? (
-                        <button
-                            type="button"
-                            className="icon-button icon-button--tertiary"
-                            data-test-id="collapse"
-                            title={gettext('Close')}
-                            onClick={() => setOpened(false)}
-                        ><i className="icon--minus"></i></button>
-                    ) : (
-                        <button
-                            type="button"
-                            className="icon-button icon-button--tertiary"
-                            data-test-id="expand"
-                            title={gettext('Open')}
-                            onClick={() => setOpened(true)}
-                            disabled={topics.length === 0}
-                        ><i className="icon--plus"></i></button>
-                    )}
+                    {opened
+                        ? (
+                            <IconButton
+                                icon='minus'
+                                variant='tertiary'
+                                data-test-id="collapse"
+                                tooltip={gettext('Close')}
+                                ariaLabel={gettext('Close')}
+                                onClick={() => setOpened(false)}
+                            />
+                        ) : (
+                            <IconButton
+                                icon='plus'
+                                variant='tertiary'
+                                data-test-id="expand"
+                                tooltip={gettext('Open')}
+                                ariaLabel={gettext('Open')}
+                                disabled={topics.length === 0}
+                                onClick={() => setOpened(true)}
+                            />
+                        )
+                    }
                     <div className="simple-card__group-header-title">
                         <i className="icon--folder"></i>
                         <span className="simple-card__group-header-name">{folder.name}</span>

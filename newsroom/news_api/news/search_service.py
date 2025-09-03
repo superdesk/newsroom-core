@@ -1,21 +1,21 @@
 from typing import Any
 from urllib.parse import urlencode
 
-from werkzeug.datastructures import ImmutableMultiDict
+from pydantic import AliasChoices
 
 from content_api.errors import UnexpectedParameterError
 from superdesk.flask import request as flask_request
 from superdesk.core.types.web import Request, Response
+from superdesk.core import get_app_config
 
 from newsroom.types import SectionEnum
 from newsroom.types.wire import WireItem
 from newsroom.wire.service import WireItemService
-from newsroom.auth.utils import get_company_or_none_from_request
-from newsroom.products.utils import get_products_by_company_async
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.search.base_service import BaseNewshubSearchService
-from newsroom.news_api.utils import check_association_permission, post_api_audit, remove_internal_renditions
+from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, update_embed_urls
 from newsroom.search.filters import apply_company_filter, apply_section_filter, apply_products_filter
+from newsroom.utils import remove_all_embeds
 
 from .filters import (
     apply_date_filter,
@@ -27,7 +27,7 @@ from .filters import (
     validate_page,
 )
 from .types import NewsApiSearchRequestArgs
-
+from ...wire.formatters.utils import remove_unpermissioned_embeds
 
 default_search_filters: list[SearchFilterFunction] = [
     prefill_company,
@@ -69,15 +69,18 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         those coming from the request. If any unknown found, it raises an error
         """
         model = self.search_args_class()
-        url_args: ImmutableMultiDict = flask_request.args
+        url_args: set[str] = set(flask_request.args.keys()) - {"token"}
         allowed_fields = set(model.model_fields.keys())
 
-        for field in model.model_fields.values():
-            if field.validation_alias:
-                for alias in field.validation_alias.choices:
-                    allowed_fields.add(alias)
+        for field, info in model.model_fields.items():
+            if isinstance(info.validation_alias, AliasChoices):
+                # Exclude `AliasPath` instances from choices, as we won't be able to
+                # translate that into a field name
+                allowed_fields |= set([choice for choice in info.validation_alias.choices if isinstance(choice, str)])
+            else:
+                allowed_fields.add(info.alias or field)
 
-        unknown_fields = set(url_args.keys()) - allowed_fields
+        unknown_fields = url_args - allowed_fields
         if unknown_fields:
             raise UnexpectedParameterError(desc=f"Unexpected parameter(s): {', '.join(unknown_fields)}")
 
@@ -91,24 +94,19 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         search_req = self.get_search_request_instance(request)
         self.build_hateoas(request, response, search_req)
 
-        company = get_company_or_none_from_request(request)
-        assert company is not None
-        products = [
-            product.to_dict()
-            for product in await get_products_by_company_async(company, product_type=SectionEnum.NEWS_API)
-        ]
-
         for doc in response.body["_items"] or []:
             self._enhance_internal_item_hateoas(doc)
 
-            if "associations" in (search_req.args.include_fields or []):
-                self._check_associations(doc, products)
+            if get_app_config("NEWS_API_IMAGE_PERMISSIONS_ENABLED"):
+                # set the references in the document to absolute values
+                update_embed_urls(doc, None)
+                if "associations" in (search_req.args.include_fields or []):
+                    # apply the filtering to any media in the doc
+                    await remove_unpermissioned_embeds(doc, SectionEnum.NEWS_API)
 
-    def _check_associations(self, doc: dict[str, Any], products: list[dict[str, Any]]):
-        if not check_association_permission(doc, products):
-            doc.pop("associations", None)
-        else:
-            remove_internal_renditions(doc)
+                    remove_internal_renditions(doc)
+                else:
+                    remove_all_embeds(doc)
 
     def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
         base_url = req.path.strip("/")

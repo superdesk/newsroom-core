@@ -2,8 +2,9 @@ from typing import Literal, Any, TypeVar, Generic, Callable, Awaitable
 from typing_extensions import TypedDict
 from dataclasses import dataclass, field
 from enum import Enum, unique
+import math
 
-from pydantic import Field, AliasChoices, field_validator
+from pydantic import Field, AliasChoices, field_validator, model_validator
 from quart_babel import gettext
 
 from superdesk.core.types import ProjectedFieldArg, Request, SearchRequest, SortListParam, ESQuery
@@ -181,7 +182,10 @@ class BaseSearchRequestArgs(BaseModel):
     page_size: int = Field(validation_alias=AliasChoices("page_size", "size", "max_results"), default=25)
 
     #: Pagination, the page number to return
-    page: int = Field(validation_alias=AliasChoices("page", "from"), default=0)
+    page: int = 0
+
+    #: Pagination, the item number to return from - internally is converted to a page number
+    from_item_number: int | None = Field(alias="from", default=None)
 
     #: An elasticsearch query_string to be added to the filter
     q: str | None = None
@@ -318,6 +322,13 @@ class BaseSearchRequestArgs(BaseModel):
         except (ValueError, TypeError):
             raise BadParameterValueError(gettext("Incorrect type supplied for projection parameter"))
 
+    @model_validator(mode="after")
+    def parse_model(self):
+        if self.from_item_number is not None:
+            # Convert the ``from`` search argument to a page number
+            self.page = (math.floor(self.from_item_number / self.page_size) + 1) if self.page_size > 0 else 0
+        return self
+
 
 SearchArgsType = TypeVar("SearchArgsType", bound=BaseSearchRequestArgs)
 
@@ -354,6 +365,9 @@ class NewshubSearchRequest(Generic[SearchArgsType]):
 
     #: The list of topics to use when constructing the elasticsearch query
     topic: TopicResourceModel | None = None
+
+    #: Match also updated items
+    include_updated: bool | None = None
 
 
 #: Function callable type for use with search filters

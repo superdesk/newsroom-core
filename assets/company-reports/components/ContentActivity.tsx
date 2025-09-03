@@ -5,8 +5,8 @@ import {gettext, formatTime} from '../../utils';
 import {fetchReport, REPORTS} from '../actions';
 
 import ReportsTable from './ReportsTable';
+import {Button} from 'components/Button';
 import {ContentActivityFilters} from './ContentActivityFilters';
-
 
 interface IReportAction {
     download?: number;
@@ -156,14 +156,12 @@ class ContentActivity extends React.Component<IProps, any> {
                 <div className="align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda">
                     <ContentActivityFilters />
 
-                    <button
-                        key='content_activity_export'
-                        className="nh-button nh-button--secondary ms-auto me-3"
-                        type="button"
+                    <Button
+                        text={gettext('Export to CSV')}
+                        variant='secondary'
+                        className='ms-auto me-3'
                         onClick={this.exportToCSV}
-                    >
-                        {gettext('Export to CSV')}
-                    </button>
+                    />
                 </div>
                 <ReportsTable
                     key='report_table'

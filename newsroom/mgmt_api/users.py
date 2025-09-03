@@ -1,5 +1,3 @@
-import re
-import json
 from typing import Any, List, Dict
 from typing_extensions import override
 from bson.objectid import ObjectId
@@ -16,10 +14,10 @@ from superdesk.core.resources import (
     ResourceConfig,
     MongoResourceConfig,
     RestEndpointConfig,
+    ResourceRestEndpoints,
 )
 from superdesk.errors import SuperdeskApiError
-from superdesk.core.types import Request
-from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync, MongoResourceCursorAsync
+from superdesk.core.types import Request, Response, SearchRequest
 
 
 class CPUsersService(UsersService):
@@ -50,14 +48,21 @@ class CPUsersService(UsersService):
     async def on_delete(self, doc: UserResourceModel) -> None:
         get_current_wsgi_app().cache.delete(str(doc.id))
 
-    async def find(
-        self, req: Request
-    ) -> ElasticsearchResourceCursorAsync[UserResourceModel] | MongoResourceCursorAsync[UserResourceModel]:
-        where = json.loads(req.where or "{}") if isinstance(req.where, str) else req.where or {}
-        if "email" in where:
-            where["email"] = {"$regex": re.compile("^{}$".format(re.escape(where["email"])), re.IGNORECASE)}
-        req.where = where
-        return await super().find(req)
+
+class UsersRestEndpoints(ResourceRestEndpoints):
+    async def search_items(self, args: None, params: SearchRequest, request: Request) -> Response:
+        """Processes a search request
+
+        If the request includes where make the search case-insensitive.
+
+        :param args: Not supported
+        :param params: The search parameters for this request
+        :param request: The HTTP request instance
+        :return: The REST response containing matches items for this request
+        """
+        if params.where:
+            params.case_insensitive = True
+        return await super().search_items(args, params, request)
 
 
 users_resource_config = ResourceConfig(
@@ -65,7 +70,7 @@ users_resource_config = ResourceConfig(
     data_class=UserResourceModel,
     service=CPUsersService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
-    rest_endpoints=RestEndpointConfig(),
+    rest_endpoints=RestEndpointConfig(endpoints_class=UsersRestEndpoints),
 )
 
 module = Module(
