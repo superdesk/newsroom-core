@@ -1,69 +1,39 @@
-import asyncio
-from superdesk.tests.environment import setup_before_all, setup_before_scenario
+from superdesk.core.tests.behave import setup_behave, BehaveTestFactory, BehaveContext
+from superdesk.factory.app import SuperdeskApp
+
 from newsroom.auth_server.client import authorization
-from newsroom.mgmt_api.app import get_app as _get_app
-from newsroom.mgmt_api.default_settings import CORE_APPS, MODULES, ASYNC_AUTH_CLASS, URL_PREFIX
-from superdesk.tests import setup as setup_app
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-def get_app(*args, **kwargs):
-    return _get_app(*args, **kwargs)
+from newsroom.mgmt_api.app import get_app
 
 
 class TestClient:
     client_id = "test"
 
 
-def before_all(context):
+class ManagementAPITestFactory(BehaveTestFactory):
+    default_settings_module = "newsroom.mgmt_api.default_settings"
     config = {
         "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
         "INSTALLED_APPS": [],
         "ELASTICSEARCH_FORCE_REFRESH": True,
         "MGMT_API_ENABLED": True,
         "CACHE_TYPE": "null",
-        "MODULES": MODULES,
-    }
-    setup_before_all(context, config, app_factory=get_app)
-
-
-def before_scenario(context, scenario):
-    if "skip" in scenario.tags:
-        scenario.skip("Marked with @skip")
-        return
-
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(before_scenario_async(context, scenario))
-    except Exception as e:
-        # Make sure exceptions raised are printed to the console
-        logger.exception(e)
-        raise e
-
-
-async def before_scenario_async(context, scenario):
-    config = {
-        "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
-        "MODULES": MODULES,
-        "INSTALLED_APPS": [],
-        "ELASTICSEARCH_FORCE_REFRESH": True,
-        "MGMT_API_ENABLED": True,
         "AUTH_SERVER_SHARED_SECRET": "test-secret",
-        "CACHE_TYPE": "null",
-        "ASYNC_AUTH_CLASS": ASYNC_AUTH_CLASS,
-        "URL_PREFIX": URL_PREFIX,
     }
+    auto_add_apps = False
+    init_eve_resources = False
+    init_request_context = False
+    init_app_context = False
 
-    context.app = get_app(config=config)
-    context.headers = []
-    async with context.app.app_context():
-        authorization.init_app(context.app, register_endpoint=False)
-        await setup_app(context, config, app_factory=get_app, reset=True)
-        await setup_before_scenario(context, scenario, config, app_factory=get_app)
+    async def get_app(self, config: dict) -> SuperdeskApp:
+        return get_app(config, testing=True)
 
-        token = authorization.generate_jwt_token(TestClient(), "client_credentials", "test", "")
-        context.headers.append(("Authorization", f"Bearer {token}"))
+    async def before_test(self, context: BehaveContext) -> None:
+        await super().before_test(context)
+        context.headers = [("Content-Type", "application/json"), ("Origin", "localhost")]
+        async with context.app.app_context():
+            token = authorization.generate_jwt_token(TestClient(), "client_credentials", "test", "")
+            context.headers.append(("Authorization", f"Bearer {token}"))
+
+
+def before_all(context: BehaveContext):
+    setup_behave(context, ManagementAPITestFactory())
