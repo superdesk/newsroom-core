@@ -29,6 +29,7 @@ users_auth_resource_config = ResourceConfig(
     datasource_name="users",
     data_class=UserAuthResourceModel,
     service=UsersAuthService,
+    mongo=users_resource_config.mongo,
 )
 
 users_endpoints = EndpointGroup("users_views", __name__)

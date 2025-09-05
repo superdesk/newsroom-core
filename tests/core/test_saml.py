@@ -52,8 +52,8 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
 
     app.config["SAML_CLIENTS"] = ["samplecomp"]
 
-    async with app.test_client() as c:
-        resp = await c.get("/login/samplecomp")
+    async with app.test_request_context("/login/samplecomp"):
+        resp = await client.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)
@@ -62,8 +62,8 @@ async def test_user_data_with_matching_preconfigured_client(app, client):
 
     await update_entries_for("companies", company["_id"], {"internal": True}, company)
 
-    async with app.test_client() as c:
-        resp = await c.get("/login/samplecomp")
+    async with app.test_request_context("/login/samplecomp"):
+        resp = await client.get("/login/samplecomp")
         assert 200 == resp.status_code
 
         user_data = get_userdata("foo@example.com", saml_data)

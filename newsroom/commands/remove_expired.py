@@ -1,5 +1,5 @@
 import click
-import content_api
+from content_api.commands.remove_expired_items import RemoveExpiredItems
 
 from .cli import newsroom_cli
 
@@ -23,5 +23,5 @@ async def remove_expired(expiry_days):
     """
     # TODO-ASYNC: Revisit when `RemoveExpiredItems` is update in superdesk-core
     # as it depends on items which is not yet an async resource on SD
-    exp = content_api.RemoveExpiredItems()
+    exp = RemoveExpiredItems()
     exp.run(expiry_days)

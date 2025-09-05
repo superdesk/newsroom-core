@@ -1,63 +1,40 @@
-import asyncio
-from superdesk.tests import setup as setup_app
-from superdesk.tests.environment import setup_before_all
-import logging
+from superdesk.core.tests.behave import setup_behave, BehaveTestFactory, BehaveContext
+from superdesk.factory.app import SuperdeskApp
 
 from newsroom.news_api.factory import get_app
-from newsroom.news_api.default_settings import CORE_APPS, MODULES
 
 
-logger = logging.getLogger(__name__)
-
-
-def before_all(context):
+class NewshubTestFactory(BehaveTestFactory):
+    default_settings_module = "newsroom.news_api.default_settings"
     config = {
         "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
-        "MODULES": MODULES,
-        "INSTALLED_APPS": [],
         "ELASTICSEARCH_FORCE_REFRESH": True,
         "NEWS_API_ENABLED": True,
-        "NEWS_API_IMAGE_PERMISSIONS_ENABLED": True,
-        "NEWS_API_TIME_LIMIT_DAYS": 100,
-        "SITE_NAME": "Newsroom",
-        "CACHE_TYPE": "null",
-    }
-    setup_before_all(context, config, app_factory=get_app)
-
-
-def before_scenario(context, scenario):
-    if "skip" in scenario.tags:
-        scenario.skip("Marked with @skip")
-        return
-
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(before_scenario_async(context, scenario))
-    except Exception as e:
-        # Make sure exceptions raised are printed to the console
-        logger.exception(e)
-        raise e
-
-
-async def before_scenario_async(context, scenario):
-    config = {
-        "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
-        "MODULES": MODULES,
-        "INSTALLED_APPS": [],
-        "ELASTICSEARCH_FORCE_REFRESH": True,
-        "NEWS_API_ENABLED": True,
-        "NEWS_API_IMAGE_PERMISSIONS_ENABLED": True,
         "NEWS_API_TIME_LIMIT_DAYS": 100,
         "SITE_NAME": "Newsroom",
         "CACHE_TYPE": "null",
         "ASYNC_AUTH_CLASS": "newsroom.news_api.api_tokens.auth:CompanyTokenAuth",
+        "RATE_LIMIT_PERIOD": None,
+        "RATE_LIMIT_REQUESTS": None,
     }
+    auto_add_apps = False
+    init_eve_resources = False
+    init_request_context = False
+    init_app_context = False
 
-    if "rate_limit" in scenario.tags:
-        config["RATE_LIMIT_PERIOD"] = 300  # 5 minutes
-        config["RATE_LIMIT_REQUESTS"] = 2
+    async def get_app(self, config: dict) -> SuperdeskApp:
+        return get_app(config=config, testing=True)
 
-    await setup_app(context, config, app_factory=get_app, reset=True)
-    context.headers = []
+    async def before_test(self, context: BehaveContext) -> None:
+        if not await super().before_test(context):
+            return
+
+        if "rate_limit" in context.scenario.tags:
+            context.app.config["RATE_LIMIT_PERIOD"] = 300  # 5 minutes
+            context.app.config["RATE_LIMIT_REQUESTS"] = 2
+
+        context.headers = []
+
+
+def before_all(context: BehaveContext):
+    setup_behave(context, factory=NewshubTestFactory())

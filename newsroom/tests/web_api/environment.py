@@ -1,124 +1,85 @@
 from copy import deepcopy
-import asyncio
-import logging
 
-from superdesk.flask import Config
-from superdesk.tests import setup_notification, set_placeholder
-from superdesk.tests.steps import get_prefixed_url
+from superdesk.core.tests.app import get_prefixed_url
+from superdesk.core.tests.behave import setup_behave, BehaveContext, BehaveTestFactory, set_placeholder
+from superdesk.factory.app import SuperdeskApp
 
 from newsroom.types import UserAuthResourceModel, CompanyResource
-from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 from newsroom.web.factory import get_app
-from newsroom.web.default_settings import CORE_APPS, BLUEPRINTS
 from newsroom.agenda.filters import aggregations as agenda_aggs
+
 from tests.search.fixtures import USERS, COMPANIES
 
 
-logger = logging.getLogger(__name__)
 orig_agenda_aggs = deepcopy(agenda_aggs)
 
 
-def before_all(context):
-    pass
-
-
-def before_scenario(context, scenario):
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(before_scenario_async(context, scenario))
-    except Exception as e:
-        # Make sure exceptions raised are printed to the console
-        logger.exception(e)
-        raise e
-
-
-async def before_scenario_async(context, scenario):
-    if "skip" in scenario.tags:
-        scenario.skip("Marked with @skip")
-        return
-
-    for key in list(agenda_aggs.keys()):
-        agenda_aggs.pop(key)
-    agenda_aggs.update(orig_agenda_aggs)
-
-    config = Config(
-        root,
-        {
-            "BEHAVE": True,
-            "TESTING": True,
-            "CORE_APPS": CORE_APPS,
-            "BLUEPRINTS": BLUEPRINTS,
-            "INSTALLED_APPS": [],
-            "WTF_CSRF_ENABLED": False,
-            "URL_PREFIX": "",
-            "ELASTICSEARCH_FORCE_REFRESH": True,
-            "SITE_NAME": "Newsroom",
-            "MONGO_URI": "mongodb://localhost/newsroom_behave",
-            "CONTENTAPI_MONGO_URI": "mongodb://localhost/newsroom_behave",
-            "MONGO_DBNAME": "newsroom_behave",
-            "CONTENTAPI_MONGO_DBNAME": "newsroom_behave",
-            "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
-            "CELERY_TASK_ALWAYS_EAGER": True,
-            "AGENDA_GROUPS": [
-                {
-                    "field": "sttdepartment",
-                    "label": "Department",
-                    "nested": {
-                        "parent": "subject",
-                        "field": "scheme",
-                        "value": "sttdepartment",
-                        "include_planning": True,
-                    },
+class NewshubTestFactory(BehaveTestFactory):
+    default_settings_module = "newsroom.web.default_settings"
+    config = {
+        "BEHAVE": True,
+        "WTF_CSRF_ENABLED": False,
+        "URL_PREFIX": "",
+        "AGENDA_GROUPS": [
+            {
+                "field": "sttdepartment",
+                "label": "Department",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "sttdepartment",
+                    "include_planning": True,
                 },
-                {
-                    "field": "sttsubj",
-                    "label": "Subject",
-                    "nested": {
-                        "parent": "subject",
-                        "field": "scheme",
-                        "value": "sttsubj",
-                        "include_planning": True,
-                    },
+            },
+            {
+                "field": "sttsubj",
+                "label": "Subject",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "sttsubj",
+                    "include_planning": True,
                 },
-                {
-                    "field": "event_type",
-                    "label": "Event Type",
-                    "nested": {
-                        "parent": "subject",
-                        "field": "scheme",
-                        "value": "event_type",
-                    },
+            },
+            {
+                "field": "event_type",
+                "label": "Event Type",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "event_type",
                 },
-            ],
-        },
-    )
+            },
+        ],
+    }
+    auto_add_apps = False
+    init_eve_resources = False
+    init_request_context = False
+    init_app_context = False
 
-    drop_mongo(config)
+    async def get_app(self, config: dict) -> SuperdeskApp:
+        return get_app(config=config, testing=True)
 
-    context.app = get_app(config=config, testing=True)
-    async with context.app.app_context():
-        await reset_elastic(context.app)
-        context.app.cache.clear()
+    async def before_test(self, context: BehaveContext) -> None:
+        if not await super().before_test(context):
+            return
 
-    context.headers = [("Content-Type", "application/json"), ("Origin", "localhost")]
-    context.client = context.app.test_client()
-
-    if scenario.status != "skipped":
-        if "notification" in scenario.tags:
-            setup_notification(context)
-
-        if "auth" in scenario.tags:
+        if "auth" in context.scenario.tags:
             await setup_users(context)
-            await login_user(context, scenario)
+            await login_user(context, context.scenario)
 
 
-async def setup_users(context):
+def before_all(context: BehaveContext):
+    setup_behave(context, NewshubTestFactory())
+
+
+async def setup_users(context: BehaveContext) -> None:
     async with context.app.test_request_context("/login"):
         await CompanyResource.get_service().create(COMPANIES)
         await UserAuthResourceModel.get_service().create(USERS)
 
 
-async def login_user(context, scenario):
+async def login_user(context: BehaveContext, scenario):
     data = None
 
     if "admin" in scenario.tags:
