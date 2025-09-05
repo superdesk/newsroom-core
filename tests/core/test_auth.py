@@ -174,6 +174,7 @@ async def test_login_fails_for_not_approved_user(app, client):
 
 
 async def test_login_fails_for_many_times_gets_limited(client, app):
+    app.config["QUART_RATE_LIMITER_ENABLED"] = True
     for i in range(1, 100):
         response = await client.post(
             url_for("auth.login"),
