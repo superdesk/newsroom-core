@@ -10,7 +10,10 @@ export type FieldRenderComponent<P extends FieldRenderProps = FieldRenderProps> 
 export type Separator = '/' | '//' | '-';
 
 // allowed component names
-export type ComponentName = 'version_type' | string;
+export enum ComponentName {
+    VersionType = 'version_type',
+    ServiceNames = 'service_names',
+}
 
 // component override: { field: "version", component: "version_type" }
 export interface ComponentField {
