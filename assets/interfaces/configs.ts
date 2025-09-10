@@ -1,23 +1,28 @@
-import {IDashboardCard} from './dashboard';
+export type Separator = '/' | '//' | '-';
 
-export type IDisplayFieldsConfig = string |
-    '/' |
-    '//' |
-    {
-        field: string,
-        component?: string;
-        styles?: {[key: string]: string | number}
-    } |
-    Array<
-        string |
-        '/' |
-        '//' |
-        {
-            field: string,
-            component?: string;
-            styles?: {[key: string]: string | number}
-        }
-    >
+// allowed component names
+export type ComponentName = 'version_type' | string;
+
+// component override: { field: "version", component: "version_type" }
+export interface ComponentField {
+    field: string;
+    component: ComponentName;
+    styles?: never;
+}
+
+// styled wrapper: { field: <any valid config>, styles: {...} }
+export interface StyledField {
+    field: IDisplayFieldsConfig;
+    styles: { [key: string]: string | number };
+    component?: never;
+}
+
+export type IDisplayFieldsConfig =
+    | string            // e.g. "source" or any item field name
+    | Separator         // "/", "//", "-"
+    | StyledField       // wraps a field (string/array/object) with styles
+    | ComponentField;   // component override for an existing item field
+
 
 export interface IListConfig {
     subject?: {
