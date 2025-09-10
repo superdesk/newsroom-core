@@ -10,8 +10,7 @@ import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
 import {ExpiryDateLabel} from './ExpiryDateLabel';
 import {IDisplayFieldsConfig as FieldConfig, Separator, StyledField, ComponentField} from 'interfaces/configs';
-
-type Item = Record<string, unknown>;
+import {IArticle} from 'interfaces';
 
 interface FieldResult {
     key: string;
@@ -19,8 +18,8 @@ interface FieldResult {
 }
 
 interface FieldComponentsProps {
-    config: FieldConfig[];
-    item: Item;
+    config: FieldConfig | FieldConfig[];
+    item: IArticle;
     fieldProps?: Record<string, unknown>;
 }
 
@@ -30,7 +29,7 @@ const SEPARATOR_KEY = 'separator';
 const isSeparator = (f: FieldConfig): f is Separator =>
     typeof f === 'string' && (ALLOWED_SEPARATORS).includes(f as Separator);
 
-const isStringField = (f: FieldConfig): f is string => typeof f === 'string' && !isSeparator(f);
+const isStringField = (f: FieldConfig): f is keyof IArticle => typeof f === 'string' && !isSeparator(f);
 
 const isObjectCfg = (f: FieldConfig): f is StyledField | ComponentField =>
     typeof f === 'object' && f !== null && !Array.isArray(f);
@@ -90,7 +89,7 @@ export function FieldComponents({config, item, fieldProps = {}}: FieldComponents
     });
 }
 
-function getComponentForField(item: Item, fieldConfig: FieldConfig): any {
+function getComponentForField(item: IArticle, fieldConfig: FieldConfig): any {
     if (Array.isArray(fieldConfig) && fieldConfig.length > 0) {
         // example: ["source", "//", "department"]
         const components = fieldConfig
@@ -145,7 +144,7 @@ function getComponentForField(item: Item, fieldConfig: FieldConfig): any {
             return {
                 key: fieldConfig.field,
                 Component: () => (
-                    <VersionType value={item[fieldConfig.field] as string} />
+                    <VersionType value={item[fieldConfig.field as keyof IArticle] as string} />
                 ),
             };
         }

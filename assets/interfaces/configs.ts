@@ -1,3 +1,5 @@
+import {IArticle} from './content';
+
 export type Separator = '/' | '//' | '-';
 
 // allowed component names
@@ -5,7 +7,7 @@ export type ComponentName = 'version_type' | string;
 
 // component override: { field: "version", component: "version_type" }
 export interface ComponentField {
-    field: string;
+    field: keyof IArticle;
     component: ComponentName;
     styles?: never;
 }
@@ -18,10 +20,11 @@ export interface StyledField {
 }
 
 export type IDisplayFieldsConfig =
-    | string            // e.g. "source" or any item field name
+    | keyof IArticle  // e.g. "source" or any item field name
     | Separator         // "/", "//", "-"
     | StyledField       // wraps a field (string/array/object) with styles
-    | ComponentField;   // component override for an existing item field
+    | ComponentField   // component override for an existing item field
+    | Array<IDisplayFieldsConfig>; // array of any of the above types
 
 
 export interface IListConfig {
