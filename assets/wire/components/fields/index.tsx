@@ -144,7 +144,7 @@ function getComponentForField(item: IArticle, fieldConfig: FieldConfig): any {
             return {
                 key: fieldConfig.field,
                 Component: () => (
-                    <VersionType value={item[fieldConfig.field as keyof IArticle] as string} />
+                    <VersionType value={item[fieldConfig.field] as string} />
                 ),
             };
         }
