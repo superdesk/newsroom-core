@@ -40,7 +40,7 @@ const isSeparator = (f: FieldConfig): f is Separator =>
 
 const isStringField = (f: FieldConfig): f is keyof IArticle => typeof f === 'string' && !isSeparator(f);
 
-const isObjectCfg = (f: FieldConfig): f is StyledField | ComponentField =>
+const isObjectCfg = (f: FieldConfig | null): f is StyledField | ComponentField =>
     typeof f === 'object' && f !== null && !Array.isArray(f);
 
 const isStyledField = (f: FieldConfig): f is StyledField => isObjectCfg(f) && 'styles' in f;
