@@ -40,4 +40,5 @@ export interface IArticle extends IResourceItem {
     // populated by the backend
     _access?: boolean;
     charcount?: number;
+    urgency?: number;
 }

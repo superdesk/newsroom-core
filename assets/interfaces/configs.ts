@@ -1,5 +1,12 @@
 import {IArticle} from './content';
 
+export interface FieldRenderProps {
+    item?: IArticle;
+    [key: string]: unknown;
+}
+
+export type FieldRenderComponent<P extends FieldRenderProps = FieldRenderProps> = React.ComponentType<P>;
+
 export type Separator = '/' | '//' | '-';
 
 // allowed component names
@@ -9,21 +16,21 @@ export type ComponentName = 'version_type' | string;
 export interface ComponentField {
     field: keyof IArticle;
     component: ComponentName;
-    styles?: never;
+    styles?: React.CSSProperties;
 }
 
 // styled wrapper: { field: <any valid config>, styles: {...} }
 export interface StyledField {
     field: IDisplayFieldsConfig;
-    styles: { [key: string]: string | number };
-    component?: never;
+    styles: React.CSSProperties;
+    component?: ComponentName;
 }
 
 export type IDisplayFieldsConfig =
-    | keyof IArticle  // e.g. "source" or any item field name
+    | keyof IArticle    // e.g. "source" or any item field name
     | Separator         // "/", "//", "-"
     | StyledField       // wraps a field (string/array/object) with styles
-    | ComponentField   // component override for an existing item field
+    | ComponentField    // component override for an existing item field
     | Array<IDisplayFieldsConfig>; // array of any of the above types
 
 
