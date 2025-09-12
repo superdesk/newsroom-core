@@ -70,6 +70,7 @@ async def setup_embeds():
 
 
 async def test_embed_permissions_for_admins(client, app):
+    app.config["WIRE_EMBED_PERMISSIONS"] = True
     await test_utils.update_entries_for(
         "companies",
         COMPANY_1_ID,
@@ -109,6 +110,7 @@ async def test_embed_permissions_for_admins(client, app):
 
 
 async def test_embed_mark_disable_download(client, app):
+    app.config["WIRE_EMBED_PERMISSIONS"] = True
     await login(client, {"email": PUBLIC_USER_EMAIL})
     await test_utils.update_entries_for(
         "companies",
