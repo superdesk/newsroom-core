@@ -9,7 +9,7 @@ from .search import AdvancedSearchParams
 from .user_roles import UserRole
 from .products import ProductResourceModel
 from .cards import CardResourceModel, DashboardCardConfig, DashboardCardType, DashboardCardDict
-from .company import CompanyProduct, CompanyResource
+from .company import CompanyProduct, CompanyResource, EmbedPermissionUserAction
 from .navigation import NavigationModel
 from .section_filters import SectionFilterModel
 from .topics import (
@@ -48,6 +48,7 @@ __all__ = [
     "DashboardCardDict",
     "CompanyProduct",
     "CompanyResource",
+    "EmbedPermissionUserAction",
     "NavigationModel",
     "SectionFilterModel",
     "NotificationType",

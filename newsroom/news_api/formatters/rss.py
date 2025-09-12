@@ -12,8 +12,7 @@ from superdesk.utc import utcnow
 from superdesk.flask import url_for
 
 from newsroom.types import SectionEnum
-from newsroom.wire.formatters.utils import remove_unpermissioned_embeds
-from newsroom.news_api.utils import update_embed_urls
+from newsroom.wire.embeds import apply_company_permissions_to_embeds, update_embed_urls, set_association_links
 from newsroom.news_api.news.search_service import NewsApiSearchServiceAsync
 
 logger = logging.getLogger(__name__)
@@ -45,9 +44,8 @@ class RSSFormatter:
                 if not complete_item:
                     continue
 
-                await remove_unpermissioned_embeds(complete_item, SectionEnum.NEWS_API)
                 entry = SubElement(channel, self.item_field)
-                self.format_item(entry, complete_item, token)
+                await self.format_item(entry, complete_item, token)
 
             except Exception as ex:
                 logger.exception("processing {} - {}".format(item.get("_id"), ex))
@@ -71,13 +69,16 @@ class RSSFormatter:
         site_name = get_app_config("SITE_NAME")
         return f"{site_name} {self.name}"
 
-    def format_item(self, entry: SubElement, item: dict, token: str | None) -> None:
+    async def format_item(self, entry: SubElement, item: dict, token: str | None) -> None:
+        await apply_company_permissions_to_embeds([item], SectionEnum.NEWS_API)
+        update_embed_urls(item, token)
+        set_association_links(item)
+
         self.set_item_id(entry, item)
         self.set_item_state(entry, item)
         self.set_item_details(entry, item)
         self.set_item_link(entry, item, token)
         self.set_item_categories(entry, item)
-        update_embed_urls(item, token)
         self.set_item_content(entry, item)
 
         try:
