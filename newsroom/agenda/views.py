@@ -46,7 +46,7 @@ from newsroom.utils import (
 
 from .email import send_coverage_request_email
 from .featured_service import FeaturedService
-from .utils import remove_fields_for_public_user, remove_restricted_coverage_info
+from .utils import remove_fields_for_public_user, remove_restricted_coverage_info, get_related_events
 from .module import agenda_endpoints
 from .agenda_service import AgendaItemService
 from .agenda_search import AgendaSearchServiceAsync
@@ -112,6 +112,7 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
 
     if params.print:
         template = "agenda_item_print.html"
+        related_events = await get_related_events(agenda_item_dict)
         await update_action_list([args.item_id], "prints", force_insert=True)
         await HistoryService().create_history_record([agenda_item_dict], "print", user.id, user.company, params.type)
         return await render_template(
@@ -123,6 +124,7 @@ async def item(args: AgendaItemViewArgs, params: AgendaItemParams, request: Requ
             contacts=get_public_contacts(agenda_item_dict),
             links=get_links(agenda_item_dict),
             is_admin=user.is_admin_or_internal(),
+            related_events=related_events,
         )
 
     data = await get_view_data()

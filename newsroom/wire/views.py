@@ -451,6 +451,11 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
             template_kwargs["linkList"] = [get_links(item) for item in items]
             template_kwargs["is_admin"] = is_admin_or_internal(user_dict)
 
+            # Import here to prevent circular imports
+            from newsroom.agenda.utils import get_related_events
+
+            template_kwargs["related_events"] = await get_related_events(items[0])
+
         await save_user_notifications(
             [
                 dict(
@@ -526,6 +531,7 @@ class WireItemRouteArgs(BaseModel):
 @wire_endpoints.endpoint("/wire/<item_id>/copy", methods=["POST"])
 async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Request) -> Response:
     """Endpoint to copy Wire OR Agenda item(s)"""
+    from newsroom.agenda.utils import get_related_events
 
     user = get_user_from_request(request)
     item_type = get_type()
@@ -552,7 +558,7 @@ async def copy(args: WireItemRouteArgs, params: ItemActionUrlParams, request: Re
                 "location": "" if item_type != "agenda" else get_location_string(item_to_copy),
                 "contacts": get_public_contacts(item_to_copy),
                 "calendars": ", ".join([calendar.get("name") for calendar in item_to_copy.get("calendars") or []]),
-                "item": item_to_copy,
+                "related_events": await get_related_events(item_to_copy),
             }
         )
 

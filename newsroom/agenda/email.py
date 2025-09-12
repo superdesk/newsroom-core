@@ -13,11 +13,11 @@ from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
 
 async def send_coverage_notification_email(user, agenda, wire_item):
+    from .utils import get_related_events
+
     if user.get("receive_email"):
         template_kwargs = dict(
-            agenda=agenda,
-            item=wire_item,
-            section="agenda",
+            agenda=agenda, item=wire_item, section="agenda", related_events=await get_related_events(agenda)
         )
         await send_user_email(
             user,
@@ -37,6 +37,8 @@ async def send_agenda_notification_email(
     time_updated,
     coverage_modified,
 ):
+    from .utils import get_related_events
+
     if agenda and user.get("receive_email"):
         template_kwargs = dict(
             name=user.get("first_name"),
@@ -56,6 +58,7 @@ async def send_agenda_notification_email(
             coverage_updated=coverage_updated,
             time_updated=time_updated,
             coverage_modified=coverage_modified,
+            related_events=await get_related_events(agenda),
         )
         await send_user_email(
             user,

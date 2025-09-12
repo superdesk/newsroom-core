@@ -122,13 +122,24 @@ class AgendaCoverage(Dataclass):
 
 
 class EventLocation(Dataclass):
-    name: fields.TextWithKeyword
+    name: fields.TextWithKeyword | None = None
     address: Annotated[dict | None, fields.dynamic_mapping()] = None
     location: fields.Geopoint | None = None
     qcode: fields.Keyword | None = None
     geo: str | None = None
     formatted_address: str | None = None
-    details: list[str] | None = None
+    details: str | None = None
+
+    @field_validator("details", mode="before")
+    @classmethod
+    def normalize_details(cls, value: Any) -> str:
+        if isinstance(value, list):
+            return ", ".join(filter(None, value))
+        elif isinstance(value, str):
+            return value
+        elif value is None:
+            return ""
+        raise ValueError("Invalid type for 'details': must be string or list of strings.")
 
 
 class PlanningItemAgenda(Dataclass):
@@ -239,6 +250,8 @@ class AgendaItem(ResourceModel, ModelWithVersions):
     planning_items: Annotated[
         list[AgendaPlanningItem], fields.nested_list(include_in_parent=True), Field(default_factory=list)
     ]
+    planning_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
+    event_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
 
     # Field/Model validators
     _parse_datetime_fields = field_validator("firstcreated", "versioncreated", mode="before")(convert_none_to_utcnow)
@@ -259,6 +272,7 @@ class AgendaItem(ResourceModel, ModelWithVersions):
         "watches",
         "products",
         "planning_items",
+        "planning_ids",
         mode="before",
     )(convert_none_to_list)
 
