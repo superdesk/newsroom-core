@@ -1,23 +1,38 @@
-import {IDashboardCard} from './dashboard';
+import {IArticle} from './content';
 
-export type IDisplayFieldsConfig = string |
-    '/' |
-    '//' |
-    {
-        field: string,
-        component?: string;
-        styles?: {[key: string]: string | number}
-    } |
-    Array<
-        string |
-        '/' |
-        '//' |
-        {
-            field: string,
-            component?: string;
-            styles?: {[key: string]: string | number}
-        }
-    >
+export interface FieldRenderProps {
+    item?: IArticle;
+    [key: string]: unknown;
+}
+
+export type FieldRenderComponent<P extends FieldRenderProps = FieldRenderProps> = React.ComponentType<P>;
+
+export type Separator = '/' | '//' | '-';
+
+// allowed component names
+export type ComponentName = 'version_type' | string;
+
+// component override: { field: "version", component: "version_type" }
+export interface ComponentField {
+    field: keyof IArticle;
+    component: ComponentName;
+    styles?: React.CSSProperties;
+}
+
+// styled wrapper: { field: <any valid config>, styles: {...} }
+export interface StyledField {
+    field: IDisplayFieldsConfig;
+    styles: React.CSSProperties;
+    component?: ComponentName;
+}
+
+export type IDisplayFieldsConfig =
+    | keyof IArticle    // e.g. "source" or any item field name
+    | Separator         // "/", "//", "-"
+    | StyledField       // wraps a field (string/array/object) with styles
+    | ComponentField    // component override for an existing item field
+    | Array<IDisplayFieldsConfig>; // array of any of the above types
+
 
 export interface IListConfig {
     subject?: {

@@ -9,11 +9,45 @@ import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
 import {ExpiryDateLabel} from './ExpiryDateLabel';
+import {
+    IDisplayFieldsConfig as FieldConfig,
+    Separator,
+    StyledField,
+    ComponentField,
+    FieldRenderComponent,
+    FieldRenderProps
+} from 'interfaces/configs';
+import {IArticle} from 'interfaces';
 
-const ALLOWED_SEPARATORS = ['/', '//', '-'];
+
+interface FieldResult {
+    key: string;
+    Component: FieldRenderComponent;
+}
+
+interface FieldComponentsProps {
+    config: FieldConfig;
+    item: IArticle;
+    fieldProps?: FieldRenderProps;
+}
+
+const ALLOWED_SEPARATORS: Array<Separator> = ['/', '//', '-'];
+
 const SEPARATOR_KEY = 'separator';
 
-const MAP_FIELD_TO_COMPONENT: any = {
+const isSeparator = (f: FieldConfig): f is Separator =>
+    typeof f === 'string' && (ALLOWED_SEPARATORS).includes(f as Separator);
+
+const isStringField = (f: FieldConfig): f is keyof IArticle => typeof f === 'string' && !isSeparator(f);
+
+const isObjectCfg = (f: FieldConfig | null): f is StyledField | ComponentField =>
+    typeof f === 'object' && f !== null && !Array.isArray(f);
+
+const isStyledField = (f: FieldConfig): f is StyledField => isObjectCfg(f) && 'styles' in f;
+
+const isComponentField = (f: FieldConfig): f is ComponentField => isObjectCfg(f) && 'component' in f;
+
+const MAP_FIELD_TO_COMPONENT = {
     urgency: UrgencyLabel,
     source: Source,
     duration: DurationLabel,
@@ -25,31 +59,33 @@ const MAP_FIELD_TO_COMPONENT: any = {
     expiry: ExpiryDateLabel,
 };
 
-// Example config:
-// [
-//   "urgency", // simple field
-//   ["charcount", "/", "wordcount"] // multiple fields on the same line
-//   ["source", "//", {field: "department", styles: {fontWeight: "bold"}}] // custom styles
-// ]
-export function FieldComponents({config, item, fieldProps = {}}: any) {
+/**
+ * Example config:
+ * [
+ *   "urgency", // simple field
+ *   ["charcount", "/", "wordcount"], // multiple fields on the same line
+ *   ["source", "//", {field: "department", styles: {fontWeight: "bold"}}] // custom styles
+ * ]
+ */
+export function FieldComponents({config, item, fieldProps = {}}: FieldComponentsProps) {
     if (!Array.isArray(config)) {
-        return [];
+        return null;
     }
 
     const fields = config
-        .map((field: any) => getComponentForField(item, field))
-        .filter(Boolean)
-        .reduce((acc: any, curr: any) => {
+        .map((field) => getComponentForField(item, field))
+        .filter(x => x !== null)
+        .reduce((acc, curr) => {
             if (acc.length > 0 && acc[acc.length - 1].key === curr.key) {
                 // remove adjacent separators
                 return acc;
             }
             return [...acc, curr];
-        }, []);
+        }, [] as Array<FieldResult>);
 
     let separator = 0;
 
-    return fields.map(({key, Component}: any) => {
+    const components = fields.map(({key, Component}: FieldResult) => {
         const _key =
             key === SEPARATOR_KEY ? `${SEPARATOR_KEY}${++separator}` : key;
 
@@ -59,50 +95,25 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
             </span>
         );
     });
+
+    return <>{components}</>;
 }
 
-function getComponentForField(item: any, field: any): any {
-    if (typeof field === 'object' && typeof field.field === 'string') {
-        if (
-            typeof field.component === 'string' &&
-            typeof item[field.field] === 'string'
-        ) {
-            // example: { field: "version", component: "version_type" }
-            switch (field.component) {
-            case 'version_type':
-                return {
-                    key: field.field,
-                    Component: () => (
-                        <VersionType value={item[field.field]} />
-                    ),
-                };
-            }
-
-            return null;
-        }
-
-        if (typeof field.styles === 'object') {
-            // example: { field: "source", styles: {fontWeight: "bold"} }
-            const result = getComponentForField(item, field.field);
-
-            return result
-                ? {
-                    key: field.field,
-                    Component: (props: any) => (
-                        <span style={field.styles || {}}>
-                            <result.Component {...props} />
-                        </span>
-                    ),
-                }
-                : null;
-        }
-
-        return null;
-    } else if (Array.isArray(field) && field.length > 0) {
+/**
+ * Recursively resolves a field configuration into a FieldResult containing a React component and a unique key.
+ *
+ * Handles arrays (composite fields), separators, styled fields, component overrides, and string fields.
+ *
+ * @param item - The article data object to extract field values from.
+ * @param fieldConfig - The field configuration describing what to render.
+ * @returns A FieldResult with a key and a React component, or null if the config is invalid or not renderable.
+ */
+function getComponentForField(item: IArticle, fieldConfig: FieldConfig): FieldResult | null {
+    if (Array.isArray(fieldConfig) && fieldConfig.length > 0) {
         // example: ["source", "//", "department"]
-        const components = field
+        const components = fieldConfig
             .map((f: any) => getComponentForField(item, f))
-            .filter(Boolean);
+            .filter(x => x !== null);
 
         // remove orphan separators. For example in ['source', '//', 'department']
         // if the 'department' is empty, then '//' should not be shown
@@ -120,38 +131,70 @@ function getComponentForField(item: any, field: any): any {
                 </span>
             ),
         };
-    } else if (typeof field === 'string') {
-        // example: "//"
-        if (ALLOWED_SEPARATORS.includes(field)) {
+    }
+
+    if (isSeparator(fieldConfig)) {
+        return {
+            key: SEPARATOR_KEY, // will be modified afterwards, as it's not unique
+            Component: () => <span> {fieldConfig} </span>,
+        };
+    }
+
+    if (isStyledField(fieldConfig)) {
+        // example: { field: "source", styles: {fontWeight: "bold"} }
+        const inner = getComponentForField(item, fieldConfig.field);
+
+        if (!inner) return null;
+
+        return {
+            key: fieldConfig.field as string,
+            Component: (props: any) => (
+                <span style={fieldConfig.styles || {}}>
+                    <inner.Component {...props} />
+                </span>
+            ),
+        };
+    }
+
+    if (isComponentField(fieldConfig)) {
+        // example: { field: "version", component: "version_type" }
+        switch (fieldConfig.component) {
+        case 'version_type':
             return {
-                key: 'separator', // will be modified afterwards, as it's not unique
-                Component: () => <span> {field} </span>,
+                key: fieldConfig.field,
+                Component: () => (
+                    <VersionType value={item[fieldConfig.field] as string} />
+                ),
             };
         }
 
+        return null;
+    }
+
+    if (isStringField(fieldConfig)) {
         let Component = null;
 
         // example: "source"
-        // eslint-disable-next-line no-prototype-builtins
-        if (MAP_FIELD_TO_COMPONENT.hasOwnProperty(field)) {
+        if (fieldConfig in MAP_FIELD_TO_COMPONENT) {
             // predefined component
-            Component = MAP_FIELD_TO_COMPONENT[field];
-        } else if (typeof item[field] === 'string') {
+            const fieldKey = fieldConfig as keyof typeof MAP_FIELD_TO_COMPONENT;
+            Component = MAP_FIELD_TO_COMPONENT[fieldKey];
+        } else if (typeof item[fieldConfig] === 'string') {
             // string value from item
-            Component = () => <span className="test">{item[field]}</span>;
+            Component = () => <span className="test">{item[fieldConfig]}</span>;
         }
 
         if (Component) {
             return {
-                key: field,
-                Component,
+                key: fieldConfig,
+                Component: Component as FieldRenderComponent,
             };
-        } else {
-            return null;
         }
+
+        return null;
     }
 
-    console.warn(`Unknown field format ${field}`);
+    console.warn(`Unknown field format ${fieldConfig}`);
 
     return null;
 }
