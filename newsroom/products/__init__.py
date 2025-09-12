@@ -17,6 +17,7 @@ from .utils import (
     get_products_by_company_async,
     get_products_by_user_async,
     get_products_by_navigation_async,
+    get_products_for_request_user_and_company,
 )
 
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     "get_products_by_company_async",
     "get_products_by_user_async",
     "get_products_by_navigation_async",
+    "get_products_for_request_user_and_company",
     "ProductsService",
 ]
 

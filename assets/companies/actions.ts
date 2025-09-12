@@ -3,6 +3,7 @@ import {gettext, notify, errorHandler, updateRouteParams} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {ICompanySettingsStore} from './reducers';
+import {IEmbedContentType, IEmbedPermissionUserAction} from 'interfaces';
 
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
@@ -46,6 +47,17 @@ export function updateCompanySeats(productId: any, seats: any) {
         productId: productId,
         seats: seats,
     }};
+}
+
+export const TOGGLE_COMPANY_EMBED_PERMISSIONS = 'TOGGLE_COMPANY_EMBED_PERMISSIONS';
+export function toggleCompanyEmbedPermission(contentType: IEmbedContentType, userAction: IEmbedPermissionUserAction) {
+    return {
+        type: TOGGLE_COMPANY_EMBED_PERMISSIONS,
+        payload: {
+            contentType: contentType,
+            userAction: userAction,
+        },
+    };
 }
 
 export const NEW_COMPANY = 'NEW_COMPANY';

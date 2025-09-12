@@ -11,11 +11,16 @@ from superdesk.core import get_app_config
 from newsroom.types import SectionEnum
 from newsroom.types.wire import WireItem
 from newsroom.wire.service import WireItemService
+from newsroom.wire.embeds import (
+    apply_company_permissions_to_embeds,
+    update_embed_urls,
+    remove_all_embeds,
+    remove_internal_renditions,
+)
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.search.base_service import BaseNewshubSearchService
-from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, update_embed_urls
+from newsroom.news_api.utils import post_api_audit
 from newsroom.search.filters import apply_company_filter, apply_section_filter, apply_products_filter
-from newsroom.utils import remove_all_embeds
 
 from .filters import (
     apply_date_filter,
@@ -27,7 +32,6 @@ from .filters import (
     validate_page,
 )
 from .types import NewsApiSearchRequestArgs
-from ...wire.formatters.utils import remove_unpermissioned_embeds
 
 default_search_filters: list[SearchFilterFunction] = [
     prefill_company,
@@ -97,14 +101,14 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         for doc in response.body["_items"] or []:
             self._enhance_internal_item_hateoas(doc)
 
-            if get_app_config("NEWS_API_IMAGE_PERMISSIONS_ENABLED"):
+            if get_app_config("WIRE_EMBED_PERMISSIONS", True):
                 # set the references in the document to absolute values
-                update_embed_urls(doc, None)
                 if "associations" in (search_req.args.include_fields or []):
                     # apply the filtering to any media in the doc
-                    await remove_unpermissioned_embeds(doc, SectionEnum.NEWS_API)
+                    await apply_company_permissions_to_embeds([doc], SectionEnum.NEWS_API)
 
                     remove_internal_renditions(doc)
+                    update_embed_urls(doc, None)
                 else:
                     remove_all_embeds(doc)
 

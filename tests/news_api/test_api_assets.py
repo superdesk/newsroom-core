@@ -29,7 +29,7 @@ async def test_get_asset(client, app):
     image_id = await setup_image(app)
     response = await client.get("api/v1/assets/{}".format(image_id), headers={"Authorization": token.get("token")})
     assert response.status_code == 200
-    audit_check(str(image_id))
+    await audit_check(str(image_id))
 
 
 async def test_authorization_get_asset(client, app):

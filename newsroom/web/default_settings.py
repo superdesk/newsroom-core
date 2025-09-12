@@ -484,9 +484,6 @@ CONTENT_API_EXPIRY_QUERY_LIMIT = int(os.environ.get("CONTENT_API_EXPIRY_QUERY_LI
 
 NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 
-# Enables the application of product filtering to image references in the API and ATOM responses
-NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", "false"))
-
 ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
     "analyze_wildcard": False,
@@ -875,3 +872,15 @@ CALENDAR_LOCATIONS_FILTER_OPTIONS = {
     "country": True,
     "place": True,
 }
+
+#: Enable/Disable Wire embedded permissions
+#:
+#: .. versionadded: 3.1
+#:
+WIRE_EMBED_PERMISSIONS = False
+
+#: Enable/Disable using Wire Embed permissions in the Dashboard
+#:
+#: .. versionadded: 3.1
+#:
+USE_EMBED_PERMISSIONS_IN_DASHBOARD = True
