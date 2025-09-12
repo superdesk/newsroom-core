@@ -25,7 +25,7 @@ class CompanyConfigs(ConfigModel):
 
 
 def init_module(app: SuperdeskAsyncApp):
-    # Only set ``CLIENT_CONFIG.embed_permissions_enabled`` is this is the WebAPI
+    # Only set ``CLIENT_CONFIG.embed_permissions_enabled`` if this is the WebAPI
     if app.wsgi.config.get("CLIENT_CONFIG"):
         app.wsgi.config["CLIENT_CONFIG"]["embed_permissions_enabled"] = app.wsgi.config.get(
             "WIRE_EMBED_PERMISSIONS", True
