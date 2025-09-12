@@ -1,5 +1,6 @@
 from typing import Annotated, Optional
 from datetime import datetime
+from enum import Enum, unique
 
 from superdesk.core.resources import Dataclass
 from superdesk.core.resources.validators import validate_data_relation_async, validate_iunique_value_async
@@ -14,6 +15,12 @@ class CompanyProduct(Dataclass):
     _id: Annotated[ObjectId, validate_data_relation_async("products")]
     section: SectionEnum
     seats: int = 0
+
+
+@unique
+class EmbedPermissionUserAction(str, Enum):
+    DISPLAY = "display"
+    DOWNLOAD = "download"
 
 
 class CompanyResource(NewshubResourceModel):
@@ -47,3 +54,12 @@ class CompanyResource(NewshubResourceModel):
     company_size: Optional[str] = None
     referred_by: Optional[str] = None
     internal: bool = False
+
+    embed_permissions: dict[str, list[EmbedPermissionUserAction]] = Field(default_factory=dict)
+
+    def is_permissioned_for_embed(self, content_type: str, user_action: str, default: bool | None = None) -> bool:
+        try:
+            return user_action in self.embed_permissions[content_type]
+        except KeyError:
+            # By default, Companies have access to all embedded content unless configured otherwise
+            return default if default is not None else True

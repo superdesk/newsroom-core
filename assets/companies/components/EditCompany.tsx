@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {isEmpty} from 'lodash';
 
-import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IUser} from 'interfaces';
+import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IUser, IEmbedContentType, IEmbedPermissionUserAction} from 'interfaces';
 import {ICompanySettingsStore} from '../reducers';
 import {gettext, shortDate} from 'utils';
 import {
@@ -11,6 +11,7 @@ import {
     toggleCompanySection,
     toggleCompanyProduct,
     updateCompanySeats,
+    toggleCompanyEmbedPermission,
     postCompany,
     setError,
     deleteCompany,
@@ -46,6 +47,7 @@ interface IDispatchProps {
     toggleCompanySection(sectionId: ISection['_id']): void;
     toggleCompanyProduct(productId: IProduct['_id'], sectionId: ISection['_id'], enable: boolean): void;
     updateCompanySeats(productId: IProduct['_id'], seats: number): void;
+    toggleCompanyEmbedPermission(contentType: IEmbedContentType, userAction: IEmbedPermissionUserAction): void;
     saveCompany(): void;
     setError(errors: {[field: string]: Array<string>}): void;
     deleteCompany(): void;
@@ -240,6 +242,7 @@ class EditCompany extends React.Component<IProps, IState> {
                             toggleCompanySection={this.props.toggleCompanySection}
                             toggleCompanyProduct={this.props.toggleCompanyProduct}
                             updateCompanySeats={this.props.updateCompanySeats}
+                            toggleCompanyEmbedPermission={this.props.toggleCompanyEmbedPermission}
                         />
                     }
                     {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
@@ -278,6 +281,7 @@ const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     toggleCompanySection: (sectionId) => dispatch(toggleCompanySection(sectionId)),
     toggleCompanyProduct: (productId, sectionId, enable) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
     updateCompanySeats: (productId, seats) => dispatch(updateCompanySeats(productId, seats)),
+    toggleCompanyEmbedPermission: (contentType, userAction) => dispatch(toggleCompanyEmbedPermission(contentType, userAction)),
     saveCompany: () => dispatch(postCompany()),
     setError: (errors) => dispatch(setError(errors)),
     deleteCompany: () => dispatch(deleteCompany()),

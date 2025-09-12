@@ -7,7 +7,8 @@ from superdesk.core.module import Module
 from superdesk.core.web import EndpointGroup
 from superdesk.utc import utcnow
 
-from newsroom.types import WireItem
+from newsroom.types import WireItem, SectionEnum
+from newsroom.wire.embeds import apply_company_permissions_to_embeds
 from newsroom.formatters import get_formatter_by_classname
 from newsroom.settings import get_setting
 from newsroom.news_api.utils import post_api_audit
@@ -39,6 +40,7 @@ async def get_item(args: RouteArguments, params: RouteParams, request: Request) 
         return await request.abort(404)
 
     item_dict = item.to_dict()
+    await apply_company_permissions_to_embeds([item_dict], SectionEnum.NEWS_API)
     formatted_item = await formatter.format_item(item_dict)
 
     response = app.response_class(response=formatted_item, status=200, mimetype=formatter.MIMETYPE)
