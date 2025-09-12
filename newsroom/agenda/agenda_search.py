@@ -11,7 +11,7 @@ from newsroom.types import (
     UserResourceModel,
     CompanyResource,
 )
-from newsroom.auth.utils import get_company_from_request
+from newsroom.auth.utils import get_company_from_request, get_user_from_request
 from newsroom.search.types import NewshubSearchRequest
 from newsroom.search.base_web_service import BaseWebSearchService
 from newsroom.search.filters import (
@@ -22,6 +22,7 @@ from newsroom.search.filters import (
     apply_section_filter,
     apply_company_filter,
 )
+from newsroom.template_filters import is_admin_or_internal
 
 from .filters import (
     AgendaSearchRequestArgs,
@@ -37,7 +38,7 @@ from .filters import (
     apply_highlights,
 )
 from .agenda_service import AgendaItemService
-from .utils import remove_restricted_coverage_info
+from .utils import remove_restricted_coverage_info, remove_fields_for_public_user
 
 logger = logging.getLogger(__name__)
 
@@ -172,6 +173,11 @@ class AgendaSearchServiceAsync(BaseWebSearchService[AgendaSearchRequestArgs, Age
 
         cursor = await self.get_items_by_id(item_ids)
         items = await cursor.to_list_raw()
+
+        user = get_user_from_request(None)
+        if not is_admin_or_internal(user):
+            for item in items:
+                remove_fields_for_public_user(item)
 
         company = get_company_from_request(None)
         if company and company.restrict_coverage_info:

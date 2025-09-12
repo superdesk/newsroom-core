@@ -146,6 +146,20 @@ Feature: News API Item
     """
 
   Scenario: Item request response restricted by featured image product
+    Given "companies"
+    """
+    [{
+      "name": "Test Company", "is_enabled": true,
+      "embed_permissions": {
+        "sd_product": ["display", "download"]
+      }
+    }]
+    """
+    Given "news_api_tokens"
+      """
+      [{"company" : "#companies._id#", "enabled" : true}]
+      """
+    When we save API token
     Given "items"
         """
         [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",

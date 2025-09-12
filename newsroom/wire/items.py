@@ -115,7 +115,7 @@ async def get_items_for_dashboard(
     for card in cards:
         if card.config is not None and card.config.get("product"):
             items_by_card[card.label] = [
-                filter_fields(item.to_dict()) if filter_public_fields else item.to_dict()
+                filter_fields(item) if filter_public_fields else item
                 for item in await wire_search.get_product_items_for_dashboard(
                     all_products[ObjectId(card.config.get("product"))],
                     card.config.get("size") or get_card_size(card.dashboard_type),
