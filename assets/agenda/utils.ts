@@ -280,11 +280,11 @@ export function hasLocation(item: any) {
 }
 
 export function hasLocationNotes(item: IAgendaItem) {
-    return get(item, 'location[0].details[0].length', 0) > 0;
+    return get(item, 'location[0].details', '').trim().length > 0;
 }
 
 export function getLocationDetails(item: IAgendaItem) {
-    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details.trim();
 }
 
 /**
@@ -329,7 +329,7 @@ export function isPlanningItem(item: any) {
 }
 
 export function planHasEvent(item: any) {
-    return isPlanningItem(item) && item.event_id != null;
+    return isPlanningItem(item) && item.event_ids != null;
 }
 
 /**
@@ -1180,3 +1180,13 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
 export const isTopStory = (subj: ISubject) => subj.scheme === window.newsroom.client_config.agenda_top_story_scheme;
 export const wireLabel = (subj: ISubject) => subj.scheme === window.newsroom.client_config.wire_labels_scheme;
+
+export const getFilteredItems = (itemIds: Array<IAgendaItem['_id']>, items: Array<IAgendaItem>) => {
+    if (!itemIds || itemIds.length === 0) {
+        return [];
+    }
+
+    return itemIds
+        .map((id:any) => items[id])
+        .filter((item) => item != null);
+};
