@@ -1,11 +1,5 @@
+import {FieldRenderProps} from 'interfaces/configs';
 import React from 'react';
-
-type Named = { name?: string };
-
-export interface IServiceNamesProps {
-    value?: Named[] | string | null;
-    styles?: React.CSSProperties;
-}
 
 /**
  * ServiceNames component
@@ -18,16 +12,20 @@ export interface IServiceNamesProps {
  * - `[{ name: "Reuters" }, { name: "AP" }]` → `"Reuters, AP"`
  * - `"BBC"` → `"BBC"`
  */
-export const ServiceNames = ({value, styles}: IServiceNamesProps) => {
-    if (!value) return null;
+export const ServiceNames = ({item}: FieldRenderProps) => {
+    if (!item) return null;
+
+    const services = item['service'] || [];
+
+    if (!services) return null;
 
     const names: string[] = [];
 
-    if (Array.isArray(value)) {
-        names.push(...value.map(v => v.name ?? '').filter(Boolean));
+    if (Array.isArray(services)) {
+        names.push(...services.map(v => v.name ?? '').filter(Boolean));
     }
-    else if (typeof value === 'string')
-        names.push(value);
+    else if (typeof services === 'string')
+        names.push(services);
 
-    return names.length > 0 ? <span style={styles}>{names.join(', ')}</span> : null;
+    return names.length > 0 ? <span style={{fontWeight: 'bold'}}>{names.join(', ')}</span> : null;
 };

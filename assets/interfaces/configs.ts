@@ -12,7 +12,6 @@ export type Separator = '/' | '//' | '-';
 // allowed component names
 export enum ComponentName {
     VersionType = 'version_type',
-    ServiceNames = 'service_names',
 }
 
 // component override: { field: "version", component: "version_type" }

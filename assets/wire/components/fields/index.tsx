@@ -8,7 +8,7 @@ import {PreviousVersions} from './PreviousVersions';
 import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
-import {ServiceNames, IServiceNamesProps} from './ServiceNames';
+import {ServiceNames} from './ServiceNames';
 import {ExpiryDateLabel} from './ExpiryDateLabel';
 import {
     IDisplayFieldsConfig as FieldConfig,
@@ -59,6 +59,7 @@ const MAP_FIELD_TO_COMPONENT = {
     embargo: Embargo,
     versioncreated: VersionCreated,
     expiry: ExpiryDateLabel,
+    service: ServiceNames,
 };
 
 /**
@@ -145,16 +146,6 @@ function getComponentForField(item: IArticle, fieldConfig: FieldConfig): FieldRe
     if (isComponentField(fieldConfig)) {
         // example: { field: "version", component: "version_type" }
         switch (fieldConfig.component) {
-        case ComponentName.ServiceNames:
-            return {
-                key: fieldConfig.field,
-                Component: () => (
-                    <ServiceNames
-                        value={item[fieldConfig.field] as IServiceNamesProps['value']}
-                        styles={fieldConfig.styles ?? {}}
-                    />
-                ),
-            };
         case ComponentName.VersionType:
             return {
                 key: fieldConfig.field,
