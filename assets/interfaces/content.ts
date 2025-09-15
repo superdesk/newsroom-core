@@ -41,4 +41,5 @@ export interface IArticle extends IResourceItem {
     _access?: boolean;
     charcount?: number;
     urgency?: number;
+    service?: Array<ISubject>;
 }

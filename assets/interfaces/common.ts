@@ -1,6 +1,6 @@
 import {IUser} from './user';
 import {IArticle} from './content';
-import {IAgendaItem, IAgendaState} from './agenda';
+import {IAgendaItem} from './agenda';
 
 export type TDatetime = string; // ISO8601 format
 

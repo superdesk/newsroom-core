@@ -8,6 +8,7 @@ import {PreviousVersions} from './PreviousVersions';
 import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
+import {ServiceNames} from './ServiceNames';
 import {ExpiryDateLabel} from './ExpiryDateLabel';
 import {
     IDisplayFieldsConfig as FieldConfig,
@@ -15,7 +16,8 @@ import {
     StyledField,
     ComponentField,
     FieldRenderComponent,
-    FieldRenderProps
+    FieldRenderProps,
+    ComponentName,
 } from 'interfaces/configs';
 import {IArticle} from 'interfaces';
 
@@ -57,6 +59,7 @@ const MAP_FIELD_TO_COMPONENT = {
     embargo: Embargo,
     versioncreated: VersionCreated,
     expiry: ExpiryDateLabel,
+    service: ServiceNames,
 };
 
 /**
@@ -140,6 +143,19 @@ function getComponentForField(item: IArticle, fieldConfig: FieldConfig): FieldRe
         };
     }
 
+    if (isComponentField(fieldConfig)) {
+        // example: { field: "version", component: "version_type" }
+        switch (fieldConfig.component) {
+        case ComponentName.VersionType:
+            return {
+                key: fieldConfig.field,
+                Component: () => (
+                    <VersionType value={item[fieldConfig.field] as string} />
+                ),
+            };
+        }
+    }
+
     if (isStyledField(fieldConfig)) {
         // example: { field: "source", styles: {fontWeight: "bold"} }
         const inner = getComponentForField(item, fieldConfig.field);
@@ -154,21 +170,6 @@ function getComponentForField(item: IArticle, fieldConfig: FieldConfig): FieldRe
                 </span>
             ),
         };
-    }
-
-    if (isComponentField(fieldConfig)) {
-        // example: { field: "version", component: "version_type" }
-        switch (fieldConfig.component) {
-        case 'version_type':
-            return {
-                key: fieldConfig.field,
-                Component: () => (
-                    <VersionType value={item[fieldConfig.field] as string} />
-                ),
-            };
-        }
-
-        return null;
     }
 
     if (isStringField(fieldConfig)) {
