@@ -53,6 +53,9 @@ const config = {
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
                     process.cwd(), // for app
                 ],
+                exclude: [
+                    path.resolve('node_modules', 'video.js'),
+                ],
                 loader: 'ts-loader',
                 options: {
                     transpileOnly: true,
