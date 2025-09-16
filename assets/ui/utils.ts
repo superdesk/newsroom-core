@@ -1,6 +1,6 @@
 import {isEmpty} from 'lodash';
 import classNames from 'classnames';
-import videojs from 'video.js';
+import videojs from '!video.js';
 
 type VjsPlayer = ReturnType<typeof videojs>;
 const isNotEmpty = (x: any) => !isEmpty(x);
