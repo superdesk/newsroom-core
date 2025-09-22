@@ -377,7 +377,7 @@ pytest-asyncio==0.26.0
     # via -r dev-requirements.in
 pytest-cov==7.0.0
     # via -r dev-requirements.in
-pytest-mock==3.15.0
+pytest-mock==3.15.1
     # via -r dev-requirements.in
 python-bidi==0.4.2
     # via
@@ -532,7 +532,7 @@ types-werkzeug==1.0.9
     # via
     #   -r mypy-requirements.txt
     #   types-flask
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r mypy-requirements.txt
     #   aiosignal
