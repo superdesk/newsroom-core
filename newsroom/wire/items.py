@@ -126,6 +126,6 @@ async def get_items_for_dashboard(
         elif card.dashboard_type == "4-photo-gallery":
             # Omit external media, let the client manually request these
             # using '/media_card_external' endpoint
-            items_by_card[card.label] = []
+            items_by_card.pop(card.label, None)
 
     return items_by_card
