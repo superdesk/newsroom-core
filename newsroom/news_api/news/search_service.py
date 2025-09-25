@@ -108,7 +108,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
                     await apply_company_permissions_to_embeds([doc], SectionEnum.NEWS_API)
 
                     remove_internal_renditions(doc)
-                    update_embed_urls(doc, None)
+                    await update_embed_urls(doc, None)
                 else:
                     remove_all_embeds(doc)
 

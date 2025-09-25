@@ -15,6 +15,11 @@ from .formatters import (
     PictureFormatter,
     NINJSFormatter,
     NINJSFormatter2,
+    HTMLFormatter,
+    HTMLMediaFormatter,
+    HTMLPackageFormatter,
+    NINJSWithoutEmbedsFormatter,
+    NINJSPackageFormatter,
 )
 
 wire_endpoints = EndpointGroup("wire", __name__)
@@ -59,6 +64,11 @@ def init_module(app: SuperdeskAsyncApp) -> None:
     register_formatter(JsonFormatter)
     register_formatter(NINJSFormatter)
     register_formatter(NINJSFormatter2)
+    register_formatter(HTMLFormatter)
+    register_formatter(HTMLMediaFormatter)
+    register_formatter(HTMLPackageFormatter)
+    register_formatter(NINJSWithoutEmbedsFormatter)
+    register_formatter(NINJSPackageFormatter)
 
     if app.wsgi.config.get("ALLOW_PICTURE_DOWNLOAD", True):
         register_formatter(PictureFormatter)

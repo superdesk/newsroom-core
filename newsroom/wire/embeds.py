@@ -1,4 +1,5 @@
-from typing import Generator, Callable
+from typing import Generator, Callable, TypeAlias, Awaitable
+from inspect import isawaitable
 import logging
 
 import re
@@ -61,20 +62,25 @@ async def apply_company_permissions_to_embeds(items: list[dict], section: Sectio
         _remove_or_disable_item_media(doc, company, sdesk_products)
 
 
-def update_embeds_in_body(
+EmbedUpdateCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], bool]
+EmbedUpdateAsyncCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], Awaitable[bool]]
+
+
+# TODO-PR: Support async callbacks
+async def update_embeds_in_body(
     item,
-    update_image: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
-    update_audio: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
-    update_video: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
+    update_image_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
+    update_audio_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
+    update_video_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
 ):
     """
     Scans the story body for editor3 embeds and calls the appropriate passed function for each embed type.
     The functions should expect the item, element and the number associated with the association
 
     :param item:
-    :param update_image:
-    :param update_audio:
-    :param update_video:
+    :param update_image_cb:
+    :param update_audio_cb:
+    :param update_video_cb:
     :return:
     """
 
@@ -88,28 +94,40 @@ def update_embeds_in_body(
             continue  # No figure element found after the comment
         figure_elem = figure_elem[0]
         if figure_elem is not None and figure_elem.tag == "figure":
-            if update_image is not None:
+            if update_image_cb is not None:
                 elem = figure_elem.find("./img")
                 if elem is not None:
-                    body_updated = update_image(embed_item, elem, editor_id) or body_updated
+                    image_updated = update_image_cb(embed_item, elem, editor_id)
+                    if isawaitable(image_updated):
+                        image_updated = await image_updated
+                    if image_updated:
+                        body_updated = True
                     continue
 
-            if update_audio is not None:
+            if update_audio_cb is not None:
                 elem = figure_elem.find("./audio")
                 if elem is not None:
-                    body_updated = update_audio(embed_item, elem, editor_id) or body_updated
+                    audio_updated = update_audio_cb(embed_item, elem, editor_id)
+                    if isawaitable(audio_updated):
+                        audio_updated = await audio_updated
+                    if audio_updated:
+                        body_updated = True
                     continue
 
-            if update_video is not None:
+            if update_video_cb is not None:
                 elem = figure_elem.find("./video")
                 if elem is not None:
-                    body_updated = update_video(embed_item, elem, editor_id) or body_updated
+                    video_updated = update_video_cb(embed_item, elem, editor_id)
+                    if isawaitable(video_updated):
+                        video_updated = await video_updated
+                    if video_updated:
+                        body_updated = True
 
     if body_updated:
         item["body_html"] = to_string(root_elem, method="html")
 
 
-def update_embed_urls(item: dict, token: str | None = None):
+async def update_embed_urls(item: dict, token: str | None = None):
     """
     Update the urls in the embeds to the endpoint that allows logging of the item that the embed belongs to
 
@@ -148,7 +166,7 @@ def update_embed_urls(item: dict, token: str | None = None):
             return True  # Return True if assignment happened
         return False  # Return False if src or elem was None
 
-    update_embeds_in_body(item, update_embed, update_embed, update_embed)
+    await update_embeds_in_body(item, update_embed, update_embed, update_embed)
 
 
 def remove_all_embeds(item: dict, remove_by_class: bool = True, remove_media_embeds: bool = True) -> bool:

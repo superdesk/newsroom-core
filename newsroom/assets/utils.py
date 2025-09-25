@@ -1,5 +1,7 @@
 import os
 import bson
+import logging
+from base64 import b64encode
 
 from werkzeug.utils import secure_filename
 from typing import Any
@@ -15,6 +17,9 @@ from .module import ASSETS_ENDPOINT_GROUP_NAME, ASSETS_RESOURCE
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
 
 
+logger = logging.getLogger(__name__)
+
+
 async def get_media_file(media_id: str, begin: int = 0, end: int | None = None) -> SuperdeskAsyncFile | None:
     """
     Asynchronously retrieves a media file from the database using its media ID.
@@ -28,6 +33,11 @@ async def get_media_file(media_id: str, begin: int = 0, end: int | None = None) 
         return result
     except bson.errors.InvalidId:
         return None
+
+
+async def get_media_file_as_base64(media_id: str) -> bytes | None:
+    file = await get_media_file(media_id)
+    return None if not file else b64encode(await file.read())
 
 
 def get_content_disposition(filename: str | None, content_type: str = "") -> str:

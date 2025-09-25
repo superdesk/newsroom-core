@@ -18,6 +18,6 @@ class NINJSFormatter2(NINJSFormatter):
         self.direct_copy_properties += ("associations",)
 
     async def _transform_to_ninjs(self, item):
-        update_embed_urls(item)
+        await update_embed_urls(item)
         set_association_links(item)
         return remove_internal_renditions(await super()._transform_to_ninjs(item))
