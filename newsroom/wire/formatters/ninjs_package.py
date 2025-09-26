@@ -30,5 +30,6 @@ class NINJSPackageFormatter(NINJSFormatter):
     async def _transform_to_ninjs(self, item: dict[str, Any]):
         await self.update_embeds(item)
         resp = await super()._transform_to_ninjs(item)
+        # log media as the last step in case something fails!
         await log_media_downloads(item)
         return resp

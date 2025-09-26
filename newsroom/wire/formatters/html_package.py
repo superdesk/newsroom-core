@@ -24,7 +24,7 @@ class HTMLPackageFormatter(BaseWireFormatter):
 
     async def format_item(self, item: dict, item_type: str | None = "items") -> bytes:
         await self.update_embeds(item)
-        await log_media_downloads(item)
         resp = str.encode(await render_template("download_embed.html", item=item), "utf-8")
         # log media as the last step in case something fails!
+        await log_media_downloads(item)
         return resp
