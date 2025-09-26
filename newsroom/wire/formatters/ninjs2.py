@@ -13,9 +13,7 @@ class NINJSFormatter2(NINJSFormatter):
     name = lazy_gettext("Ninjs v2")
     # No sections this is an API only format
     sections = []
-
-    def __init__(self):
-        self.direct_copy_properties += ("associations",)
+    direct_copy_properties: set[str] = NINJSFormatter.direct_copy_properties.union(["associations"])
 
     async def _transform_to_ninjs(self, item):
         await update_embed_urls(item)

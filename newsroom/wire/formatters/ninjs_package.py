@@ -25,9 +25,7 @@ class NINJSPackageFormatter(NINJSFormatter):
         SectionEnum.MEDIA_RELEASES,
     ]
     MULTI_ZIP = True
-    direct_copy_properties: set[str] = NINJSFormatter.direct_copy_properties | set(
-        "associations",
-    )
+    direct_copy_properties: set[str] = NINJSFormatter.direct_copy_properties.union(["associations"])
 
     async def _transform_to_ninjs(self, item: dict[str, Any]):
         await self.update_embeds(item)
