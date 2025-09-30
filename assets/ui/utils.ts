@@ -34,32 +34,44 @@ export function setupMediaPlayers(root: HTMLElement) {
     root.querySelectorAll('video, audio').forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
 
-        const disable = element.getAttribute('data-disable-download') === 'true';
-        element.setAttribute('data-vjs-initialized', 'true');
+        try {
+            const disable = element.getAttribute('data-disable-download') === 'true';
 
-        if (disable) {
-            // Remove native controls everywhere on all major browsers
-            element.removeAttribute('controls');
-            // Additional override for browsers that support controlsList
-            element.setAttribute('controlsList', 'nodownload');
-            // Disable right-click context menu on all browsers
-            element.addEventListener('contextmenu', (e) => e.preventDefault());
+            if (disable) {
+                // Remove native controls everywhere on all major browsers
+                element.removeAttribute('controls');
+                // Additional override for browsers that support controlsList
+                element.setAttribute('controlsList', 'nodownload');
+                // Disable right-click context menu on all browsers
+                element.addEventListener('contextmenu', (e) => e.preventDefault());
 
-            if (element instanceof HTMLVideoElement) {
-                element.classList.add('video-js', 'vjs-big-play-centered');
-            } else if (element instanceof HTMLAudioElement) {
-                element.classList.add('video-js');
+                if (element instanceof HTMLVideoElement) {
+                    element.classList.add('video-js', 'vjs-big-play-centered');
+                } else if (element instanceof HTMLAudioElement) {
+                    element.classList.add('video-js');
+                }
+
+                // Guard to return early if import is not resolved
+                if (typeof videojs !== 'function') {
+                    console.warn('videojs not ready yet'); 
+                    return;
+                }
+
+                const player = videojs(element, {
+                    controls: true,
+                    preload: 'auto',
+                    fluid: true,
+                });
+                players.push(player);
+
+                // Mark element as initialized only after successful initialization to allow for retrys
+                element.setAttribute('data-vjs-initialized', 'true');
+            } else {
+                // Enable all native controls
+                element.setAttribute('controls', '');
             }
-
-            const player = videojs(element, {
-                controls: true,
-                preload: 'auto',
-                fluid: true,
-            });
-            players.push(player);
-        } else {
-            // Enable all native controls
-            element.setAttribute('controls', '');
+        } catch (err) {
+            console.error('Video.js init failed', err);
         }
     });
 
