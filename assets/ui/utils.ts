@@ -28,50 +28,63 @@ export function bem(block: any, element: any, modifier: any) {
     return classes.join(' ');
 }
 
+function tryInitPlayer(el: HTMLElement, retries = 3, delay = 100): VjsPlayer | null {
+    if (!document.body.contains(el)) return null;
+
+    if (typeof videojs !== 'function') {
+        if (retries > 0) {
+            setTimeout(() => tryInitPlayer(el, retries - 1, delay), delay);
+        } else {
+            console.warn('video.js not ready after retries for', el);
+        }
+        return null;
+    }
+
+    try {
+        const player = videojs(el, {
+            controls: true,
+            preload: 'auto',
+            fluid: true,
+        });
+        // Mark element initialized only after success
+        el.setAttribute('data-vjs-initialized', 'true');
+        return player;
+    } catch (err) {
+        console.warn('video.js init failed, retrying...', err);
+        if (retries > 0) {
+            setTimeout(() => tryInitPlayer(el, retries - 1, delay), delay);
+        }
+        return null;
+    }
+}
+
 export function setupMediaPlayers(root: HTMLElement) {
     const players: Array<VjsPlayer> = [];
 
     root.querySelectorAll('video, audio').forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
 
-        try {
-            const disable = element.getAttribute('data-disable-download') === 'true';
+        const disable = element.getAttribute('data-disable-download') === 'true';
 
-            if (disable) {
-                // Remove native controls everywhere on all major browsers
-                element.removeAttribute('controls');
-                // Additional override for browsers that support controlsList
-                element.setAttribute('controlsList', 'nodownload');
-                // Disable right-click context menu on all browsers
-                element.addEventListener('contextmenu', (e) => e.preventDefault());
+        if (disable) {
+            // Remove native controls everywhere on all major browsers
+            element.removeAttribute('controls');
+            // Additional override for browsers that support controlsList
+            element.setAttribute('controlsList', 'nodownload');
+            // Disable right-click context menu on all browsers
+            element.addEventListener('contextmenu', (e) => e.preventDefault());
 
-                if (element instanceof HTMLVideoElement) {
-                    element.classList.add('video-js', 'vjs-big-play-centered');
-                } else if (element instanceof HTMLAudioElement) {
-                    element.classList.add('video-js');
-                }
-
-                // Guard to return early if import is not resolved
-                if (typeof videojs !== 'function') {
-                    console.warn('videojs not ready yet'); 
-                    return;
-                }
-
-                const player = videojs(element, {
-                    controls: true,
-                    preload: 'auto',
-                    fluid: true,
-                });
-                players.push(player);
-
-                // Mark element as initialized only after successful initialization to allow for retrys
-                element.setAttribute('data-vjs-initialized', 'true');
-            } else {
-                // Enable all native controls
-                element.setAttribute('controls', '');
+            if (element instanceof HTMLVideoElement) {
+                element.classList.add('video-js', 'vjs-big-play-centered');
+            } else if (element instanceof HTMLAudioElement) {
+                element.classList.add('video-js');
             }
-        } catch (err) {
-            console.error('Video.js init failed', err);
+
+            const player = tryInitPlayer(element);
+            if (player) players.push(player);
+        } else {
+            // Enable all native controls
+            element.setAttribute('controls', '');
         }
     });
 
