@@ -5,19 +5,19 @@ from quart_babel import lazy_gettext
 from superdesk.utils import json_serialize_datetime_objectId
 
 from newsroom.types import SectionEnum
-from newsroom.formatters import BaseFormatter, FormatterAssetType
+
+from .base_wire_formatter import BaseWireFormatter
 
 
-class NINJSFormatter(BaseFormatter):
+class NINJSFormatter(BaseWireFormatter):
     format_id = "ninjs"
     name = lazy_gettext("Ninjs")
     sections = [SectionEnum.WIRE]
-    assets = [FormatterAssetType.TEXT]
 
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"
 
-    direct_copy_properties = (
+    direct_copy_properties: set[str] = {
         "versioncreated",
         "usageterms",
         "language",
@@ -49,7 +49,7 @@ class NINJSFormatter(BaseFormatter):
         "evolvedfrom",
         "original_id",
         "decsription_text",
-    )
+    }
 
     async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         item = item.copy()
