@@ -67,7 +67,7 @@ associations: dict[str, Any] = {
             "original": {
                 "mimetype": "audio/mp3",
                 "href": "/assets/640feb9bfb5122dcf06a6f7c",
-                "media": "640feb9bfb5122dcf06a6f7c",
+                "media": media_id,
             }
         },
         "mimetype": "audio/mp3",
@@ -81,14 +81,14 @@ associations: dict[str, Any] = {
                 "width": 800,
                 "height": 600,
                 "mimetype": "image/jpeg",
-                "media": "633d11b9fb5122dcf06a6f03",
+                "media": media_id,
             },
             "16-9": {
                 "href": "/assets/633d0f59fb5122dcf06a6ee8",
                 "width": 1280,
                 "height": 720,
                 "mimetype": "image/jpeg",
-                "media": "633d0f59fb5122dcf06a6ee8",
+                "media": media_id,
                 "poi": {},
             },
         },
@@ -150,9 +150,10 @@ async def _setup_company_user_products(client, app) -> bson.ObjectId:
                 "name": "Another Press co.",
                 "is_enabled": True,
                 "embed_permissions": {
+                    "picture": ["display"],
                     "video": ["display", "download"],
                     "audio": ["display", "download"],
-                    "sd_product": ["display", "download"],
+                    "sd_product": ["display"],
                 },
             }
         ],
@@ -427,3 +428,36 @@ async def test_html_package_formatter_download_multiple(client, app):
             items[1]["_id"]: ["download"],
         },
     )
+
+
+async def test_package_download_permissions(client, app):
+    company_id = await _setup_company_user_products(client, app)
+
+    # Remove sdesk product checking, use content type directly and remove download permission for video
+    await test_utils.update_entries_for(
+        "companies",
+        company_id,
+        {
+            "embed_permissions": {
+                "featuremedia": [],
+                "picture": [],
+                "video": ["display"],
+                "audio": ["display", "download"],
+            }
+        },
+    )
+
+    with open(get_fixture_path("picture.jpg"), "rb") as original_fixture:
+        original_fixture_data = original_fixture.read()
+
+    _file = await test_utils.download_zip_file(client, items_ids, "html_package", "wire")
+    with ZipFile(_file) as zf:
+        # pictures and video will not be included, only audio will be
+        _assert_zip_file_contents(
+            zf,
+            {
+                test_utils.get_download_filename("weather.html", items[1]): None,
+                test_utils.get_download_filename("amazon-bookstore-opening.html", item): None,
+                _get_rendition_href("editor_0", "original"): original_fixture_data,
+            },
+        )

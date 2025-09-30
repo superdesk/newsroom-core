@@ -41,7 +41,9 @@ def iterate_embeds(
         yield comment, f"editor_{m.group(1)}"
 
 
-async def apply_company_permissions_to_embeds(items: list[dict], section: SectionEnum) -> None:
+async def apply_company_permissions_to_embeds(
+    items: list[dict], section: SectionEnum, use_download_as_view_permission: bool = False
+) -> None:
     if not len(items) or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
         return
 
@@ -59,7 +61,7 @@ async def apply_company_permissions_to_embeds(items: list[dict], section: Sectio
     }
 
     for doc in items:
-        _remove_or_disable_item_media(doc, company, sdesk_products)
+        _remove_or_disable_item_media(doc, company, sdesk_products, use_download_as_view_permission)
 
 
 EmbedUpdateCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], bool]
@@ -270,7 +272,9 @@ def _embed_item_has_product_code(embed_item: dict, products: set[str]) -> bool:
 
 
 def _get_associations_to_remove_or_disable(
-    item: dict, company: CompanyResource, permitted_products: set[str]
+    item: dict,
+    company: CompanyResource,
+    permitted_products: set[str],
 ) -> tuple[set[str], set[str]]:
     disable_display: set[str] = set()
     disable_download: set[str] = set()
@@ -300,8 +304,12 @@ def _get_associations_to_remove_or_disable(
     return disable_display, disable_download
 
 
-def _remove_or_disable_item_media(item: dict, company: CompanyResource, permitted_products: set[str]) -> None:
+def _remove_or_disable_item_media(
+    item: dict, company: CompanyResource, permitted_products: set[str], use_download_as_view_permission: bool = False
+) -> None:
     disable_display, disable_download = _get_associations_to_remove_or_disable(item, company, permitted_products)
+    if use_download_as_view_permission:
+        disable_display |= disable_download
     disable_embed_codes = not company.is_permissioned_for_embed("embed_code", EmbedPermissionUserAction.DISPLAY)
 
     if not disable_download and not disable_display and not disable_embed_codes:

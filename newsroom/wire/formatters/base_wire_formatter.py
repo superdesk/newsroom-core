@@ -90,7 +90,7 @@ class BaseWireFormatter(BaseFormatter):
             rendition_data["href"] = rendition_data.get("href", "").lstrip("/")
 
     async def update_embeds(self, item: dict):
-        await apply_company_permissions_to_embeds([item], SectionEnum.WIRE)
+        await apply_company_permissions_to_embeds([item], SectionEnum.WIRE, use_download_as_view_permission=True)
 
         # Remove the renditions we should not be showing the world
         remove_internal_renditions(item, remove_media=False)
