@@ -286,6 +286,10 @@ def _remove_or_disable_item_media(item: dict, company: CompanyResource, permitte
     disable_display, disable_download = _get_associations_to_remove_or_disable(item, company, permitted_products)
     disable_embed_codes = not company.is_permissioned_for_embed("embed_code", EmbedPermissionUserAction.DISPLAY)
 
+    # Tag featuredMedia association if download is disabled too
+    if "featuremedia" in disable_download and item.get("associations", {}).get("featuremedia"):
+        item["associations"]["featuremedia"]["disable_download"] = True
+
     if not disable_download and not disable_display and not disable_embed_codes:
         return
 
