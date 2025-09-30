@@ -60,8 +60,9 @@ function tryInitPlayer(el: HTMLElement, retries = 3, delay = 100): VjsPlayer | n
 
 export function setupMediaPlayers(root: HTMLElement) {
     const players: Array<VjsPlayer> = [];
+    const elements = root.querySelectorAll<HTMLVideoElement | HTMLAudioElement>('video, audio');
 
-    root.querySelectorAll('video, audio').forEach((element) => {
+    elements.forEach((element) => {
         if (element.getAttribute('data-vjs-initialized')) return;
 
         const disable = element.getAttribute('data-disable-download') === 'true';
