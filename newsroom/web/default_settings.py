@@ -878,7 +878,7 @@ CALENDAR_LOCATIONS_FILTER_OPTIONS = {
 #:
 #: .. versionadded: 3.1
 #:
-WIRE_EMBED_PERMISSIONS = False
+WIRE_EMBED_PERMISSIONS = True
 
 #: Enable/Disable using Wire Embed permissions in the Dashboard
 #:
