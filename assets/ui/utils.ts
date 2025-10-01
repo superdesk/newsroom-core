@@ -28,38 +28,54 @@ export function bem(block: any, element: any, modifier: any) {
     return classes.join(' ');
 }
 
-function tryInitPlayer(el: HTMLElement, retries = 3, delay = 100): VjsPlayer | null {
-    if (!document.body.contains(el)) return null;
+function initPlayer(
+    el: HTMLElement,
+    retries = 3,
+    delay = 100,
+    onReady: (player: VjsPlayer | null) => void
+): () => void {
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    if (typeof videojs !== 'function') {
-        if (retries > 0) {
-            setTimeout(() => tryInitPlayer(el, retries - 1, delay), delay);
+    function attempt(remainingTries: number): void {
+        if (cancelled) return;
+        if (!document.body.contains(el)) { onReady(null); return; }
+
+        if (typeof videojs === 'function') {
+            try {
+                const player = videojs(el, {
+                    controls: true,
+                    preload: 'auto',
+                    fluid: true,
+                });
+                el.setAttribute('data-vjs-initialized', 'true');
+                onReady(player);
+                return;
+            } catch (err) {
+                console.warn('video.js init failed, retrying...', err);
+            }
+        }
+
+        if (remainingTries > 0) {
+            timeoutId = setTimeout(() => attempt(remainingTries - 1), delay);
         } else {
             console.warn('video.js not ready after retries for', el);
+            onReady(null);
         }
-        return null;
     }
 
-    try {
-        const player = videojs(el, {
-            controls: true,
-            preload: 'auto',
-            fluid: true,
-        });
-        // Mark element initialized only after success
-        el.setAttribute('data-vjs-initialized', 'true');
-        return player;
-    } catch (err) {
-        console.warn('video.js init failed, retrying...', err);
-        if (retries > 0) {
-            setTimeout(() => tryInitPlayer(el, retries - 1, delay), delay);
-        }
-        return null;
-    }
+    attempt(retries);
+
+    // Return cancel function for any pending timeouts in cases of unmounts and such
+    return () => {
+        cancelled = true;
+        if (timeoutId) clearTimeout(timeoutId);
+    };
 }
 
 export function setupMediaPlayers(root: HTMLElement) {
     const players: Array<VjsPlayer> = [];
+    const timeoutCancels: Array<() => void> = [];
     const elements = root.querySelectorAll<HTMLVideoElement | HTMLAudioElement>('video, audio');
 
     elements.forEach((element) => {
@@ -81,8 +97,10 @@ export function setupMediaPlayers(root: HTMLElement) {
                 element.classList.add('video-js');
             }
 
-            const player = tryInitPlayer(element);
-            if (player) players.push(player);
+            const cancel = initPlayer(element, 3, 100, (player: VjsPlayer | null) => {
+                if (player) players.push(player);
+            });
+            timeoutCancels.push(cancel);
         } else {
             // Enable all native controls
             element.setAttribute('controls', '');
@@ -90,10 +108,7 @@ export function setupMediaPlayers(root: HTMLElement) {
     });
 
     return () => {
-        players.forEach((player) => {
-            if (player && typeof player.dispose === 'function') {
-                player.dispose();
-            }
-        });
+        timeoutCancels.forEach((c) => c());
+        players.forEach((p) => p?.dispose?.());
     };
 }

@@ -11,7 +11,8 @@ export default function ArticleMedia({isKilled, media, download}: any) {
     const disableDownload = media.disable_download;
 
     useEffect(() => {
-        const cleanupMediaPlayers = containerRef.current && setupMediaPlayers(containerRef.current);
+        if (!containerRef.current) return;
+        const cleanupMediaPlayers = setupMediaPlayers(containerRef.current);
         return () => cleanupMediaPlayers?.();
     }, [media]);
 
