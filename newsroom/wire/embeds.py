@@ -314,6 +314,7 @@ def _get_associations_to_remove_or_disable(
             embed_type, EmbedPermissionUserAction.DOWNLOAD
         ):
             disable_download.add(key)
+            item["associations"][key]["disable_download"] = True
 
     return disable_display, disable_download
 

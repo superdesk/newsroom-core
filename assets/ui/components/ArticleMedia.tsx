@@ -1,29 +1,38 @@
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {getOriginalRendition} from 'wire/utils';
+import {setupMediaPlayers} from '../utils';
 
 export default function ArticleMedia({isKilled, media, download}: any) {
     const rendition = getOriginalRendition(media);
     const filename = media.slugline || rendition.media;
+    const containerRef = useRef<HTMLDivElement>(null);
+    const disableDownload = media.disable_download;
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const cleanupMediaPlayers = setupMediaPlayers(containerRef.current);
+        return () => cleanupMediaPlayers?.();
+    }, [media]);
 
     return (
         (rendition && !isKilled) && (
-            <div className='wire-column__preview__video' key={rendition.href}>
+            <div ref={containerRef} className='wire-column__preview__video' key={rendition.href}>
                 <span className='wire-column__preview__video-headline'>{media.headline || media.description_text}</span>
                 {media.type === 'video' && (
-                    <video controls preload="metadata">
+                    <video controls preload="metadata" {...(disableDownload && {'data-disable-download':'true'})}>
                         <source src={rendition.href} type={rendition.mimetype} />
                         {gettext('Your browser does not support playing video')}
                     </video>
                 )}
                 {media.type === 'audio' && (
-                    <audio controls>
+                    <audio controls {...(disableDownload && {'data-disable-download':'true'})}>
                         <source src={rendition.href} type={rendition.mimetype} />
                         {gettext('Your browser does not support playing audio')}
                     </audio>
                 )}
-                {rendition.media && (
+                {rendition.media && !disableDownload && (
                     <button className="nh-button nh-button--secondary nh-button--small mt-3 mb-4"
                         onClick={() => download(rendition.media, filename)}>
                         <i className="icon--download"></i>{gettext('Download')}
