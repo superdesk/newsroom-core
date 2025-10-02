@@ -40,14 +40,21 @@ function initPlayer(
     function attempt(remainingTries: number): void {
         if (cancelled) return;
         if (!document.body.contains(el)) { onReady(null); return; }
+        const isAudio = el instanceof HTMLAudioElement;
 
         if (typeof videojs === 'function') {
             try {
-                const player = videojs(el, {
+                const options = {
                     controls: true,
                     preload: 'auto',
                     fluid: true,
-                });
+                };
+
+                if (isAudio) {
+                    options.audioOnlyMode = true;
+                }
+
+                const player = videojs(el, options);
                 el.setAttribute('data-vjs-initialized', 'true');
                 onReady(player);
                 return;
