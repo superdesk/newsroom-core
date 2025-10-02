@@ -149,3 +149,75 @@ async def test_embed_mark_disable_download(client, app):
             "editor_1": ["display"],
         },
     )
+
+
+async def test_html_starts_with_embed_comment(client, app):
+    app.config["WIRE_EMBED_PERMISSIONS"] = True
+    await login(client, {"email": PUBLIC_USER_EMAIL})
+    await test_utils.update_entries_for(
+        "companies",
+        COMPANY_1_ID,
+        {
+            "embed_permissions": {"video": ["display"], "audio": ["display"], "sd_product": ["display"]},
+        },
+    )
+    await test_utils.add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "Service A",
+                "is_enabled": True,
+                "query": "service.code: a",
+                "product_type": "wire",
+            },
+            {
+                "name": "product test",
+                "is_enabled": True,
+                "sd_product_id": "123",
+                "product_type": "wire",
+            },
+        ],
+    )
+    await setup_embeds()
+
+    # Update the body_html so it starts with an embed comment
+    item = items[:2][0]
+    await test_utils.update_entries_for(
+        "items",
+        item["_id"],
+        {
+            "body_html": (
+                '<!-- EMBED START Audio {id: "editor_0"} --><figure>'
+                '<audio controls src="/assets/640feb9bfb5122dcf06a6f7c" alt="minns" '
+                'width="100%" height="100%"></audio>'
+                "<figcaption>minns</figcaption>"
+                "</figure>"
+                '<!-- EMBED END Audio {id: "editor_0"} -->'
+                "<p><br></p>"
+                "<p>Par 2</p>"
+                '<!-- EMBED START Video {id: "editor_1"} -->'
+                "<figure>"
+                '<video controls src="/assets/640ff0bdfb5122dcf06a6fc3" '
+                'alt="Scomo text" width="100%" height="100%">'
+                "</video>"
+                "<figcaption>Scomo whinging</figcaption>"
+                "</figure>"
+                '<!-- EMBED END Video {id: "editor_1"} -->'
+                "<p><br></p>Par 3<p></p>"
+                "<p>Par 4</p>"
+            ),
+        },
+        item,
+    )
+    resp = await client.get("/wire/search?type=wire")
+
+    data = await resp.get_json()
+    assert data is not None
+    test_utils.test_embed_permissions(
+        data["_items"][0],
+        {
+            "editor_0": [],
+            "editor_1": ["display"],
+        },
+    )
