@@ -64,11 +64,25 @@ async def apply_company_permissions_to_embeds(
         _remove_or_disable_item_media(doc, company, sdesk_products, use_download_as_view_permission)
 
 
+def _get_html_from_string(html_string: bytes | str | None) -> HtmlElement:
+    # Fix a parsing issue when the HTML string starts with an embed comment
+    # otherwise ``xpath("//comment()")[0].getparent()`` returns None
+    # instead of the root element
+
+    if not html_string:
+        html_string = "<p></p>"
+    elif isinstance(html_string, bytes) and html_string.startswith(b"<!--"):
+        html_string = b"<p></p>" + html_string
+    elif isinstance(html_string, str) and html_string.startswith("<!--"):
+        html_string = "<p></p>" + html_string
+
+    return lxml_html.fromstring(html_string)
+
+
 EmbedUpdateCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], bool]
 EmbedUpdateAsyncCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], Awaitable[bool]]
 
 
-# TODO-PR: Support async callbacks
 async def update_embeds_in_body(
     item,
     update_image_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
@@ -87,7 +101,7 @@ async def update_embeds_in_body(
     """
 
     body_updated = False
-    root_elem = lxml_html.fromstring(item.get("body_html") or "<p></p>")
+    root_elem = _get_html_from_string(item.get("body_html"))
     for comment, editor_id in iterate_embeds(root_elem, ["Image", "Video", "Audio"]):
         # Assumes the sibling of the Embed Image comment is the figure tag containing the image
         embed_item = (item.get("associations") or {}).get(editor_id) or {}
@@ -184,7 +198,7 @@ def remove_all_embeds(item: dict, remove_by_class: bool = True, remove_media_emb
     if not original_body_html:
         return False  # No body to process, so no changes made
 
-    root_elem = lxml_html.fromstring(original_body_html)
+    root_elem = _get_html_from_string(original_body_html)
 
     if remove_by_class:
         embed_blocks = root_elem.xpath('//div[contains(concat(" ", @class, " "), " embed-block ")]')
@@ -328,10 +342,10 @@ def _remove_or_disable_item_media(
     highlighted: bool = False
     root_elem: HtmlElement
     if item.get("es_highlight", {}).get("body_html", ""):
-        root_elem = lxml_html.fromstring(item.get("es_highlight", {}).get("body_html", "")[0])
+        root_elem = _get_html_from_string(item.get("es_highlight", {}).get("body_html", "")[0])
         highlighted = True
     else:
-        root_elem = lxml_html.fromstring(item.get("body_html", ""))
+        root_elem = _get_html_from_string(item.get("body_html"))
 
     for comment, editor_id in iterate_embeds(root_elem):
         if editor_id in disable_display:
