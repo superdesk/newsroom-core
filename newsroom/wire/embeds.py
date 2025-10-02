@@ -71,9 +71,9 @@ def _get_html_from_string(html_string: bytes | str | None) -> HtmlElement:
 
     if not html_string:
         html_string = "<p></p>"
-    elif isinstance(html_string, bytes) and html_string.startswith(b"<!-- EMBED START"):
+    elif isinstance(html_string, bytes) and html_string.startswith(b"<!--"):
         html_string = b"<p></p>" + html_string
-    elif isinstance(html_string, str) and html_string.startswith("<!-- EMBED START"):
+    elif isinstance(html_string, str) and html_string.startswith("<!--"):
         html_string = "<p></p>" + html_string
 
     return lxml_html.fromstring(html_string)
