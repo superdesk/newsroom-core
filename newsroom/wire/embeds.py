@@ -1,4 +1,5 @@
-from typing import Generator, Callable
+from typing import Generator, Callable, TypeAlias, Awaitable
+from inspect import isawaitable
 import logging
 
 import re
@@ -40,7 +41,9 @@ def iterate_embeds(
         yield comment, f"editor_{m.group(1)}"
 
 
-async def apply_company_permissions_to_embeds(items: list[dict], section: SectionEnum) -> None:
+async def apply_company_permissions_to_embeds(
+    items: list[dict], section: SectionEnum, use_download_as_view_permission: bool = False
+) -> None:
     if not len(items) or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
         return
 
@@ -58,28 +61,47 @@ async def apply_company_permissions_to_embeds(items: list[dict], section: Sectio
     }
 
     for doc in items:
-        _remove_or_disable_item_media(doc, company, sdesk_products)
+        _remove_or_disable_item_media(doc, company, sdesk_products, use_download_as_view_permission)
 
 
-def update_embeds_in_body(
+def _get_html_from_string(html_string: bytes | str | None) -> HtmlElement:
+    # Fix a parsing issue when the HTML string starts with an embed comment
+    # otherwise ``xpath("//comment()")[0].getparent()`` returns None
+    # instead of the root element
+
+    if not html_string:
+        html_string = "<p></p>"
+    elif isinstance(html_string, bytes) and html_string.startswith(b"<!--"):
+        html_string = b"<p></p>" + html_string
+    elif isinstance(html_string, str) and html_string.startswith("<!--"):
+        html_string = "<p></p>" + html_string
+
+    return lxml_html.fromstring(html_string)
+
+
+EmbedUpdateCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], bool]
+EmbedUpdateAsyncCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], Awaitable[bool]]
+
+
+async def update_embeds_in_body(
     item,
-    update_image: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
-    update_audio: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
-    update_video: Callable[[dict, lxml_html.HtmlElement, str], bool] | None = None,
+    update_image_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
+    update_audio_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
+    update_video_cb: EmbedUpdateCallback | EmbedUpdateAsyncCallback | None = None,
 ):
     """
     Scans the story body for editor3 embeds and calls the appropriate passed function for each embed type.
     The functions should expect the item, element and the number associated with the association
 
     :param item:
-    :param update_image:
-    :param update_audio:
-    :param update_video:
+    :param update_image_cb:
+    :param update_audio_cb:
+    :param update_video_cb:
     :return:
     """
 
     body_updated = False
-    root_elem = lxml_html.fromstring(item.get("body_html") or "<p></p>")
+    root_elem = _get_html_from_string(item.get("body_html"))
     for comment, editor_id in iterate_embeds(root_elem, ["Image", "Video", "Audio"]):
         # Assumes the sibling of the Embed Image comment is the figure tag containing the image
         embed_item = (item.get("associations") or {}).get(editor_id) or {}
@@ -88,28 +110,40 @@ def update_embeds_in_body(
             continue  # No figure element found after the comment
         figure_elem = figure_elem[0]
         if figure_elem is not None and figure_elem.tag == "figure":
-            if update_image is not None:
+            if update_image_cb is not None:
                 elem = figure_elem.find("./img")
                 if elem is not None:
-                    body_updated = update_image(embed_item, elem, editor_id) or body_updated
+                    image_updated = update_image_cb(embed_item, elem, editor_id)
+                    if isawaitable(image_updated):
+                        image_updated = await image_updated
+                    if image_updated:
+                        body_updated = True
                     continue
 
-            if update_audio is not None:
+            if update_audio_cb is not None:
                 elem = figure_elem.find("./audio")
                 if elem is not None:
-                    body_updated = update_audio(embed_item, elem, editor_id) or body_updated
+                    audio_updated = update_audio_cb(embed_item, elem, editor_id)
+                    if isawaitable(audio_updated):
+                        audio_updated = await audio_updated
+                    if audio_updated:
+                        body_updated = True
                     continue
 
-            if update_video is not None:
+            if update_video_cb is not None:
                 elem = figure_elem.find("./video")
                 if elem is not None:
-                    body_updated = update_video(embed_item, elem, editor_id) or body_updated
+                    video_updated = update_video_cb(embed_item, elem, editor_id)
+                    if isawaitable(video_updated):
+                        video_updated = await video_updated
+                    if video_updated:
+                        body_updated = True
 
     if body_updated:
         item["body_html"] = to_string(root_elem, method="html")
 
 
-def update_embed_urls(item: dict, token: str | None = None):
+async def update_embed_urls(item: dict, token: str | None = None):
     """
     Update the urls in the embeds to the endpoint that allows logging of the item that the embed belongs to
 
@@ -148,7 +182,7 @@ def update_embed_urls(item: dict, token: str | None = None):
             return True  # Return True if assignment happened
         return False  # Return False if src or elem was None
 
-    update_embeds_in_body(item, update_embed, update_embed, update_embed)
+    await update_embeds_in_body(item, update_embed, update_embed, update_embed)
 
 
 def remove_all_embeds(item: dict, remove_by_class: bool = True, remove_media_embeds: bool = True) -> bool:
@@ -164,7 +198,7 @@ def remove_all_embeds(item: dict, remove_by_class: bool = True, remove_media_emb
     if not original_body_html:
         return False  # No body to process, so no changes made
 
-    root_elem = lxml_html.fromstring(original_body_html)
+    root_elem = _get_html_from_string(original_body_html)
 
     if remove_by_class:
         embed_blocks = root_elem.xpath('//div[contains(concat(" ", @class, " "), " embed-block ")]')
@@ -252,7 +286,9 @@ def _embed_item_has_product_code(embed_item: dict, products: set[str]) -> bool:
 
 
 def _get_associations_to_remove_or_disable(
-    item: dict, company: CompanyResource, permitted_products: set[str]
+    item: dict,
+    company: CompanyResource,
+    permitted_products: set[str],
 ) -> tuple[set[str], set[str]]:
     disable_display: set[str] = set()
     disable_download: set[str] = set()
@@ -283,8 +319,12 @@ def _get_associations_to_remove_or_disable(
     return disable_display, disable_download
 
 
-def _remove_or_disable_item_media(item: dict, company: CompanyResource, permitted_products: set[str]) -> None:
+def _remove_or_disable_item_media(
+    item: dict, company: CompanyResource, permitted_products: set[str], use_download_as_view_permission: bool = False
+) -> None:
     disable_display, disable_download = _get_associations_to_remove_or_disable(item, company, permitted_products)
+    if use_download_as_view_permission:
+        disable_display |= disable_download
     disable_embed_codes = not company.is_permissioned_for_embed("embed_code", EmbedPermissionUserAction.DISPLAY)
 
     if not disable_download and not disable_display and not disable_embed_codes:
@@ -303,10 +343,10 @@ def _remove_or_disable_item_media(item: dict, company: CompanyResource, permitte
     highlighted: bool = False
     root_elem: HtmlElement
     if item.get("es_highlight", {}).get("body_html", ""):
-        root_elem = lxml_html.fromstring(item.get("es_highlight", {}).get("body_html", "")[0])
+        root_elem = _get_html_from_string(item.get("es_highlight", {}).get("body_html", "")[0])
         highlighted = True
     else:
-        root_elem = lxml_html.fromstring(item.get("body_html", ""))
+        root_elem = _get_html_from_string(item.get("body_html"))
 
     for comment, editor_id in iterate_embeds(root_elem):
         if editor_id in disable_display:

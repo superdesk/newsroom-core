@@ -4,7 +4,7 @@ import logging
 from superdesk.flask import flask
 
 from newsroom.auth.utils import get_user_from_request
-from newsroom.assets import ASSETS_RESOURCE
+from newsroom.assets.utils import get_media_file
 from newsroom.history_async import HistoryService
 
 
@@ -27,13 +27,13 @@ async def add_media(zf, item: dict[str, Any]):
             name = associated_item.get("renditions").get(rendition).get("href").lstrip("/")
             if name in added_files:
                 continue
-            file = flask.current_app.media.get(
-                associated_item.get("renditions").get(rendition).get("media"), ASSETS_RESOURCE
-            )
+
+            file = await get_media_file(associated_item.get("renditions").get(rendition).get("media"))
             if not file:
                 logger.warning("failed to get file for media {}".format(associated_item))
                 continue
-            zf.writestr(name, file.read())
+
+            zf.writestr(name, await file.read())
             added_files.append(name)
 
 

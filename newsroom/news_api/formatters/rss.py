@@ -71,7 +71,7 @@ class RSSFormatter:
 
     async def format_item(self, entry: SubElement, item: dict, token: str | None) -> None:
         await apply_company_permissions_to_embeds([item], SectionEnum.NEWS_API)
-        update_embed_urls(item, token)
+        await update_embed_urls(item, token)
         set_association_links(item)
 
         self.set_item_id(entry, item)
