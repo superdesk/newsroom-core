@@ -44,17 +44,12 @@ function initPlayer(
 
         if (typeof videojs === 'function') {
             try {
-                const options = {
+                const player = videojs(el, {
                     controls: true,
                     preload: 'auto',
                     fluid: true,
-                };
-
-                if (isAudio) {
-                    options.audioOnlyMode = true;
-                }
-
-                const player = videojs(el, options);
+                    audioOnlyMode: isAudio,
+                });
                 el.setAttribute('data-vjs-initialized', 'true');
                 onReady(player);
                 return;
