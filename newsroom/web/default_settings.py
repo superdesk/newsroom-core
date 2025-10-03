@@ -874,3 +874,9 @@ CALENDAR_LOCATIONS_FILTER_OPTIONS = {
     "country": True,
     "place": True,
 }
+
+#: Maximum allowed content length for file uploads (in bytes)
+#:
+#: .. versionadded: 3.0
+#:
+MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 1024 * 1024 * 1000))  # 1GB
