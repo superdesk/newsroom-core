@@ -344,7 +344,7 @@ async def share(request: Request) -> Response:
             "item_name": "Monitoring Report",
         }
         formatter = get_formatter("monitoring_pdf")
-        monitoring_profile["format_type"] = "monitoring_pdf"
+        monitoring_profile.format_type = "monitoring_pdf"
         monitoring_file = await get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(monitoring_file.read())
 
