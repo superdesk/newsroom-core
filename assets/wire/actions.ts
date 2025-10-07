@@ -86,8 +86,8 @@ export function openItem(item: any) {
 }
 
 export function selectCopy(item: any) {
-    return () => {
-        recordAction(item, 'clipboard');
+    return (dispatch: any, getState: any) => {
+        recordAction(item, 'clipboard', getState().context, getState());
     };
 }
 
