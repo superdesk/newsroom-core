@@ -30,12 +30,14 @@ from .filters import (
     prefill_company,
     prefill_products,
     validate_page,
+    prefill_search_latest_version,
 )
 from .types import NewsApiSearchRequestArgs
 
 default_search_filters: list[SearchFilterFunction] = [
     prefill_company,
     prefill_products,
+    prefill_search_latest_version,
     apply_section_filter,
     apply_company_filter,
     apply_products_filter,

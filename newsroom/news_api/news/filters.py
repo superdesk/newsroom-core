@@ -144,3 +144,13 @@ def apply_projection(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
         include_fields.remove(field)
 
     request.search.include_fields = include_fields
+
+
+def prefill_search_latest_version(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
+    """
+    Prefill to return the latest version of each item
+    @param request:
+    @return:
+    """
+    request.search.query.must_not.append({"term": {"type": "composite"}})
+    request.search.query.must_not.append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
