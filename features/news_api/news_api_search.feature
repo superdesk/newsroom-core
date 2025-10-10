@@ -544,8 +544,8 @@ Feature: News API News Search
         {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
         """
 
-    Scenario: Search request response restricted by featured image product
-      Given "companies"
+  Scenario: Search request response restricted by featured image product
+    Given "companies"
       """
       [{
         "name": "Test Company", "is_enabled" : true,
@@ -554,12 +554,12 @@ Feature: News API News Search
         }
       }]
       """
-      Given "news_api_tokens"
+    Given "news_api_tokens"
       """
       [{"company" : "#companies._id#", "enabled" : true}]
       """
-      When we save API token
-      Given "items"
+    When we save API token
+    Given "items"
           """
           [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
            "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
@@ -568,7 +568,7 @@ Feature: News API News Search
           "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
            "associations": {"featuremedia": {"products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
           """
-      Given "products"
+    Given "products"
           """
           [{"name": "A fishy Product",
           "description": "a product for those interested in fish",
@@ -588,16 +588,16 @@ Feature: News API News Search
           }
           ]
           """
-      When we get "news/search?q=fish&include_fields=associations"
-      Then we get list with 1 items
+    When we get "news/search?q=fish&include_fields=associations"
+    Then we get list with 1 items
       """
         {"_items": [
         {"_id": "111",
         "associations": {"featuremedia": {"renditions": {"original": {}} }}}
         ]}
       """
-      When we get "news/search?q=aardvark&include_fields=associations"
-      Then we get list with 1 items
+    When we get "news/search?q=aardvark&include_fields=associations"
+    Then we get list with 1 items
       """
         {"_items": [
         {"_id": "222",
@@ -605,8 +605,8 @@ Feature: News API News Search
         ]}
       """
 
-    Scenario: search by not allowed product raises error
-        Given "products"
+  Scenario: search by not allowed product raises error
+    Given "products"
         """
         [{
             "name": "A Product",
@@ -616,11 +616,11 @@ Feature: News API News Search
             "product_type": "news_api"
         }]
         """
-        When we get "news/search?start_date=now-10d&products=111111111111111111111111"
-        Then we get response code 400
+    When we get "news/search?start_date=now-10d&products=111111111111111111111111"
+    Then we get response code 400
 
-    Scenario: search by empty product uses all company products
-        Given "products"
+  Scenario: search by empty product uses all company products
+    Given "products"
         """
         [{
             "name": "A Product",
@@ -630,7 +630,7 @@ Feature: News API News Search
             "product_type": "news_api"
         }]
         """
-        Given "items"
+    Given "items"
         """
         [{
             "body_html": "Three aardvark story",
@@ -642,6 +642,40 @@ Feature: News API News Search
             ]
         }]
         """
-        When we get "news/search?start_date=now-10d&products="
-        Then we get OK response
-        Then we get list with 0 items
+    When we get "news/search?start_date=now-10d&products="
+    Then we get OK response
+    Then we get list with 0 items
+
+  Scenario: Search returns the latest version only
+    Given "items"
+        """
+        [{"_id":"urn:test:1234567890",
+        "body_html": "<p>Original fish story</p>", "headline": "headline 1",
+         "firstpublished": "#DATE-1#", "versioncreated": "#DATE-1#",
+         "nextversion": "urn-1234567891"},
+
+         {"_id":"urn:test:1234567891",
+        "body_html": "<p>Updated fish story</p>",
+         "firstpublished": "#DATE#", "versioncreated": "#DATE#",
+         "evolved_from": "urn:test:1234567890",
+         "ancestors": ["urn:test:1234567890"]}
+         ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&include_fields=body_html"
+    Then we get list with 1 items
+     """
+     {"_items": [
+         {"body_html": "<p>Updated fish story</p>"}
+     ]}
+     """
