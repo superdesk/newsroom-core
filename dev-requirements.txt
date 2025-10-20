@@ -334,11 +334,11 @@ pycodestyle==2.14.0
     # via flake8
 pycparser==2.23
     # via cffi
-pydantic==2.11.10
+pydantic==2.12.3
     # via
     #   -r mypy-requirements.txt
     #   superdesk-core
-pydantic-core==2.33.2
+pydantic-core==2.41.4
     # via pydantic
 pyflakes==3.4.0
     # via flake8
@@ -548,7 +548,7 @@ typing-extensions==4.15.0
     #   pypdf
     #   taskgroup
     #   typing-inspection
-typing-inspection==0.4.1
+typing-inspection==0.4.2
     # via pydantic
 tzdata==2025.2
     # via
