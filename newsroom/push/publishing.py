@@ -25,7 +25,7 @@ from newsroom.agenda.notifications import notify_agenda_update
 
 from .tasks import notify_new_agenda_item
 from .agenda_manager import AgendaManager
-from .utils import fix_hrefs, fix_updates, set_dates, validate_event_push
+from .utils import fix_hrefs, fix_updates, set_dates, validate_event_push, fix_translation_value
 
 
 logger = logging.getLogger(__name__)
@@ -105,6 +105,10 @@ class Publisher:
                 for subject in doc["subject"]
                 if subject.get("scheme") in get_app_config("WIRE_SUBJECT_SCHEME_WHITELIST")
             ]
+
+        for field in {"subject", "service"}:
+            if doc.get(field):
+                doc[field] = fix_translation_value(doc[field])
 
         await signals.publish_item.send(doc, original is None)
 

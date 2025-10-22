@@ -98,7 +98,7 @@ async def test_push_binary(client):
     resp = await client.post(
         "/push_binary",
         form=dict(media_id=media_id),
-        files={"media": FileStorage(io.BytesIO(b"binary"), filename=media_id)},
+        files={"media": FileStorage(io.BytesIO(1024 * 1024 * 20 * b"b"), filename=media_id)},
     )
     assert 201 == resp.status_code
 

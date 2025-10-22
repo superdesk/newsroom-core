@@ -94,6 +94,10 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         if event.get("pubstatus") == "cancelled":
             agenda["state"] = AgendaWorkflowState.CANCELLED
 
+        if agenda["state"] not in list(AgendaWorkflowState):
+            # Fix an issue where Superdesk is not sending us a valid state
+            agenda["state"] = AgendaWorkflowState.SCHEDULED
+
         if event.get("planning_items"):
             agenda["planning_items"] = event["planning_items"]
         if event.get("coverages"):
@@ -151,6 +155,10 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
             if planning_item.get("pubstatus") == "cancelled":
                 agenda["state"] = AgendaWorkflowState.CANCELLED
 
+            if agenda["state"] not in list(AgendaWorkflowState):
+                # Fix an issue where Superdesk is not sending us a valid state
+                agenda["state"] = AgendaWorkflowState.SCHEDULED
+
         if planning_item.get("event_id"):
             agenda["event_id"] = planning_item["event_id"]
         elif planning_item.get("event_item") and force_adhoc:
@@ -195,6 +203,10 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
         plan["language"] = planning_item.get("language")
         plan["source"] = planning_item.get("source")
+
+        if plan["state"] not in list(AgendaWorkflowState):
+            # Fix an issue where Superdesk is not sending us a valid state
+            plan["state"] = AgendaWorkflowState.SCHEDULED
 
         if new_plan:
             agenda["planning_items"].append(plan)
