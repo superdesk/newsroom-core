@@ -13,6 +13,7 @@ assets_endpoints = EndpointGroup("assets", __name__)
 
 class RouteParams(BaseModel):
     token: str | None = None
+    item_id: str | None = None
 
 
 class RouteArguments(BaseModel):
@@ -41,8 +42,10 @@ async def get_item(args: RouteArguments, params: RouteParams, request: Request):
     @param request:
     @return:
     """
-
-    return await return_item(args, None, request)
+    response = await return_item(args, None, request=request)
+    if params.item_id is not None:
+        await HistoryService().log_api_media_download(params.item_id, args.asset_id)
+    return response
 
 
 async def return_item(args: RouteArguments, _p: None, request: Request):
