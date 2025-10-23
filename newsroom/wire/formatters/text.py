@@ -11,7 +11,7 @@ from newsroom.formatters import BaseFormatter, FormatterAssetType
 class TextFormatter(BaseFormatter):
     format_id = "text"
     name = lazy_gettext("Plain Text")
-    sections = [SectionEnum.WIRE, SectionEnum.AGENDA]
+    sections = [SectionEnum.WIRE, SectionEnum.AGENDA, SectionEnum.NEWS_API]
     assets = [FormatterAssetType.TEXT]
 
     FILE_EXTENSION = "txt"

@@ -31,7 +31,7 @@ class NewsroomFormatter(SuperdeskFormatter):
 class NewsMLG2Formatter(BaseFormatter):
     format_id = "newsmlg2"
     name = lazy_gettext("NewsMLG2")
-    sections = [SectionEnum.WIRE]
+    sections = [SectionEnum.WIRE, SectionEnum.NEWS_API]
     assets = [FormatterAssetType.TEXT]
 
     MIMETYPE = "application/vnd.iptc.g2.newsitem+xml"
