@@ -177,6 +177,11 @@ export function recieveItem(data: any) {
     return {type: RECIEVE_ITEM, data};
 }
 
+export const STORE_ITEMS = 'STORE_ITEMS';
+export function storeItems(items: Array<IAgendaItem>) {
+    return {type: STORE_ITEMS, data: items};
+}
+
 export const INIT_DATA = 'INIT_DATA';
 export function initData(agendaData: any, readData: any, activeDate: any, featuredOnly: any) {
     return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
@@ -406,7 +411,7 @@ export function fetchItemsById(ids: Array<string>): Promise<IRestApiResponse<IAg
 export function fetchItemsByIdToRedux(ids: Array<string>): (dispatch: any) => Promise<void> {
     return (dispatch: any) => {
         return fetchItemsById(ids).then((response) => {
-            dispatch(recieveItem(response));
+            dispatch(storeItems(response._items));
         });
     };
 }

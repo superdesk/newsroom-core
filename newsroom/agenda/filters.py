@@ -171,6 +171,9 @@ def apply_item_type_filter(request: NewshubSearchRequest[AgendaSearchRequestArgs
                 }
             }
         )
+    elif request.args.ids:
+        # This request is for Items by ID, don't apply item type filter
+        return
     elif get_app_config("AGENDA_DEFAULT_FILTER_HIDE_PLANNING"):
         request.search.query.filter.append(
             {
