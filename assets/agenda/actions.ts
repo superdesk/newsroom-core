@@ -172,9 +172,14 @@ export function toggleHiddenGroupItems(dateString: string) {
     return {type: TOGGLE_HIDDEN_GROUP_ITEMS, data: dateString};
 }
 
-export const RECIEVE_ITEM = 'RECIEVE_ITEM';
+export const RECEIVE_ITEM = 'RECEIVE_ITEM';
 export function recieveItem(data: any) {
-    return {type: RECIEVE_ITEM, data};
+    return {type: RECEIVE_ITEM, data};
+}
+
+export const STORE_ITEMS = 'STORE_ITEMS';
+export function storeItems(items: Array<IAgendaItem>) {
+    return {type: STORE_ITEMS, data: items};
 }
 
 export const INIT_DATA = 'INIT_DATA';
@@ -406,7 +411,7 @@ export function fetchItemsById(ids: Array<string>): Promise<IRestApiResponse<IAg
 export function fetchItemsByIdToRedux(ids: Array<string>): (dispatch: any) => Promise<void> {
     return (dispatch: any) => {
         return fetchItemsById(ids).then((response) => {
-            dispatch(recieveItem(response));
+            dispatch(storeItems(response._items));
         });
     };
 }

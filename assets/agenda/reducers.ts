@@ -8,6 +8,7 @@ import {
 } from 'interfaces';
 import {
     RECIEVE_ITEMS,
+    STORE_ITEMS,
     SET_LIST_GROUPS_AND_ITEMS,
     ADD_ITEMS_TO_LIST_GROUPS,
     TOGGLE_HIDDEN_GROUP_ITEMS,
@@ -84,18 +85,12 @@ const initialState: IAgendaState = {
     savedItemsCount: 0,
 };
 
-function recieveItems(state: IAgendaState, data: IRestApiResponse<IAgendaItem>): IAgendaState {
-    const itemsById = Object.assign({}, state.itemsById);
-    const items = data._items.map((item) => {
-        itemsById[item._id] = item;
-        return item._id;
-    });
+function receiveItemsFromSearch(state: IAgendaState, data: IRestApiResponse<IAgendaItem>): IAgendaState {
+    const newState = receiveItems(state, data._items);
 
     return {
-        ...state,
-        items,
-        fetchFrom: items.length,
-        itemsById,
+        ...newState,
+        fetchFrom: newState.items.length,
         listItems: {
             ...state.listItems,
             groups: [],
@@ -106,6 +101,20 @@ function recieveItems(state: IAgendaState, data: IRestApiResponse<IAgendaItem>):
         newItems: [],
         searchInitiated: false,
         loadingAggregations: false,
+    };
+}
+
+function receiveItems(state: IAgendaState, items: Array<IAgendaItem>): IAgendaState {
+    const itemsById = {...state.itemsById};
+    const itemIds = items.map((item) => {
+        itemsById[item._id] = item;
+        return item._id;
+    });
+
+    return {
+        ...state,
+        items: itemIds,
+        itemsById,
     };
 }
 
@@ -161,7 +170,10 @@ export default function agendaReducer(state: IAgendaState = initialState, action
     switch (action.type) {
 
     case RECIEVE_ITEMS:
-        return recieveItems(state, action.data);
+        return receiveItemsFromSearch(state, action.data);
+
+    case STORE_ITEMS:
+        return receiveItems(state, action.data);
 
     case SET_LIST_GROUPS_AND_ITEMS:
         return {
