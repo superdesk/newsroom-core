@@ -12,7 +12,7 @@ from .base_wire_formatter import BaseWireFormatter
 class NINJSFormatter(BaseWireFormatter):
     format_id = "ninjs"
     name = lazy_gettext("Ninjs")
-    sections = [SectionEnum.WIRE]
+    sections = [SectionEnum.WIRE, SectionEnum.NEWS_API]
 
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"

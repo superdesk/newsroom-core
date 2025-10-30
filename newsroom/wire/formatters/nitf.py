@@ -47,7 +47,7 @@ class NewsroomNITFFormatter(SuperdeskNITFFormatter):
 class NITFFormatter(BaseFormatter):
     format_id = "nitf"
     name = lazy_gettext("NITF")
-    sections = [SectionEnum.WIRE]
+    sections = [SectionEnum.WIRE, SectionEnum.NEWS_API]
     assets = [FormatterAssetType.TEXT]
 
     MIMETYPE = "application/xml"
