@@ -111,9 +111,9 @@ function recieveAggs(data: any) {
     return {type: RECIEVE_AGGS, data};
 }
 
-export const RECIEVE_ITEM = 'RECIEVE_ITEM';
+export const RECEIVE_ITEM = 'RECEIVE_ITEM';
 export function recieveItem(data: any) {
-    return {type: RECIEVE_ITEM, data};
+    return {type: RECEIVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';

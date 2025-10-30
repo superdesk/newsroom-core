@@ -172,9 +172,9 @@ export function toggleHiddenGroupItems(dateString: string) {
     return {type: TOGGLE_HIDDEN_GROUP_ITEMS, data: dateString};
 }
 
-export const RECIEVE_ITEM = 'RECIEVE_ITEM';
+export const RECEIVE_ITEM = 'RECEIVE_ITEM';
 export function recieveItem(data: any) {
-    return {type: RECIEVE_ITEM, data};
+    return {type: RECEIVE_ITEM, data};
 }
 
 export const STORE_ITEMS = 'STORE_ITEMS';
