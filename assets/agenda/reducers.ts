@@ -105,7 +105,7 @@ function receiveItemsFromSearch(state: IAgendaState, data: IRestApiResponse<IAge
 }
 
 function receiveItems(state: IAgendaState, items: Array<IAgendaItem>): IAgendaState {
-    const itemsById = Object.assign({}, state.itemsById);
+    const itemsById = {...state.itemsById};
     const itemIds = items.map((item) => {
         itemsById[item._id] = item;
         return item._id;
