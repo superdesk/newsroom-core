@@ -42,11 +42,7 @@ async def get_all(resource: str) -> list[Any]:
     async_app = app.async_app
 
     try:
-        return [
-            # item.to_dict(context={"use_objectid": True})
-            item
-            async for item in async_app.resources.get_resource_service(resource).get_all_raw()
-        ]
+        return [item async for item in async_app.resources.get_resource_service(resource).get_all_raw()]
     except KeyError:
         return [item for item in app.data.find(resource, {})]
 
