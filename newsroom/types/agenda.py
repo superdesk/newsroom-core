@@ -229,7 +229,9 @@ class AgendaItem(ResourceModel, ModelWithVersions):
     dates: AgendaDates
     display_dates: list[AgendaDisplayDates] = Field(default_factory=list)
 
-    coverages: Annotated[list[AgendaCoverage], fields.nested_list(include_in_parent=True, dynamic=False), Field(default_factory=list)]
+    coverages: Annotated[
+        list[AgendaCoverage], fields.nested_list(include_in_parent=True, dynamic=False), Field(default_factory=list)
+    ]
 
     files: Annotated[list[dict], fields.mapping_disabled("object"), Field(default_factory=list)]
 
