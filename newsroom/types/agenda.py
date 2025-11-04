@@ -221,22 +221,24 @@ class AgendaItem(ResourceModel, ModelWithVersions):
     urgency: Annotated[int | None, fields.keyword_mapping()] = None
     priority: Annotated[int | None, fields.keyword_mapping()] = None
 
-    place: list[Place] = Field(default_factory=list)
-    service: list[AgendaCVItem] = Field(default_factory=list)
+    place: Annotated[list[Place], fields.dynamic_mapping(False), Field(default_factory=list)]
+    service: Annotated[list[AgendaCVItem], fields.dynamic_mapping(False), Field(default_factory=list)]
 
     state_reason: str | None = None
     subject: Annotated[list[AgendaCVItem], fields.nested_list(include_in_parent=True), Field(default_factory=list)]
     dates: AgendaDates
     display_dates: list[AgendaDisplayDates] = Field(default_factory=list)
 
-    coverages: Annotated[list[AgendaCoverage], fields.nested_list(include_in_parent=True), Field(default_factory=list)]
+    coverages: Annotated[
+        list[AgendaCoverage], fields.nested_list(include_in_parent=True, dynamic=False), Field(default_factory=list)
+    ]
 
     files: Annotated[list[dict], fields.mapping_disabled("object"), Field(default_factory=list)]
 
     state: AgendaWorkflowState
     pubstatus: Annotated[PubStatusType | None, fields.keyword_mapping()] = None
-    calendars: list[CalendarItem] = Field(default_factory=list)
-    location: list[EventLocation] = Field(default_factory=list)
+    calendars: Annotated[list[CalendarItem], fields.dynamic_mapping(False), Field(default_factory=list)]
+    location: Annotated[list[EventLocation], fields.dynamic_mapping(False), Field(default_factory=list)]
     event: dict | None = None
 
     bookmarks: Annotated[list[fields.ObjectId], fields.keyword_mapping(), Field(default_factory=list)]
@@ -248,7 +250,7 @@ class AgendaItem(ResourceModel, ModelWithVersions):
 
     products: Annotated[list[CVItemWithCode], Field(default_factory=list)]
     planning_items: Annotated[
-        list[AgendaPlanningItem], fields.nested_list(include_in_parent=True), Field(default_factory=list)
+        list[AgendaPlanningItem], fields.nested_list(include_in_parent=True, dynamic=False), Field(default_factory=list)
     ]
     planning_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
     event_ids: Annotated[list[fields.Keyword], Field(default_factory=list)]
