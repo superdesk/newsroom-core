@@ -22,7 +22,12 @@ class RouteArguments(BaseModel):
     token: str | None = None
 
 
-@assets_endpoints.endpoint("assets/<path:asset_id>/<item_id>", methods=["GET"], auth=[support_auth_token_in_url])
+@assets_endpoints.endpoint(
+    "assets/<path:asset_id>/<item_id>",
+    title="Download Asset (with Wire ID)",
+    methods=["GET"],
+    auth=[support_auth_token_in_url],
+)
 async def download(args: RouteArguments, params: RouteParams, request: Request):
     """
     Called on download of a media item, keeps a record of the download
@@ -33,7 +38,12 @@ async def download(args: RouteArguments, params: RouteParams, request: Request):
     return response
 
 
-@assets_endpoints.endpoint("assets/<string:asset_id>", methods=["GET"], auth=[support_auth_token_in_url])
+@assets_endpoints.endpoint(
+    "assets/<string:asset_id>",
+    title="Download Asset",
+    methods=["GET"],
+    auth=[support_auth_token_in_url],
+)
 async def get_item(args: RouteArguments, params: RouteParams, request: Request):
     """
     Get media item via the assets endpoint

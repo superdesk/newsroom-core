@@ -1,10 +1,12 @@
 from quart_babel import lazy_gettext
 
-from newsroom import MONGO_PREFIX
-from newsroom.types import SectionFilterModel
-from newsroom.web.factory import NewsroomWebApp
 from superdesk.core.module import Module
 from superdesk.core.resources import ResourceConfig, MongoIndexOptions, MongoResourceConfig
+
+from newsroom import MONGO_PREFIX
+from newsroom.types import SectionFilterModel
+from newsroom.core import NewshubModuleConfig
+from newsroom.web.factory import NewsroomWebApp
 
 from .service import SectionFiltersService
 from .views import get_settings_data, section_filters_endpoints
@@ -29,17 +31,23 @@ section_filters_config = ResourceConfig(
 
 
 def init_module(app: NewsroomWebApp):
-    app.wsgi.settings_app(
-        "section-filters",
-        lazy_gettext("Section Filters"),
-        weight=450,
-        data=get_settings_data,
-    )
+    if section_filter_config.register_settings:
+        app.wsgi.settings_app(
+            "section-filters",
+            lazy_gettext("Section Filters"),
+            weight=450,
+            data=get_settings_data,
+        )
+
+    if section_filter_config.register_endpoints:
+        app.wsgi.register_endpoint(section_filters_endpoints)
 
 
+section_filter_config = NewshubModuleConfig()
 module = Module(
     name="newsroom.section_filters",
     resources=[section_filters_config],
-    endpoints=[section_filters_endpoints],
+    endpoints=[],
+    config=section_filter_config,
     init=init_module,
 )

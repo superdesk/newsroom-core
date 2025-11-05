@@ -4,6 +4,7 @@ from superdesk.core.web import EndpointGroup
 
 from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
 from newsroom.types import WireItem
+from newsroom.core import NewshubModuleConfig
 from newsroom.formatters import register_formatter
 
 from .service import WireItemService
@@ -73,7 +74,17 @@ def init_module(app: SuperdeskAsyncApp) -> None:
     if app.wsgi.config.get("ALLOW_PICTURE_DOWNLOAD", True):
         register_formatter(PictureFormatter)
 
+    if wire_module_config.register_endpoints:
+        app.wsgi.register_endpoint(wire_endpoints)
 
-module = Module("newsroom.wire", endpoints=[wire_endpoints], resources=[wire_items_resource_config], init=init_module)
+
+wire_module_config = NewshubModuleConfig()
+module = Module(
+    "newsroom.wire",
+    endpoints=[],
+    resources=[wire_items_resource_config],
+    init=init_module,
+    config=wire_module_config,
+)
 
 from . import views  # noqa

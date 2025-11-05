@@ -11,11 +11,21 @@ class AtomArgs(BaseModel):
     token: str | None = None
 
 
-@atom_endpoints.endpoint("atom/<path:token>", methods=["GET"], auth=[support_auth_token_in_url])
+@atom_endpoints.endpoint(
+    "atom/<path:token>",
+    title="ATOM Feed (URL auth)",
+    methods=["GET"],
+    auth=[support_auth_token_in_url],
+)
 async def get_atom_token(args: AtomArgs, params: None, request: Request) -> Response:
     return await AtomFormatter().format_feed(args.token, request)
 
 
-@atom_endpoints.endpoint("atom", methods=["GET"], auth=[support_auth_token_in_url])
+@atom_endpoints.endpoint(
+    "atom",
+    title="ATOM Feed (Header auth)",
+    methods=["GET"],
+    auth=[support_auth_token_in_url],
+)
 async def get_atom_authed(args: None, params: AtomArgs, request: Request) -> Response:
     return await AtomFormatter().format_feed(params.token, request)
