@@ -8,6 +8,7 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     CLIENT_URL,
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
+    LOG_CONFIG_FILE,
 )
 
 SITE_NAME = env("SITE_NAME", "NEWSHUB")
@@ -27,17 +28,16 @@ CORE_APPS = [
     "content_api.items_versions",
     "newsroom.news_api.section_filters",
     "newsroom.news_api.news",
-    "newsroom.history",
 ]
 
 MODULES = [
     "newsroom.assets.module",
-    "newsroom.companies",
-    "newsroom.history_async",
+    ("newsroom.companies", dict(register_endpoints=False)),
+    ("newsroom.history_async", dict(register_endpoints=False)),
     # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
     ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
-    "newsroom.wire.module",
-    "newsroom.section_filters",
+    ("newsroom.wire.module", dict(register_endpoints=False)),
+    ("newsroom.section_filters", dict(register_endpoints=False)),
     "newsroom.news_api.news.assets",
     "newsroom.news_api.news.atom",
     "newsroom.news_api.news.rss",
@@ -45,7 +45,7 @@ MODULES = [
     "newsroom.news_api.news.feed",
     "newsroom.news_api.api_audit",
     "newsroom.news_api.news.item.item",
-    "newsroom.products",
+    ("newsroom.products", dict(register_endpoints=False)),
     "newsroom.news_api.products",
 ]
 

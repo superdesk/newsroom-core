@@ -7,6 +7,7 @@ from quart_babel import gettext
 import logging
 
 from superdesk.core.types import Request, Response
+from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.core.module import Module
 from superdesk.core.resources import (
     ResourceConfig,
@@ -20,6 +21,7 @@ from superdesk.utc import utcnow
 from superdesk.flask import abort
 
 from newsroom.types import HistoryResourceModel, UserResourceModel, SectionEnum, WireItem
+from newsroom.core import NewshubModuleConfig
 from newsroom.auth.utils import get_company_or_none_from_request
 from newsroom.core.resources.service import NewshubAsyncResourceService
 from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
@@ -221,10 +223,18 @@ history_resource_config = ResourceConfig(
 history_endpoint = EndpointGroup("history", __name__)
 
 
+def init_module(app: SuperdeskAsyncApp):
+    if history_config.register_endpoints:
+        app.wsgi.register_endpoint(history_endpoint)
+
+
+history_config = NewshubModuleConfig()
 module = Module(
     name="newsroom.history_async",
+    config=history_config,
     resources=[history_resource_config],
-    endpoints=[history_endpoint],
+    endpoints=[],
+    init=init_module,
 )
 
 

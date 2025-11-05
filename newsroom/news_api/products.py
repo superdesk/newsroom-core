@@ -27,7 +27,7 @@ def get_product_links(product: ProductResourceModel) -> dict[str, Any]:
     }
 
 
-@product_endpoints.endpoint("account/products", methods=["GET"])
+@product_endpoints.endpoint("account/products", title="Account Products Search", methods=["GET"])
 async def get_products(request: Request) -> Response:
     company = get_company_from_newsapi_request(request)
     products = await get_products_by_company_async(company, None, SectionEnum.NEWS_API)
@@ -57,7 +57,7 @@ class GetProductArgs(BaseModel):
     product_id: ObjectId
 
 
-@product_endpoints.endpoint("account/products/<string:product_id>")
+@product_endpoints.endpoint("account/products/<string:product_id>", title="Get Account Product")
 async def get_product(args: GetProductArgs, params: None, request: Request) -> Response:
     company = get_company_from_newsapi_request(request)
     company_product_ids = [product._id for product in company.products if product.section == SectionEnum.NEWS_API]

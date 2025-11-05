@@ -4,8 +4,8 @@ from typing import cast
 from quart_babel import lazy_gettext
 
 from superdesk.core.module import Module, SuperdeskAsyncApp
-from superdesk.core.config import ConfigModel
 
+from newsroom.core import NewshubModuleConfig
 from .views import settings_endpoints
 from .resource import register_resource, get_setting, get_client_config, get_settings_collection
 
@@ -99,12 +99,7 @@ class SettingsApp:
         return {}
 
 
-class SettingsModuleConfig(ConfigModel):
-    register_endpoints: bool = True
-    register_settings: bool = True
-
-
-settings_module_config = SettingsModuleConfig()
+settings_module_config = NewshubModuleConfig()
 module = Module(
     name="newsroom.settings",
     init=init_app,

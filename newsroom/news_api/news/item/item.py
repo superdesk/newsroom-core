@@ -26,7 +26,7 @@ class RouteParams(BaseModel):
     format: str = "NINJSFormatter"
 
 
-@news_item_endpoints.endpoint("news/item/<path:item_id>", methods=["GET"])
+@news_item_endpoints.endpoint("news/item/<path:item_id>", title="Get News Item", methods=["GET"])
 async def get_item(args: RouteArguments, params: RouteParams, request: Request) -> Response:
     app = get_current_app()
     formatter = get_formatter_by_classname(params.format)
