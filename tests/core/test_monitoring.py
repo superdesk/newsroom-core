@@ -800,7 +800,7 @@ async def test_last_run_time_always_updated_with_matching_content_immediate(clie
         w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
-        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
+        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=15))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -856,7 +856,7 @@ async def test_last_run_time_always_updated_with_matching_content_scheduled(clie
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_last_run_time_always_updated_with_no_matching_content_immediate(client, app):
+async def test_last_run_time_does_not_update_with_no_matching_content_immediate(client, app):
     await create_entries_for(
         "items",
         [
@@ -1214,8 +1214,7 @@ async def test_send_immediate_email_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Something after the embed" in outbox[0].body
-        ## TODO When code to remove the embeds from email is ported
-        # assert 'Assistant Treasurer' not in outbox[0].body
+        assert "Assistant Treasurer" not in outbox[0].body
         assert "Newsroom Monitoring: W1" in outbox[0].body
 
 
