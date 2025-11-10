@@ -207,7 +207,7 @@ httmock==1.4.0
     # via -r dev-requirements.in
 httplib2==0.31.0
     # via oauth2client
-hypercorn==0.17.3
+hypercorn==0.18.0
     # via
     #   -r requirements.txt
     #   quart
