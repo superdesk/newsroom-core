@@ -294,6 +294,7 @@ export interface IAgendaState {
         itemType?: 'events' | 'planning';
         featuredOnly: boolean;
         agendaWireItems: Array<IArticle>;
+        restrictCoverageInfo: boolean;
     };
     search: ISearchState;
     detail: boolean;
@@ -348,4 +349,5 @@ export interface ICoverageMetadataPreviewProps {
     actions?: Array<ICoverageItemAction>;
     user?: IUser['_id'];
     hideViewContentItems?: Array<IArticle['_id']>;
+    restrictCoverageInfo?: boolean;
 }

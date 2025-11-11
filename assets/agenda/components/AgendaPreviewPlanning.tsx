@@ -137,6 +137,7 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                                 user={user}
                                 previewGroup={previewGroup}
                                 previewConfig={previewConfig}
+                                restrictCoverageInfo={restrictCoverageInfo}
                             />
                         </div>
                     </div>

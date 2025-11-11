@@ -39,6 +39,7 @@ interface IProps {
     planningId?: IAgendaItem['_id'];
     showShortcutActionIcons: boolean;
     listConfig: IListConfig;
+    restrictCoverageInfo?: boolean;
 
     onClick(item: IAgendaItem, date: string, planningId?: IAgendaItem['_id']): void;
     onDoubleClick(item: IAgendaItem, date: string, planningId?: IAgendaItem['_id']): void;
@@ -351,6 +352,7 @@ class AgendaListItem extends React.Component<IProps> {
                             isMobilePhone={isMobile}
                             user={this.props.user}
                             listConfig={listConfig}
+                            restrictCoverageInfo={this.props.restrictCoverageInfo}
                         />
 
                         {(isMobile || isExtended) && description && (
