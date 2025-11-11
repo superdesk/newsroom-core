@@ -984,6 +984,10 @@ export function isItemTBC(item: IAgendaItem): boolean {
  * @return {String}
  */
 export function formatCoverageDate(coverage: ICoverage) {
+    if (!coverage.scheduled) {
+        return TO_BE_CONFIRMED_TEXT;
+    }
+
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
         `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
@@ -992,7 +996,7 @@ export function formatCoverageDate(coverage: ICoverage) {
 export const getCoverageTooltip = (coverage: any, beingUpdated?: any, restrictCoverageInfo?: boolean) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
-    const coverageScheduled = moment(coverage.scheduled);
+    const coverageScheduled = coverage.scheduled ? moment(coverage.scheduled) : null;
     const assignee = getCoverageAsigneeName(coverage);
     const desk = getCoverageDeskName(coverage);
     const assignedDetails = [
@@ -1017,13 +1021,19 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any, restrictCo
                 assignedDetails,
             });
         } else {
-            return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                date: formatDate(coverageScheduled),
-                time: formatTime(coverageScheduled),
-                assignedDetails,
-            });
+            return coverageScheduled ? 
+                gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
+                    type: coverageType,
+                    slugline: slugline,
+                    date: formatDate(coverageScheduled),
+                    time: formatTime(coverageScheduled),
+                    assignedDetails,
+                }) :
+                gettext('Planned {{ type }} coverage {{ slugline }} {{assignedDetails}}', {
+                    type: coverageType,
+                    slugline: slugline,
+                    assignedDetails,
+                });
         }
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
         if (restrictCoverageInfo) {
@@ -1033,13 +1043,19 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any, restrictCo
                 assignedDetails,
             });
         } else {
-            return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                date: formatDate(coverageScheduled),
-                time: formatTime(coverageScheduled),
-                assignedDetails,
-            });
+            return coverageScheduled ? 
+                gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
+                    type: coverageType,
+                    slugline: slugline,
+                    date: formatDate(coverageScheduled),
+                    time: formatTime(coverageScheduled),
+                    assignedDetails,
+                }) :
+                gettext('{{ type }} coverage {{ slugline }} in progress {{assignedDetails}}', {
+                    type: coverageType,
+                    slugline: slugline,
+                    assignedDetails,
+                });
         }
     } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
         return gettext('{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}', {
