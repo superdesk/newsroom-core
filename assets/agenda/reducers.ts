@@ -74,6 +74,7 @@ const initialState: IAgendaState = {
         itemType: undefined,
         featuredOnly: false,
         agendaWireItems: [],
+        restrictCoverageInfo: false,
     },
     search: searchReducer(undefined, undefined, 'agenda'),
     detail: false,

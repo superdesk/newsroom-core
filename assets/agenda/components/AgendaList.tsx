@@ -123,6 +123,7 @@ interface IStateProps {
     hiddenGroupsShown: {[dateString: string]: boolean};
     itemTypeFilter: IAgendaState['agenda']['itemType'];
     activeSortQuery: string;
+    restrictCoverageInfo: boolean;
 }
 
 interface IDispatchProps {
@@ -385,6 +386,7 @@ class AgendaList extends React.Component<IProps, IState> {
                                     resetActioningItem={this.resetActioningItem}
                                     showShortcutActionIcons={showShortcutActionIcons}
                                     listConfig={this.props.listConfig}
+                                    restrictCoverageInfo={this.props.restrictCoverageInfo}
                                 />
                             ))}
                         </React.Fragment>
@@ -411,6 +413,7 @@ class AgendaList extends React.Component<IProps, IState> {
                             resetActioningItem={this.resetActioningItem}
                             showShortcutActionIcons={showShortcutActionIcons}
                             listConfig={this.props.listConfig}
+                            restrictCoverageInfo={this.props.restrictCoverageInfo}
                         />
                     );
                 })}
@@ -497,6 +500,7 @@ const mapStateToProps = (state: IAgendaState): IStateProps => ({
     hiddenGroupsShown: hiddenGroupsShownSelector(state),
     itemTypeFilter: state.agenda?.itemType,
     activeSortQuery: state.search.activeSortQuery || '',
+    restrictCoverageInfo: state.agenda.restrictCoverageInfo,
 });
 
 const mapDispatchToProps: IDispatchProps = {

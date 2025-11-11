@@ -61,6 +61,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
                             actions={actions}
                             user={user}
                             previewConfig={this.props.previewConfig}
+                            restrictCoverageInfo={restrictCoverageInfo}
                         />
                     </PreviewBox>
                 )}
@@ -74,6 +75,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
                             actions={actions}
                             user={user}
                             previewConfig={this.props.previewConfig}
+                            restrictCoverageInfo={restrictCoverageInfo}
                         />
                     </PreviewBox>
                 )}
@@ -139,6 +141,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
                                     actions={actions}
                                     user={user}
                                     previewConfig={this.props.previewConfig}
+                                    restrictCoverageInfo={restrictCoverageInfo}
                                 />
                             </PreviewBox>
                         )}
@@ -152,6 +155,7 @@ class AgendaPreviewCoverages extends React.Component<IProps, IState> {
                                     actions={actions}
                                     user={user}
                                     previewConfig={this.props.previewConfig}
+                                    restrictCoverageInfo={restrictCoverageInfo}
                                 />
                             </PreviewBox>
                         )}
