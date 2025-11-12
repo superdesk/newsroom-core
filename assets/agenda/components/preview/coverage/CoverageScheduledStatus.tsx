@@ -16,13 +16,15 @@ export function CoverageScheduledStatus({coverage, fullCoverage}: ICoverageMetad
         return null;
     }
 
-    const dateString = moment(scheduledUpdate.planning.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
+    const dateString = scheduledUpdate.planning.scheduled ? 
+        moment(scheduledUpdate.planning.scheduled).format(COVERAGE_DATE_TIME_FORMAT) : 
+        null;
 
-    return (
+    return dateString ? (
         <div className='coverage-item__row'>
             <span>
                 {gettext('Updated expected @ {{dateString}}', {dateString: dateString})}
             </span>
         </div>
-    );
+    ) : null;
 }

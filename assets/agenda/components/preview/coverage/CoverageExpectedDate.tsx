@@ -5,11 +5,11 @@ import {formatCoverageDate, WORKFLOW_STATUS} from 'agenda/utils';
 import {gettext} from 'utils';
 
 export function CoverageExpectedDate({coverage}: ICoverageMetadataPreviewProps) {
-    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED || coverage.scheduled == null) {
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
         return null;
     }
 
-    return (
+    return coverage.scheduled ? (
         <div
             className='coverage-item__row align-items-center'
         >
@@ -18,5 +18,5 @@ export function CoverageExpectedDate({coverage}: ICoverageMetadataPreviewProps) 
                 <span className=''>{formatCoverageDate(coverage)}</span>
             </span>
         </div>
-    );
+    ) : null;
 }
