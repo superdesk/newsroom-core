@@ -984,10 +984,6 @@ export function isItemTBC(item: IAgendaItem): boolean {
  * @return {String}
  */
 export function formatCoverageDate(coverage: ICoverage) {
-    if (!coverage.scheduled) {
-        return TO_BE_CONFIRMED_TEXT;
-    }
-
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
         `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
@@ -1011,6 +1007,14 @@ const handleStatus = (coverage: any, data: any, beingUpdated?: any, restrictCove
     const {slugline, coverageType, coverageScheduled, assignedDetails} = data;
     const {workflow_status} = coverage;
 
+    const showScheduledInfo = !restrictCoverageInfo && coverageScheduled;
+    const scheduledText = showScheduledInfo
+        ? gettext(', expected {{date}} at {{time}}', {
+            date: formatDate(coverageScheduled),
+            time: formatTime(coverageScheduled),
+        })
+        : '';
+
     switch (workflow_status) {
     case WORKFLOW_STATUS.DRAFT:
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}', {
@@ -1021,48 +1025,20 @@ const handleStatus = (coverage: any, data: any, beingUpdated?: any, restrictCove
         });
 
     case WORKFLOW_STATUS.ASSIGNED:
-        if (restrictCoverageInfo) {
-            return gettext('Planned {{ type }} coverage {{ slugline }} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                assignedDetails,
-            });
-        }
-        return coverageScheduled ? 
-            gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                date: formatDate(coverageScheduled),
-                time: formatTime(coverageScheduled),
-                assignedDetails,
-            }) :
-            gettext('Planned {{ type }} coverage {{ slugline }} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                assignedDetails,
-            });
+        return gettext('Planned {{ type }} coverage {{ slugline }}{{scheduledText}} {{assignedDetails}}', {
+            type: coverageType,
+            slugline: slugline,
+            scheduledText,
+            assignedDetails,
+        });
 
     case WORKFLOW_STATUS.ACTIVE:
-        if (restrictCoverageInfo) {
-            return gettext('{{ type }} coverage {{ slugline }} in progress {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                assignedDetails,
-            });
-        }
-        return coverageScheduled ? 
-            gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                date: formatDate(coverageScheduled),
-                time: formatTime(coverageScheduled),
-                assignedDetails,
-            }) :
-            gettext('{{ type }} coverage {{ slugline }} in progress {{assignedDetails}}', {
-                type: coverageType,
-                slugline: slugline,
-                assignedDetails,
-            });
+        return gettext('{{ type }} coverage {{ slugline }} in progress{{scheduledText}} {{assignedDetails}}', {
+            type: coverageType,
+            slugline: slugline,
+            scheduledText,
+            assignedDetails,
+        });
 
     case WORKFLOW_STATUS.CANCELLED:
         return gettext('{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}', {
