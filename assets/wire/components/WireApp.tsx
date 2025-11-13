@@ -373,7 +373,7 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
     errorMessage: state.errorMessage,
     dateFilters: state.dateFilters,
-    restrictCoverageInfo: !!get(state, 'restrictCoverageInfo', false)
+    restrictCoverageInfo: state.restrictCoverageInfo ? state.restrictCoverageInfo : false
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
