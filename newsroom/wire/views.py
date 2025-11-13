@@ -1,6 +1,7 @@
 from typing import Any, TypedDict
 import io
 import zipfile
+from copy import deepcopy
 
 from bson import ObjectId
 from pydantic import BaseModel, field_validator, Field, AliasChoices
@@ -405,6 +406,7 @@ async def download(args: None, params: ItemActionUrlParams, request: Request):
 @wire_endpoints.endpoint("/wire_share", methods=["POST"])
 async def share(args: None, params: ItemActionUrlParams, request: Request) -> Response:
     """Endpoint to share Wire OR Agenda item(s)"""
+    from newsroom.agenda.utils import remove_fields_for_public_user
 
     current_user = get_user_from_request(None)
     current_user_dict = current_user.to_dict()
@@ -433,22 +435,31 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
         assert user
         user_dict = user.to_dict()
 
+        # Create sanitized copy for non-admin users
+        items_for_email = items
+        if item_type == "agenda" and not is_admin_or_internal(user_dict):
+            items_for_email = []
+            for item in items:
+                item_copy = deepcopy(item)
+                remove_fields_for_public_user(item_copy)
+                items_for_email.append(item_copy)
+
         template_kwargs = {
             "app_name": get_app_config("SITE_NAME"),
             "recipient": user,
             "sender": current_user_dict,
-            "items": items,
+            "items": items_for_email,
             "message": data.get("message"),
             "section": params.type,
-            "subject_name": items[0].get("headline") or items[0].get("name"),
+            "subject_name": items_for_email[0].get("headline") or items_for_email[0].get("name"),
         }
 
         if item_type == "agenda":
             template_kwargs["maps"] = data.get("maps") if get_app_config("GOOGLE_MAPS_KEY") else []
-            template_kwargs["dateStrings"] = [get_agenda_dates(item) for item in items]
-            template_kwargs["locations"] = [get_location_string(item) for item in items]
-            template_kwargs["contactList"] = [get_public_contacts(item) for item in items]
-            template_kwargs["linkList"] = [get_links(item) for item in items]
+            template_kwargs["dateStrings"] = [get_agenda_dates(item) for item in items_for_email]
+            template_kwargs["locations"] = [get_location_string(item) for item in items_for_email]
+            template_kwargs["contactList"] = [get_public_contacts(item) for item in items_for_email]
+            template_kwargs["linkList"] = [get_links(item) for item in items_for_email]
             template_kwargs["is_admin"] = is_admin_or_internal(user_dict)
 
             # Import here to prevent circular imports

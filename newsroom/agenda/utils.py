@@ -119,19 +119,23 @@ def get_coverage_status_text(coverage):
     if coverage.get("workflow_status") == WORKFLOW_STATE.CANCELLED:
         return "has been cancelled."
 
+    scheduled_date = get_coverage_scheduled_date(coverage)
+    has_scheduled = get_coverage_scheduled(coverage) is not None
+
     if coverage.get("workflow_status") == WORKFLOW_STATE.DRAFT:
-        return "due at {}.".format(get_coverage_scheduled_date(coverage))
+        return "due at {}.".format(scheduled_date) if has_scheduled else "due."
 
     if coverage.get("workflow_status") == ASSIGNMENT_WORKFLOW_STATE.ASSIGNED:
-        return "expected at {}.".format(get_coverage_scheduled_date(coverage))
+        return "expected at {}.".format(scheduled_date) if has_scheduled else "expected."
 
     if coverage.get("workflow_status") == WORKFLOW_STATE.ACTIVE:
-        return "in progress at {}.".format(get_coverage_scheduled_date(coverage))
+        return "in progress at {}.".format(scheduled_date) if has_scheduled else "in progress."
 
     if coverage.get("workflow_status") == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
+        publish_time = get_coverage_publish_time(coverage)
         return "{}{}.".format(
             "updated" if len(coverage.get("deliveries") or []) > 1 else "available",
-            " at " + get_coverage_publish_time(coverage),
+            " at " + publish_time if publish_time else "",
         )
 
 
