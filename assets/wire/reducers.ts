@@ -173,6 +173,7 @@ export default function wireReducer(state: any = initialState, action: any) {
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             secondaryFormats: get(action, 'wireData.secondary_formats') || [],
+            restrictCoverageInfo: action.wireData.company?.restrict_coverage_info || false,
             wire: Object.assign({}, state.wire, {
                 newsOnly: action.newsOnly,
                 searchAllVersions: action.searchAllVersions,

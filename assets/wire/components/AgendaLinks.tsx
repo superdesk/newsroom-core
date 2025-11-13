@@ -95,7 +95,8 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
                             coverages={coverages}
                             wireItems={agendaWireItems}
                             onClick={this.openAgenda}
-                            hideViewContentItems={[get(this.props, 'item._id')]} />
+                            hideViewContentItems={[get(this.props, 'item._id')]}
+                            restrictCoverageInfo={this.props.restrictCoverageInfo} />
                     </div>
                 </PreviewBox>}
             </Fragment>
@@ -110,4 +111,5 @@ AgendaLinks.propTypes = {
         coverage_id: PropTypes.string,
     }),
     preview: PropTypes.bool,
+    restrictCoverageInfo: PropTypes.bool,
 };

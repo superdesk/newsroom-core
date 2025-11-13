@@ -149,6 +149,7 @@ class WireApp extends SearchBase<any> {
                 followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
                 filterGroupLabels={this.props.filterGroupLabels}
+                restrictCoverageInfo={this.props.restrictCoverageInfo}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <h3 className="a11y-only">{gettext('{{wire}} Content', window.sectionNames)}</h3>
@@ -332,6 +333,7 @@ WireApp.propTypes = {
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
     dateFilters: PropTypes.arrayOf(PropTypes.object),
+    restrictCoverageInfo: PropTypes.bool,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -370,7 +372,8 @@ const mapStateToProps = (state: any) => ({
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
     errorMessage: state.errorMessage,
-    dateFilters: state.dateFilters
+    dateFilters: state.dateFilters,
+    restrictCoverageInfo: !!get(state, 'restrictCoverageInfo', false)
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
