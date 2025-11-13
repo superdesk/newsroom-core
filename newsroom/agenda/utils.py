@@ -11,6 +11,7 @@ from newsroom.gettext import get_session_locale
 from newsroom.notifications import push_notification
 from newsroom.companies.companies_async import CompanyService
 from newsroom.template_filters import time_short, parse_date, format_datetime
+from newsroom.agenda.filters import PRIVATE_FIELDS
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = "_time_to_be_confirmed"
@@ -149,6 +150,11 @@ def remove_fields_for_public_user(item):
         for c in coverages:
             c.pop("internal_note", None)
             c.get("planning", {}).pop("internal_note", None)
+            # Handle additional PRIVATE_FIELDS for coverages if defined
+            for field in PRIVATE_FIELDS:
+                if field.startswith("coverages.") and field != "coverages":
+                    coverage_field = field.split(".", 1)[1]
+                    c.pop(coverage_field, None)
 
     item.get("event", {}).pop("files", None)
     item.get("event", {}).pop("internal_note", None)

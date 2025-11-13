@@ -386,6 +386,10 @@ async def related_wire_items(args: RelatedWireUrlArgs, params: None, request: Re
     if company and company.restrict_coverage_info:
         remove_restricted_coverage_info([agenda_item])
 
+    user = get_user_from_request(None)
+    if not user.is_admin_or_internal():
+        remove_fields_for_public_user(agenda_item)
+
     wire_ids = []
     for cov in agenda_item.get("coverages") or []:
         if cov.get("coverage_type") == "text" and cov.get("delivery_id"):
