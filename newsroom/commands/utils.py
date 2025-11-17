@@ -1,4 +1,5 @@
 import logging
+import json
 from pathlib import Path
 
 from superdesk.core import get_current_app
@@ -18,10 +19,7 @@ async def async_entity_import(entity_name, path, file_name, index_params, do_pat
         return
 
     logger.info(" - got file path: %s", file_path)
-
     with file_path.open("rt", encoding="utf-8") as f:
-        import json
-
         json_data = json.loads(f.read())
 
     data = [fillEnvironmentVariables(item) for item in json_data if fillEnvironmentVariables(item) is not None]

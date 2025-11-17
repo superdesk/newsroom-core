@@ -94,7 +94,7 @@ class AppInitializeWithDataCommand:
 
             except Exception as ex:
                 logger.exception(ex)
-                logger.error("Unexpected error processing entity %s", name)
+                logger.error("Exception loading entity %s", name)
 
         logger.info("Data import finished")
         return 0
