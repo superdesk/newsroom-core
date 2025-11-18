@@ -8,6 +8,7 @@ from collections import OrderedDict
 from superdesk.core import get_current_app
 from apps.prepopulate.app_initialize import import_file
 from .cli import newsroom_cli
+from .utils import async_entity_import
 
 from .elastic_rebuild import elastic_rebuild
 
@@ -63,16 +64,37 @@ class AppInitializeWithDataCommand:
 
         for name in entity_name:
             try:
-                (file_name, index_params, do_patch) = __entities__[name]
+                try:
+                    (file_name, index_params, do_patch) = __entities__[name]
+                except KeyError:
+                    logger.warning("Entity %s not configured in __entities__, skipping", name)
+                    continue
+
+                file_found = False
+                file_path = None
                 for path in data_paths:
                     if path.joinpath(file_name).exists():
-                        import_file(name, path, file_name, index_params, do_patch, force)
+                        file_found = True
+                        file_path = path
                         break
-            except KeyError:
-                continue
+
+                if not file_found:
+                    logger.warning("Data file %s not found for entity %s", file_name, name)
+                    continue
+
+                try:
+                    if name in ["ui_config"]:
+                        await async_entity_import(name, file_path, file_name, index_params, do_patch, force)
+                    else:
+                        import_file(name, file_path, file_name, index_params, do_patch, force)
+                    logger.info("Successfully imported entity %s", name)
+                except Exception as ex:
+                    logger.exception(ex)
+                    logger.error("Failed to import entity %s", name)
+
             except Exception as ex:
                 logger.exception(ex)
-                logger.info("Exception loading entity %s", name)
+                logger.error("Exception loading entity %s", name)
 
         logger.info("Data import finished")
         return 0
