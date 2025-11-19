@@ -34,7 +34,7 @@ from newsroom.history_async import HistoryService
 from .service import MonitoringProfileService
 from .search import MonitoringSearchService, MonitoringSearchRequestArgs
 from .utils import get_monitoring_file, truncate_article_body, get_date_items_dict
-
+from ..wire.embeds import remove_all_embeds
 
 logger = logging.getLogger(__name__)
 
@@ -345,6 +345,7 @@ class MonitoringEmailAlerts:
         companies_service = CompanyServiceAsync()
 
         for monitoring_data in monitoring_list:
+            last_run_time = local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)
             if monitoring_data.schedule is None:
                 # This should not happen, as we're filtering specifically for monitoring profiles with a schedule
                 # but the schedule is optional, and the type dictates it could be `None`, so trap that scenario here
@@ -372,12 +373,20 @@ class MonitoringEmailAlerts:
                     )
                     continue
 
+                # if immediate set the created from to the time of the last item set in the profile, if available
+                if monitoring_data.schedule.interval == "immediate" and monitoring_data.last_run_time:
+                    start_date = monitoring_data.last_run_time.strftime("%Y-%m-%d")
+                    start_time = monitoring_data.last_run_time.strftime("%H:%M:%S")
+                else:
+                    start_date = created_from
+                    start_time = created_from_time
+
                 search_request = NewshubSearchRequest(
                     args=MonitoringSearchRequestArgs(
                         navigation_ids=[monitoring_data.id],
                         skip_user_validation=True,
-                        start_date=created_from,
-                        start_time=created_from_time,
+                        start_date=start_date,
+                        start_time=start_time,
                     ),
                     company=company,
                 )
@@ -386,7 +395,8 @@ class MonitoringEmailAlerts:
                 # remove any items that have already been sent
                 items[:] = [item for item in items if not await self.already_sent(item, monitoring_data)]
                 template_kwargs = {"profile": monitoring_data.to_dict()}
-
+                for item in items:
+                    remove_all_embeds(item)
                 if items:
                     try:
                         template_kwargs.update(
@@ -462,9 +472,20 @@ class MonitoringEmailAlerts:
                             template_kwargs=template_kwargs,
                         )
 
-            await MonitoringProfileService().update(
-                monitoring_data.id, {"last_run_time": local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)}
-            )
+                # for immediate schedules we set the last_run_time to the versioncreated of the last item.
+                # with an additional grace period in case an item is late getting to Newshub or previouse run
+                # exceeds the soft time out or dies with the lock!
+                if monitoring_data.schedule.interval == "immediate":
+                    if len(items):
+                        last_article_created = max(parse_date_str(item.get("versioncreated")) for item in items)
+                        if last_article_created:
+                            last_run_time = last_article_created - timedelta(minutes=11)
+                    elif monitoring_data.last_run_time is None:
+                        last_run_time = last_run_time - timedelta(minutes=11)
+                    else:  # don't override the last_run_time if no items were found
+                        last_run_time = None
+            if last_run_time:
+                await MonitoringProfileService().update(monitoring_data.id, {"last_run_time": last_run_time})
 
 
 @celery.task(soft_time_limit=600)
