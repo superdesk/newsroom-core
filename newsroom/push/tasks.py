@@ -22,8 +22,8 @@ def get_lock(_id: str, service: str) -> str | None:
 
 @celery.task
 async def notify_new_wire_item(_id, check_topics=True):
-    lock = get_lock(_id, "wire")
-    if not lock:
+    lock_name = get_lock(_id, "wire")
+    if not lock_name:
         return
     try:
         logger.info("Send notifications for wire item %s", _id)
@@ -31,13 +31,13 @@ async def notify_new_wire_item(_id, check_topics=True):
         if item:
             await notifier.notify_new_item(item.to_dict(), check_topics=check_topics)
     finally:
-        unlock(lock)
+        unlock(lock_name)
 
 
 @celery.task
 async def notify_new_agenda_item(_id, check_topics=True, is_new=False):
-    lock = get_lock(_id, "wire")
-    if not lock:
+    lock_name = get_lock(_id, "agenda")
+    if not lock_name:
         return
     try:
         logger.info("Send notifications for agenda item %s", _id)
@@ -55,4 +55,4 @@ async def notify_new_agenda_item(_id, check_topics=True, is_new=False):
         await AgendaItemService().enhance_item(agenda_dict)
         await notifier.notify_new_item(agenda_dict, check_topics=check_topics)
     finally:
-        unlock(lock)
+        unlock(lock_name)
