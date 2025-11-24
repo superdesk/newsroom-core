@@ -334,11 +334,11 @@ pycodestyle==2.14.0
     # via flake8
 pycparser==2.23
     # via cffi
-pydantic==2.12.3
+pydantic==2.12.4
     # via
     #   -r mypy-requirements.txt
     #   superdesk-core
-pydantic-core==2.41.4
+pydantic-core==2.41.5
     # via pydantic
 pyflakes==3.4.0
     # via flake8
