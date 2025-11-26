@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from email.utils import format_datetime
-from typing import List, Any
+from typing import List, Any, cast
 
 from lxml import etree
 from lxml.etree import Element, SubElement, QName, CDATA
@@ -52,12 +52,12 @@ class RSSFormatter:
 
                 entry = SubElement(channel, self.item_field)
                 await self.format_item(entry, complete_item, token)
-                item_ids.append(item.get("_id"))
+                item_ids.append(item.get("_id", ""))
 
             except Exception as ex:
                 logger.exception("processing {} - {}".format(item.get("_id"), ex))
 
-        await self.log_items(item_ids, {item.get("_id"): item for item in items})
+        await self.log_items(item_ids, {item.get("_id", ""): item for item in items})
 
         return Response(
             XML_ROOT + etree.tostring(feed, method="xml", pretty_print=True).decode("utf-8"),
@@ -74,6 +74,8 @@ class RSSFormatter:
         if not item_ids:
             return
         company = get_company_from_request(None)
+        if company is None:
+            return
         service = HistoryService()
         query = {
             "size": 0,
@@ -96,7 +98,11 @@ class RSSFormatter:
 
         logged_ids = {bucket.get("key") for bucket in buckets}
         unlogged_ids = set(item_ids) - logged_ids
-        items_to_log = [items.get(unlogged_id) for unlogged_id in unlogged_ids if unlogged_id]
+        items_to_log: list[dict[str, Any]] = [
+            cast(dict[str, Any], items.get(unlogged_id))
+            for unlogged_id in unlogged_ids
+            if items.get(unlogged_id) is not None
+        ]
         if items_to_log:
             await service.create_history_record(items_to_log, "api", None, company.id, SectionEnum.NEWS_API.value, None)
 
