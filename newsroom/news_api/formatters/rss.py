@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, timedelta
 
 from email.utils import format_datetime
+from typing import List, Any
+
 from lxml import etree
 from lxml.etree import Element, SubElement, QName, CDATA
 
@@ -11,6 +13,8 @@ from superdesk.core.utils import str_to_date
 from superdesk.utc import utcnow
 from superdesk.flask import url_for
 
+from newsroom.auth.utils import get_company_from_request
+from newsroom.history_async import HistoryService
 from newsroom.types import SectionEnum
 from newsroom.wire.embeds import apply_company_permissions_to_embeds, update_embed_urls, set_association_links
 from newsroom.news_api.news.search_service import NewsApiSearchServiceAsync
@@ -38,7 +42,9 @@ class RSSFormatter:
         search_service = NewsApiSearchServiceAsync()
         response = await search_service.process_web_request(request)
 
-        for item in response.body.get("_items"):
+        item_ids: List[str] = []
+        items: List[dict] = response.body.get("_items")
+        for item in items:
             try:
                 complete_item = await search_service.service.find_by_id_raw(item.get("_id"))
                 if not complete_item:
@@ -46,14 +52,53 @@ class RSSFormatter:
 
                 entry = SubElement(channel, self.item_field)
                 await self.format_item(entry, complete_item, token)
+                item_ids.append(item.get("_id"))
 
             except Exception as ex:
                 logger.exception("processing {} - {}".format(item.get("_id"), ex))
+
+        await self.log_items(item_ids, {item.get("_id"): item for item in items})
 
         return Response(
             XML_ROOT + etree.tostring(feed, method="xml", pretty_print=True).decode("utf-8"),
             headers=[("Content-Type", self.mimetype)],
         )
+
+    async def log_items(self, item_ids: List[str], items: dict[str, Any]) -> None:
+        """
+        Log the items that have been included Feed as having been retrieved if they have not been logged before
+        @param item_ids:
+        @param items:
+        @return:
+        """
+        if not item_ids:
+            return
+        company = get_company_from_request(None)
+        service = HistoryService()
+        query = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"term": {"company": company.id}},
+                        {"term": {"section": SectionEnum.NEWS_API.value}},
+                        {"term": {"action": "api"}},
+                        {"terms": {"item": item_ids}},
+                    ]
+                }
+            },
+            "aggs": {"logged_items_agg": {"terms": {"field": "item", "size": len(item_ids)}}},
+        }
+
+        search_logged = await service.search(query)
+        aggregations = (search_logged.hits or {}).get("aggregations") or {}
+        buckets = aggregations.get("logged_items_agg", {}).get("buckets", [])
+
+        logged_ids = {bucket.get("key") for bucket in buckets}
+        unlogged_ids = set(item_ids) - logged_ids
+        items_to_log = [items.get(unlogged_id) for unlogged_id in unlogged_ids if unlogged_id]
+        if items_to_log:
+            await service.create_history_record(items_to_log, "api", None, company.id, SectionEnum.NEWS_API.value, None)
 
     def get_root_xml(self) -> tuple[Element, Element]:
         feed = Element("rss", attrib={"version": "2.0"}, nsmap=self.nsmap)
@@ -83,7 +128,9 @@ class RSSFormatter:
 
         try:
             if item["associations"]["featuremedia"]["renditions"]:
-                self.set_item_featuremedia_details(entry, item["associations"]["featuremedia"], token)
+                self.set_item_featuremedia_details(
+                    entry, item["associations"]["featuremedia"], token=token, item_id=item.get("_id")
+                )
         except (KeyError, TypeError):
             pass
 
@@ -197,7 +244,9 @@ class RSSFormatter:
     def set_item_content(self, entry: SubElement, item: dict) -> None:
         SubElement(entry, QName(self.nsmap.get("content"), "encoded")).text = CDATA(item.get("body_html", ""))
 
-    def set_item_featuremedia_details(self, entry: SubElement, featuremedia: dict, token: str | None) -> None:
+    def set_item_featuremedia_details(
+        self, entry: SubElement, featuremedia: dict, token: str | None, item_id: str | None
+    ) -> None:
         try:
             image: dict | None = featuremedia["renditions"]["16-9"]
         except (KeyError, TypeError):
@@ -207,11 +256,16 @@ class RSSFormatter:
             # 16x9 rendition not found, not including featuremedia details
             return
 
-        url = (
-            url_for("assets.get_item", _external=True, asset_id=image.get("media"), token=token)
-            if token
-            else url_for("assets.get_item", _external=True, asset_id=image.get("media"))
-        )
+        url_kwargs = {
+            "asset_id": image.get("media"),
+            "item_id": item_id,
+            "_external": True,
+        }
+        if token:
+            url_kwargs["token"] = token
+
+        endpoint_name = "assets.download" if token else "assets.get_item"
+        url = url_for(endpoint_name, **url_kwargs)
 
         media = SubElement(
             entry,

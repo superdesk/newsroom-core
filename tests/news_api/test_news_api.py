@@ -1,6 +1,9 @@
 from bson import ObjectId
+import lxml.etree
 from newsroom.types import SectionEnum
+from superdesk.utc import utcnow
 from tests.core.utils import create_entries_for, find_one_for
+from newsroom.tests import test_utils
 
 
 async def test_news_api_root_links(client, app):
@@ -28,6 +31,80 @@ async def test_news_api_root_links(client, app):
         "account/products": "Account Products Search",
         "account/products/<string:product_id>": "Get Account Product",
     }
+
+
+async def test_rss_item_history(client, app):
+    api_product_id = ObjectId()
+    await create_entries_for(
+        "products",
+        [
+            {
+                "_id": api_product_id,
+                "name": "Test Product",
+                "is_enabled": True,
+                "product_type": SectionEnum.NEWS_API,
+                "query": "story",
+            }
+        ],
+    )
+    company_id = ObjectId()
+    await create_entries_for(
+        "companies",
+        [
+            {
+                "_id": company_id,
+                "name": "Test Company",
+                "is_enabled": True,
+                "products": [
+                    {"_id": api_product_id, "section": SectionEnum.NEWS_API},
+                ],
+                "sections": {"news_api": True},
+            }
+        ],
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "111",
+                "firstpublished": utcnow(),
+                "pubstatus": "usable",
+                "headline": "Headline of the story",
+                "version": "1",
+            },
+            {
+                "_id": "222",
+                "firstpublished": utcnow(),
+                "pubstatus": "usable",
+                "headline": "Headline of the story 2",
+                "version": "1",
+            },
+        ],
+    )
+    await create_entries_for(
+        "history",
+        [
+            {
+                "item": "222",
+                "action": "api",
+                "section": "news_api",
+                "version": "1",
+                "versioncreated": utcnow(),
+                "company": company_id,
+            }
+        ],
+    )
+
+    await create_entries_for("news_api_tokens", [{"company": company_id, "enabled": True}])
+    token = await find_one_for("news_api_tokens", company=company_id)
+
+    response = await client.get("/api/v1/rss", headers={"Authorization": token.get("token")})
+    assert response.status_code == 200
+    body = await response.get_data()
+    tree = lxml.etree.fromstring(body)
+    assert "rss" == tree.tag, tree.tag
+    history_items = await test_utils.get_all("history")
+    assert len(history_items) == 2
 
 
 async def test_product_search(client, app):
