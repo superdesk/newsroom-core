@@ -891,3 +891,10 @@ USE_EMBED_PERMISSIONS_IN_DASHBOARD = True
 #: .. versionadded: 3.0
 #:
 MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 1024 * 1024 * 1000))  # 1GB
+
+#: Enable/Disable the application of setting the "user_has_access"/"_access" flag on items in the dashboard cards
+#: If true Items that are not permissioned for the Company will have the _access flag set to False
+#:
+#: .. versionadded: 3.?
+#:
+PERMISSION_DASHBOARD_CARDS = False
