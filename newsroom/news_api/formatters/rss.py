@@ -92,11 +92,15 @@ class RSSFormatter:
             "aggs": {"logged_items_agg": {"terms": {"field": "item", "size": len(item_ids)}}},
         }
 
-        search_logged = await service.search(query)
-        aggregations = (search_logged.hits or {}).get("aggregations") or {}
-        buckets = aggregations.get("logged_items_agg", {}).get("buckets", [])
+        try:
+            search_logged = await service.search(query)
+            aggregations = (search_logged.hits or {}).get("aggregations") or {}
+            buckets = aggregations.get("logged_items_agg", {}).get("buckets", [])
+            logged_ids = {bucket.get("key") for bucket in buckets}
+        except Exception as e:
+            logger.warning(f"Exception raised on search: {e}")
+            logged_ids = set()
 
-        logged_ids = {bucket.get("key") for bucket in buckets}
         unlogged_ids = set(item_ids) - logged_ids
         items_to_log: list[dict[str, Any]] = [
             cast(dict[str, Any], items.get(unlogged_id))
