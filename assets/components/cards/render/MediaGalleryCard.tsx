@@ -23,7 +23,7 @@ const getMediaPanel = (item: IArticle, picture: IArticle | null, openItem: any, 
                         <span>{shortDate(item.versioncreated)}</span>
                     </div>
                 </div>
-                <h4 className='card-title'>{item.headline}</h4>
+                <h4 className='card-title card-title--overlaid'>{item.headline}</h4>
                 <Embargo item={item} isCard={true} />
             </div>
         </div>
