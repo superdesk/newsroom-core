@@ -7,6 +7,7 @@ import {
     IAgendaListGroup,
     IAgendaListGroupItem,
     ICoverage,
+    IFullCoverage,
     IUser,
     IAgendaState
 } from 'interfaces';
@@ -485,38 +486,45 @@ export function getInternalNote(item: any, plan: any) {
     return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
-export const getNextPendingScheduledUpdate = (coverage: any) => {
+export const getNextPendingScheduledUpdate = (coverage?: IFullCoverage) => {
+    if (coverage == null) {
+        return null;
+    }
+
+    const scheduledUpdates = coverage.scheduled_updates || [];
+    const deliveries = coverage.deliveries || [];
+
     if (coverage.scheduled == null) {
         // Not privileged to see coverage details
         return null;
     } else if (
-        get(coverage, 'scheduled_updates.length', 0) === 0 ||
-        get(coverage, 'deliveries.length', 0) === 0
+        scheduledUpdates.length === 0 ||
+        deliveries.length === 0
     ) {
         // No scheduled_updates or deliveries
         return null;
-    } else if (get(coverage, 'deliveries.length', 0) === 1) {
+    } else if (deliveries.length === 1) {
         // Only one delivery: no scheduled_update was published
-        return coverage.scheduled_updates[0];
+        return scheduledUpdates[0];
     }
 
-    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d: any) => d.scheduled_update_id);
+    const lastScheduledDelivery = (deliveries.reverse()).find((d) => d.scheduled_update_id);
     // More deliveries, but no scheduled_update was published
     if (!lastScheduledDelivery) {
-        return coverage.scheduled_updates[0];
+        return scheduledUpdates[0];
     }
 
-    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s: any) =>
+    const lastPublishedScheduledUpdateIndex = scheduledUpdates.findIndex((s) =>
         s.scheduled_update_id === lastScheduledDelivery.scheduled_update_id);
 
-    if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
+    if (lastPublishedScheduledUpdateIndex === scheduledUpdates.length - 1) {
         // Last scheduled_update was published, nothing pending
         return;
     }
 
-    if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
+    if (lastPublishedScheduledUpdateIndex < scheduledUpdates.length - 1){
         // There is a pending scheduled_update
-        return coverage.scheduled_updates[lastPublishedShceduledUpdateIndex + 1];
+        return scheduledUpdates[lastPublishedScheduledUpdateIndex + 1];
     }
 };
 
