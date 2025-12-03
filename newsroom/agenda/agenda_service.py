@@ -404,6 +404,8 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
             # If published first time, coverage completion will trigger email - not needed now
             if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:
                 agenda_updated_notification_sent = True
-                await notify_agenda_update(updated_agenda, updated_agenda, None, True, None, parent_coverage)
+                await notify_agenda_update(
+                    updated_agenda.to_dict(), updated_agenda.to_dict(), None, True, None, parent_coverage
+                )
 
         return agenda_items
