@@ -35,16 +35,20 @@ async def prefill_products(request: NewshubSearchRequest[NewsApiSearchRequestArg
     products_service = ProductsService()
     assert request.company is not None
 
+    company_products = await get_products_by_company_async(request.company, product_type=request.section)
+    company_products_ids = set(item.id for item in company_products)
     if request.args.product_ids:
         cursor = await products_service.find(
-            {"is_enabled": True, "companies": request.company.id, "_id": {"$in": request.args.product_ids}},
+            {"is_enabled": True, "_id": {"$in": request.args.product_ids}},
         )
         request.products = await cursor.to_list()
         valid_product_ids = set(item.id for item in request.products)
-        if not all(product in valid_product_ids for product in request.args.product_ids):
+        if not all(product in valid_product_ids for product in request.args.product_ids) or not all(
+            product in company_products_ids for product in request.args.product_ids
+        ):
             raise BadParameterValueError(gettext("Bad product value"))
     else:
-        request.products = await get_products_by_company_async(request.company, product_type=request.section)
+        request.products = company_products
 
 
 def validate_page(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
