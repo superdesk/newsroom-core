@@ -1544,3 +1544,16 @@ async def test_push_item_with_invalid_state(client, app):
 
     await _test_item_state(deepcopy(test_event))
     await _test_item_state(deepcopy(test_planning))
+
+
+async def test_push_plan_with_missing_secondary_related_event(client, app):
+    planning = deepcopy(test_planning)
+    planning["related_events"] = [
+        {"_id": "missing", "link_type": "secondary"},
+    ]
+
+    resp = await client.post("/push", json=planning)
+    assert resp.status_code == 200
+
+    parsed = await find_one_by_id("agenda", planning["_id"])
+    assert parsed is not None

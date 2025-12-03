@@ -309,15 +309,18 @@ class Publisher:
             await service.update(agenda["_id"], agenda)
             return agenda["_id"]
 
-    async def publish_planning_related_events(self, planning: dict[str, Any], related_event: dict[str, Any]):
+    async def publish_planning_related_events(self, planning: dict[str, Any], related_event: dict[str, Any]) -> None:
         if not related_event.get("link_type") == "secondary":
-            return None
+            return
 
         service = AgendaItemService()
         event_id = related_event.get("_id")
 
         event = await service.find_by_id(event_id)
         updates: dict[str, Any] = {}
+
+        if not event:
+            return
 
         if event.item_type == AgendaItemType.EVENT and planning and planning.get("guid") not in event.planning_ids:
             updates["planning_ids"] = event.planning_ids + [planning["guid"]]
