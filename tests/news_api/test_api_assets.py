@@ -1,3 +1,4 @@
+import base64
 import os
 from bson import ObjectId
 from tests.news_api.test_api_audit import audit_check
@@ -30,6 +31,21 @@ async def test_get_asset(client, app):
     response = await client.get("api/v1/assets/{}".format(image_id), headers={"Authorization": token.get("token")})
     assert response.status_code == 200
     await audit_check(str(image_id))
+    response = await client.get(
+        "api/v1/assets/{}".format(image_id), headers={"Authorization": f"Bearer {token.get('token')}"}
+    )
+    assert response.status_code == 200
+    response = await client.get(
+        "api/v1/assets/{}".format(image_id), headers={"Authorization": f"Token {token.get('token')}"}
+    )
+    assert response.status_code == 200
+    credentials_string = f"{token.get('token')}:password"
+    credentials_bytes = credentials_string.encode("utf-8")
+    encoded_payload = base64.b64encode(credentials_bytes).decode("utf-8")
+    response = await client.get(
+        "api/v1/assets/{}".format(image_id), headers={"Authorization": f"Basic {encoded_payload}"}
+    )
+    assert response.status_code == 200
 
 
 async def test_authorization_get_asset(client, app):
