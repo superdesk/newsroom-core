@@ -25,7 +25,7 @@ async def get_rss_token(args: RSSArgs, params: None, request: Request) -> Respon
     "rss",
     title="RSS Feed (Header auth)",
     methods=["GET"],
-    auth=[support_auth_basic_auth],
+    auth=[support_auth_basic_auth, support_auth_token_in_url],
 )
 async def get_rss_authed(args: None, params: RSSArgs, request: Request) -> Response:
     return await RSSFormatter().format_feed(params.token, request)

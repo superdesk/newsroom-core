@@ -25,7 +25,7 @@ async def get_atom_token(args: AtomArgs, params: None, request: Request) -> Resp
     "atom",
     title="ATOM Feed (Header auth)",
     methods=["GET"],
-    auth=[support_auth_basic_auth],
+    auth=[support_auth_basic_auth, support_auth_token_in_url],
 )
 async def get_atom_authed(args: None, params: AtomArgs, request: Request) -> Response:
     return await AtomFormatter().format_feed(params.token, request)
