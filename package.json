@@ -91,5 +91,8 @@
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "~5.0.1",
     "sinon": "^18.0.0"
+  },
+  "volta": {
+    "node": "22.21.1"
   }
 }
