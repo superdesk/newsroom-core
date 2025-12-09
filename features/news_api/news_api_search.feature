@@ -679,3 +679,35 @@ Feature: News API News Search
          {"body_html": "<p>Updated fish story</p>"}
      ]}
      """
+
+  Scenario: search with multiple products
+    Given "products"
+        """
+        [{
+            "_id": "111111111111111111111111",
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "NOT aardvark",
+            "product_type": "news_api"
+        },
+        {
+            "_id": "222222222222222222222222",
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
+    Given "items"
+        """
+        [{
+            "body_html": "Three aardvark story",
+            "versioncreated": "#DATE-3#",
+            "headline": "Headline 1"
+        }]
+        """
+    When we get "news/search?start_date=now-10d&products=222222222222222222222222,111111111111111111111111"
+    Then we get OK response
+    Then we get list with 1 items
