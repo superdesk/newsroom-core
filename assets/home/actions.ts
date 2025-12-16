@@ -1,5 +1,5 @@
 import server from '../server';
-import {errorHandler, recordAction} from 'utils';
+import {errorHandler, recordAction, notify, gettext} from 'utils';
 import {pushNotification as wirePushNotification} from 'wire/actions';
 import {get} from 'lodash';
 
@@ -15,8 +15,12 @@ function openItem(item: any) {
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item: any) {
     return (dispatch: any) => {
-        dispatch(openItem(item));
-        recordAction(item, 'open');
+        if (item._access) {
+            dispatch(openItem(item));
+            recordAction(item, 'open');
+        } else {
+            notify.warning(gettext('This item is not part of your subscription'));
+        }
     };
 }
 

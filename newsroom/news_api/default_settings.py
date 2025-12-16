@@ -17,7 +17,7 @@ server_url = urlparse(NEWSAPI_URL)
 URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or "api/v1"
 
 QUERY_MAX_PAGE_SIZE = 100
-
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+00:00"
 BLUEPRINTS = []
 
 CORE_APPS = [

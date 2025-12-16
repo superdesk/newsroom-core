@@ -81,7 +81,10 @@ HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
 async def set_permissions(
-    wire_item: WireItem, ignore_latest: bool = False, service: WireSearchServiceAsync | None = None
+    wire_item: WireItem,
+    ignore_latest: bool = False,
+    service: WireSearchServiceAsync | None = None,
+    strip_associations: bool = True,
 ):
     try:
         if not service:
@@ -98,10 +101,10 @@ async def set_permissions(
     except Exception:
         permitted = False
 
-    set_item_permission(wire_item, permitted)
+    set_item_permission(wire_item, permitted, strip_associations)
 
 
-def set_item_permission(wire_item: WireItem, permitted=True):
+def set_item_permission(wire_item: WireItem, permitted=True, strip_associations=True):
     if not wire_item:
         return
 
@@ -109,8 +112,42 @@ def set_item_permission(wire_item: WireItem, permitted=True):
     if not wire_item.user_has_access:
         wire_item.body_text = ""
         wire_item.body_html = ""
-        wire_item.renditions = None
-        wire_item.associations = None
+        if strip_associations:
+            wire_item.renditions = None
+            wire_item.associations = None
+
+
+async def set_permissions_on_cards(items_by_card):
+    """
+    Sets permissions flag "user_has_access"/"_access" on the items in each card based on what is allowed for the
+    Company
+    @param items_by_card:
+    @return:
+    """
+    # If the feature is not enabled then flag all items as being accessible
+    if not get_app_config("PERMISSION_DASHBOARD_CARDS"):
+        for card_items in items_by_card.values():
+            for item_dict in card_items:
+                item_dict["_access"] = True
+        return
+
+    card_item_ids = []
+    for _c, card_items in items_by_card.items():
+        card_item_ids.extend([itm.get("_id") for itm in card_items if itm.get("_id")])
+    service = WireSearchServiceAsync()
+    cursor = await service.get_items_by_id(
+        card_item_ids, WireSearchRequestArgs(ignore_latest=False), apply_permissions=True
+    )
+    allowed_ids_list = await cursor.to_list()
+    allowed_ids_set = {itm.id for itm in allowed_ids_list if itm.id}
+
+    for card, card_items in items_by_card.items():
+        for i, card_item in enumerate(card_items):
+            wire_item = WireItem.from_dict(card_item)
+
+            is_permitted = wire_item.id in allowed_ids_set
+            set_item_permission(wire_item, permitted=is_permitted, strip_associations=False)
+            card_items[i] = wire_item.to_dict()
 
 
 async def get_view_data() -> dict:
@@ -151,6 +188,9 @@ async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId
         return app.cache.get(cache_key)
 
     items_by_card = await get_items_for_dashboard(cards)
+
+    await set_permissions_on_cards(items_by_card)
+
     app.cache.set(cache_key, items_by_card, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
 
@@ -195,7 +235,12 @@ async def get_personal_dashboards_data(
                     topic=topic,
                 )
             )
-            topic_items = await cursor.to_list_raw()
+            topic_items = []
+            topic_items_list = await cursor.to_list()
+            # All items on the personal dashboard have user access
+            for topic_item in topic_items_list:
+                topic_item.user_has_access = True
+                topic_items.append(topic_item.to_dict())
             await apply_company_permissions_to_embeds(topic_items, topic.topic_type)
             return topic_items
         except AuthorizationError:
