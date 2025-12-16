@@ -31,5 +31,5 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.10'
-      - run: pip install -r black-requirements.txt
+      - run: pip install -Ur dev-requirements.txt
       - run: black --check .
