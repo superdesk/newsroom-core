@@ -20,7 +20,7 @@ from newsroom.tests import markers
 from newsroom.utils import parse_date_str
 
 from .test_push import get_signature_headers
-from tests.utils import post_json, get_json, mock_send_email
+from tests.utils import post_json, get_json, mock_send_email, login
 from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 
@@ -440,13 +440,13 @@ async def test_notify_topic_matches_for_new_event_item(client, app, mocker):
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
+                "password": "test123",
             }
         ],
     )
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
+    user = str(user_ids[0])
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
 
     topic = {
         "label": "bar",
@@ -486,13 +486,13 @@ async def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
+                "password": "test123",
             }
         ],
     )
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
+    user = str(user_ids[0])
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
 
     topic = {
         "label": "bar",
@@ -527,7 +527,7 @@ async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker
     planning = deepcopy(test_planning)
     planning["guid"] = "bar3"
     planning["event_item"] = None
-    client.post("/push", json=planning)
+    await client.post("/push", json=planning)
 
     user_ids = await create_entries_for(
         "auth_user",
@@ -539,13 +539,13 @@ async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
+                "password": "test123",
             }
         ],
     )
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
+    user = str(user_ids[0])
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
 
     topic = {
         "label": "bar",

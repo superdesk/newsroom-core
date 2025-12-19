@@ -10,6 +10,7 @@ from superdesk.core.types import Request, Response
 from newsroom.types import Topic, TopicResourceModel, UserResourceModel, UserRole
 from newsroom.email import send_user_email
 from newsroom.auth import auth_rules
+from newsroom.types.common import SectionEnum
 
 from .topics_async import get_user_topics, auto_enable_user_emails, topic_endpoints, TopicService
 
@@ -155,7 +156,7 @@ def get_topic_url(topic: TopicResourceModel):
         url_params["advanced"] = json.dumps({field: value for field, value in topic_dict["advanced"].items() if value})
 
     return url_for(
-        "wire.wire" if topic.topic_type == "wire" else f"{topic.topic_type}.index",
+        "wire.wire" if topic.topic_type == SectionEnum.WIRE else f"{topic.topic_type.value}.index",
         _external=True,
         **url_params,
     )
