@@ -9,7 +9,7 @@ python3-saml>=1.15,<1.17
 google-auth>=2.6,<2.30
 
 quart-wtforms>=1.0.1,<1.1
-quart-rate-limiter>=0.10.0,<0.11
+quart-rate-limiter>=0.10.0,<0.13
 
 # Fix issue with xhtml2pdf not working with python-bidi>=0.5
 python-bidi<0.5
