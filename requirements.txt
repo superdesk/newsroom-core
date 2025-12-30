@@ -6,7 +6,7 @@ hypercorn>=0.17.3
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 python3-saml>=1.15,<1.17
-google-auth>=2.6,<2.30
+google-auth>=2.6,<2.46
 
 quart-wtforms>=1.0.1,<1.1
 quart-rate-limiter>=0.10.0,<0.13
