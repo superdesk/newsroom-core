@@ -12,7 +12,7 @@ quart-wtforms>=1.0.1,<1.1
 quart-rate-limiter>=0.10.0,<0.13
 
 # Fix issue with xhtml2pdf not working with python-bidi>=0.5
-python-bidi<0.5
+python-bidi<0.7
 
 superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@release/3.0-alpha
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v3.0.0-alpha.1
