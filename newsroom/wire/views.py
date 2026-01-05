@@ -495,7 +495,7 @@ async def share(args: None, params: ItemActionUrlParams, request: Request) -> Re
             "sender": current_user_dict,
             "items": items_for_email,
             "message": data.get("message"),
-            "section": params.type,
+            "section": params.type.value,
             "subject_name": items_for_email[0].get("headline") or items_for_email[0].get("name"),
         }
 
