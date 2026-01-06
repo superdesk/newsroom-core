@@ -1,6 +1,6 @@
 from typing import Any
 import bson
-from datetime import timedelta
+from datetime import timedelta, datetime
 from copy import deepcopy
 
 from zipfile import ZipFile
@@ -19,6 +19,8 @@ from newsroom.tests.fixtures import (  # noqa
     ADMIN_USER_ID,
 )
 from .test_push import upload_binary, get_fixture_path
+
+YEAR = datetime.now().year
 
 items_ids = [item["_id"] for item in items[:2]]
 item = deepcopy(items[0])
@@ -215,7 +217,7 @@ def _assert_html_content(content: str, item: dict, use_base64: bool = False) -> 
         assert root.find("body//article/pre").text == item["slugline"]
         assert root.find("body//article/h1").text == item["headline"]
         footer_text = root.find("body/footer").text_content()
-        assert "All contents © Copyright 2025 Sourcefabric. All rights reserved." in footer_text
+        assert f"All contents © Copyright {YEAR} Sourcefabric. All rights reserved." in footer_text
 
         featuremedia_element = root.xpath("//img[@id='feature-image']")[0]
         assert featuremedia_element.attrib["src"] == featuremedia_src
