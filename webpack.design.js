@@ -52,7 +52,9 @@ const config = {
                     {
                         loader: 'css-loader',
                         options: {
-                            url: (url, resourcePath) => url.startsWith('/') === false,
+                            url: {
+                                filter: (url, resourcePath) => url.startsWith('/') === false,
+                            },
                         },
                     },
                     'sass-loader',
@@ -60,9 +62,7 @@ const config = {
             },
             {
                 test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
-                use: [
-                    'file-loader',
-                ],
+                type: 'asset/resource',
             },
         ],
     },
