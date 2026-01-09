@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Literal, cast
 from pymongo.cursor import Cursor as MongoCursor
 
 from bson import ObjectId
@@ -198,8 +198,8 @@ def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> 
 
     if all_day:
         format = get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT") or "dd/MM/yyyy"
-        _start = _format_date(start, format, rebase=False)
-        _end = _format_date(end, format, rebase=False)
+        _start = _format_date(start, cast(Literal["short", "medium", "long", "full"], format), rebase=False)
+        _end = _format_date(end, cast(Literal["short", "medium", "long", "full"], format), rebase=False)
         return _start if start.date() == end.date() else "{} - {}".format(_start, _end)
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
@@ -519,8 +519,14 @@ def deep_get(val: Dict[str, Any], keys: str, default: Optional[Any] = None) -> A
     deep_get(account, "details.name.last", "Not Defined")  # "Not Defined"
     """
 
+    def _get_nested(d: Dict[str, Any], key: str) -> Dict[str, Any]:
+        if isinstance(d, dict):
+            result = d.get(key, default)
+            return result if isinstance(result, dict) else {}
+        return {}
+
     return reduce(
-        lambda d, key: d.get(key, default) if isinstance(d, dict) else default or {},
+        _get_nested,
         keys.split("."),
         val,
     )

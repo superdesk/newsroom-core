@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Sequence
 
 from bson import ObjectId
 
@@ -129,7 +129,9 @@ async def get_products_by_navigation_async(
     ]
 
 
-def get_products_lookup(product_ids: IdsList, navigation_ids: IdsList | None) -> dict[str, Any]:
+def get_products_lookup(
+    product_ids: Sequence[str | ObjectId], navigation_ids: Sequence[str | ObjectId] | None
+) -> dict[str, Any]:
     lookup = {"_id": {"$in": product_ids}}
 
     if navigation_ids:
