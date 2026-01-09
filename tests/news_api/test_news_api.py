@@ -1,3 +1,5 @@
+import base64
+
 from bson import ObjectId
 import lxml.etree
 from newsroom.types import SectionEnum
@@ -181,3 +183,40 @@ async def test_product_search(client, app):
         f"/api/v1/news/search/?products={wire_product_id}", headers={"Authorization": token.get("token")}
     )
     assert response.status_code == 400
+
+
+async def test_get_atom_and_rss_auth(client, app):
+    company_id = ObjectId()
+    await create_entries_for(
+        "companies",
+        [
+            {
+                "_id": company_id,
+                "name": "Test Company",
+                "is_enabled": True,
+                "products": [],
+                "sections": {"news_api": True, "wire": True},
+            }
+        ],
+    )
+    await create_entries_for("news_api_tokens", [{"company": company_id, "enabled": True}])
+    token = await find_one_for("news_api_tokens", company=company_id)
+
+    response = await client.get("/api/v1/rss", headers={"Authorization": token.get("token")})
+    assert response.status_code == 200
+    response = await client.get("/api/v1/atom", headers={"Authorization": "Bearer " + token.get("token")})
+    assert response.status_code == 200
+
+    credentials_string = f"{token.get('token')}:password"
+    credentials_bytes = credentials_string.encode("utf-8")
+    encoded_payload = base64.b64encode(credentials_bytes).decode("utf-8")
+
+    response = await client.get("api/v1/rss", headers={"Authorization": f"Basic {encoded_payload}"})
+    assert response.status_code == 200
+    response = await client.get("api/v1/atom", headers={"Authorization": f"Basic {encoded_payload}"})
+
+    assert response.status_code == 200
+    response = await client.get(f"api/v1/atom/{token.get('token')}")
+    assert response.status_code == 200
+    response = await client.get(f"api/v1/rss/{token.get('token')}")
+    assert response.status_code == 200

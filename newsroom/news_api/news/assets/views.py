@@ -6,7 +6,7 @@ from newsroom.history_async import HistoryService
 
 from newsroom.assets import get_upload
 from newsroom.news_api.utils import post_api_audit
-from newsroom.news_api.api_tokens.auth import support_auth_token_in_url
+from newsroom.news_api.api_tokens.auth import support_auth_token_in_url, support_auth_basic_auth
 
 assets_endpoints = EndpointGroup("assets", __name__)
 
@@ -26,7 +26,7 @@ class RouteArguments(BaseModel):
     "assets/<path:asset_id>/<item_id>",
     title="Download Asset (with Wire ID)",
     methods=["GET"],
-    auth=[support_auth_token_in_url],
+    auth=[support_auth_token_in_url, support_auth_basic_auth],
 )
 async def download(args: RouteArguments, params: RouteParams, request: Request):
     """
@@ -42,7 +42,7 @@ async def download(args: RouteArguments, params: RouteParams, request: Request):
     "assets/<string:asset_id>",
     title="Download Asset",
     methods=["GET"],
-    auth=[support_auth_token_in_url],
+    auth=[support_auth_token_in_url, support_auth_basic_auth],
 )
 async def get_item(args: RouteArguments, params: RouteParams, request: Request):
     """
