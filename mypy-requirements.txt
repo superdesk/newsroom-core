@@ -1,5 +1,5 @@
 mypy==1.19.1
 types-python-dateutil~=2.9.0
 types-pytz~=2025.2.0
-types-requests~=2.31.0  # https://github.com/python/typeshed/issues/10825
+types-requests~=2.32.4  # https://github.com/python/typeshed/issues/10825
 typing-extensions==4.15.0
