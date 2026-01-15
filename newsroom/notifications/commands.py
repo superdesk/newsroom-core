@@ -111,7 +111,7 @@ class SendScheduledNotificationEmails:
                 if not user.notification_schedule.times:
                     user.notification_schedule.times = get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
 
-                company = companies.get(user.company)
+                company = companies.get(user.company) if user.company else None
                 await self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user.id) or {}, force)
             except Exception as e:
                 logger.exception(e)

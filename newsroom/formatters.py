@@ -1,9 +1,10 @@
-from typing import Any, TypedDict
+from typing import Any, TypedDict, Union
 from io import BytesIO
 from enum import Enum, unique
 
 import zipfile
 from werkzeug.utils import secure_filename
+from quart_babel import LazyString
 
 from superdesk.errors import SuperdeskApiError
 from superdesk.utc import utcnow
@@ -20,7 +21,7 @@ class FormatterAssetType(str, Enum):
 
 class BaseFormatter:
     format_id: str
-    name: str
+    name: Union[str, LazyString]
     sections: list[SectionEnum]
     assets: list[FormatterAssetType] | None = None
 
@@ -99,7 +100,7 @@ def get_formatters_id_and_names(section: SectionEnum | None) -> list[FormatterId
     return [
         FormatterIdAndName(
             format=formatter.format_id,
-            name=formatter.name,
+            name=str(formatter.name),
             types=formatter.sections,
             assets=formatter.assets if formatter.assets is not None else [],
         )

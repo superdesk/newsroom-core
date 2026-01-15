@@ -1,4 +1,4 @@
-import asyncio
+from features.utils import run_async
 from superdesk.tests.environment import setup_before_all, setup_before_scenario
 from newsroom.auth_server.client import authorization
 from newsroom.mgmt_api.app import get_app as _get_app
@@ -35,13 +35,7 @@ def before_scenario(context, scenario):
         scenario.skip("Marked with @skip")
         return
 
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(before_scenario_async(context, scenario))
-    except Exception as e:
-        # Make sure exceptions raised are printed to the console
-        logger.exception(e)
-        raise e
+    run_async(before_scenario_async(context, scenario))
 
 
 async def before_scenario_async(context, scenario):

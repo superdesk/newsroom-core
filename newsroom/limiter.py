@@ -1,6 +1,6 @@
 from typing import Callable
 
-from quart import Blueprint
+from flask.sansio.blueprints import Blueprint
 from quart_rate_limiter import RateLimiter as BaseRateLimiter, rate_limit, RateLimit
 
 from superdesk.core import get_current_app

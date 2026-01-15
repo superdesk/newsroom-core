@@ -1,4 +1,5 @@
 import ipaddress
+import base64
 from typing import Any
 from datetime import timedelta
 from quart_babel import gettext
@@ -48,22 +49,41 @@ async def support_auth_token_in_url(request: Request) -> None:
     return None
 
 
+async def support_auth_basic_auth(request: Request) -> None:
+    """Flag to indicate this endpoint supports using the basic auth"""
+    return None
+
+
 class CompanyTokenAuth(UserAuthProtocol):
     def get_token_from_request(self, request: Request) -> str | None:
         """
         Extracts the token from `Authorization` header. Code taken partly
         from eve.Auth module
         """
+        supports_basic_auth = (
+            isinstance(request.endpoint.auth, list) and support_auth_basic_auth in request.endpoint.auth
+        ) or (isinstance(request.endpoint.auth, dict) and support_auth_basic_auth in request.endpoint.auth.values())
+        supports_token_in_url = (
+            isinstance(request.endpoint.auth, list) and support_auth_token_in_url in request.endpoint.auth
+        ) or (isinstance(request.endpoint.auth, dict) and support_auth_token_in_url in request.endpoint.auth.values())
 
         auth = (request.get_header("Authorization") or "").strip()
         if len(auth):
             if auth.lower().startswith(("token", "bearer")):
                 return auth.split(" ")[1] if " " in auth else None
+
+            if supports_basic_auth and auth.lower().startswith("basic"):
+                base64_payload = auth.split(" ", 1)[1]
+
+                credentials_bytes = base64.b64decode(base64_payload)
+                credentials = credentials_bytes.decode("utf-8")
+                username, password = credentials.split(":", 1)
+
+                return username if username else password
+
+            # In case just the token was passed
             return auth
 
-        supports_token_in_url = (
-            isinstance(request.endpoint.auth, list) and support_auth_token_in_url in request.endpoint.auth
-        ) or (isinstance(request.endpoint.auth, dict) and support_auth_token_in_url in request.endpoint.auth.values())
         if supports_token_in_url:
             token = request.get_url_arg("token") or request.get_view_args("token")
             if token:

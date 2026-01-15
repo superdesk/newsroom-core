@@ -13,7 +13,7 @@ from newsroom.formatters import get_formatter_by_classname
 from newsroom.settings import get_setting
 from newsroom.news_api.utils import post_api_audit
 from newsroom.history_async import HistoryService
-
+from newsroom.news_api.api_tokens.auth import support_auth_token_in_url, support_auth_basic_auth
 
 news_item_endpoints = EndpointGroup("news/item", __name__)
 
@@ -26,7 +26,12 @@ class RouteParams(BaseModel):
     format: str = "NINJSFormatter"
 
 
-@news_item_endpoints.endpoint("news/item/<path:item_id>", title="Get News Item", methods=["GET"])
+@news_item_endpoints.endpoint(
+    "news/item/<path:item_id>",
+    title="Get News Item",
+    methods=["GET"],
+    auth=[support_auth_token_in_url, support_auth_basic_auth],
+)
 async def get_item(args: RouteArguments, params: RouteParams, request: Request) -> Response:
     app = get_current_app()
     formatter = get_formatter_by_classname(params.format)

@@ -249,7 +249,10 @@ class BaseSearchRequestArgs(BaseModel):
         if not value:
             return []
         elif isinstance(value, (str, ObjectId)):
-            return [str(value)]
+            if "," in value:
+                return [part.strip() for part in value.split(",") if part.strip()]
+            else:
+                return [str(value)]
         return value
 
     @field_validator("advanced", mode="before")

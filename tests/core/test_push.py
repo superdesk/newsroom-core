@@ -18,6 +18,7 @@ from newsroom.history_async import HistoryService
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.tests import markers
 from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
+from tests.utils import login
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email, get_json
 
@@ -287,13 +288,15 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
                 "is_enabled": True,
                 "receive_email": True,
                 "user_type": "administrator",
+                "password": "test123",  # Set a password for login
             }
         ],
     )
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
+    user = str(user_ids[0])
+
+    # Login the user through the auth endpoint
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
 
     resp = await client.post(
         f"users/{user}/topics",
@@ -496,6 +499,7 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         "receive_email": True,
         "receive_app_notifications": True,
         "company": COMPANY_1_ID,
+        "password": "test123",
     }
 
     user_ids = await create_entries_for("auth_user", [user])
@@ -528,10 +532,8 @@ async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker
         ],
     )
 
-    async with client.session_transaction() as session:
-        session["user"] = str(user["_id"])
-        session["user_type"] = "public"
-        session["name"] = "public"
+    # Login the user
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
 
     resp = await client.post(
         "/wire_bookmark",
@@ -583,13 +585,16 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
                 "is_enabled": True,
                 "receive_email": True,
                 "company": company_ids[0],
+                "password": "test123",
             }
         ],
     )
 
-    async with client.session_transaction() as session:
-        user = str(user_ids[0])
-        session["user"] = user
+    user = str(user_ids[0])
+
+    # Login the user
+    await login(client, {"email": "foo2@bar.com", "password": "test123"})
+
     resp = await client.post(
         "users/%s/topics" % user,
         json={"label": "bar", "topic_type": "wire", "query": "test", "notifications": True},
@@ -597,8 +602,8 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
     assert 201 == resp.status_code, await resp.get_data(as_text=True)
 
     # disable user
-    user = await find_one_by_id("users", user_ids[0])
-    await update_entries_for("users", user_ids[0], {"is_enabled": False}, user)
+    user_obj = await find_one_by_id("users", user_ids[0])
+    await update_entries_for("users", user_ids[0], {"is_enabled": False}, user_obj)
     # clean cache
     app.cache.delete(str(user_ids[0]))
 
