@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.10']
-        node-version: ['14']
+        node-version: ['22']
 
     services:
       redis:
@@ -40,7 +40,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
       - name: Install node_modules
-        run: npm install
+        run: npm ci
       - name: Install APT packages
         run: |
              sudo apt-get update
@@ -50,7 +50,7 @@ jobs:
       - name: Install python modules
         run: pip install -e .
       - name: Install CypressIO
-        run: cd e2e && npm install
+        run: cd e2e && npm ci
       - name: Build Client
         run: cd e2e && npm run build
       - name: Start Services
