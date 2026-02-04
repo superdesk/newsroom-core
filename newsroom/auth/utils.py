@@ -161,15 +161,24 @@ def get_current_user_sections(request: Request | None) -> dict[str, bool]:
 
 
 def get_user_sections(user: UserResourceModel | None, company: CompanyResource | None) -> dict[str, bool]:
-    if not user:
+    available_sections = get_current_wsgi_app().sections
+
+    if user and user.user_type == UserRole.ADMINISTRATOR:
+        return {section["_id"]: True for section in available_sections}
+    elif not user or not company:
+        # All non-admin users must have a company assigned
         return {}
-    elif user.user_type == UserRole.ADMINISTRATOR:
-        return {section["_id"]: True for section in get_current_wsgi_app().sections}
-    elif user.sections:
-        return user.sections
-    elif company and company.sections:
-        return company.sections
-    return {}
+    elif not user.sections:
+        return company.sections or {}
+
+    company_sections = company.sections or {}
+    return {
+        section["_id"]: (
+            company_sections.get(section["_id"])
+            and (section["_id"] not in user.sections or user.sections[section["_id"]])
+        )
+        for section in available_sections
+    }
 
 
 def get_auth_providers() -> dict[str, "AuthProvider"]:

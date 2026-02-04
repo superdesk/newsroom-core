@@ -5,8 +5,9 @@ from pytest import fixture
 
 from superdesk.utils import get_hash
 
-from newsroom.types import UserAuthResourceModel
+from newsroom.types import UserAuthResourceModel, UserResourceModel, CompanyResource, UserRole
 from newsroom.auth.token import verify_auth_token
+from newsroom.auth.utils import get_user_sections
 from newsroom.auth.views import _is_password_valid
 from newsroom.users import UsersService
 from newsroom.tests.users import ADMIN_USER_EMAIL
@@ -16,7 +17,7 @@ from tests.core.utils import create_entries_for
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
-company = ObjectId()
+company_id = ObjectId()
 
 
 @fixture(autouse=True)
@@ -35,7 +36,7 @@ async def init(app):
                 "is_enabled": True,
                 "expiry_date": datetime.datetime.now() - datetime.timedelta(days=5),
             },
-            {"_id": company, "name": "Foo bar co.", "is_enabled": True},
+            {"_id": company_id, "name": "Foo bar co.", "is_enabled": True},
         ],
     )
 
@@ -60,7 +61,7 @@ async def test_login_fails_for_disabled_user(app, client):
                 "is_validated": True,
                 "is_enabled": False,
                 "is_approved": True,
-                "company": company,
+                "company": company_id,
                 "_created": datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
             }
         ],
@@ -163,7 +164,7 @@ async def test_login_fails_for_not_approved_user(app, client):
                 "user_type": "public",
                 "is_validated": True,
                 "is_enabled": True,
-                "company": company,
+                "company": company_id,
                 "is_approved": False,
                 "_created": datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
             }
@@ -199,7 +200,7 @@ async def test_account_is_locked_after_5_wrong_passwords(app, client):
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": company,
+                "company": company_id,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -239,7 +240,7 @@ async def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": company,
+                "company": company_id,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -307,7 +308,7 @@ async def test_login_with_remember_me_selected_creates_permanent_session(app, cl
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": company,
+                "company": company_id,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -458,7 +459,7 @@ async def test_access_for_disabled_user(app, client):
                 "is_validated": True,
                 "is_enabled": True,
                 "is_approved": True,
-                "company": company,
+                "company": company_id,
                 "_created": datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
             }
         ],
@@ -483,7 +484,7 @@ async def test_access_for_disabled_user(app, client):
             "is_validated": "true",
             "is_enabled": "false",
             "is_approved": "true",
-            "company": company,
+            "company": company_id,
             "_etag": user.etag,
         },
         headers={"If-Match": user.etag},
@@ -589,3 +590,38 @@ async def test_change_password(client, admin):
 
     assert 200 == resp.status_code
     assert "Your password has been changed" in await resp.get_data(as_text=True)
+
+
+async def test_get_user_sections(app):
+    # No user or company, no sections enabled
+    assert get_user_sections(None, None) == {}
+
+    # Admin user, all sections enabled
+    user = UserResourceModel(user_type=UserRole.ADMINISTRATOR, first_name="foo", last_name="bar", email="foo@bar.org")
+    assert get_user_sections(user, None) == {"agenda": True, "monitoring": True, "news_api": True, "wire": True}
+
+    # non-admin user without company provided, no sections enabled
+    user.user_type = UserRole.COMPANY_ADMIN
+    assert get_user_sections(user, None) == {}
+
+    # Company provided without a user, no sections enabled
+    company = CompanyResource(name="FooBar Org")
+    assert get_user_sections(None, company) == {}
+
+    # No sections defined on user, uses company permissions
+    user.sections = None
+    company.sections = {"agenda": False, "monitoring": True, "news_api": True, "wire": True}
+    assert get_user_sections(user, company) == {"agenda": False, "monitoring": True, "news_api": True, "wire": True}
+
+    # User sections override company section permission
+    user.sections = company.sections.copy()
+    user.sections["wire"] = False
+    assert get_user_sections(user, company)["wire"] is False
+
+    # Section that's disabled for a company not allowed for all its users
+    user.sections["agenda"] = True
+    assert get_user_sections(user, company)["agenda"] is False
+
+    # Section not defined in user falls back to company permission
+    user.sections.pop("news_api")
+    assert get_user_sections(user, company)["news_api"] is True
