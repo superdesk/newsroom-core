@@ -621,7 +621,3 @@ async def test_get_user_sections(app):
     # Section that's disabled for a company not allowed for all its users
     user.sections["agenda"] = True
     assert get_user_sections(user, company)["agenda"] is False
-
-    # Section not defined in user falls back to company permission
-    user.sections.pop("news_api")
-    assert get_user_sections(user, company)["news_api"] is True

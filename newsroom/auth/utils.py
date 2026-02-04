@@ -173,10 +173,7 @@ def get_user_sections(user: UserResourceModel | None, company: CompanyResource |
 
     company_sections = company.sections or {}
     return {
-        section["_id"]: (
-            company_sections.get(section["_id"], False)
-            and (section["_id"] not in user.sections or user.sections[section["_id"]])
-        )
+        section["_id"]: company_sections.get(section["_id"], False) and user.sections.get(section["_id"], False)
         for section in available_sections
     }
 
