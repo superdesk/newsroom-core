@@ -34,7 +34,7 @@ class MonitoringSearchService(WireSearchServiceAsync):
 
         cursor = await self.search(
             NewshubSearchRequest(
-                section= self.section,
+                section=self.section,
                 args=self.search_args_class(bookmarks=[user.id], page_size=0, navigation_ids=navigation_ids),
             )
         )
