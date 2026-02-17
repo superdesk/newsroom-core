@@ -4,6 +4,7 @@ from asyncio import gather
 from bson import ObjectId
 from typing import Any
 
+from superdesk.core.resources import AsyncResourceService
 from superdesk.utc import utcnow
 from superdesk.core import get_app_config
 from superdesk.notification import push_notification
@@ -13,6 +14,7 @@ from newsroom.auth.utils import get_user_id_from_request
 from newsroom.types import WireItem, AgendaItem
 from newsroom.topics.topics_async import TopicService
 from .services import NotificationsService
+from superdesk.resource_fields import ID_FIELD
 
 
 def user_notifications_lookup(user_id: ObjectId) -> dict[str, Any]:
@@ -57,6 +59,11 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     Returns the stories that user has notifications for
     :return: List of stories. None if there is not user session.
     """
+
+    async def get_notification_items(service: AsyncResourceService, ids: list[str]) -> list[dict[str, Any]]:
+        cursor = await service.find({ID_FIELD: {"$in": ids}}, use_mongo=True, max_results=500)
+        return await cursor.to_list_raw()
+
     try:
         user_id = get_user_id_from_request(None)
     except AuthorizationError:
@@ -66,15 +73,19 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
     item_ids = [n["item"] for n in saved_notifications]
 
     wire_items, agenda_items, topic_items = await gather(
-        WireItem.get_service().find_by_ids_raw(item_ids),
-        AgendaItem.get_service().find_by_ids_raw(item_ids),
-        TopicService().find_by_ids_raw(item_ids),
+        get_notification_items(WireItem.get_service(), item_ids),
+        get_notification_items(AgendaItem.get_service(), item_ids),
+        get_notification_items(TopicService(), item_ids),
     )
+
+    all_items = wire_items + agenda_items + topic_items
+    found_item_ids = {str(item["_id"]) for item in all_items}
+    valid_notifications = [n for n in saved_notifications if str(n.get("item")) in found_item_ids]
 
     return {
         "user": str(user_id),
-        "items": wire_items + agenda_items + topic_items,
-        "notifications": saved_notifications,
+        "items": all_items,
+        "notifications": valid_notifications,
     }
 
 

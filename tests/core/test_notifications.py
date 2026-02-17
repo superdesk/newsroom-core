@@ -1,16 +1,17 @@
 import datetime
 
 from quart import json
-from bson import ObjectId
 from pytest import fixture
 
 from superdesk.utc import utcnow
 
 from newsroom.notifications import get_user_notifications, NotificationsService
+from newsroom.tests.test_utils import create_entries_for
 from ..fixtures import PUBLIC_USER_ID, TEST_USER_ID
 from tests.utils import login_public
 
-TEST_ITEM_ID = ObjectId()
+TEST_ITEM_ID = "item_1111"
+TEST_ITEM_ID_2 = "item_2222"
 TEST_USER = str(PUBLIC_USER_ID)
 TEST_NOTIFICATION = {"item": TEST_ITEM_ID, "user": TEST_USER, "resource": "test-resource", "action": "test-action"}
 USER_NOTIFICATIONS_URL = f"users/{TEST_USER}/notifications"
@@ -73,7 +74,7 @@ async def test_delete_notification_fails_for_different_user(client, service):
 
 async def test_delete_notification(client, service):
     await service.create_or_update([TEST_NOTIFICATION])
-
+    await create_entries_for("items", [{"_id": TEST_ITEM_ID, "pubstatus": "usable", "headline": "test item"}])
     await login_public(client)
     resp = await client.get(USER_NOTIFICATIONS_URL)
     print(await resp.get_data(as_text=True))
@@ -93,13 +94,20 @@ async def test_delete_all_notifications(client, service):
         [
             TEST_NOTIFICATION,
             {
-                "item": ObjectId(),
+                "item": TEST_ITEM_ID_2,
                 "user": TEST_USER,
                 "resource": "test-resources",
                 "action": "test-action",
                 "_created": utcnow() - datetime.timedelta(hours=12),
             },
         ]
+    )
+    await create_entries_for(
+        "items",
+        [
+            {"_id": TEST_ITEM_ID, "pubstatus": "usable", "headline": "test item"},
+            {"_id": TEST_ITEM_ID_2, "pubstatus": "usable", "headline": "another test item"},
+        ],
     )
 
     await login_public(client)
