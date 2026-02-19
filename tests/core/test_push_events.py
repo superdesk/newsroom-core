@@ -1085,6 +1085,62 @@ async def test_filter_killed_events(client, app):
     assert "killed" == parsed["state"]
 
 
+async def test_push_killed_event_with_pubstatus(client, app):
+    """Test that events with state=killed and pubstatus=cancelled remain hidden"""
+    event = deepcopy(test_event)
+    event["guid"] = "killed_event_with_pubstatus"
+    await post_json(client, "/push", event)
+    events = await get_json(client, "/agenda/search")
+    assert 1 == len(events["_items"])
+
+    # Superdesk sends both state=killed and pubstatus=cancelled when an item is killed
+    event["state"] = "killed"
+    event["pubstatus"] = "cancelled"
+    await post_json(client, "/push", event)
+
+    # Item should be hidden from search (killed state takes precedence)
+    events = await get_json(client, "/agenda/search")
+    assert 0 == len(events["_items"])
+
+    # But should still be accessible directly
+    parsed = await get_json(client, "/agenda/%s" % event["guid"])
+    assert "killed" == parsed["state"]
+
+
+async def test_push_killed_planning_with_pubstatus(client, app):
+    """Test that ad-hoc planning items with state=killed and pubstatus=cancelled remain hidden"""
+    # pushing an event to create the index
+    event = deepcopy(test_event)
+    event["guid"] = "event_for_killed_planning"
+    await client.post("/push", json=event)
+
+    # Create ad-hoc planning item (no event link)
+    planning = deepcopy(test_planning)
+    planning["guid"] = "killed_planning_with_pubstatus"
+    planning["event_item"] = None
+
+    await client.post("/push", json=planning)
+    parsed = await find_one_by_id("agenda", planning["guid"])
+    assert parsed["state"] == "scheduled"
+
+    events = await get_json(client, "/agenda/search")
+    assert 2 == len(events["_items"])  # event + planning
+
+    # Superdesk sends both state=killed and pubstatus=cancelled when planning is killed
+    planning["state"] = "killed"
+    planning["pubstatus"] = "cancelled"
+
+    await client.post("/push", json=planning)
+
+    # Planning item should be hidden from search (killed state takes precedence)
+    events = await get_json(client, "/agenda/search")
+    assert 1 == len(events["_items"])  # only event remains
+
+    # But should still be accessible directly
+    parsed = await get_json(client, "/agenda/%s" % planning["guid"])
+    assert "killed" == parsed["state"]
+
+
 async def test_push_cancelled_planning_cancels_adhoc_planning(client, app):
     # pushing an event to create the index
     event = deepcopy(test_event)
