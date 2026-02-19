@@ -90,8 +90,10 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
 
         agenda["dates"] = get_event_dates(event)
 
-        agenda["state"] = event.get("state") or AgendaWorkflowState.CANCELLED.SCHEDULED
-        if event.get("pubstatus") == "cancelled":
+        agenda["state"] = event.get("state") or AgendaWorkflowState.SCHEDULED
+        # Only use pubstatus to set cancelled if state is not already killed
+        # (killed items should stay hidden, pubstatus:cancelled is always present with state:killed)
+        if event.get("pubstatus") == "cancelled" and event.get("state") != AgendaWorkflowState.KILLED:
             agenda["state"] = AgendaWorkflowState.CANCELLED
 
         if agenda["state"] not in list(AgendaWorkflowState):
@@ -145,14 +147,18 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
             agenda["definition_short"] = planning_item.get("description_text") or agenda.get("definition_short")
             agenda["definition_long"] = planning_item.get("abstract") or agenda.get("definition_long")
             agenda["service"] = format_qcode_items(planning_item.get("anpa_category"))
-            agenda["state"] = planning_item.get("state") or "scheduled"
             agenda["state_reason"] = planning_item.get("state_reason")
             agenda["language"] = planning_item.get("language")
             agenda["source"] = planning_item.get("source")
             agenda["event_ids"] = [link["_id"] for link in (planning_item.get("related_events") or [])]
 
-            agenda["state"] = planning_item.get("state") or AgendaWorkflowState.CANCELLED.SCHEDULED
-            if planning_item.get("pubstatus") == "cancelled":
+            agenda["state"] = planning_item.get("state") or AgendaWorkflowState.SCHEDULED
+            # Only use pubstatus to set cancelled if state is not already killed
+            # (killed items should stay hidden, pubstatus:cancelled is always present with state:killed)
+            if (
+                planning_item.get("pubstatus") == "cancelled"
+                and planning_item.get("state") != AgendaWorkflowState.KILLED
+            ):
                 agenda["state"] = AgendaWorkflowState.CANCELLED
 
             if agenda["state"] not in list(AgendaWorkflowState):
