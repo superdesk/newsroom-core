@@ -215,7 +215,7 @@ def _assert_html_content(content: str, item: dict, use_base64: bool = False) -> 
         assert root.find("body//article/pre").text == item["slugline"]
         assert root.find("body//article/h1").text == item["headline"]
         footer_text = root.find("body/footer").text_content()
-        assert "All contents © Copyright 2025 Sourcefabric. All rights reserved." in footer_text
+        assert f"All contents © Copyright {utcnow().year} Sourcefabric. All rights reserved." in footer_text
 
         featuremedia_element = root.xpath("//img[@id='feature-image']")[0]
         assert featuremedia_element.attrib["src"] == featuremedia_src
