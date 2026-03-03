@@ -19,11 +19,13 @@ class MonitoringSearchService(WireSearchServiceAsync):
     ]
 
     async def get_current_monitoring_bookmarks_count(self, navigations: list[dict]) -> int:
-        """Returns the number of items that have been bookmarked by the current user
+        """Returns the number of items that have been bookmarked by the current user.
 
-        :param section: The section to search for, defaults to ``SectionEnum.WIRE``
-        :param navigations: The monitoring profiles defined for the Company
+        The count is scoped to items found in enabled monitoring navigations.
+
+        :param navigations: The monitoring profiles defined for the Company.
         :returns: The number of items that have been bookmarked by the current user
+            within the enabled monitoring navigations.
         """
 
         user = get_user_or_none_from_request(None)
