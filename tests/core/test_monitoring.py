@@ -16,10 +16,11 @@ from newsroom.monitoring import MonitoringProfileService
 
 company_id = "5c3eb6975f627db90c84093c"
 even_now = utcnow().replace(hour=4, minute=0)
+fixed_mock_now = utcnow().replace(minute=0, second=0, microsecond=0)
 
 
 def mock_utcnow():
-    return utcnow().replace(minute=0)
+    return fixed_mock_now
 
 
 def get_fixture_path(fixture):
