@@ -42,15 +42,16 @@ async def get_view_data():
     user = get_user_from_request(None)
     company = get_company_from_request(None)
     ui_config_service = UiConfigResourceService()
+    navigations = await get_monitoring_for_company(user)
 
     return {
         "user": user.to_dict(),
         "company": str(company.id) if company else None,
-        "navigations": await get_monitoring_for_company(user),
+        "navigations": navigations,
         "context": "monitoring",
         "groups": get_app_config("MONITORING_GROUPS") or get_app_config("WIRE_GROUPS", []),
         "ui_config": await ui_config_service.get_section_config("monitoring"),
-        "saved_items": await MonitoringSearchService().get_current_user_bookmarks_count(),
+        "saved_items": await MonitoringSearchService().get_current_monitoring_bookmarks_count(navigations),
         "formats": get_formatters_id_and_names(SectionEnum.MONITORING),
         "secondary_formats": [{"format": f[0], "name": f[1]} for f in alert_types],
     }
