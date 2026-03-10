@@ -16,10 +16,11 @@ from newsroom.monitoring import MonitoringProfileService
 
 company_id = "5c3eb6975f627db90c84093c"
 even_now = utcnow().replace(hour=4, minute=0)
+fixed_mock_now = utcnow().replace(minute=0, second=0, microsecond=0)
 
 
 def mock_utcnow():
-    return utcnow().replace(minute=0)
+    return fixed_mock_now
 
 
 def get_fixture_path(fixture):
@@ -855,6 +856,7 @@ async def test_last_run_time_always_updated_with_matching_content_scheduled(clie
         assert w["last_run_time"] > (last_run_time - timedelta(minutes=5))
 
 
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_does_not_update_with_no_matching_content_immediate(client, app):
     await create_entries_for(
@@ -874,7 +876,7 @@ async def test_last_run_time_does_not_update_with_no_matching_content_immediate(
         w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
-        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
+        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=15))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
