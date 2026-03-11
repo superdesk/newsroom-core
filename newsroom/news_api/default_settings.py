@@ -9,12 +9,16 @@ from newsroom.web.default_settings import (  # noqa
     CLIENT_URL,
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
     LOG_CONFIG_FILE,
+    CACHE_REDIS_URL,
 )
 
 SITE_NAME = env("SITE_NAME", "NEWSHUB")
 NEWSAPI_URL = env("NEWSAPI_URL", "http://localhost:5400")
 server_url = urlparse(NEWSAPI_URL)
 URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or "api/v1"
+
+# fix superdesk cache config
+CACHE_URL = CACHE_REDIS_URL
 
 QUERY_MAX_PAGE_SIZE = 100
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+00:00"
