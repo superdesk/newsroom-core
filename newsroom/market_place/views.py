@@ -1,10 +1,8 @@
-from eve.render import send_response
-from eve.methods.get import get_internal
-
+from superdesk.core import get_app_config
 from superdesk.flask import render_template, jsonify, request
 
 from newsroom.types import Navigation, CompanyResource, UserResourceModel, SectionEnum
-from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.auth.utils import get_user_from_request, get_company_from_request, get_current_request
 from newsroom.formatters import get_formatters_id_and_names
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.decorator import login_required, section
@@ -53,6 +51,7 @@ async def get_view_data():
         "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
         "title": SECTION_NAME,
+        "date_filters": get_app_config("WIRE_TIME_FILTERS", []),
     }
 
 
@@ -102,8 +101,9 @@ async def home():
 @blueprint.route("/{}/search".format(SECTION_ID))
 @login_required
 async def search():
-    response = await get_internal(search_endpoint_name)
-    return await send_response(search_endpoint_name, response)
+    rq = get_current_request()
+    response = await MarketPlaceSearchServiceAsync().process_web_request(request=rq)
+    return response.body, response.status_code, response.headers
 
 
 @blueprint.route("/bookmarks_{}".format(SECTION_ID))
