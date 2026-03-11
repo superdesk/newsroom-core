@@ -72,7 +72,7 @@ async def handle_publish_planning_featured(item):
     orig = await service.find_by_id(item["_id"])
 
     if orig:
-        await service.update(orig["_id"], {"items": item.get("items") or []})
+        await service.update(item["_id"], {"items": item.get("items") or []})
     else:
         # Assert `tz` and `items` in initial push only
         assert item.get("tz"), {"tz": 1}

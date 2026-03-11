@@ -1,5 +1,6 @@
 from typing import Any
 from datetime import datetime
+import logging
 
 from superdesk.core.types import ESQuery, RestGetResponse, RestResponseMeta
 from superdesk.core.resources import AsyncResourceService
@@ -14,12 +15,15 @@ from .filters import (
     apply_item_state_filter,
     apply_section_filter,
     apply_agenda_filters,
+    apply_item_type_filter,
     planning_items_query_string,
     nested_query,
     aggregations,
     AgendaSearchRequestArgs,
 )
 from .agenda_search import AgendaSearchServiceAsync
+
+logger = logging.getLogger(__name__)
 
 
 class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
@@ -114,6 +118,7 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
                 apply_section_filter,
                 apply_agenda_filters,
                 apply_featured_filters,
+                apply_item_type_filter,
             ],
         )
 
@@ -137,6 +142,8 @@ class FeaturedService(AsyncResourceService[FeaturedResourceModel]):
             if agenda_item and agenda_item.get("_id") not in agenda_ids:
                 docs.append(agenda_item)
                 agenda_ids.add(agenda_item.get("_id"))
+            else:
+                logger.warning(f"No featured agenda found for {agenda_id}")
 
         response = RestGetResponse(
             _items=docs,
