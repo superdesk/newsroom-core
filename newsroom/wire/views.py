@@ -135,11 +135,15 @@ async def set_permissions_on_cards(items_by_card):
     for _c, card_items in items_by_card.items():
         card_item_ids.extend([itm.get("_id") for itm in card_items if itm.get("_id")])
     service = WireSearchServiceAsync()
-    cursor = await service.get_items_by_id(
-        card_item_ids, WireSearchRequestArgs(ignore_latest=False), apply_permissions=True
-    )
-    allowed_ids_list = await cursor.to_list()
-    allowed_ids_set = {itm.id for itm in allowed_ids_list if itm.id}
+    try:
+        cursor = await service.get_items_by_id(
+            card_item_ids, WireSearchRequestArgs(ignore_latest=False), apply_permissions=True
+        )
+        allowed_ids_list = await cursor.to_list()
+        allowed_ids_set = {itm.id for itm in allowed_ids_list if itm.id}
+    except AuthorizationError:
+        # Exception thrown if no wire items are allowed
+        allowed_ids_set = set()
 
     for card, card_items in items_by_card.items():
         for i, card_item in enumerate(card_items):
