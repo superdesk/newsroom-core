@@ -15,13 +15,9 @@ notifier = NotificationManager()
 LOCK_EXPIRE_SECONDS = 300
 
 
-def get_lock_name(service: str, _id: str) -> str:
-    return f"notify-{service}-{_id}"
-
-
 @contextmanager
 def task_lock(service: str, _id: str, expire: int = LOCK_EXPIRE_SECONDS) -> Iterator[bool]:
-    lock_name = get_lock_name(service, _id)
+    lock_name = f"notify-{service}-{_id}"
     acquired = lock(lock_name, expire=expire)
     if not acquired:
         logger.debug("Lock conflict on %s", lock_name)
