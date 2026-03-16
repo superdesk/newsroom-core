@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 import quart
 
@@ -326,24 +325,24 @@ async def test_realtime_notifications_agenda_reccuring_event(app):
         assert notifier.notify_new_item.call_count == 2
 
 
-def test_notify_new_wire_item_lock_conflict_returns_early():
+async def test_notify_new_wire_item_lock_conflict_returns_early():
     with mock.patch("newsroom.push.tasks.lock", return_value=False), mock.patch(
         "newsroom.push.tasks.notifier"
     ) as notifier:
         notifier.notify_new_item = mock.AsyncMock()
 
-        asyncio.run(notify_new_wire_item.run("item1"))
+        await notify_new_wire_item("item1")
 
         notifier.notify_new_item.assert_not_awaited()
 
 
-def test_notify_new_agenda_item_lock_conflict_returns_early():
+async def test_notify_new_agenda_item_lock_conflict_returns_early():
     with mock.patch("newsroom.push.tasks.lock", return_value=False), mock.patch(
         "newsroom.push.tasks.notifier"
     ) as notifier:
         notifier.notify_new_item = mock.AsyncMock()
 
-        asyncio.run(notify_new_agenda_item.run("event_id_1"))
+        await notify_new_agenda_item("event_id_1")
 
         notifier.notify_new_item.assert_not_awaited()
 
