@@ -54,6 +54,7 @@ async def get_view_data():
         "saved_items": await MonitoringSearchService().get_current_monitoring_bookmarks_count(navigations),
         "formats": get_formatters_id_and_names(SectionEnum.MONITORING),
         "secondary_formats": [{"format": f[0], "name": f[1]} for f in alert_types],
+        "date_filters": get_app_config("WIRE_TIME_FILTERS", []),
     }
 
 
@@ -78,9 +79,8 @@ def process_form_request(updates, request_updates, form):
         updates["keywords"] = request_updates["keywords"]
 
     if "email" in request_updates:
-        updates["email"] = request_updates.get("email").replace(" ", "")
-        if updates["email"] == "":
-            updates["email"] = None
+        email_val = (request_updates.get("email") or "").replace(" ", "")
+        updates["email"] = email_val if email_val else None
 
 
 async def get_monitoring_for_company(user: UserResourceModel | None):

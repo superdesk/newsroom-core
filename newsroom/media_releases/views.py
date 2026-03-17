@@ -1,11 +1,10 @@
 import logging
-from eve.render import send_response
-from eve.methods.get import get_internal
+from superdesk.core import get_app_config
 
 from superdesk.flask import render_template, jsonify, request
 
 from newsroom.types import SectionEnum
-from newsroom.auth.utils import get_user_from_request, get_company_from_request
+from newsroom.auth.utils import get_user_from_request, get_company_from_request, get_current_request
 from newsroom.formatters import get_formatters_id_and_names
 from newsroom.media_releases import blueprint
 from newsroom.decorator import login_required, section
@@ -35,6 +34,7 @@ async def get_view_data():
         "saved_items": await MediaReleasesSearchServiceAsync().get_current_user_bookmarks_count(),
         "context": "media_releases",
         "ui_config": await ui_config_service.get_section_config("media_releases"),
+        "date_filters": get_app_config("WIRE_TIME_FILTERS", []),
     }
 
 
@@ -50,8 +50,9 @@ async def index():
 @login_required
 @section("media_releases")
 async def search():
-    response = await get_internal("media_releases_search")
-    return await send_response("media_releases_search", response)
+    rq = get_current_request()
+    response = await MediaReleasesSearchServiceAsync().process_web_request(request=rq)
+    return response.body, response.status_code, response.headers
 
 
 @blueprint.route("/bookmarks_media_releases")
