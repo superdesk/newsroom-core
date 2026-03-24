@@ -494,7 +494,7 @@ export const getNextPendingScheduledUpdate = (coverage?: IFullCoverage) => {
     const scheduledUpdates = coverage.scheduled_updates || [];
     const deliveries = coverage.deliveries || [];
 
-    if (coverage.scheduled == null) {
+    if (coverage.scheduled === null) {
         // Not privileged to see coverage details
         return null;
     } else if (
