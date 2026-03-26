@@ -146,7 +146,6 @@ class NotificationManager:
                         continue
                     else:
                         with elasticapm.capture_span("notify_user"):
-                            users_with_realtime_subscription.add(user.id)
                             if topic.topic_type == SectionEnum.WIRE:
                                 wire_service = WireSearchServiceAsync()
                                 query = await wire_service.get_topic_items_query(
@@ -160,7 +159,7 @@ class NotificationManager:
                                     ),
                                     include_updated=True,
                                 )
-                                if not query:
+                                if query is None:
                                     continue
                                 cursor = await wire_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
@@ -176,6 +175,8 @@ class NotificationManager:
                                         es_highlight=True,
                                     ),
                                 )
+                                if query is None:
+                                    continue
                                 cursor = await agenda_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
                             highlighted_item = item
@@ -189,6 +190,7 @@ class NotificationManager:
                                 item=highlighted_item,
                                 section=section.value,
                             )
+                            users_with_realtime_subscription.add(user.id)
                 except Exception as e:
                     logger.exception(e)
                     # when there is an error for specific topic/subscriber continue
