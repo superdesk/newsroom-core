@@ -23,7 +23,7 @@ from tests.core.utils import create_entries_for
 
 
 async def test_item_notification_template(client, app, mocker):
-    user = {"email": "foo@example.com", "receive_email": True}
+    user = {"email": "foo@example.com", "receive_email": True, "is_enabled": True}
     item = {
         "_id": "tag:localhost:2018:bcc9fd45",
         "guid": "tag:localhost:2018:bcc9fd45",
@@ -99,6 +99,7 @@ MOCK_USERS = [
         "last_name": "Test",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
     {
         "email": EMAILS[1],
@@ -107,6 +108,7 @@ MOCK_USERS = [
         "locale": "fr_CA",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
     {
         "email": EMAILS[2],
@@ -115,6 +117,7 @@ MOCK_USERS = [
         "locale": "fi",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
 ]
 
@@ -227,6 +230,7 @@ async def test_send_user_email(app):
         notification_schedule={"timezone": "Europe/Helsinki"},
         user_type="user",
         receive_email=True,
+        is_enabled=True,
     )
     date = datetime(2024, 4, 9, 11, 0, 0)
     template_kwargs = dict(date=date, topic_match_table={"wire": [], "agenda": []}, entries={})
@@ -257,6 +261,7 @@ async def test_item_killed_notification_email(app):
         last_name="Bar",
         email="foo@example.com",
         user_type=UserRole.PUBLIC,
+        is_enabled=True,
     )
 
     item = {
@@ -291,6 +296,7 @@ async def test_send_user_email_on_locale_changed():
         notification_schedule={"timezone": "Asia/Calcutta"},
         user_type="user",
         receive_email=True,
+        is_enabled=True,
     )
 
     event_item["coverages"][0]["coverage_status"] = "coverage intended"
