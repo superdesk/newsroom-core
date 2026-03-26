@@ -105,6 +105,8 @@ class NotificationManager:
         users_with_realtime_subscription: set[ObjectId] = set()
         notification_queue_service = NotificationQueueService()
 
+        logger.info("Sending topic notifications for item %s", item["_id"])
+
         for topic in topics:
             if topic.id not in topic_matches:
                 continue
@@ -158,6 +160,8 @@ class NotificationManager:
                                     ),
                                     include_updated=True,
                                 )
+                                if not query:
+                                    continue
                                 cursor = await wire_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
                             else:
