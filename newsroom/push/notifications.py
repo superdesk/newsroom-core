@@ -285,7 +285,7 @@ class NotificationManager:
     async def send_user_notification_emails(
         self, item: dict[str, Any], user_matches: set[ObjectId], users: dict[ObjectId, UserResourceModel], section: str
     ):
-        logger.info("Sending topic notifications for item %s", item["_id"])
+        logger.info("Sending history match notification for item %s", item["_id"])
         for user_id in user_matches:
             user = users.get(user_id)
             if not user:
