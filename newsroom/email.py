@@ -268,9 +268,8 @@ async def send_user_email(
     """Send an email to Newsroom user, respecting user's email preferences."""
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
 
-    if not user_dict.get("receive_email") and not ignore_preferences:
-        # If this is a user in the system, and has emails disabled
-        # then skip this recipient
+    if (not user_dict.get("receive_email") and not ignore_preferences) or (not user_dict.get("is_enabled")):
+        # skip user if has emails disabled or the user is not enabled
         return
 
     language = user_dict.get("locale") or get_app_config("DEFAULT_LANGUAGE")
