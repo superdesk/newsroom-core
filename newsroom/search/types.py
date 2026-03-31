@@ -309,6 +309,9 @@ class BaseSearchRequestArgs(BaseModel):
                 except ValueError:
                     raise BadParameterValueError(gettext("Invalid sort param"))
 
+            if field == "score":
+                field = "_score"
+
             return field, direction_int
 
         values = value.split(",") if isinstance(value, str) else value
