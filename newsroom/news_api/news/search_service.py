@@ -115,7 +115,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
                     remove_all_embeds(doc)
 
     def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
-        base_url = req.path.strip("/")
+        base_url = req.path.strip("/").replace(get_app_config("URL_PREFIX"), "")
         query_params = search_req.args.to_dict(flatten_lists=True)
 
         resp.body.setdefault("_links", {})

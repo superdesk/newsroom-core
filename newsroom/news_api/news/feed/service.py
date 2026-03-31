@@ -4,7 +4,7 @@ from pydantic import field_validator, model_validator
 
 from content_api.errors import UnexpectedParameterError
 from newsroom.news_api.news.filters_utils import parse_iso_date
-from superdesk.core.types import Response
+from superdesk.core.types import Response, SortListParam
 from superdesk.core.types.web import Request
 from superdesk.core.resources.fields import Field
 
@@ -24,6 +24,9 @@ allowed_exclude_fields = {
 
 class NewsAPIFeedSearchArgs(NewsApiSearchRequestArgs):
     allowed_exclude_fields: ClassVar[set[str]] = allowed_exclude_fields
+
+    # By definition the feed must be ordered chronologically
+    sort: SortListParam = [("versioncreated", 1)]
 
     exclude_ids: list[str] = Field(default_factory=list)
 
@@ -76,9 +79,9 @@ class NewsAPIFeedSearchService(NewsApiSearchServiceAsync):
 
         if doc["_meta"]["total"] > 0:
             items = list(doc.get("_items") or [])
-            last_datetime = items[0].get("versioncreated")
+            last_datetime = items[-1].get("versioncreated")
             exclude_ids = []
-            for item in items:
+            for item in reversed(items):
                 if item.get("versioncreated") != last_datetime:
                     break
 
