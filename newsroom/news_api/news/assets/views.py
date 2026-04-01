@@ -23,7 +23,7 @@ class RouteArguments(BaseModel):
 
 
 @assets_endpoints.endpoint(
-    "assets/<path:asset_id>/<item_id>",
+    "assets/download/<path:asset_id>/<string:item_id>",
     title="Download Asset (with Wire ID)",
     methods=["GET"],
     auth=[support_auth_token_in_url, support_auth_basic_auth],
@@ -39,7 +39,7 @@ async def download(args: RouteArguments, params: RouteParams, request: Request):
 
 
 @assets_endpoints.endpoint(
-    "assets/<string:asset_id>",
+    "assets/<path:asset_id>",
     title="Download Asset",
     methods=["GET"],
     auth=[support_auth_token_in_url, support_auth_basic_auth],
