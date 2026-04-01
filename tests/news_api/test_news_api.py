@@ -21,8 +21,8 @@ async def test_news_api_root_links(client, app):
     assert response.status_code == 200
     data = await response.get_json()
     assert {child["href"]: child["title"] for child in data["_links"]["child"]} == {
-        "assets/<path:asset_id>/<item_id>": "Download Asset (with Wire ID)",
-        "assets/<string:asset_id>": "Download Asset",
+        "assets/download/<path:asset_id>/<string:item_id>": "Download Asset (with Wire ID)",
+        "assets/<path:asset_id>": "Download Asset",
         "atom/<path:token>": "ATOM Feed (URL auth)",
         "atom": "ATOM Feed (Header auth)",
         "rss/<path:token>": "RSS Feed (URL auth)",
