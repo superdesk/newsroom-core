@@ -54,6 +54,8 @@ from superdesk.default_settings import (  # noqa
     SENTRY_TRACES_SAMPLE_RATE,
     SENTRY_PROFILES_SAMPLE_RATE,
     CACHE_URL,
+    CACHE_REDIS_TIMEOUT,
+    CACHE_REDIS_CONNECT_TIMEOUT,
 )
 
 from newsroom.types import AuthProviderConfig, AuthProviderType
