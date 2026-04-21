@@ -18,6 +18,7 @@ NewshubResourceModelType = TypeVar("NewshubResourceModelType", bound=NewshubReso
 
 
 class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceModelType]]):
+    add_item_to_cache_on_create: ClassVar[bool] = False
     clear_item_cache_on_update: ClassVar[bool] = False
 
     async def on_create(self, docs: list[NewshubResourceModelType]) -> None:
@@ -30,6 +31,10 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
                 doc.original_creator = current_user.id
                 doc.version_creator = current_user.id
 
+    async def on_created(self, docs: list[NewshubResourceModelType]) -> None:
+        if self.add_item_to_cache_on_create and docs:
+            get_current_wsgi_app().cache.set_many_in_thread({str(doc.id): doc.to_dict() for doc in docs})
+
     async def on_update(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         from newsroom.auth.utils import get_user_or_none_from_request
 
@@ -41,14 +46,15 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
     async def on_updated(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         await super().on_updated(updates, original)
         if self.clear_item_cache_on_update:
-            app = get_current_wsgi_app()
-            app.cache.delete(str(original.id))
+            self.delete_item_from_cache(original)
 
     async def on_deleted(self, doc: NewshubResourceModelType):
         await super().on_deleted(doc)
         if self.clear_item_cache_on_update:
-            app = get_current_wsgi_app()
-            app.cache.delete(str(doc.id))
+            self.delete_item_from_cache(doc)
+
+    def delete_item_from_cache(self, doc: NewshubResourceModelType) -> None:
+        get_current_wsgi_app().cache.delete_in_thread(str(doc.id))
 
     async def find_items_by_ids(self, ids: list[str] | list[ObjectId]) -> list[NewshubResourceModelType]:
         """

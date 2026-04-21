@@ -21,6 +21,7 @@ from superdesk.utc import utcnow
 
 from newsroom.flask import flash
 from newsroom.types import AuthProviderType, UserAuthResourceModel, User, UserRole, Company
+from newsroom.core import get_current_wsgi_app
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.auth.utils import (
     redirect_to_next_url,
@@ -112,6 +113,9 @@ def email_has_exceeded_max_login_attempts(email):
     if not email:
         return True
 
+    # TODO: What do we do if connection to Redis is lost???
+    #       As this raises a security issue, Redis is down, account never get's disabled
+    #       Do we use MongoDB, $set and $inc on the collection itself?
     app = get_current_app().as_any()
     login_attempt = app.cache.get(email)
 
@@ -141,7 +145,7 @@ def _is_password_valid(password: bytes, user: UserAuthResourceModel):
     if not user.password:
         return False
 
-    app = get_current_app().as_any()
+    app = get_current_wsgi_app()
     previous_login_attempt = app.cache.get(user.email) or {}
     previous_login_attempt["user_id"] = user.id
     app.cache.set(user.email, previous_login_attempt)
@@ -154,7 +158,7 @@ def _is_password_valid(password: bytes, user: UserAuthResourceModel):
     try:
         if bcrypt.checkpw(password, hashed):
             # login successful so remove the login attempt check record
-            app.cache.delete(user.email)
+            app.cache.delete_in_thread(user.email)
             return True
     except (TypeError, ValueError):
         return False
@@ -344,7 +348,7 @@ async def reset_password(args: LoginTokenRouteArgs, params: None, req: Request) 
 
         return req.redirect(url_for("auth.login"))
 
-    get_current_app().as_any().cache.delete(user.email)
+    get_current_wsgi_app().cache.delete_in_thread(user.email)
     return await render_template("reset_password.html", form=form, token=args.token)
 
 

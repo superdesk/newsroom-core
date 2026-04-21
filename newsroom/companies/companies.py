@@ -1,13 +1,14 @@
 from quart_babel import gettext
 from content_api import MONGO_PREFIX
 
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_app_config
 from superdesk.flask import abort
 from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 import newsroom
 
 from newsroom.types import SectionEnum
+from newsroom.core import get_current_wsgi_app
 
 from .utils import get_company_section_names, get_company_product_ids
 
@@ -119,7 +120,7 @@ class CompaniesService(newsroom.Service):
             ]
 
     def on_updated(self, updates, original):
-        get_current_app().as_any().cache.delete(str(original["_id"]))
+        get_current_wsgi_app().cache.delete_in_thread(str(original["_id"]))
 
         updated = original.copy()
         updated.update(updates)
@@ -151,7 +152,7 @@ class CompaniesService(newsroom.Service):
                 user_service.patch(user[ID_FIELD], updates=user_updates)
 
     def on_deleted(self, doc):
-        get_current_app().as_any().cache.delete(str(doc["_id"]))
+        get_current_wsgi_app().cache.delete_in_thread(str(doc["_id"]))
 
     def validate_auth_provider(self, company):
         supported_provider_ids = [provider["_id"] for provider in get_app_config("AUTH_PROVIDERS")]

@@ -24,6 +24,7 @@ from newsroom.types import (
     WireItem,
     DashboardCardType,
 )
+from newsroom.core import get_current_wsgi_app
 from newsroom.exceptions import AuthorizationError
 from newsroom.search.types import NewshubSearchRequest
 from newsroom.auth.utils import (
@@ -156,13 +157,21 @@ async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId
 
 
 def delete_dashboard_caches():
-    app = get_current_app().as_any()
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
-    for company in query_resource("companies"):
-        app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
+    """Delete system caches used for the dashboard
+
+    .. note::
+        If the system has many companies, this would send many commands which could affect its performance.
+        Consider disabling ``DELETE_DASHBOARD_CACHE_ON_PUSH`` config, and modify ``DASHBOARD_CACHE_TIMEOUT``
+        to reflect desired homepage update rate.
+    """
+
+    keys = [
+        HOME_ITEMS_CACHE_KEY,
+        PUBLIC_DASHBOARD_CONFIG_CACHE_KEY,
+        PUBLIC_DASHBOARD_CARDS_CACHE_KEY,
+        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
+    ] + [f"{HOME_ITEMS_CACHE_KEY}{company['_id']}" for company in query_resource("companies")]
+    get_current_wsgi_app().cache.delete_many_in_thread(*keys)
 
 
 class DashboardTopicData(TypedDict):

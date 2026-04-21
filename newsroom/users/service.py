@@ -36,6 +36,7 @@ from .users import COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES, COMPANY_ADMIN_ALLOWED_
 
 class UsersService(NewshubAsyncResourceService[UserResourceModel]):
     resource_name = "users"
+    clear_item_cache_on_update = True
 
     async def authorize(self, request: Request):
         current_user = get_user_or_none_from_request(request)
@@ -77,11 +78,9 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
             updates["sections"] = get_updated_sections(updates, original, company)
             updates["products"] = get_updated_products(updates, original, company)
 
-        app = get_current_wsgi_app()
-        app.cache.delete(str(original.id))
-        app.cache.delete(original.email)
-
     async def on_updated(self, updates: dict[str, Any], original: UserResourceModel):
+        await super().on_updated(updates, original)
+
         if is_from_request():
             # If this is from a request, test to see if we need to update the
             # current user cached in request storage
@@ -100,7 +99,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         await user_updated.send(updated, updates)
 
     async def on_deleted(self, doc):
-        get_current_wsgi_app().cache.delete(str(doc.id))
+        await super().on_deleted(doc)
         await user_deleted.send(doc)
 
     async def on_delete(self, doc):
@@ -110,6 +109,9 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         user = await self.find_by_id(doc.id)
         await self.check_permissions(user, None, "DELETE")
         await super().on_delete(doc)
+
+    def delete_item_from_cache(self, doc: UserResourceModel) -> None:
+        get_current_wsgi_app().cache.delete_many_in_thread([str(doc.id), doc.email])
 
     async def check_permissions(self, user: UserResourceModel, updates: dict | None, method: HTTP_METHOD):
         """Check if current user has permissions to edit user."""
@@ -172,10 +174,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         notification_schedule = deepcopy(user.notification_schedule)
         notification_schedule.last_run_time = run_time
         await self.update(user.id, {"notification_schedule": notification_schedule})
-
-        app = self.app.wsgi
-        app.cache.delete(str(user.id))
-        app.cache.delete(user.email)
+        self.delete_item_from_cache(user)
 
     @staticmethod
     def user_has_paused_notifications(user: User) -> bool:
@@ -212,16 +211,13 @@ class UsersAuthService(NewshubAsyncResourceService[UserAuthResourceModel]):
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
 
-        app = get_current_wsgi_app()
-        app.cache.delete(str(original.id))
-        app.cache.delete(original.email)
-
     async def on_updated(self, updates: dict[str, Any], original: UserAuthResourceModel):
+        await super().on_updated(updates, original)
         updated = original.model_copy(update=updates)
         await user_updated.send(updated, updates)
 
     async def on_deleted(self, doc):
-        get_current_wsgi_app().cache.delete(str(doc.id))
+        await super().on_deleted(doc)
         await user_deleted.send(doc)
 
     def _get_password_hash(self, password):
