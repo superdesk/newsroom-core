@@ -8,18 +8,18 @@ aioboto3==14.3.0
     # via superdesk-core
 aiobotocore[boto3]==2.22.0
     # via aioboto3
-aiofiles==24.1.0
+aiofiles==25.1.0
     # via
     #   aioboto3
     #   quart
     #   quart-uploads
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.15
+aiohttp==3.13.5
     # via
     #   aiobotocore
     #   elasticsearch
-aioitertools==0.12.0
+aioitertools==0.13.0
     # via aiobotocore
 aiosignal==1.4.0
     # via aiohttp
@@ -33,7 +33,7 @@ arrow==1.3.0
     # via
     #   eve-elastic
     #   superdesk-core
-asgiref==3.9.1
+asgiref==3.11.1
     # via superdesk-core
 asn1crypto==1.5.1
     # via
@@ -44,17 +44,17 @@ async-timeout==5.0.1
     # via
     #   aiohttp
     #   redis
-attrs==25.3.0
+attrs==26.1.0
     # via aiohttp
 authlib==1.4.1
     # via superdesk-core
-babel==2.17.0
+babel==2.18.0
     # via quart-babel
 bcrypt==4.2.1
     # via superdesk-core
 behave==1.2.6
     # via wooper
-billiard==4.2.1
+billiard==4.2.4
     # via celery
 black==23.12.1
     # via -r black-requirements.txt
@@ -81,13 +81,13 @@ cachetools==5.5.2
     # via
     #   flask-oidc-ex
     #   google-auth
-celery[redis]==5.4.0
+celery[redis]==5.6.3
     # via superdesk-core
-cerberus==1.3.7
+cerberus==1.3.8
     # via
     #   eve
     #   superdesk-core
-certifi==2025.8.3
+certifi==2026.2.25
     # via
     #   elastic-apm
     #   elasticsearch
@@ -97,7 +97,7 @@ cffi==2.0.0
     # via cryptography
 chardet==5.2.0
     # via superdesk-core
-charset-normalizer==3.4.3
+charset-normalizer==3.4.7
     # via
     #   reportlab
     #   requests
@@ -119,19 +119,19 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.10.6
+coverage[toml]==7.13.5
     # via pytest-cov
 croniter==6.0.0
     # via superdesk-core
-cryptography==45.0.7
+cryptography==46.0.7
     # via
     #   authlib
     #   jwcrypto
     #   pyhanko
     #   pyhanko-certvalidator
-cssselect2==0.8.0
+cssselect2==0.9.0
     # via svglib
-deepdiff==8.6.1
+deepdiff==9.0.0
     # via superdesk-planning
 defusedxml==0.7.1
     # via pyhanko
@@ -141,11 +141,11 @@ dnspython==2.8.0
     #   pymongo
 draftjs-exporter[lxml]==2.1.0
     # via superdesk-core
-ecs-logging==2.2.0
+ecs-logging==2.3.0
     # via elastic-apm
-elastic-apm[flask]==6.24.0
+elastic-apm[flask]==6.25.0
     # via superdesk-core
-elasticsearch[async]==7.17.12
+elasticsearch[async]==7.17.13
     # via
     #   eve-elastic
     #   superdesk-core
@@ -155,8 +155,9 @@ eve @ git+https://github.com/superdesk/eve@async
     # via superdesk-core
 eve-elastic @ git+https://github.com/superdesk/eve-elastic@async
     # via superdesk-core
-exceptiongroup==1.3.0
+exceptiongroup==1.3.1
     # via
+    #   celery
     #   hypercorn
     #   pytest
     #   taskgroup
@@ -164,14 +165,14 @@ feedparser==6.0.12
     # via superdesk-core
 flake8==7.3.0
     # via -r dev-requirements.in
-flask==3.1.2
+flask==3.1.3
     # via
     #   flask-caching
     #   flask-mail
     #   flask-oidc-ex
     #   flask-webpack
     #   quart
-flask-caching==2.3.1
+flask-caching==2.4.0
     # via -r requirements.txt
 flask-mail==0.10.0
     # via superdesk-core
@@ -179,7 +180,7 @@ flask-oidc-ex==0.6.2
     # via superdesk-core
 flask-webpack==0.1.0
     # via -r requirements.txt
-frozenlist==1.7.0
+frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
@@ -205,7 +206,7 @@ html5lib==1.1
     # via xhtml2pdf
 httmock==1.4.0
     # via -r dev-requirements.in
-httplib2==0.31.0
+httplib2==0.31.2
     # via oauth2client
 hypercorn==0.18.0
     # via
@@ -213,14 +214,14 @@ hypercorn==0.18.0
     #   quart
 hyperframe==6.1.0
     # via h2
-icalendar==5.0.13
+icalendar==5.0.14
     # via superdesk-planning
-idna==3.10
+idna==3.11
     # via
     #   email-validator
     #   requests
     #   yarl
-iniconfig==2.1.0
+iniconfig==2.3.0
     # via pytest
 isodate==0.7.2
     # via python3-saml
@@ -233,19 +234,17 @@ jinja2==3.1.6
     # via
     #   flask
     #   quart
-jmespath==1.0.1
+jmespath==1.1.0
     # via
     #   aiobotocore
     #   boto3
     #   botocore
-jwcrypto==1.5.6
+jwcrypto==1.5.7
     # via
     #   flask-oidc-ex
     #   python-jwt
-kombu==5.4.2
-    # via
-    #   celery
-    #   superdesk-core
+kombu[redis]==5.6.2
+    # via celery
 ldap3==2.9.1
     # via superdesk-core
 lxml==5.3.2
@@ -256,9 +255,9 @@ lxml==5.3.2
     #   superdesk-core
     #   svglib
     #   xmlsec
-lxml-html-clean==0.4.2
+lxml-html-clean==0.4.4
     # via superdesk-core
-markupsafe==3.0.2
+markupsafe==3.0.3
     # via
     #   flask
     #   jinja2
@@ -270,7 +269,7 @@ mccabe==0.7.0
     # via flake8
 motor==3.7.1
     # via superdesk-core
-multidict==6.6.4
+multidict==6.7.1
     # via
     #   aiobotocore
     #   aiohttp
@@ -289,24 +288,25 @@ orderly-set==5.5.0
     # via deepdiff
 oscrypto==1.3.0
     # via pyhanko-certvalidator
-packaging==25.0
+packaging==26.1
     # via
     #   black
+    #   kombu
     #   pytest
-parse==1.20.2
+parse==1.21.1
     # via
     #   behave
     #   parse-type
 parse-type==0.6.6
     # via behave
-pathspec==0.12.1
+pathspec==1.0.4
     # via black
 pillow==11.1.0
     # via
     #   reportlab
     #   superdesk-core
     #   xhtml2pdf
-platformdirs==4.4.0
+platformdirs==4.9.6
     # via black
 pluggy==1.6.0
     # via
@@ -316,11 +316,11 @@ priority==2.0.0
     # via hypercorn
 prompt-toolkit==3.0.52
     # via click-repl
-propcache==0.3.2
+propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-pyasn1==0.6.1
+pyasn1==0.6.3
     # via
     #   ldap3
     #   oauth2client
@@ -332,7 +332,7 @@ pyasn1-modules==0.4.2
     #   oauth2client
 pycodestyle==2.14.0
     # via flake8
-pycparser==2.23
+pycparser==3.0
     # via cffi
 pydantic==2.12.5
     # via
@@ -342,7 +342,7 @@ pydantic-core==2.41.5
     # via pydantic
 pyflakes==3.4.0
     # via flake8
-pygments==2.19.2
+pygments==2.20.0
     # via pytest
 pyhanko==0.28.0
     # via xhtml2pdf
@@ -359,11 +359,11 @@ pymongo==4.9.2
     #   eve
     #   motor
     #   superdesk-core
-pyparsing==3.2.3
+pyparsing==3.3.2
     # via
     #   httplib2
     #   pyrtf3
-pypdf==6.4.0
+pypdf==6.10.2
     # via xhtml2pdf
 pyrtf3==0.47.5
     # via -r requirements.txt
@@ -375,7 +375,7 @@ pytest==8.4.2
     #   pytest-mock
 pytest-asyncio==0.26.0
     # via -r dev-requirements.in
-pytest-cov==7.0.0
+pytest-cov==7.1.0
     # via -r dev-requirements.in
 pytest-mock==3.15.1
     # via -r dev-requirements.in
@@ -400,14 +400,14 @@ python-twitter==3.5
     # via superdesk-core
 python3-saml==1.16.0
     # via -r requirements.txt
-pytz==2025.2
+pytz==2026.1.post1
     # via
     #   croniter
     #   eve-elastic
     #   icalendar
     #   quart-babel
     #   superdesk-core
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via
     #   pyhanko
     #   responses
@@ -434,18 +434,16 @@ quart-uploads==0.0.4
     # via quart-wtforms
 quart-wtforms==1.0.3
     # via -r requirements.txt
-redis==5.2.1
-    # via
-    #   celery
-    #   superdesk-core
+redis==6.4.0
+    # via kombu
 regex==2024.11.6
     # via superdesk-core
-reportlab==4.4.3
+reportlab==4.4.10
     # via
     #   superdesk-core
     #   svglib
     #   xhtml2pdf
-requests==2.32.5
+requests==2.33.1
     # via
     #   httmock
     #   pyhanko
@@ -465,11 +463,11 @@ rsa==4.9.1
     #   oauth2client
 s3transfer==0.11.3
     # via boto3
-sentry-sdk[quart]==2.37.1
+sentry-sdk[quart]==2.58.0
     # via superdesk-core
 sgmllib3k==1.0.0
     # via feedparser
-simplejson==3.20.1
+simplejson==3.20.2
     # via eve
 six==1.17.0
     # via
@@ -488,18 +486,18 @@ svglib==1.5.1
     # via xhtml2pdf
 taskgroup==0.2.2
     # via hypercorn
-tinycss2==1.4.0
+tinycss2==1.5.1
     # via
     #   cssselect2
     #   svglib
-tomli==2.2.1
+tomli==2.4.1
     # via
     #   black
     #   coverage
     #   hypercorn
     #   mypy
     #   pytest
-types-aiofiles==24.1.0.20250822
+types-aiofiles==25.1.0.20260409
     # via quart-uploads
 types-click==7.1.8
     # via types-flask
@@ -511,13 +509,13 @@ types-jinja2==2.11.9
     #   types-flask
 types-markupsafe==1.1.10
     # via types-jinja2
-types-protobuf==6.32.1.20251105
+types-protobuf==7.34.1.20260408
     # via -r mypy-requirements.txt
-types-python-dateutil==2.9.0.20251115
+types-python-dateutil==2.9.0.20260408
     # via
     #   -r mypy-requirements.txt
     #   arrow
-types-pytz==2025.2.0.20251108
+types-pytz==2026.1.1.20260408
     # via
     #   -r mypy-requirements.txt
     #   quart-babel
@@ -538,6 +536,7 @@ typing-extensions==4.15.0
     #   aiosignal
     #   asgiref
     #   black
+    #   cryptography
     #   exceptiongroup
     #   hypercorn
     #   jwcrypto
@@ -550,19 +549,18 @@ typing-extensions==4.15.0
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
-tzdata==2025.2
-    # via
-    #   celery
-    #   kombu
+tzdata==2026.1
+    # via kombu
 tzlocal==5.3.1
     # via
+    #   celery
     #   pyhanko
     #   superdesk-core
 unidecode==1.3.8
     # via superdesk-core
-uritools==5.0.0
+uritools==6.0.1
     # via pyhanko-certvalidator
-urllib3==1.26.20
+urllib3==2.6.3
     # via
     #   botocore
     #   elastic-apm
@@ -576,16 +574,16 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-wcwidth==0.2.13
+wcwidth==0.6.0
     # via prompt-toolkit
 webencodings==0.5.1
     # via
     #   cssselect2
     #   html5lib
     #   tinycss2
-websockets==13.1
+websockets==16.0
     # via superdesk-core
-werkzeug==3.1.4
+werkzeug==3.1.8
     # via
     #   flask
     #   quart
@@ -595,7 +593,7 @@ wrapt==1.17.3
     # via
     #   aiobotocore
     #   elastic-apm
-wsproto==1.2.0
+wsproto==1.3.2
     # via hypercorn
 wtforms[email]==3.2.1
     # via
@@ -608,7 +606,7 @@ xmlsec==1.3.14
     # via
     #   python3-saml
     #   superdesk-core
-yarl==1.20.1
+yarl==1.23.0
     # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
