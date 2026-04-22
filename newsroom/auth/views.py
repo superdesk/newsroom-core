@@ -114,7 +114,7 @@ def email_has_exceeded_max_login_attempts(email):
         return True
 
     # TODO: What do we do if connection to Redis is lost???
-    #       As this raises a security issue, Redis is down, account never get's disabled
+    #       As this raises a security issue, Redis is down, account never gets disabled
     #       Do we use MongoDB, $set and $inc on the collection itself?
     app = get_current_app().as_any()
     login_attempt = app.cache.get(email)

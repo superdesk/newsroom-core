@@ -45,7 +45,7 @@ class CPUsersService(UsersService):
 
     @override
     async def on_delete(self, doc: UserResourceModel) -> None:
-        # Skipping UsersService.on_updated as its validations are not needed for this API.
+        # Skipping UsersService.on_delete so delete-specific validations/side effects are bypassed for this API.
         await super(UsersService, self).on_delete(doc)
 
 
