@@ -4,6 +4,7 @@ from quart import Quart
 
 from flask_caching import Cache
 
+from superdesk.core import get_config
 from newsroom.core import get_current_wsgi_app
 
 
@@ -71,16 +72,20 @@ class NewshubCache(Cache):
 
         get_current_wsgi_app().add_background_task(self.delete_many, *keys)
 
-    async def get_in_background(self, key: str, async_timeout: int = 2) -> Any:
+    async def get_in_background(self, key: str, async_timeout: int | None = None) -> Any:
         """
         Look up key in the cache in a background thread, await until it's finished and return the result.
 
         :param key: The key to look up
         :param async_timeout: If the cache does not respond within this time, return None.
+                              (Defaults to the ``CACHE_REDIS_TIMEOUT`` setting)
         :return: The value for the key, or None if the key is not found.
         """
 
         try:
+            if async_timeout is None:
+                async_timeout = get_config(int, "CACHE_REDIS_TIMEOUT")
+
             loop = asyncio.get_running_loop()
             return await asyncio.wait_for(loop.run_in_executor(None, self.get, key), timeout=async_timeout)
         except asyncio.TimeoutError:

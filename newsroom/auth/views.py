@@ -65,7 +65,7 @@ async def login(req: Request):
         auth = get_current_auth()
         await auth.stop_session(req)
 
-        if email_has_exceeded_max_login_attempts(form.email.data):
+        if await email_has_exceeded_max_login_attempts(form.email.data):
             return await render_template("account_locked.html", form=form)
 
         user = await UsersAuthService().get_by_email(form.email.data)
@@ -93,7 +93,7 @@ async def login(req: Request):
                 # Password login is not enabled for this user's company, and the user is not an admin
                 await flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
-                if not _is_password_valid(form.password.data.encode("UTF-8"), user):
+                if not await _is_password_valid(form.password.data.encode("UTF-8"), user):
                     await flash(gettext("Invalid username or password."), "danger")
                 else:
                     await auth.start_session(req, user, permanent=form.remember_me.data)
@@ -102,7 +102,7 @@ async def login(req: Request):
     return await render_template("login.html", form=form, firebase=get_app_config("FIREBASE_ENABLED"))
 
 
-def email_has_exceeded_max_login_attempts(email):
+async def email_has_exceeded_max_login_attempts(email) -> bool:
     """
     Checks if the user with given email has exceeded maximum number of
     allowed attempts before the successful login.
@@ -116,15 +116,15 @@ def email_has_exceeded_max_login_attempts(email):
     # TODO: What do we do if connection to Redis is lost???
     #       As this raises a security issue, Redis is down, account never gets disabled
     #       Do we use MongoDB, $set and $inc on the collection itself?
-    app = get_current_app().as_any()
-    login_attempt = app.cache.get(email)
+    app = get_current_wsgi_app()
+    login_attempt = await app.cache.get_in_background(email)
 
     if not login_attempt or "attempt_count" not in login_attempt:
-        app.cache.set(email, {"attempt_count": 0})
+        app.cache.set_in_background(email, {"attempt_count": 0})
         return False
 
     login_attempt["attempt_count"] += 1
-    app.cache.set(email, login_attempt)
+    app.cache.set_in_background(email, login_attempt)
     max_attempt_allowed = get_app_config("MAXIMUM_FAILED_LOGIN_ATTEMPTS")
 
     if login_attempt["attempt_count"] >= max_attempt_allowed:
@@ -137,7 +137,7 @@ def email_has_exceeded_max_login_attempts(email):
     return login_attempt["attempt_count"] >= max_attempt_allowed
 
 
-def _is_password_valid(password: bytes, user: UserAuthResourceModel):
+async def _is_password_valid(password: bytes, user: UserAuthResourceModel) -> bool:
     """
     Checks the password of the user
     """
@@ -146,9 +146,9 @@ def _is_password_valid(password: bytes, user: UserAuthResourceModel):
         return False
 
     app = get_current_wsgi_app()
-    previous_login_attempt = app.cache.get(user.email) or {}
+    previous_login_attempt = (await app.cache.get_in_background(user.email)) or {}
     previous_login_attempt["user_id"] = user.id
-    app.cache.set(user.email, previous_login_attempt)
+    app.cache.set_in_background(user.email, previous_login_attempt)
 
     try:
         hashed = user.password.encode("UTF-8")
@@ -176,12 +176,12 @@ async def get_login_token(req: Request):
     if not email or not password:
         return await req.abort(400)
 
-    if email_has_exceeded_max_login_attempts(email):
+    if await email_has_exceeded_max_login_attempts(email):
         return await req.abort(401, gettext("Exceeded number of allowed login attempts"))
 
     user_auth = await UsersAuthService().get_by_email(email)
 
-    if user_auth is not None and _is_password_valid(password.encode("UTF-8"), user_auth):
+    if user_auth is not None and await _is_password_valid(password.encode("UTF-8"), user_auth):
         user = await UsersService().find_by_id(user_auth.id)
         company = await user.get_company()
 
@@ -444,7 +444,7 @@ async def change_password(req: Request):
             user_auth = await UsersAuthService().get_by_email(user.email)
             if user_auth is None:
                 await flash(gettext("Invalid username or password."), "danger")
-            elif not _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
+            elif not await _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
                 await flash(gettext("Invalid username or password."), "danger")
             else:
                 updates = {"password": form.new_password.data}
