@@ -47,7 +47,7 @@ async def test_cache_many(app) -> None:
     for i in range(number_of_docs):
         docs[f"key{i}"] = f"value{i}"
     async with app.test_app():
-        app.cache.set_many_in_thread(docs)
+        app.cache.set_many_in_background(docs)
 
     results = await app.cache.get_dict_in_background(docs.keys())
     for i in range(number_of_docs):
