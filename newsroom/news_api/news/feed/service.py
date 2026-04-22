@@ -77,6 +77,16 @@ class NewsAPIFeedSearchService(NewsApiSearchServiceAsync):
         doc = resp.body
         query_params = search_req.args.to_dict(flatten_lists=True)
 
+        # Page size is not available on the feed endpoint
+        page_size = query_params.pop("page_size", None)
+        if page_size:
+            query_params["max_results"] = page_size
+
+        # Externally documented as products
+        products = query_params.pop("product_ids", None)
+        if products:
+            query_params["products"] = products
+
         if doc["_meta"]["total"] > 0:
             items = list(doc.get("_items") or [])
             last_datetime = items[-1].get("versioncreated")

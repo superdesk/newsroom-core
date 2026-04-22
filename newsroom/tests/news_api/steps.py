@@ -43,7 +43,9 @@ def step_assert_response_header(context):
 @async_run_until_complete
 async def step_store_next_page_from_response(context):
     data = await get_json_data(context.response)
-    href = ((data.get("_links") or {}).get("next_page") or {}).get("href")
+    links = data.get("_links", {})
+    next_link = links.get("next") or links.get("next_page")
+    href = next_link.get("href") if next_link else None
     assert href, data
     set_placeholder(context, "NEXT_PAGE", href)
 

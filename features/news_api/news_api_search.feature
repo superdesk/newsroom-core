@@ -711,3 +711,41 @@ Feature: News API News Search
     When we get "news/search?start_date=now-10d&products=222222222222222222222222,111111111111111111111111"
     Then we get OK response
     Then we get list with 1 items
+
+ Scenario: Search pagination with sort in request
+    Given "items"
+        """
+        [
+        {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 3</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 4</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 5</p>"}
+        ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&sort=versioncreated:desc&page_size=1&page=2&include_fields=body_html"
+    Then we get list with 5 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>"}
+     ]}
+     """
+     Then we store NEXT_PAGE from HATEOAS
+     When we get "#NEXT_PAGE#"
+     Then we get list with 5 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 3</p>"}
+     ]}
+     """

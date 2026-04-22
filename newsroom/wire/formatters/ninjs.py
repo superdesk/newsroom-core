@@ -1,6 +1,8 @@
 from typing import Any
 import json
+from datetime import datetime
 from quart_babel import lazy_gettext
+from superdesk import get_app_config
 
 from superdesk.utils import json_serialize_datetime_objectId
 
@@ -54,6 +56,13 @@ class NINJSFormatter(BaseWireFormatter):
     async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
         item = item.copy()
         ninjs = await self._transform_to_ninjs(item)
+
+        date_format = get_app_config("API_DATE_FORMAT")
+        if date_format:
+            for k, v in ninjs.items():
+                if isinstance(v, datetime):
+                    # Update the dictionary with the formatted string
+                    ninjs[k] = v.strftime(date_format)
 
         return str.encode(json.dumps(ninjs, default=json_serialize_datetime_objectId), "utf-8")
 
