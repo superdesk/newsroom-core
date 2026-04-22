@@ -28,7 +28,7 @@ class NewshubCache(Cache):
 
         super().init_app(app, config)  # type: ignore[arg-type]
 
-    def set_in_thread(self, key: str, value: Any, timeout: int | None = None):
+    def set_in_background(self, key: str, value: Any, timeout: int | None = None):
         """
         Add/update a key/value pair in the cache, in a background thread.
 
@@ -41,7 +41,7 @@ class NewshubCache(Cache):
 
         get_current_wsgi_app().add_background_task(self.set, key, value, timeout=timeout)
 
-    def set_many_in_thread(self, mapping: dict, timeout: int | None = None) -> None:
+    def set_many_in_background(self, mapping: dict, timeout: int | None = None) -> None:
         """
         Set multiple keys and values from a mapping, in a background thread.
 
@@ -53,7 +53,7 @@ class NewshubCache(Cache):
 
         get_current_wsgi_app().add_background_task(self.set_many, mapping, timeout=timeout)
 
-    def delete_in_thread(self, key: str) -> None:
+    def delete_in_background(self, key: str) -> None:
         """
         Delete a key from the cache, in a background thread.
 
@@ -62,7 +62,7 @@ class NewshubCache(Cache):
 
         get_current_wsgi_app().add_background_task(self.delete, key)
 
-    def delete_many_in_thread(self, keys: list[str]):
+    def delete_many_in_background(self, keys: list[str]):
         """
         Delete multiple keys from the cache, in a background thread.
 
@@ -71,7 +71,7 @@ class NewshubCache(Cache):
 
         get_current_wsgi_app().add_background_task(self.delete_many, *keys)
 
-    async def get_in_thread(self, key: str, async_timeout: int = 2) -> Any:
+    async def get_in_background(self, key: str, async_timeout: int = 2) -> Any:
         """
         Look up key in the cache in a background thread, await until it's finished and return the result.
 
@@ -86,7 +86,7 @@ class NewshubCache(Cache):
         except asyncio.TimeoutError:
             return None
 
-    async def get_dict_in_thread(self, keys: list[str], async_timeout: int = 2) -> dict[str, Any] | None:
+    async def get_dict_in_background(self, keys: list[str], async_timeout: int = 2) -> dict[str, Any] | None:
         """
         Return a dictionary of key/value pairs for the given keys.
 

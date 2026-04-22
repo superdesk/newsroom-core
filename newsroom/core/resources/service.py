@@ -34,7 +34,7 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
     async def on_created(self, docs: list[NewshubResourceModelType]) -> None:
         await super().on_created(docs)
         if self.add_item_to_cache_on_create and docs:
-            get_current_wsgi_app().cache.set_many_in_thread({str(doc.id): doc.to_dict() for doc in docs})
+            get_current_wsgi_app().cache.set_many_in_background({str(doc.id): doc.to_dict() for doc in docs})
 
     async def on_update(self, updates: dict[str, Any], original: NewshubResourceModelType) -> None:
         from newsroom.auth.utils import get_user_or_none_from_request
@@ -55,7 +55,7 @@ class NewshubAsyncResourceService(AsyncResourceService[Generic[NewshubResourceMo
             self.delete_item_from_cache(doc)
 
     def delete_item_from_cache(self, doc: NewshubResourceModelType) -> None:
-        get_current_wsgi_app().cache.delete_in_thread(str(doc.id))
+        get_current_wsgi_app().cache.delete_in_background(str(doc.id))
 
     async def find_items_by_ids(self, ids: list[str] | list[ObjectId]) -> list[NewshubResourceModelType]:
         """

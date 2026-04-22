@@ -35,9 +35,9 @@ def test_cache_redis_args() -> None:
 async def test_cache_get_set(app) -> None:
     # Use ``test_app`` here to make sure background task is finished before proceeding
     async with app.test_app():
-        app.cache.set_in_thread("foo", "bar")
+        app.cache.set_in_background("foo", "bar")
 
-    foo = await app.cache.get_in_thread("foo")
+    foo = await app.cache.get_in_background("foo")
     assert foo == "bar"
 
 
@@ -49,6 +49,6 @@ async def test_cache_many(app) -> None:
     async with app.test_app():
         app.cache.set_many_in_thread(docs)
 
-    results = await app.cache.get_dict_in_thread(docs.keys())
+    results = await app.cache.get_dict_in_background(docs.keys())
     for i in range(number_of_docs):
         assert results[f"key{i}"] == f"value{i}"

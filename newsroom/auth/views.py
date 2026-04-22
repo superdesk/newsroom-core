@@ -158,7 +158,7 @@ def _is_password_valid(password: bytes, user: UserAuthResourceModel):
     try:
         if bcrypt.checkpw(password, hashed):
             # login successful so remove the login attempt check record
-            app.cache.delete_in_thread(user.email)
+            app.cache.delete_in_background(user.email)
             return True
     except (TypeError, ValueError):
         return False
@@ -348,7 +348,7 @@ async def reset_password(args: LoginTokenRouteArgs, params: None, req: Request) 
 
         return req.redirect(url_for("auth.login"))
 
-    get_current_wsgi_app().cache.delete_in_thread(user.email)
+    get_current_wsgi_app().cache.delete_in_background(user.email)
     return await render_template("reset_password.html", form=form, token=args.token)
 
 

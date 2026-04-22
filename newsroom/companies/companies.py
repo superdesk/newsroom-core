@@ -120,7 +120,7 @@ class CompaniesService(newsroom.Service):
             ]
 
     def on_updated(self, updates, original):
-        get_current_wsgi_app().cache.delete_in_thread(str(original["_id"]))
+        get_current_wsgi_app().cache.delete_in_background(str(original["_id"]))
 
         updated = original.copy()
         updated.update(updates)
@@ -152,7 +152,7 @@ class CompaniesService(newsroom.Service):
                 user_service.patch(user[ID_FIELD], updates=user_updates)
 
     def on_deleted(self, doc):
-        get_current_wsgi_app().cache.delete_in_thread(str(doc["_id"]))
+        get_current_wsgi_app().cache.delete_in_background(str(doc["_id"]))
 
     def validate_auth_provider(self, company):
         supported_provider_ids = [provider["_id"] for provider in get_app_config("AUTH_PROVIDERS")]

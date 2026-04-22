@@ -111,7 +111,7 @@ class UsersService(NewshubAsyncResourceService[UserResourceModel]):
         await super().on_delete(doc)
 
     def delete_item_from_cache(self, doc: UserResourceModel) -> None:
-        get_current_wsgi_app().cache.delete_many_in_thread([str(doc.id), doc.email])
+        get_current_wsgi_app().cache.delete_many_in_background([str(doc.id), doc.email])
 
     async def check_permissions(self, user: UserResourceModel, updates: dict | None, method: HTTP_METHOD):
         """Check if current user has permissions to edit user."""

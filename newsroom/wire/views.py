@@ -171,7 +171,7 @@ def delete_dashboard_caches():
         PUBLIC_DASHBOARD_CARDS_CACHE_KEY,
         PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
     ] + [f"{HOME_ITEMS_CACHE_KEY}{company['_id']}" for company in query_resource("companies")]
-    get_current_wsgi_app().cache.delete_many_in_thread(keys)
+    get_current_wsgi_app().cache.delete_many_in_background(keys)
 
 
 class DashboardTopicData(TypedDict):
