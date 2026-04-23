@@ -19,7 +19,7 @@ from newsroom.wire.embeds import (
 )
 from newsroom.search.types import NewshubSearchRequest, SearchFilterFunction
 from newsroom.search.base_service import BaseNewshubSearchService
-from newsroom.news_api.utils import post_api_audit
+from newsroom.news_api.utils import post_api_audit, format_api_date
 from newsroom.search.filters import apply_company_filter, apply_section_filter, apply_products_filter
 
 from .filters import (
@@ -100,7 +100,16 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         search_req = self.get_search_request_instance(request)
         self.build_hateoas(request, response, search_req)
 
+        # If a date format has been configured then apply it to date fields
+        date_format = get_app_config("API_DATE_FORMAT")
+
         for doc in response.body["_items"] or []:
+            if date_format:
+                for date_field in ["firstcreated", "versioncreated", "embargoed"]:
+                    date_value = doc.get(date_field)
+                    if isinstance(date_value, str) and date_value:
+                        doc[date_field] = format_api_date(date_value)
+
             self._enhance_internal_item_hateoas(doc)
 
             if get_app_config("WIRE_EMBED_PERMISSIONS", True):
@@ -116,33 +125,34 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
 
     def build_hateoas(self, req: Request, resp: Response, search_req: NewshubSearchRequest[NewsApiSearchRequestArgs]):
         base_url = req.path.strip("/").replace(get_app_config("URL_PREFIX"), "")
-        query_params = search_req.args.to_dict(flatten_lists=True)
+        original_args = req.request.args.to_dict()
 
         resp.body.setdefault("_links", {})
         resp.body["_links"]["parent"] = {"title": "Home", "href": "/"}
 
-        # append page and page_size only if they were provided in original request
-        for arg in ["page", "page_size"]:
-            if arg in flask_request.view_args:
-                query_params.update({arg: query_params.get(arg)})
+        resp.body["_links"]["self"] = {
+            "title": "News Search",
+            "href": f"{base_url}?{urlencode(original_args)}" if original_args else base_url,
+        }
 
-        q_args = f"?{urlencode(query_params)}" if query_params else ""
-        resp.body["_links"]["self"] = (
-            {
-                "title": "News Search",
-                "href": f"{base_url}{q_args}",
-            },
-        )
+        total_items = resp.body.get("_meta", {}).get("total", 0)
+        current_page = search_req.args.page
+        page_size = search_req.args.page_size
 
         # add next page if there are more items
-        if (search_req.args.page * search_req.args.page_size) < resp.body["_meta"]["total"]:
-            query_params["page"] = search_req.args.page + 1
-            resp.body["_links"]["next"] = {"title": "next page", "href": f"{base_url}?{urlencode(query_params)}"}
+        if (current_page * page_size) < total_items:
+            next_args = {**original_args, "page": current_page + 1}
+            resp.body["_links"]["next"] = {"title": "next page", "href": f"{base_url}?{urlencode(next_args)}"}
 
         # add prev page if needed
-        if search_req.args.page > 1:
-            query_params["page"] = search_req.args.page - 1
-            resp.body["_links"]["prev"] = {"title": "prev page", "href": f"{base_url}?{urlencode(query_params)}"}
+        if current_page > 1:
+            prev_args = {**original_args, "page": current_page - 1}
+            resp.body["_links"]["prev"] = {"title": "prev page", "href": f"{base_url}?{urlencode(prev_args)}"}
+
+        if total_items > 0:
+            last_page = (total_items + page_size - 1) // page_size
+            last_args = {**original_args, "page": last_page}
+            resp.body["_links"]["last"] = {"title": "last page", "href": f"{base_url}?{urlencode(last_args)}"}
 
     def _enhance_internal_item_hateoas(self, item: dict[str, Any]):
         item.setdefault("_links", {})

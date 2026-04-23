@@ -74,8 +74,25 @@ Feature: News API News Feed
         {"_items": [{"_id": "urn:test2"}, {"_id": "urn:test4"}]}
         """
 
-  @skip
   Scenario: Response provides a link to the next page
+    Given "products"
+        """
+        [{
+            "_id": "5e4cade4d69954b6d55ac09a",
+            "name": "A fishy product",
+            "description": "A product for those interested in fish",
+            "companies": ["#companies._id#"],
+            "query": "fish",
+            "product_type": "news_api"
+        }, {
+            "_id": "5e4cade4d69954b6d55ac09b",
+            "name": "An aardvark product",
+            "description": "A product for those interested in aardvarks",
+            "companies": ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
     Given "items"
         """
         [
@@ -97,18 +114,18 @@ Feature: News API News Feed
             }
         ]
         """
-    When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
+    When we get "news/feed?include_fields=body_html&max_results=2&products=5e4cade4d69954b6d55ac09a,5e4cade4d69954b6d55ac09b"
     Then we get list with 5 items
         """
         {
             "_items": [
-                {"_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim"},
-                {"_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim"}
+                {"_id": "urn:test1", "body_html": "<p>Once upon a time there was a single fish who could swim</p>"},
+                {"_id": "urn:test2", "body_html": "<p>Once upon a time there were 2 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
                     "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test2&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-02T03:48:39"
+                    "href": "news/feed?include_fields=body_html&max_results=2&products=5e4cade4d69954b6d55ac09a%2C5e4cade4d69954b6d55ac09b&start_date=2015-06-02T03%3A48%3A39&exclude_ids=urn%3Atest2"
                 }
             }
         }
@@ -119,13 +136,13 @@ Feature: News API News Feed
         """
         {
             "_items": [
-                {"_id": "urn:test3", "body_html": "Once upon a time there were 3 fish who could swim"},
-                {"_id": "urn:test4", "body_html": "Once upon a time there were 4 fish who could swim"}
+                {"_id": "urn:test3", "body_html": "<p>Once upon a time there were 3 fish who could swim</p>"},
+                {"_id": "urn:test4", "body_html": "<p>Once upon a time there were 4 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
                     "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test4&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-03T03:48:39"
+                    "href": "news/feed?start_date=2015-06-03T03%3A48%3A39&include_fields=body_html&exclude_ids=urn%3Atest4&max_results=2&products=5e4cade4d69954b6d55ac09a%2C5e4cade4d69954b6d55ac09b"
                 }
             }
         }
@@ -136,12 +153,12 @@ Feature: News API News Feed
         """
         {
             "_items": [
-                {"_id": "urn:test5", "body_html": "Once upon a time there were 5 fish who could swim"}
+                {"_id": "urn:test5", "body_html": "<p>Once upon a time there were 5 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
                     "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test5&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-04T03:48:39"
+                    "href": "news/feed?start_date=2015-06-04T03%3A48%3A39&include_fields=body_html&exclude_ids=urn%3Atest5&max_results=2&products=5e4cade4d69954b6d55ac09a%2C5e4cade4d69954b6d55ac09b"
                 }
             }
         }
@@ -155,7 +172,7 @@ Feature: News API News Feed
             "_links": {
                 "next_page": {
                     "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test5&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-04T03:48:39"
+                    "href": "news/feed?start_date=2015-06-04T03%3A48%3A39&include_fields=body_html&exclude_ids=urn%3Atest5&max_results=2&products=5e4cade4d69954b6d55ac09a%2C5e4cade4d69954b6d55ac09b"
                 }
             }
         }
