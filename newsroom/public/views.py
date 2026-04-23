@@ -60,7 +60,7 @@ class PageArgs(BaseModel):
     template: str
 
 
-@public_endpoints.endpoint("/page/<path:template>")
+@public_endpoints.endpoint("/page/<path:template>", auth=False)
 async def page(args: PageArgs, _p: None, _r: None):
     template = secure_filename(args.template)
     return await render_template(f"page-{template}.html")
