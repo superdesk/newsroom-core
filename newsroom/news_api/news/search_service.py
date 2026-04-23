@@ -100,11 +100,15 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         search_req = self.get_search_request_instance(request)
         self.build_hateoas(request, response, search_req)
 
+        # If a date format has been configured then apply it to date fields
+        date_format = get_app_config("API_DATE_FORMAT")
+
         for doc in response.body["_items"] or []:
-            if get_app_config("API_DATE_FORMAT"):
+            if date_format:
                 for date_field in ["firstcreated", "versioncreated", "embargoed"]:
-                    if date_field in doc:
-                        doc[date_field] = format_api_date(doc.get(date_field))
+                    date_value = doc.get(date_field)
+                    if isinstance(date_value, str) and date_value:
+                        doc[date_field] = format_api_date(date_value)
 
             self._enhance_internal_item_hateoas(doc)
 
