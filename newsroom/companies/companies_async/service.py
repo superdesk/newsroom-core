@@ -12,6 +12,7 @@ from ..utils import get_company_section_names, get_company_product_ids, get_user
 
 class CompanyService(NewshubAsyncResourceService[CompanyResource]):
     resource_name = "companies"
+    add_item_to_cache_on_create = True
     clear_item_cache_on_update = True
 
     async def on_create(self, docs: List[CompanyResource]) -> None:

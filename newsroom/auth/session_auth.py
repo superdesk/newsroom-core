@@ -6,13 +6,14 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from quart_babel import gettext
 
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_app_config
 from superdesk.core.types import Request
 from superdesk.core.auth.user_auth import UserAuthProtocol
 from superdesk.flask import url_for
 from superdesk.utc import utcnow
 
 from newsroom.types import CompanyResource, UserResourceModel, UserRole
+from newsroom.core import get_current_wsgi_app
 from newsroom.flask import flash
 from newsroom.companies import CompanyServiceAsync
 from newsroom.users.service import UsersService
@@ -123,7 +124,7 @@ class NewshubSessionAuth(UserAuthProtocol):
             await UsersService().system_update(user.id, updates)
             user.last_active = current_time
             user.is_validated = True
-            get_current_app().as_any().cache.set(str(user.id), user.to_json())
+            get_current_wsgi_app().cache.set_in_background(str(user.id), user.to_json())
 
     async def stop_session(self, request: "Request") -> None:
         await super().stop_session(request)

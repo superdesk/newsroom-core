@@ -151,4 +151,4 @@ async def add_remove_products_for_navigation(nav_id: ObjectId, product_ids: list
         else:
             db.update_one({"_id": product["_id"]}, {"$pull": {"navigations": nav_id}})
 
-    cache.clean(["products"])
+    cache.clean_in_thread(["products"])

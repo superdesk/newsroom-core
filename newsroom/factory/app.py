@@ -11,7 +11,6 @@ import pathlib
 import importlib
 
 from flask_mail import Mail
-from flask_caching import Cache
 from elasticapm.contrib.flask import ElasticAPM
 from pydantic import ValidationError
 from eve.io.mongo import ensure_mongo_indexes
@@ -32,6 +31,8 @@ from newsroom.exceptions import AuthorizationError
 from newsroom.utils import is_json_request, parse_validation_error
 from newsroom.gettext import setup_babel
 
+from .cache import NewshubCache
+
 
 NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 
@@ -43,6 +44,7 @@ class BaseNewsroomApp(SuperdeskEve):
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
+    cache: NewshubCache
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -171,7 +173,7 @@ class BaseNewsroomApp(SuperdeskEve):
 
     def setup_cache(self):
         cache_backend.init_app(self)
-        self.cache = Cache(self)
+        self.cache = NewshubCache(self)
 
     def setup_error_handlers(self):
         def assertion_error(err):
