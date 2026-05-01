@@ -86,7 +86,12 @@ class HistoryService(NewshubAsyncResourceService[HistoryResourceModel]):
         return {"_items": docs, "hits": cursor.hits}
 
     async def create_media_history_record(
-        self, item: dict[str, Any], association_name: str, action: str | None, user: UserResourceModel, section: str
+        self,
+        item: dict[str, Any],
+        association_name: str,
+        action: str | None,
+        user: UserResourceModel,
+        section: str = "wire",
     ):
         """
         Log the download of an association belonging to an item
