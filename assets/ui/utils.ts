@@ -115,14 +115,13 @@ export function setupMediaPlayers(root: HTMLElement) {
             if (!disableDownload) {
                 const VjsButton = videojs.getComponent('Button');
                 const downloadBtn = new VjsButton(player, {
-                    controlText: 'Download',
                     className: 'vjs-control vjs-download-button vjs-icon-file-download'
                 });
-                player.getChild('ControlBar')?.addChild(downloadBtn);
+                (downloadBtn as any).controlText('Download');
 
-                downloadBtn.handleClick = async () => {
+                (downloadBtn as any).handleClick = async () => {
                     const item_id = element.getAttribute('data-item-id') || '';
-                    const altText= element.getAttribute('alt') || 'download';
+                    const altText = element.getAttribute('alt') || 'download';
                     const filename = sanitizeFilename(altText);
 
                     const source = player.currentSrc() + '/download';
@@ -147,11 +146,14 @@ export function setupMediaPlayers(root: HTMLElement) {
                         } else if (error.status === 404) {
                             notify.error(gettext('File not found.'));
                         } else {
-                            notify.error(gettext('An error occurred while checking download permissions.'));
+                            notify.error(gettext('An error occurred while checking permissions.'));
                         }
                     }
                 };
-
+                const controlBar = player.getChild('ControlBar');
+                if (controlBar) {
+                    controlBar.addChild(downloadBtn);
+                }
             }
         });
 
@@ -168,9 +170,10 @@ function sanitizeFilename(name: string): string {
     if (!name) return 'download';
 
     return name
+        // eslint-disable-next-line no-control-regex
         .replace(/[\x00-\x1f\x80-\x9f]/g, '')
         .replace(/[\\/:*?"<>|%]/g, '')
         .replace(/[\s_]+/g, '_')
-        .replace(/[\.\s]+$/, '')
+        .replace(/[.\s]+$/, '')
         .substring(0, 255); // Max filename length for most OS
 }
