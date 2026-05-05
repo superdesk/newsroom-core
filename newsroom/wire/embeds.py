@@ -12,7 +12,7 @@ from superdesk.etree import to_string
 
 from newsroom.types import SectionEnum, CompanyResource, EmbedPermissionUserAction
 from newsroom.settings import get_setting
-from newsroom.auth.utils import get_user_or_none_from_request, get_company_from_request
+from newsroom.auth.utils import get_company_from_request
 from newsroom.products import get_products_for_request_user_and_company
 
 __all__ = [
@@ -44,14 +44,9 @@ def iterate_embeds(
 async def apply_company_permissions_to_embeds(
     items: list[dict], section: SectionEnum, use_download_as_view_permission: bool = False
 ) -> None:
-    if not len(items) or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
-        return
-
-    user = get_user_or_none_from_request(None)
     company = get_company_from_request(None)
 
-    if (user and user.is_admin()) or not company:
-        # If the current user is an admin, then there are no permissions to be applied
+    if not len(items) or not company or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
         return
 
     sdesk_products: set[str] = {
@@ -61,7 +56,8 @@ async def apply_company_permissions_to_embeds(
     }
 
     for doc in items:
-        _remove_or_disable_item_media(doc, company, sdesk_products, use_download_as_view_permission)
+        if company is not None:
+            _remove_or_disable_item_media(doc, company, sdesk_products, use_download_as_view_permission)
 
 
 def _get_html_from_string(html_string: bytes | str | None) -> HtmlElement:
@@ -327,9 +323,6 @@ def _remove_or_disable_item_media(
         disable_display |= disable_download
     disable_embed_codes = not company.is_permissioned_for_embed("embed_code", EmbedPermissionUserAction.DISPLAY)
 
-    if not disable_download and not disable_display and not disable_embed_codes:
-        return
-
     for key in disable_display:
         (item.get("associations") or {}).pop(key, None)
 
@@ -363,6 +356,9 @@ def _remove_or_disable_item_media(
                 if elem.tag in ["video", "audio"]:
                     if editor_id in disable_download:
                         elem.attrib["data-disable-download"] = "true"
+                    else:
+                        elem.attrib["data-disable-download"] = "false"
+                        elem.attrib["data-item-id"] = item.get("_id")
                 if elem.text and " EMBED END " in elem.text:
                     break
             html_updated = True
