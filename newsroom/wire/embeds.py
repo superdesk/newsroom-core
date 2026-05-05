@@ -44,10 +44,10 @@ def iterate_embeds(
 async def apply_company_permissions_to_embeds(
     items: list[dict], section: SectionEnum, use_download_as_view_permission: bool = False
 ) -> None:
-    if not len(items) or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
-        return
-
     company = get_company_from_request(None)
+
+    if not len(items) or not company or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
+        return
 
     sdesk_products: set[str] = {
         product.sd_product_id

@@ -90,7 +90,10 @@ export function setupMediaPlayers(root: HTMLElement) {
     const elements = root.querySelectorAll<HTMLVideoElement | HTMLAudioElement>('video, audio');
 
     elements.forEach((element) => {
-        if (element.getAttribute('data-vjs-initialized')) return;
+        // Nothing to do if already initialised, or we have now download logging requirement.
+        if (element.hasAttribute('data-vjs-initialized') || !element.hasAttribute('data-disable-download')) {
+            return;
+        }
 
         const disableDownload = element.getAttribute('data-disable-download') === 'true';
 
@@ -113,6 +116,7 @@ export function setupMediaPlayers(root: HTMLElement) {
             if (player) players.push(player);
 
             if (!disableDownload) {
+                // Add the download button referencing the logging download endpoint
                 const VjsButton = videojs.getComponent('Button');
                 const downloadBtn = new VjsButton(player, {
                     className: 'vjs-control vjs-download-button vjs-icon-file-download'

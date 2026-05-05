@@ -1,4 +1,4 @@
-from flask import abort
+from superdesk.flask import abort
 from pydantic import BaseModel
 import logging
 
@@ -58,16 +58,17 @@ async def download_file_logged(args: RouteArguments, params: DownloadUrlParams, 
     """
     Download and log the download. Accepts a HEAD request that will validate that the user has the rights to download
     the asset.
-    @param args: The item_id is the identifier for the item the asset belongs to. The filename is the suggeted name for
-    the download file.
-    @param params: The media identifier
-    @param request:
-    @return:
+    @param args: Contains the media_id, the unique identifier for the asset.
+    @param params: item_id The of the parent item.
+                   and the suggested filename for the attachment.
+    @param request: The incoming HTTP request object.
+    @return: A Response object containing the file stream (GET) or a success
+             status (HEAD) if the item is allowed to be downloaded , otherwise aborts with 403 or 404.
     """
     if params.item_id:
         item: WireItem = await WireItem.get_service().find_by_id(params.item_id)
         if not item:
-            logger.warning(f"Failed find item for media download for {params.item_id} with media id {args.media_id}")
+            logger.warning(f"Failed to find item for media download for {params.item_id} with media id {args.media_id}")
             abort(404)
 
         name, association = _find_association(item, args.media_id)
@@ -78,7 +79,10 @@ async def download_file_logged(args: RouteArguments, params: DownloadUrlParams, 
             if product.sd_product_id and product.is_enabled
         }
 
-        association_products = {a.get("code") for a in association.get("products", {})}
+        products = association.get("products", [])
+        if not isinstance(products, list):
+            products = []
+        association_products = {a.get("code") for a in products if isinstance(a, dict) and a.get("code")}
 
         if not (sdesk_products & association_products):
             abort(403)
