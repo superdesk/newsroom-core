@@ -1,5 +1,6 @@
 import {auth} from './init';
 import {sendPasswordResetEmail} from 'firebase/auth';
+import {reportFirebaseAuthError} from './sentry';
 
 declare const nextUrl: string;
 
@@ -22,12 +23,22 @@ if (sendButton != null) {
         params.append('email', email);
         url.search = params.toString();
 
+        debugger;
+
         sendButton.disabled = true;
         sendPasswordResetEmail(auth, email, {url: url.toString()})
             .then(() => {
                 form.submit();
             })
             .catch((reason) => {
+                reportFirebaseAuthError(reason, {
+                    action: 'reset_password',
+                    email,
+                    extra: {
+                        nextPath: url.pathname,
+                    },
+                });
+
                 if (reason.code === 'auth/user-not-found') {
                     // User not registered with OAuth, try attempting normal password reset
                     form.submit();

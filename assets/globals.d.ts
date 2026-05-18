@@ -111,6 +111,12 @@ interface Window {
 
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
     sitename: string;
+    Sentry?: {
+        captureException: (error: unknown, context?: {
+            tags?: Record<string, string>;
+            extra?: Record<string, unknown>;
+        }) => void;
+    };
 }
 
 type Dictionary<T> = {[key: string]: T};
