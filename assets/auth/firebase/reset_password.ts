@@ -23,8 +23,6 @@ if (sendButton != null) {
         params.append('email', email);
         url.search = params.toString();
 
-        debugger;
-
         sendButton.disabled = true;
         sendPasswordResetEmail(auth, email, {url: url.toString()})
             .then(() => {
