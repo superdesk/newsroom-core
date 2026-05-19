@@ -5,10 +5,11 @@ from werkzeug.utils import secure_filename
 
 from superdesk.flask import render_template
 from superdesk.core.web import EndpointGroup
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_app_config
 
 from newsroom.auth.utils import is_valid_session
 from newsroom.types import Article, CardResourceModel
+from newsroom.core import get_current_wsgi_app
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.cards import CardsResourceService
@@ -21,37 +22,40 @@ public_endpoints = EndpointGroup("public", __name__)
 
 
 async def get_public_dashboard_config():
-    app = get_current_app().as_any()
-    if app.cache.get(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY):
-        return app.cache.get(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
-    ui_config_service = UiConfigResourceService()
+    app = get_current_wsgi_app()
 
+    if cached_data := await app.cache.get_in_background(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY):
+        return cached_data
+
+    ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("home")
-    app.cache.set(
+    app.cache.set_in_background(
         PUBLIC_DASHBOARD_CONFIG_CACHE_KEY, config, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return config
 
 
 async def get_public_items_by_cards() -> Dict[str, List[Article]]:
-    app = get_current_app().as_any()
-    if app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY):
-        return app.cache.get(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
+    app = get_current_wsgi_app()
+    if cached_data := await app.cache.get_in_background(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY):
+        return cached_data
 
     items_by_card = await get_items_for_dashboard(await get_public_cards(), True, True)
-    app.cache.set(
+    app.cache.set_in_background(
         PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return items_by_card
 
 
 async def get_public_cards() -> List[CardResourceModel]:
-    app = get_current_app().as_any()
-    if app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY):
-        return app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
+    app = get_current_wsgi_app()
+    if cached_data := await app.cache.get_in_background(PUBLIC_DASHBOARD_CARDS_CACHE_KEY):
+        return cached_data
 
     cards = await (await CardsResourceService().find({"dashboard": "newsroom"})).to_list()
-    app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
+    app.cache.set_in_background(
+        PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=get_app_config("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
+    )
 
     return cards
 

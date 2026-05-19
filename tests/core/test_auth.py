@@ -387,13 +387,13 @@ async def test_is_user_valid_empty_password():
     password_str = "plaintextpassword"
     password = password_str.encode("utf-8")
     user_auth = UserAuthResourceModel(id=ObjectId(), email="foo@example.com", first_name="foo", last_name="bar")
-    assert not _is_password_valid(password, user_auth)
+    assert not await _is_password_valid(password, user_auth)
     user_auth.password = None
-    assert not _is_password_valid(password, user_auth)
+    assert not await _is_password_valid(password, user_auth)
     user_auth.password = password_str
-    assert not _is_password_valid(password, user_auth)
+    assert not await _is_password_valid(password, user_auth)
     user_auth.password = get_hash(password_str, 10)
-    assert _is_password_valid(password, user_auth)
+    assert await _is_password_valid(password, user_auth)
 
 
 async def test_login_for_public_user_if_company_not_assigned(client, app):

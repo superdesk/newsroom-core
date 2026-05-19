@@ -281,7 +281,8 @@ async def test_get_products_by_navigation_caching(app):
     async with app.app_context():
         assert 1 == len(get_products_by_navigation([nav_id], "wire"))
 
-    await add_remove_products_for_navigation(nav_id, [])
+    async with app.test_app():
+        await add_remove_products_for_navigation(nav_id, [])
 
     async with app.app_context():
         assert 0 == len(get_products_by_navigation([nav_id], "wire"))

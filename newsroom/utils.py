@@ -389,40 +389,6 @@ async def get_company_dict_async(use_globals: bool = True) -> Dict[ObjectId, Com
     return companies_dict
 
 
-def get_cached_resource_by_id(resource, _id, black_list_keys=None):
-    """If the document exist in cache then return the document form cache
-    else fetch the document from the database store in the cache and return the document.
-
-
-    :param str resource: Name of the resource
-    :param _id: id
-    :param set black_list_keys: black list of keys to exclude from the document.
-    """
-    app = get_current_app().as_any()
-    item = app.cache.get(str(_id))
-    if item:
-        return loads(item)
-    try:
-        # item is not stored in cache
-        item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
-    except KeyError:
-        item = None
-    if item:
-        if not black_list_keys:
-            black_list_keys = {
-                "password",
-                "token",
-                "token_expiry",
-                "_id",
-                "_updated",
-                "_etag",
-            }
-        item = {key: item[key] for key in item.keys() if key not in black_list_keys}
-        app.cache.set(str(_id), json.dumps(item, default=json_serialize_datetime_objectId))
-        return item
-    return None
-
-
 def get_items_by_id(ids, resource):
     try:
         return list(superdesk.get_resource_service(resource).find(where={"_id": {"$in": ids}}))

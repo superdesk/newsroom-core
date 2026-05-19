@@ -3,7 +3,6 @@ from typing_extensions import override
 from bson.objectid import ObjectId
 
 from newsroom import MONGO_PREFIX
-from newsroom.core import get_current_wsgi_app
 from newsroom.mgmt_api.utils import validate_product_refs
 from newsroom.users.service import UsersService
 from newsroom.types import UserResourceModel
@@ -46,7 +45,8 @@ class CPUsersService(UsersService):
 
     @override
     async def on_delete(self, doc: UserResourceModel) -> None:
-        get_current_wsgi_app().cache.delete(str(doc.id))
+        # Skipping UsersService.on_delete so delete-specific validations/side effects are bypassed for this API.
+        await super(UsersService, self).on_delete(doc)
 
 
 class UsersRestEndpoints(ResourceRestEndpoints):

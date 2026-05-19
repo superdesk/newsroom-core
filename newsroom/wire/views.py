@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from quart_babel import gettext
 
 from superdesk.core.types import Request, Response
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_app_config
 from superdesk.flask import render_template, send_file
 from superdesk.utc import utcnow
 
@@ -24,6 +24,7 @@ from newsroom.types import (
     WireItem,
     DashboardCardType,
 )
+from newsroom.core import get_current_wsgi_app
 from newsroom.exceptions import AuthorizationError
 from newsroom.search.types import NewshubSearchRequest
 from newsroom.auth.utils import (
@@ -187,26 +188,35 @@ async def get_view_data() -> dict:
 
 async def get_items_by_card(cards: list[CardResourceModel], company_id: ObjectId | None) -> dict[str, list[dict]]:
     cache_key = "{}{}".format(HOME_ITEMS_CACHE_KEY, company_id or "")
-    app = get_current_app().as_any()
-    if app.cache.get(cache_key):
-        return app.cache.get(cache_key)
+    app = get_current_wsgi_app()
+    if cached_items := await app.cache.get_in_background(cache_key):
+        return cached_items
 
     items_by_card = await get_items_for_dashboard(cards)
 
     await set_permissions_on_cards(items_by_card)
 
-    app.cache.set(cache_key, items_by_card, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
+    app.cache.set_in_background(cache_key, items_by_card, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
+
     return items_by_card
 
 
 def delete_dashboard_caches():
-    app = get_current_app().as_any()
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
-    app.cache.delete(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
-    for company in query_resource("companies"):
-        app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
+    """Delete system caches used for the dashboard
+
+    .. note::
+        If the system has many companies, this would send many commands which could affect its performance.
+        Consider disabling ``DELETE_DASHBOARD_CACHE_ON_PUSH`` config, and modify ``DASHBOARD_CACHE_TIMEOUT``
+        to reflect desired homepage update rate.
+    """
+
+    keys = [
+        HOME_ITEMS_CACHE_KEY,
+        PUBLIC_DASHBOARD_CONFIG_CACHE_KEY,
+        PUBLIC_DASHBOARD_CARDS_CACHE_KEY,
+        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
+    ] + [f"{HOME_ITEMS_CACHE_KEY}{company['_id']}" for company in query_resource("companies")]
+    get_current_wsgi_app().cache.delete_many_in_background(keys)
 
 
 class DashboardTopicData(TypedDict):
@@ -327,16 +337,16 @@ class MediaCardRouteArguments(BaseModel):
 @wire_endpoints.endpoint("/media_card_external/<card_id>")
 async def get_media_card_external(args: MediaCardRouteArguments, params: None, request: Request) -> Response:
     cache_id = "{}_{}".format(HOME_EXTERNAL_ITEMS_CACHE_KEY, args.card_id)
-    app = get_current_app().as_any()
+    app = get_current_wsgi_app()
 
-    if app.cache.get(cache_id):
-        card_items = app.cache.get(cache_id)
+    if cached_items := await app.cache.get_in_background(cache_id):
+        card_items = cached_items
     else:
         card = await CardsResourceService().find_by_id_raw(args.card_id)
         if not card:
             await request.abort(404)
         card_items = app.get_media_cards_external(card)
-        app.cache.set(cache_id, card_items, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
+        app.cache.set_in_background(cache_id, card_items, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
 
     return Response({"_items": card_items})
 
