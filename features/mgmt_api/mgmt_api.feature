@@ -31,11 +31,11 @@ Feature: Management API
                     },
                     {
                         "href": "companies/<regex('[a-f0-9]{24}'):company_id>/products",
-                        "title": "Update Company Products"
+                        "title": "update_company_products"
                     },
                     {
                         "href": "companies/<regex('[a-f0-9]{24}'):company_id>/products",
-                        "title": "Get Company Products Endpoint"
+                        "title": "get_company_products_endpoint"
                     }
                 ]
         }}
