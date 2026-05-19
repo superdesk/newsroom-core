@@ -40,7 +40,9 @@ class CompanyProductRouteArguments(BaseModel):
         return await CompanyResource.get_service().find_by_id(self.company_id)
 
 
-@company_products_endpoints.endpoint("companies/<regex('[a-f0-9]{24}'):company_id>/products", methods=["POST"])
+@company_products_endpoints.endpoint(
+    "companies/<regex('[a-f0-9]{24}'):company_id>/products", methods=["POST"], title="update_company_products"
+)
 async def update_company_products(args: CompanyProductRouteArguments, params: None, request: Request) -> Response:
     company = await args.get_company()
     if not company:
@@ -75,7 +77,9 @@ async def update_company_products(args: CompanyProductRouteArguments, params: No
     return Response({"updated_product_ids": ids}, 201)
 
 
-@company_products_endpoints.endpoint("companies/<regex('[a-f0-9]{24}'):company_id>/products", methods=["GET"])
+@company_products_endpoints.endpoint(
+    "companies/<regex('[a-f0-9]{24}'):company_id>/products", methods=["GET"], title="get_company_products_endpoint"
+)
 async def get_company_products_endpoint(args: CompanyProductRouteArguments, params: None, request: Request) -> Response:
     company = await args.get_company()
     if not company:

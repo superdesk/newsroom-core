@@ -105,6 +105,8 @@ class NotificationManager:
         users_with_realtime_subscription: set[ObjectId] = set()
         notification_queue_service = NotificationQueueService()
 
+        logger.info("Sending topic notifications for item %s", item["_id"])
+
         for topic in topics:
             if topic.id not in topic_matches:
                 continue
@@ -144,7 +146,6 @@ class NotificationManager:
                         continue
                     else:
                         with elasticapm.capture_span("notify_user"):
-                            users_with_realtime_subscription.add(user.id)
                             if topic.topic_type == SectionEnum.WIRE:
                                 wire_service = WireSearchServiceAsync()
                                 query = await wire_service.get_topic_items_query(
@@ -158,6 +159,8 @@ class NotificationManager:
                                     ),
                                     include_updated=True,
                                 )
+                                if query is None:
+                                    continue
                                 cursor = await wire_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
                             else:
@@ -172,6 +175,8 @@ class NotificationManager:
                                         es_highlight=True,
                                     ),
                                 )
+                                if query is None:
+                                    continue
                                 cursor = await agenda_service.service.find(SearchRequest(elastic=query))
                                 items = await cursor.to_list_raw()
                             highlighted_item = item
@@ -185,6 +190,7 @@ class NotificationManager:
                                 item=highlighted_item,
                                 section=section.value,
                             )
+                            users_with_realtime_subscription.add(user.id)
                 except Exception as e:
                     logger.exception(e)
                     # when there is an error for specific topic/subscriber continue
@@ -279,7 +285,7 @@ class NotificationManager:
     async def send_user_notification_emails(
         self, item: dict[str, Any], user_matches: set[ObjectId], users: dict[ObjectId, UserResourceModel], section: str
     ):
-        logger.info("Sending topic notifications for item %s", item["_id"])
+        logger.info("Sending history match notification for item %s", item["_id"])
         for user_id in user_matches:
             user = users.get(user_id)
             if not user:

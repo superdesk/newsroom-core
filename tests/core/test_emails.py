@@ -99,6 +99,7 @@ MOCK_USERS = [
         "last_name": "Test",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
     {
         "email": EMAILS[1],
@@ -107,6 +108,7 @@ MOCK_USERS = [
         "locale": "fr_CA",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
     {
         "email": EMAILS[2],
@@ -115,6 +117,7 @@ MOCK_USERS = [
         "locale": "fi",
         "receive_email": True,
         "receive_app_notifications": True,
+        "is_enabled": True,
     },
 ]
 
@@ -258,6 +261,7 @@ async def test_item_killed_notification_email(app):
         last_name="Bar",
         email="foo@example.com",
         user_type=UserRole.PUBLIC,
+        is_enabled=True,
     )
 
     item = {

@@ -1,5 +1,6 @@
 import {auth} from './init';
 import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
+import {reportFirebaseAuthError} from './sentry';
 
 const form = document.getElementById('formLogin') as HTMLFormElement;
 const params = new URLSearchParams(window.location.search);
@@ -44,6 +45,11 @@ form.onsubmit = (event) => {
         userCredential.user.getIdToken().then(sendTokenToServer);
     }, (reason) => {
         // login via firebase didn't work out,
+        reportFirebaseAuthError(reason, {
+            action: 'login',
+            email,
+            ignoredCodes: ['auth/invalid-credential'],
+        });
         firebaseStatus.value = reason.code;
         form.submit();
     });

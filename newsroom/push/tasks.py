@@ -10,6 +10,7 @@ from .notifications import NotificationManager
 
 logger = logging.getLogger(__name__)
 notifier = NotificationManager()
+LOCK_EXPIRE_SECONDS = 300
 
 
 def get_lock(_id: str, service: str) -> str | None:
@@ -52,7 +53,7 @@ async def notify_new_agenda_item(_id, check_topics=True, is_new=False):
             return
 
         agenda_dict = agenda.to_dict()
-        await AgendaItemService().enhance_item(agenda_dict)
+        await service.enhance_item(agenda_dict)
         await notifier.notify_new_item(agenda_dict, check_topics=check_topics)
     finally:
         unlock(lock_name)
