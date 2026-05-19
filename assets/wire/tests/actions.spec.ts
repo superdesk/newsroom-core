@@ -36,10 +36,11 @@ describe('wire actions', () => {
     let store: any;
     const response: any = {
         _meta: {total: 2},
-        _items: [{_id: 'foo'}],
+        _items: [{_id: 'foo', type: 'text'}],
     };
 
     beforeEach(() => {
+        actions.resetFetchNewItemsThrottleForTests();
         (spyOn(utils.now, 'utcOffset') as any).and.returnValue('');
         fetchMock.get('/wire/search', response, {
             name: 'wire_search:from_0',
@@ -49,6 +50,7 @@ describe('wire actions', () => {
     });
 
     afterEach(() => {
+        actions.resetFetchNewItemsThrottleForTests();
         fetchMock.restore();
     });
 
@@ -110,10 +112,33 @@ describe('wire actions', () => {
     });
 
     it('can populate new items on update', () => {
+        const searchSpy = spyOn(server, 'get').and.callThrough();
+
         expect(store.getState().newItems).toEqual([]);
         return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
             .then(() => {
                 expect(store.getState().newItems).toEqual(['foo']);
+                expect(searchSpy).toHaveBeenCalled();
+            });
+    });
+
+    it('throttles new item update fetches during bursts', () => {
+        const searchSpy = spyOn(server, 'get').and.callThrough();
+        jasmine.clock().install();
+        jasmine.clock().mockDate();
+
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
+            .then(() => {
+                store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'bar', 'type': 'text'} ]}}));
+
+                expect(searchSpy.calls.count()).toBe(1);
+
+                jasmine.clock().tick(2000);
+
+                expect(searchSpy.calls.count()).toBe(2);
+            })
+            .finally(() => {
+                jasmine.clock().uninstall();
             });
     });
 
