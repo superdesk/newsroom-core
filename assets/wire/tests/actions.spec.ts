@@ -122,6 +122,17 @@ describe('wire actions', () => {
             });
     });
 
+    it('sets an error message when throttled new item fetch gets a 403', () => {
+        spyOn(server, 'get').and.returnValue(Promise.reject({status: 403, statusText: 'Forbidden'} as Response));
+
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
+            .then(() => {
+                expect(store.getState().errorMessage).toBe(
+                    'There is no product associated with your user. Please reach out to your Company Admin'
+                );
+            });
+    });
+
     it('throttles new item update fetches during bursts', () => {
         const searchSpy = spyOn(server, 'get').and.callThrough();
         jasmine.clock().install();

@@ -34,7 +34,7 @@ import {getFoldersUrl} from 'user-profile/actions';
 const NEW_ITEMS_FETCH_THROTTLE_MS = 2000;
 
 const throttledFetchNewItems = throttle(
-    (dispatch: any) => dispatch(fetchNewItems()).catch(errorHandler),
+    (dispatch: any) => dispatch(fetchNewItems()).catch((error: any) => errorHandler(error, dispatch)),
     NEW_ITEMS_FETCH_THROTTLE_MS,
     {leading: true, trailing: true}
 );
