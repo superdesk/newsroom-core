@@ -71,6 +71,7 @@ interface IClientConfig {
 }
 
 interface Window {
+    __newsroomWebSocketManager?: INewsroomWebSocketManager;
     sectionNames: {
         home: string;
         wire: string;
@@ -118,6 +119,21 @@ interface Window {
             extra?: Record<string, unknown>;
         }) => void;
     };
+}
+
+interface IWebSocketListener {
+    store: any;
+    action: any;
+}
+
+interface INewsroomWebSocketManager {
+    firstConnection: boolean;
+    wsConnection: WebSocket | null;
+    connectInterval: ReturnType<typeof setInterval> | null;
+    listeners: IWebSocketListener[];
+    shuttingDown: boolean;
+    unloadHandlerAttached: boolean;
+    unloadHandler: (() => void) | null;
 }
 
 type Dictionary<T> = {[key: string]: T};
