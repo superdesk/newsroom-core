@@ -22,8 +22,9 @@ products_endpoints = EndpointGroup("products_views", __name__)
 
 async def get_settings_data():
     app = get_current_wsgi_app()
+
     return {
-        "products": await ProductsService().get_all_raw_as_list(),
+        "products": sorted(await ProductsService().get_all_raw_as_list(), key=lambda x: x.get("name", "").lower()),
         "navigations": await get_navigations_as_list(),
         "companies": await CompanyService().get_all_raw_as_list(),
         "sections": [s for s in app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
@@ -49,6 +50,7 @@ class ProductsArgs(BaseModel):
 @products_endpoints.endpoint("/products", methods=["GET"], auth=[auth_rules.admin_only])
 async def index():
     products = await ProductsService().get_all_raw_as_list()
+    products.sort(key=lambda x: x.get("name", "").lower())
     return Response(products)
 
 
@@ -63,7 +65,7 @@ async def search(_a: None, params: SearchParams, _r: None):
 
     search_cursor = await ProductsService().search(lookup)
     products = await search_cursor.to_list_raw()
-
+    products.sort(key=lambda x: x.get("name", "").lower())
     return Response(products)
 
 

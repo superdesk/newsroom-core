@@ -24,6 +24,7 @@ navigations_endpoints = EndpointGroup("navigations", __name__)
 
 async def get_settings_data():
     all_navigations = await get_navigations_as_list()
+    all_navigations.sort(key=lambda x: x.get("name", "").lower())
 
     return {
         "products": list(query_resource("products")),
@@ -65,6 +66,7 @@ async def search(_a, params: SearchParams, _q):
         lookup = {"name": regex}
     cursor = await NavigationsService().search(lookup)
     navigations = await cursor.to_list_raw()
+    navigations.sort(key=lambda x: x.get("name", "").lower())
     return Response(navigations)
 
 
