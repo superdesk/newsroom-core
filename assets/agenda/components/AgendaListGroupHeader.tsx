@@ -58,18 +58,25 @@ export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, to
             <span className="badge rounded-pill badge--neutral">{itemIds.length}</span>
             {coverageTypes.length === 0 ? (
                 <div className="list-group-header__title">
-                    {gettext('More hidden')}
+                    {itemsShown
+                        ? gettext('Extra shown')
+                        : gettext('More hidden')
+                    }
                 </div>
             ) : (
                 <React.Fragment>
                     <div className="list-group-header__title">
-                        {gettext('More hidden')}
+                        {itemsShown
+                            ? gettext('Extra shown')
+                            : gettext('More hidden')
+                        }
                     </div>
                     <div className="list-group-header__coverage-group">
                         {coverageTypes.map((coverageType) => (
                             <div key={coverageType} className="list-group-header__coverage-item">
-                                <span className="wire-articles__item__icon" title="Some title">
-                                    <i className={`icon--coverage-${getCoverageIcon(coverageType)}`} />
+                                <span className="wire-articles__item__icon"
+                                    title={gettext('{{ coverageType }} coverage', {coverageType})}>
+                                    <i className={`icon--coverage-${getCoverageIcon(coverageType)}`}/>
                                 </span>
                                 <span className="list-group-header__coverage-number">
                                     {coverageTypeCount[coverageType]}
