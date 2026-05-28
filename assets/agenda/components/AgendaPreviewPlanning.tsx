@@ -104,6 +104,9 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
         const plan = planningItems.find((p) => p.guid === planningId);
         const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
         const relatedPlanningItems = getFilteredItems(item.planning_ids || [], this.props.items);
+        // Ensure the planningItems are not in the relatedPlanningItems
+        const planningItemIds = new Set(planningItems.map((p) => p._id));
+        const cleanedRelatedItems = relatedPlanningItems.filter((p) => !planningItemIds.has(p.guid));
 
         if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
@@ -171,10 +174,10 @@ class AgendaPreviewPlanningComponent extends React.Component<IProps, IState> {
                         </span>
                         {loading ? (
                             <div className="spinner-border text-success" />
-                        ) : relatedPlanningItems.length === 0 ? (
+                        ) : cleanedRelatedItems.length === 0 ? (
                             <div>{gettext('No Related Planning Items')}</div>
                         ) : (
-                            relatedPlanningItems.map((planningItem: any) => {
+                            cleanedRelatedItems.map((planningItem: any) => {
                                 const isExpanded = expandedPlanningItems[planningItem._id] || false;
                                 return (
                                     <div
