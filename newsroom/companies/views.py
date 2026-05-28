@@ -39,9 +39,9 @@ async def get_settings_data():
 
     ui_config_service = UiConfigResourceService()
     return {
-        "companies": await CompanyService().get_all_raw_as_list(),
+        "companies": sorted(await CompanyService().get_all_raw_as_list(), key=lambda x: x.get("name", "").lower()),
         "services": get_app_config("SERVICES"),
-        "products": await ProductsService().get_all_raw_as_list(),
+        "products": sorted(await ProductsService().get_all_raw_as_list(), key=lambda x: x.get("name", "").lower()),
         "sections": get_current_app().as_any().sections,
         "company_types": get_company_types_options(),
         "api_enabled": get_app_config("NEWS_API_ENABLED", False),
@@ -67,6 +67,7 @@ async def search_companies(args: None, params: CompanySearchArgs, request: Reque
         lookup = {"name": regex}
     cursor = await CompanyService().search(lookup)
     companies = await cursor.to_list_raw()
+    companies.sort(key=lambda x: x.get("name", "").lower())
     return Response(companies)
 
 
