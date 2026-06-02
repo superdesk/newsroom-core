@@ -306,11 +306,16 @@ async def get_subscriber_activity_report():
                     doc["item"],
                 ),
                 "published": item_data.versioncreated,
-                "place": "\r\n".join([_p.name or "" for _p in item_data.place or []]),
-                "service": "\r\n".join([_s.name or "" for _s in item_data.service or []]),
-                "subject": "\r\n".join([_s.name or "" for _s in item_data.subject or []]),
+                "place": "\r\n".join(_p.name for _p in (item_data.place or []) if _p.name),
+                "service": "\r\n".join(_s.name for _s in (item_data.service or []) if _s.name),
+                "subject": "\r\n".join(_s.name for _s in (item_data.subject or []) if _s.name),
                 "anpa_take_key": item_data.anpa_take_key,
                 "slugline": item_data.slugline,
+                "source": item_data.source,
+                "urgency": item_data.urgency,
+                "priority": item_data.priority,
+                "keywords": ",".join(item_data.keywords or []),
+                "byline": item_data.byline,
             }
             try:
                 if "download" in doc.get("action", "") and doc.get("extra_data") is not None:
@@ -379,29 +384,38 @@ async def get_subscriber_activity_report():
             "Subject",
             "Reference",
             "Created",
+            "Source",
+            "News Value",
+            "Priority",
+            "Keywords",
+            "Byline",
         ]
+        default_tz = get_app_config("DEFAULT_TIMEZONE")
         rows = []
         rows.append(field_names)
         for doc in docs:
             item_value = doc.get("item")
+            is_dict = isinstance(item_value, dict)
+            published_date = item_value.get("published") if is_dict else None
             row = [
                 doc.get("company", "") or "",
                 doc.get("section", "") or "",
-                item_value.get("item_text", "") if isinstance(item_value, dict) else (item_value or ""),
+                item_value.get("item_text", "") if is_dict else (item_value or ""),
                 doc.get("action", "") or "",
                 doc.get("user", "N/A") or "",
-                utc_to_local(get_app_config("DEFAULT_TIMEZONE"), item_value.get("published")).strftime("%H:%M %d/%m/%y")
-                if isinstance(item_value, dict) and item_value.get("published")
-                else "",
-                item_value.get("place") or "" if isinstance(item_value, dict) else "",
-                item_value.get("slugline") or "" if isinstance(item_value, dict) else "",
-                item_value.get("anpa_take_key") or "" if isinstance(item_value, dict) else "",
-                item_value.get("service") or "" if isinstance(item_value, dict) else "",
-                item_value.get("subject") or "" if isinstance(item_value, dict) else "",
+                utc_to_local(default_tz, published_date).strftime("%H:%M %d/%m/%y") if published_date else "",
+                item_value.get("place") if is_dict else "",
+                item_value.get("slugline") if is_dict else "",
+                item_value.get("anpa_take_key") if is_dict else "",
+                item_value.get("service") if is_dict else "",
+                item_value.get("subject") if is_dict else "",
                 doc.get("association", {}).get("reference", "") or "",
-                utc_to_local(get_app_config("DEFAULT_TIMEZONE"), get_date(doc.get("versioncreated"))).strftime(
-                    "%H:%M %d/%m/%y"
-                ),
+                utc_to_local(default_tz, get_date(doc.get("versioncreated"))).strftime("%H:%M %d/%m/%y"),
+                item_value.get("source", "") if is_dict else "",
+                item_value.get("urgency") if is_dict else "",
+                item_value.get("priority") if is_dict else "",
+                item_value.get("keywords") if is_dict else "",
+                item_value.get("byline") if is_dict else "",
             ]
             rows.append(row)
         return rows
