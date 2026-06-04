@@ -31,7 +31,7 @@ jobs:
             discovery.type: single-node
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
       - name: setup python
         uses: actions/setup-python@v6
@@ -74,7 +74,7 @@ jobs:
             discovery.type: single-node
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
       - name: setup python
         uses: actions/setup-python@v6
@@ -105,7 +105,7 @@ jobs:
         node-version: ['22']
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
       - uses: actions/setup-node@v6
         with:
