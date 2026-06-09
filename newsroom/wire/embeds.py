@@ -23,6 +23,7 @@ __all__ = [
     "remove_all_embeds",
     "remove_internal_renditions",
     "set_association_links",
+    "apply_company_permissions_to_cards",
 ]
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,37 @@ def iterate_embeds(
 
         # if we've found an Embed Start comment, yield it now
         yield comment, f"editor_{m.group(1)}"
+
+
+async def apply_company_permissions_to_cards(card_items: list[dict]):
+    """
+    Applies company permissions to the items displayed on the home page/cards.
+    It will leave the featuremedia association untouched as this may be displayed.
+
+    @param card_items: List of item dictionaries to process
+    """
+    company = get_company_from_request(None)
+    if not len(card_items) or not company or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
+        return
+
+    saved_featuremedia = {}
+    for card_item in card_items:
+        item_id = card_item.get("_id")
+        associations = card_item.get("associations") or {}
+        featuremedia = associations.get("featuremedia")
+
+        if item_id and featuremedia:
+            saved_featuremedia[item_id] = dict(featuremedia)
+
+    await apply_company_permissions_to_embeds(card_items, SectionEnum.WIRE)
+
+    # Restore the featuremedia
+    for card_item in card_items:
+        item_id = card_item.get("_id")
+        if item_id in saved_featuremedia:
+            if not card_item.get("associations"):
+                card_item["associations"] = {}
+            card_item["associations"]["featuremedia"] = saved_featuremedia[item_id]
 
 
 async def apply_company_permissions_to_embeds(

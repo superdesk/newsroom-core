@@ -74,7 +74,7 @@ from newsroom.wire.formatters.utils import add_media
 from .items import get_items_for_dashboard
 from .service import WireSearchServiceAsync
 from .formatters.picture import PictureFormatter
-from .embeds import apply_company_permissions_to_embeds
+from .embeds import apply_company_permissions_to_embeds, apply_company_permissions_to_cards
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -131,9 +131,7 @@ async def set_permissions_on_cards(items_by_card):
                 item_dict["_access"] = True
         return
 
-    card_item_ids = []
-    for _c, card_items in items_by_card.items():
-        card_item_ids.extend([itm.get("_id") for itm in card_items if itm.get("_id")])
+    card_item_ids = [itm.get("_id") for card_items in items_by_card.values() for itm in card_items if itm.get("_id")]
     service = WireSearchServiceAsync()
     try:
         cursor = await service.get_items_by_id(
@@ -145,7 +143,8 @@ async def set_permissions_on_cards(items_by_card):
         # Exception thrown if no wire items are allowed
         allowed_ids_set = set()
 
-    for card, card_items in items_by_card.items():
+    for card_items in items_by_card.values():
+        await apply_company_permissions_to_cards(card_items)
         for i, card_item in enumerate(card_items):
             wire_item = WireItem.from_dict(card_item)
 
