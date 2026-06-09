@@ -116,7 +116,7 @@ def get_company_updates(data, original=None):
                 "video": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
                 "audio": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
                 "embed_code": [EmbedPermissionUserAction.DISPLAY],
-                "picture": [EmbedPermissionUserAction.DISPLAY],
+                "picture": [EmbedPermissionUserAction.DISPLAY, EmbedPermissionUserAction.DOWNLOAD],
                 "sd_product": [],
             }
         ),
