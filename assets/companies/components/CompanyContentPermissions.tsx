@@ -24,7 +24,7 @@ const embedPermissions: Array<IEmbedPermissionOptions> = [
     {
         contentType: 'picture',
         label: gettext('Images'),
-        separateDownloadPermission: false,
+        separateDownloadPermission: true,
     },
     {
         contentType: 'video',
