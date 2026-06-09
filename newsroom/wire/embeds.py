@@ -306,7 +306,7 @@ def _get_associations_to_remove_or_disable(
             continue
 
         # This item has display enabled. Check to see if we need to disable the download from browser action
-        elif content_type in {"audio", "video"} and not company.is_permissioned_for_embed(
+        elif content_type in {"audio", "video", "picture"} and not company.is_permissioned_for_embed(
             embed_type, EmbedPermissionUserAction.DOWNLOAD
         ):
             disable_download.add(key)
