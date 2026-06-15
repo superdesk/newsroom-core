@@ -38,8 +38,7 @@ from .filters import (
     apply_time_limit_filter,
     apply_highlights,
 )
-from .embeds import apply_company_permissions_to_embeds
-
+from .embeds import apply_company_permissions_to_embeds, apply_company_permissions_to_cards
 
 logger = logging.getLogger(__name__)
 
@@ -347,7 +346,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
         )
         items = await cursor.to_list_raw()
         if get_app_config("USE_EMBED_PERMISSIONS_IN_DASHBOARD", True):
-            await apply_company_permissions_to_embeds(items, self.section)
+            await apply_company_permissions_to_cards(items)
         return items
 
     async def get_matching_item_bookmarks(
