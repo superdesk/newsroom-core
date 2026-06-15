@@ -74,7 +74,7 @@ from newsroom.wire.formatters.utils import add_media
 from .items import get_items_for_dashboard
 from .service import WireSearchServiceAsync
 from .formatters.picture import PictureFormatter
-from .embeds import apply_company_permissions_to_embeds, apply_company_permissions_to_cards
+from .embeds import apply_company_permissions_to_embeds
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -144,7 +144,6 @@ async def set_permissions_on_cards(items_by_card):
         allowed_ids_set = set()
 
     for card_items in items_by_card.values():
-        await apply_company_permissions_to_cards(card_items)
         for i, card_item in enumerate(card_items):
             wire_item = WireItem.from_dict(card_item)
 

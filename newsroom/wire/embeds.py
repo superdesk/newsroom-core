@@ -45,9 +45,10 @@ def iterate_embeds(
 async def apply_company_permissions_to_cards(card_items: list[dict]):
     """
     Applies company permissions to the items displayed on the home page/cards.
-    It will leave the featuremedia association untouched as this may be displayed.
+    Leaves the ``featuremedia`` association untouched so it can still be displayed.
 
-    @param card_items: List of item dictionaries to process
+    :param card_items: List of item dictionaries to process.
+    :return
     """
     company = get_company_from_request(None)
     if not len(card_items) or not company or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
