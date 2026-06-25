@@ -505,6 +505,21 @@ describe('utils', () => {
         expect(formatted.includes(' - ')).toBe(false);
     });
 
+    it('formatAgendaDate handles missing end date without using current time', () => {
+        const item = createEvent('event1', {
+            start: '2026-06-19T22:00:00+0000',
+            tz: 'America/Vancouver',
+            all_day: false,
+            no_end_time: true,
+        });
+
+        const formatted = utils.formatAgendaDate(item);
+        const expectedDate = moment(utils.getStartDate(item)).format('DD-MM-YYYY');
+
+        expect(formatted).toContain(expectedDate);
+        expect(formatted.includes(' - ')).toBe(false);
+    });
+
     describe('timezone', () => {
         it('should be CET/CEST', () => {
             const offset = new Date().getTimezoneOffset();

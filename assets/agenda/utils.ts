@@ -1113,7 +1113,8 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
     const isTBCItem = isItemTBC(item);
     const start = parseDate(item.dates.start, item.dates.all_day);
-    const parsedEnd = parseDate(item.dates.end, item.dates.all_day);
+    const endDateString = item.dates.end || item.dates.start;
+    const parsedEnd = parseDate(endDateString, item.dates.all_day);
     const end = item.dates.no_end_time && parsedEnd.isBefore(start) ?
         getEndDate(item) :
         parsedEnd;
