@@ -43,7 +43,9 @@ async def test_update_user_with_deleted_creator_ref_succeeds(client):
         )
     )[0]
 
-    await client.delete(f"/users/{creator_id}")
+    resp = await client.delete(f"/users/{creator_id}")
+    assert resp.status_code == 200
+    assert await find_one_by_id("users", creator_id) is None
 
     original_user = await find_one_by_id("users", user_id)
     assert original_user is not None
@@ -89,7 +91,9 @@ async def test_update_company_with_deleted_creator_ref_succeeds(client):
         )
     )[0]
 
-    await client.delete(f"/users/{creator_id}")
+    resp = await client.delete(f"/users/{creator_id}")
+    assert resp.status_code == 200
+    assert await find_one_by_id("users", creator_id) is None
 
     original_company = await find_one_by_id("companies", company_id)
     assert original_company is not None
