@@ -101,6 +101,12 @@ class DataUpdateCommand:
 
     async def run(self, data_update_id=None, fake=False, dry=False):
         # TODO-ASYNC: revisit when `data_updates` module is migrated to async
+        if data_update_id and data_update_id not in get_data_updates_files(strip_file_extension=True):
+            print(
+                "Error argument --id/-i: invalid choice: '{}'"
+                " (choose from  {})".format(data_update_id, get_data_updates_files(strip_file_extension=True))
+            )
+            return
         self.data_updates_service = superdesk.get_resource_service("data_updates")
         self.data_updates_files = get_data_updates_files(strip_file_extension=True)
 
