@@ -22,7 +22,6 @@ async def data_generate_update(resource):
     "--id",
     "data_update_id",
     required=False,
-    type=click.Choice(get_data_updates_files(strip_file_extension=True)),
     help="Data update id to run last",
 )
 @click.option(
