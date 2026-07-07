@@ -2,6 +2,7 @@ import os
 import re
 import time
 import getpass
+import click
 import superdesk
 
 from string import Template
@@ -102,11 +103,9 @@ class DataUpdateCommand:
     async def run(self, data_update_id=None, fake=False, dry=False):
         # TODO-ASYNC: revisit when `data_updates` module is migrated to async
         if data_update_id and data_update_id not in get_data_updates_files(strip_file_extension=True):
-            print(
-                "Error argument --id/-i: invalid choice: '{}'"
-                " (choose from  {})".format(data_update_id, get_data_updates_files(strip_file_extension=True))
-            )
-            return
+            error_message = f"'{data_update_id}' (choose from  {get_data_updates_files(strip_file_extension=True)})"
+            raise click.BadParameter(error_message, param_hint="--id/-i")
+
         self.data_updates_service = superdesk.get_resource_service("data_updates")
         self.data_updates_files = get_data_updates_files(strip_file_extension=True)
 
