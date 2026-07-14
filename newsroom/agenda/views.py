@@ -1,3 +1,5 @@
+import logging
+import urllib
 from typing import Annotated, Any, cast
 from asyncio import gather
 
@@ -52,6 +54,30 @@ from .agenda_service import AgendaItemService
 from .agenda_search import AgendaSearchServiceAsync
 from .filters import AgendaSearchRequestArgs
 
+logger = logging.getLogger(__name__)
+
+# see https://developers.google.com/maps/documentation/maps-static/start
+ALLOWED_GOOGLE_PARAMS = {
+    "center",
+    "zoom",
+    "size",
+    "scale",
+    "format",
+    "maptype",
+    "language",
+    "region",
+    "map_id",
+    "markers",
+    "path",
+    "visible",
+    "style",
+    "key",
+    "signature",
+}
+
+# See assets/maps/utils.ts for the frontend equivalent
+MAP_URL_PREFIX = "https://maps.googleapis.com/maps/api/staticmap"
+
 
 @agenda_endpoints.endpoint("/agenda", auth=[auth_rules.section_required("agenda")])
 async def index() -> str:
@@ -80,6 +106,43 @@ class AgendaItemParams(BaseModel):
     def parse_print(cls, value: str | bool | None) -> bool | str | None:
         # Support this URL param as a toggle, if `print` is provided in the URL then it is `True`
         return True if value == "" else value
+
+    @field_validator("map", mode="before")
+    def validate_map_url(cls, value: str | None) -> str | None:
+        """
+        Attempt to ensure the map parameter is a legitimate google static map api url
+        If not remove it and log the reason
+        :param value:
+        :return:
+        """
+        if not value or not value.strip():
+            return None
+
+        map_url = value.strip()
+
+        bad_characters = ("<", ">", '"', "'", "`", "javascript:", "data:")
+        if any(signal in map_url.lower() for signal in bad_characters):
+            logger.warning("map_url validation rejected character sequence")
+            return None
+        try:
+            if map_url.startswith(MAP_URL_PREFIX):
+                _, _, map_params = map_url.partition("?")
+            else:
+                logger.warning("unexpected prefix to map url")
+                return None
+            parsed_query = urllib.parse.parse_qsl(map_params, strict_parsing=True)
+            clean_pairs = []
+            for key, val in parsed_query:
+                if key.lower() not in ALLOWED_GOOGLE_PARAMS:
+                    logger.warning(f"Disallowed query parameter in map url: {key}")
+                    return None
+                clean_pairs.append((key, val))
+
+            return f"{MAP_URL_PREFIX}?{urllib.parse.urlencode(clean_pairs)}"
+
+        except Exception as ex:
+            logger.warning(f"Malformed map query format: {str(ex)}")
+            return None
 
 
 @agenda_endpoints.endpoint("/agenda/<_id>")
