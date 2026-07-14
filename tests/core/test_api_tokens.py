@@ -1,8 +1,10 @@
-from quart import json
+from quart import json, url_for
 from bson import ObjectId
 import urllib.parse
 
 from tests.core.utils import create_entries_for
+
+from ..utils import login
 
 
 async def test_api_tokens_create(client):
@@ -13,6 +15,21 @@ async def test_api_tokens_create(client):
     data = json.loads(await response.get_data())
     assert "token" in data
     assert response.status_code == 201
+
+
+async def test_api_tokens_create_public_user_fails(client, app, public_user):
+    await login(client, public_user)
+    response = await client.post(
+        "/news_api_tokens",
+        json={"company": "5b504318975bd5227e5ea0b9"},
+    )
+    assert response.status_code == 403
+
+
+async def test_api_tokens_create_with_no_session(client, app, public_user):
+    await client.get(url_for("auth.logout"), follow_redirects=True)
+    response = await client.post("/news_api_tokens", json={"company": "5b504318975bd5227e5ea0b9"})
+    assert response.status_code == 403
 
 
 async def test_api_tokens_create_expired(client):
