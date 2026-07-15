@@ -715,7 +715,7 @@ async def test_filter_events_only(client):
     assert "coverages" not in data["_items"][0]
 
 
-async def test_item_print(client, caplog):
+async def test_item_print(client):
     MAP_URL_PREFIX = "https://maps.googleapis.com/maps/api/staticmap"
     payload = (
         f"{MAP_URL_PREFIX}%3Fmarkers%3D-35.3066572,149.1235713%26size%3D600x306%26key%3DKEY%26"

@@ -134,14 +134,14 @@ class AgendaItemParams(BaseModel):
             clean_pairs = []
             for key, val in parsed_query:
                 if key.lower() not in ALLOWED_GOOGLE_PARAMS:
-                    logger.warning(f"Disallowed query parameter in map url: {key}")
+                    logger.warning("Disallowed query parameter in map url: %s", key)
                     return None
                 clean_pairs.append((key, val))
 
             return f"{MAP_URL_PREFIX}?{urllib.parse.urlencode(clean_pairs)}"
 
-        except Exception as ex:
-            logger.warning(f"Malformed map query format: {str(ex)}")
+        except ValueError as ex:
+            logger.warning("Malformed map query format: %s", ex)
             return None
 
 
