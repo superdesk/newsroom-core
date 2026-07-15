@@ -79,3 +79,37 @@ async def test_api_tokens_patch(client, app):
     data = json.loads(await response.get_data())
     assert data.get("enabled") is False
     assert response.status_code == 200
+
+
+async def test_api_tokens_delete(client, app):
+    await create_entries_for(
+        "news_api_tokens",
+        [
+            {
+                "company": ObjectId("5b504318975bd5227e5ea0b9"),
+                "enabled": True,
+            }
+        ],
+    )
+
+    response = await client.delete("/news_api_tokens?company={}".format("5b504318975bd5227e5ea0b9"))
+    data = json.loads(await response.get_data())
+    print(data)
+    assert response.status_code == 200
+
+
+async def test_api_tokens_get(client, app):
+    await create_entries_for(
+        "news_api_tokens",
+        [
+            {
+                "company": ObjectId("5b504318975bd5227e5ea0b9"),
+                "enabled": True,
+            }
+        ],
+    )
+
+    response = await client.get("/news_api_tokens?company={}".format("5b504318975bd5227e5ea0b9"))
+    data = json.loads(await response.get_data())
+    print(data)
+    assert response.status_code == 200
