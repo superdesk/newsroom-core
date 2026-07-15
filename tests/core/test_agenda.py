@@ -1,3 +1,4 @@
+import logging
 import pytz
 from quart import json
 from datetime import datetime
@@ -5,6 +6,7 @@ from unittest import mock
 from pytest import fixture
 
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
+from newsroom.agenda.views import AgendaItemParams
 from newsroom.utils import (
     get_location_string,
     get_agenda_dates,
@@ -711,3 +713,47 @@ async def test_filter_events_only(client):
     assert "urn:conference" == data["_items"][0]["_id"]
     assert "planning_items" not in data["_items"][0]
     assert "coverages" not in data["_items"][0]
+
+
+async def test_item_print(client):
+    MAP_URL_PREFIX = "https://maps.googleapis.com/maps/api/staticmap"
+    payload = (
+        f"{MAP_URL_PREFIX}%3Fmarkers%3D-35.3066572,149.1235713%26size%3D600x306%26key%3DKEY%26"
+        f"scale%3D2%26style%3Dfeature%3Apoi.business%7Celement%3Alabels%7Cvisibility%3Aoff%26"
+        f"style%3Dfeature%3Apoi.attraction%7Celement%3Alabels%7Cvisibility%3Aoff%26zoom%3D15"
+    )
+    resp = await client.get(f"/agenda/urn:conference?print&map={payload}")
+    assert resp.status_code == 200
+    data = (await resp.get_data()).decode()
+    assert "https://maps.googleapis.com/maps/api/staticmap?markers=-35.3066572%2C149.1235713" in data
+
+
+def test_map_validator_rejects_bad_prefix(caplog):
+    with caplog.at_level(logging.WARNING):
+        model = AgendaItemParams(map="https://evil-attacker.com/maps")
+
+        assert model.map is None
+        assert any("unexpected prefix to map url" in record.message for record in caplog.records)
+
+
+def test_map_validator_rejects_bad_characters(caplog):
+    MAP_URL_PREFIX = "https://maps.googleapis.com/maps/api/staticmap"
+    payload = f"{MAP_URL_PREFIX}?center=40.7,-74.0&size=600x300&key=123<script>"
+
+    with caplog.at_level(logging.WARNING):
+        model = AgendaItemParams(map=payload)
+        assert model.map is None
+        assert any("map_url validation rejected character sequence" in record.message for record in caplog.records)
+
+
+def test_map_validator_rejects_disallowed_parameters(caplog):
+    MAP_URL_PREFIX = "https://maps.googleapis.com/maps/api/staticmap"
+    payload = f"{MAP_URL_PREFIX}?center=40.7,-74.0&size=600x300&malicious_param=hack"
+
+    with caplog.at_level(logging.WARNING):
+        model = AgendaItemParams(map=payload)
+
+        assert model.map is None
+        assert any(
+            "Disallowed query parameter in map url: malicious_param" in record.message for record in caplog.records
+        )
