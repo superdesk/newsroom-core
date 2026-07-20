@@ -71,10 +71,20 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
         TopicService().find_by_ids_raw(item_ids),
     )
 
+    items = wire_items + agenda_items + topic_items
+    found_ids = {item["_id"] for item in items}
+
+    # skip notifications whose item is gone, there is nothing to render for those
+    notifications = [
+        notification
+        for notification in saved_notifications
+        if notification["item"] in found_ids or (notification.get("data") or {}).get("item")
+    ]
+
     return {
         "user": str(user_id),
-        "items": wire_items + agenda_items + topic_items,
-        "notifications": saved_notifications,
+        "items": items,
+        "notifications": notifications,
     }
 
 

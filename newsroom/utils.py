@@ -1,3 +1,5 @@
+import logging
+
 import pytz
 import regex
 import superdesk
@@ -33,6 +35,8 @@ from newsroom.template_filters import (
     get_client_format,
 )
 
+
+logger = logging.getLogger(__name__)
 
 DAY_IN_MINUTES = 24 * 60 - 1
 MAX_TERMS_SIZE = 1000
@@ -315,11 +319,19 @@ async def get_user_dict_async(use_globals: bool = True) -> dict[ObjectId, UserRe
         users_task = UsersService().search({"is_enabled": True})
         users_cursor, companies = await gather(users_task, get_company_dict_async(use_globals))
 
-        return {
-            user.id: user
-            async for user in users_cursor
-            if _is_user_and_company_enabled(user, companies.get(user.company))
-        }
+        # build users one by one, so an invalid one doesn't fail the whole lookup
+        users: dict[ObjectId, UserResourceModel] = {}
+        for user_dict in await users_cursor.to_list_raw():
+            try:
+                user = UserResourceModel.from_dict(user_dict)
+            except Exception:
+                logger.warning("Skipping invalid user %s", user_dict.get("_id"), exc_info=True)
+                continue
+
+            if _is_user_and_company_enabled(user, companies.get(user.company)):
+                users[user.id] = user
+
+        return users
 
     if not use_globals or not is_from_request():
         return await _get_users()

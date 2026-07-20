@@ -42,17 +42,22 @@ class NotificationManager:
 
         item_type = item.get("type")
         users_with_realtime_subscription: set[ObjectId] = set()
+
+        # broadcast first, so the live Wire/Agenda refresh survives a failure below
+        try:
+            if item_type == "agenda":
+                await push_agenda_item_notification("new_item", item=item)
+            else:
+                push_notification("new_item", _items=[item])
+        except Exception:
+            logger.exception(f"Failed to broadcast new {item_type} item", extra={"_id": item["_id"]})
+
         try:
             users = await get_user_dict_async()
             user_ids = list(users.keys())
 
             companies = await get_company_dict_async()
             company_ids = list(companies.keys())
-
-            if item_type == "agenda":
-                await push_agenda_item_notification("new_item", item=item)
-            else:
-                push_notification("new_item", _items=[item])
 
             if check_topics:
                 if item_type == "text":
