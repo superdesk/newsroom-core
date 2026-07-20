@@ -95,7 +95,6 @@ async def test_delete_notification(client, service):
 
     await login_public(client)
     resp = await client.get(USER_NOTIFICATIONS_URL)
-    print(await resp.get_data(as_text=True))
     data = json.loads(await resp.get_data())
     notify_id = data["notifications"][0]["_id"]
 
@@ -157,3 +156,6 @@ async def test_notifications_without_an_item_are_not_returned(client, service):
 
     assert 1 == len(data["notifications"])
     assert WIRE_ITEM_ID == data["notifications"][0]["item"]
+
+    # the orphan is dropped, so it stops inflating the notification count
+    assert 1 == len(await get_user_notifications(PUBLIC_USER_ID))

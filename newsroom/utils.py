@@ -321,8 +321,9 @@ async def get_user_dict_async(use_globals: bool = True) -> dict[ObjectId, UserRe
 
         # build users one by one, so an invalid one doesn't fail the whole lookup
         users: dict[ObjectId, UserResourceModel] = {}
-        for user_dict in await users_cursor.to_list_raw():
+        while (user_dict := await users_cursor.next_raw()) is not None:
             try:
+                user_dict.pop("_type", None)
                 user = UserResourceModel.from_dict(user_dict)
             except Exception:
                 logger.warning("Skipping invalid user %s", user_dict.get("_id"), exc_info=True)
