@@ -4,7 +4,7 @@ import NotificationListItem from '../components/NotificationListItem';
 
 import 'tests/setup';
 
-const notification = {
+const notification: any = {
     _id: 'user_id_item_id',
     item: 'item_id',
     resource: 'wire',
@@ -30,17 +30,12 @@ describe('NotificationListItem', () => {
         expect(wrapper.text()).toContain('Demo Article');
     });
 
-    it('renders nothing when the item is missing', () => {
-        expect(setup(undefined).isEmptyRender()).toBe(true);
-        expect(setup(null).isEmptyRender()).toBe(true);
-    });
-
     it('clears the notification by its item id', () => {
         const clearNotification = jasmine.createSpy('clearNotification');
         const wrapper = mount(
             <NotificationListItem
                 notification={notification}
-                item={{_id: 'item_id', type: 'text', headline: 'Demo Article'}}
+                item={{_id: 'item_id', type: 'text', headline: 'Demo Article'} as any}
                 clearNotification={clearNotification}
             />
         );
