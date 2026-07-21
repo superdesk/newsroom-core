@@ -19,6 +19,7 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
+from superdesk.errors import SuperdeskApiError
 from superdesk.core.types import Request
 from superdesk.core import json, get_current_app, get_app_config, get_current_async_app
 from superdesk.flask import abort, request, g, url_for, Request as FlaskRequest
@@ -325,7 +326,7 @@ async def get_user_dict_async(use_globals: bool = True) -> dict[ObjectId, UserRe
             try:
                 user_dict.pop("_type", None)
                 user = UserResourceModel.from_dict(user_dict)
-            except Exception:
+            except (ValidationError, SuperdeskApiError):
                 logger.warning("Skipping invalid user %s", user_dict.get("_id"), exc_info=True)
                 continue
 
