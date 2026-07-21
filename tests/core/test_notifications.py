@@ -1,18 +1,20 @@
 import datetime
 
 from quart import json
-from bson import ObjectId
 from pytest import fixture
 
 from superdesk.utc import utcnow
 
 from newsroom.notifications import get_user_notifications, NotificationsService
 from ..fixtures import PUBLIC_USER_ID, TEST_USER_ID
+from tests.core.utils import create_entries_for
 from tests.utils import login_public
 
-TEST_ITEM_ID = ObjectId()
+WIRE_ITEM_ID = "urn:newsml:localhost:wire-item"
+SECOND_WIRE_ITEM_ID = "urn:newsml:localhost:second-wire-item"
+DELETED_ITEM_ID = "urn:newsml:localhost:deleted-item"
 TEST_USER = str(PUBLIC_USER_ID)
-TEST_NOTIFICATION = {"item": TEST_ITEM_ID, "user": TEST_USER, "resource": "test-resource", "action": "test-action"}
+TEST_NOTIFICATION = {"item": WIRE_ITEM_ID, "user": TEST_USER, "resource": "test-resource", "action": "test-action"}
 USER_NOTIFICATIONS_URL = f"users/{TEST_USER}/notifications"
 
 
@@ -21,13 +23,29 @@ def service() -> NotificationsService:
     return NotificationsService()
 
 
+async def create_items_for(*item_ids):
+    """Notifications are only returned when their item can be found."""
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": item_id,
+                "type": "text",
+                "headline": "Test item",
+                "versioncreated": utcnow(),
+            }
+            for item_id in item_ids
+        ],
+    )
+
+
 async def test_notification_has_unique_id(service, app):
     app.config["NOTIFICATIONS_TTL"] = 1
     await service.create_or_update([TEST_NOTIFICATION])
 
     notifications = await get_user_notifications(PUBLIC_USER_ID)
     assert len(notifications) == 1
-    assert notifications[0]["_id"] == f"{TEST_USER}_{TEST_ITEM_ID}"
+    assert notifications[0]["_id"] == f"{TEST_USER}_{WIRE_ITEM_ID}"
 
 
 async def test_notification_updates_with_unique_id(app, service):
@@ -35,13 +53,13 @@ async def test_notification_updates_with_unique_id(app, service):
     await service.create_or_update([TEST_NOTIFICATION])
 
     # update the existing notification with an older created date
-    test_notification_id = f"{TEST_USER}_{TEST_ITEM_ID}"
+    test_notification_id = f"{TEST_USER}_{WIRE_ITEM_ID}"
     updates = dict(_created=utcnow() - datetime.timedelta(hours=1))
     await service.update(test_notification_id, updates)
     user_notifications = await get_user_notifications(PUBLIC_USER_ID)
 
     assert len(user_notifications) == 1
-    assert user_notifications[0]["_id"] == f"{TEST_USER}_{TEST_ITEM_ID}"
+    assert user_notifications[0]["_id"] == f"{TEST_USER}_{WIRE_ITEM_ID}"
 
     app.config["NOTIFICATIONS_TTL"] = 1
     old_created = user_notifications[0]["_created"]
@@ -60,7 +78,7 @@ async def test_delete_notification_fails_for_different_user(client, service):
     async with client.session_transaction() as session:
         session["user"] = TEST_USER
 
-    test_notification_id = f"{TEST_USER}_{TEST_ITEM_ID}"
+    test_notification_id = f"{TEST_USER}_{WIRE_ITEM_ID}"
     await service.create_or_update([TEST_NOTIFICATION])
 
     async with client.session_transaction() as session:
@@ -72,11 +90,11 @@ async def test_delete_notification_fails_for_different_user(client, service):
 
 
 async def test_delete_notification(client, service):
+    await create_items_for(WIRE_ITEM_ID)
     await service.create_or_update([TEST_NOTIFICATION])
 
     await login_public(client)
     resp = await client.get(USER_NOTIFICATIONS_URL)
-    print(await resp.get_data(as_text=True))
     data = json.loads(await resp.get_data())
     notify_id = data["notifications"][0]["_id"]
 
@@ -89,11 +107,12 @@ async def test_delete_notification(client, service):
 
 
 async def test_delete_all_notifications(client, service):
+    await create_items_for(WIRE_ITEM_ID, SECOND_WIRE_ITEM_ID)
     await service.create_or_update(
         [
             TEST_NOTIFICATION,
             {
-                "item": ObjectId(),
+                "item": SECOND_WIRE_ITEM_ID,
                 "user": TEST_USER,
                 "resource": "test-resources",
                 "action": "test-action",
@@ -113,3 +132,30 @@ async def test_delete_all_notifications(client, service):
     resp = await client.get(USER_NOTIFICATIONS_URL)
     data = json.loads(await resp.get_data())
     assert 0 == len(data["notifications"])
+
+
+async def test_notifications_without_an_item_are_not_returned(client, service):
+    await create_items_for(WIRE_ITEM_ID)
+    await service.create_or_update(
+        [
+            TEST_NOTIFICATION,
+            {
+                "item": DELETED_ITEM_ID,
+                "user": TEST_USER,
+                "resource": "wire",
+                "action": "topic_matches",
+            },
+        ]
+    )
+
+    assert 2 == len(await get_user_notifications(PUBLIC_USER_ID))
+
+    await login_public(client)
+    resp = await client.get(USER_NOTIFICATIONS_URL)
+    data = json.loads(await resp.get_data())
+
+    assert 1 == len(data["notifications"])
+    assert WIRE_ITEM_ID == data["notifications"][0]["item"]
+
+    # the orphan is dropped, so it stops inflating the notification count
+    assert 1 == len(await get_user_notifications(PUBLIC_USER_ID))

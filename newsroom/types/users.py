@@ -120,7 +120,7 @@ class UserResourceModel(NewshubResourceModel):
     @field_validator("locale", mode="before")
     @classmethod
     def validate_locale(cls, value: str | None) -> str:
-        if value is not None and value not in get_app_config("LANGUAGES", []):
+        if value and value not in get_app_config("LANGUAGES", []):
             raise SuperdeskApiError.badRequestError("Locale is not in configured list of locales.")
         return value or get_app_config("DEFAULT_LANGUAGE", "en")
 

@@ -1,3 +1,5 @@
+import logging
+
 import pytz
 import regex
 import superdesk
@@ -17,6 +19,7 @@ from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from quart_babel import gettext, format_date as _format_date
 
+from superdesk.errors import SuperdeskApiError
 from superdesk.core.types import Request
 from superdesk.core import json, get_current_app, get_app_config, get_current_async_app
 from superdesk.flask import abort, request, g, url_for, Request as FlaskRequest
@@ -33,6 +36,8 @@ from newsroom.template_filters import (
     get_client_format,
 )
 
+
+logger = logging.getLogger(__name__)
 
 DAY_IN_MINUTES = 24 * 60 - 1
 MAX_TERMS_SIZE = 1000
@@ -315,11 +320,20 @@ async def get_user_dict_async(use_globals: bool = True) -> dict[ObjectId, UserRe
         users_task = UsersService().search({"is_enabled": True})
         users_cursor, companies = await gather(users_task, get_company_dict_async(use_globals))
 
-        return {
-            user.id: user
-            async for user in users_cursor
-            if _is_user_and_company_enabled(user, companies.get(user.company))
-        }
+        # build users one by one, so an invalid one doesn't fail the whole lookup
+        users: dict[ObjectId, UserResourceModel] = {}
+        while (user_dict := await users_cursor.next_raw()) is not None:
+            try:
+                user_dict.pop("_type", None)
+                user = UserResourceModel.from_dict(user_dict)
+            except (ValidationError, SuperdeskApiError):
+                logger.warning("Skipping invalid user %s", user_dict.get("_id"), exc_info=True)
+                continue
+
+            if _is_user_and_company_enabled(user, companies.get(user.company)):
+                users[user.id] = user
+
+        return users
 
     if not use_globals or not is_from_request():
         return await _get_users()

@@ -428,3 +428,63 @@ async def test_pause_notifications(app, mocker, company_products):
         await notify_new_wire_item("item1")
         assert len(outbox) == 0
         push_mock.assert_not_called()
+
+
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_realtime_notifications_with_an_invalid_user(app, mocker, company_products):
+    user = await UsersService().find_by_id(PUBLIC_USER_ID)
+
+    await create_entries_for(
+        "topics",
+        [
+            {
+                "user": user.id,
+                "label": "Cheesy Stuff",
+                "query": "cheese",
+                "topic_type": "wire",
+                "subscribers": [
+                    {
+                        "user_id": user.id,
+                        "notification_type": "real-time",
+                    },
+                ],
+            },
+        ],
+    )
+
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "cheese_item",
+                "type": "text",
+                "slugline": "cheese",
+                "headline": "Demo Article",
+                "body_html": "Story that involves cheese",
+                "versioncreated": utcnow(),
+            },
+        ],
+    )
+
+    # an unrelated user that no longer passes validation, bypassing the service
+    result = await UsersService().mongo_async.update_one(
+        {"_id": ObjectId(ADMIN_USER_ID)}, {"$set": {"locale": "xx_XX"}}
+    )
+    assert result.modified_count == 1
+
+    broadcast_mock = mocker.patch("newsroom.push.notifications.push_notification")
+    count_mock = mocker.patch("newsroom.notifications.utils.push_notification")
+
+    await notify_new_wire_item("cheese_item")
+
+    # the item is still broadcast for the live Wire refresh
+    assert broadcast_mock.call_args_list[0][0][0] == "new_item"
+
+    # and the subscriber is still notified
+    count_mock.assert_called_once()
+    assert count_mock.call_args[0][0] == "new_notifications"
+
+    notification = await NotificationsService().find_one(user=user.id)
+    assert notification is not None
+    assert notification.item == "cheese_item"
+    assert notification.action == "topic_matches"
