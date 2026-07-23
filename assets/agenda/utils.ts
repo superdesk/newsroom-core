@@ -685,9 +685,18 @@ export function getStartDate(item: IAgendaItem): moment.Moment {
 
 // get end date in utc mode if there is no end time info
 export function getEndDate(item: IAgendaItem): moment.Moment {
-    return item.dates.all_day === true ?
-        moment.utc(item.dates.end || item.dates.start) :
-        moment(item.dates.end || item.dates.start);
+    if (item.dates.all_day === true) {
+        return moment.utc(item.dates.end || item.dates.start);
+    }
+
+    if (item.dates.no_end_time === true) {
+        const start = getStartDate(item);
+        const localEndDate = moment(moment.utc(item.dates.end || item.dates.start).format('YYYY-MM-DD')).endOf('day');
+
+        return localEndDate.isBefore(start) ? start.clone() : localEndDate;
+    }
+
+    return moment(item.dates.end || item.dates.start);
 }
 
 // compare days without being affected by timezone
@@ -1150,7 +1159,11 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
     const isTBCItem = isItemTBC(item);
     const start = parseDate(item.dates.start, item.dates.all_day);
-    const end = parseDate(item.dates.end, item.dates.all_day);
+    const endDateString = item.dates.end || item.dates.start;
+    const parsedEnd = parseDate(endDateString, item.dates.all_day);
+    const end = item.dates.no_end_time && parsedEnd.isBefore(start) ?
+        getEndDate(item) :
+        parsedEnd;
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);
