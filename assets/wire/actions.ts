@@ -1,4 +1,5 @@
 import {get, isEmpty} from 'lodash';
+import throttle from 'lodash/throttle';
 
 import {IArticle} from 'interfaces';
 import server from 'server';
@@ -29,6 +30,22 @@ import {
     loadMyTopic,
 } from 'search/actions';
 import {getFoldersUrl} from 'user-profile/actions';
+
+const NEW_ITEMS_FETCH_THROTTLE_MS = 2000;
+
+const throttledFetchNewItems = throttle(
+    (dispatch: any) => dispatch(fetchNewItems()).catch((error: any) => errorHandler(error, dispatch)),
+    NEW_ITEMS_FETCH_THROTTLE_MS,
+    {leading: true, trailing: true}
+);
+
+export function resetFetchNewItemsThrottleForTests() {
+    throttledFetchNewItems.cancel();
+}
+
+export function fetchNewItemsThrottled() {
+    return (dispatch: any) => throttledFetchNewItems(dispatch) || Promise.resolve();
+}
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state: any) {
@@ -488,7 +505,7 @@ export function pushNotification(push: any): any {
             return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
-            return dispatch(setNewItems(push.extra));
+            return dispatch(fetchNewItemsThrottled());
 
         case `topics:${user}`:
             return dispatch(reloadMyTopics());

@@ -197,6 +197,21 @@ describe('utils', () => {
             expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(false);
             expect(groupedItems['17-10-2018']['items']).toEqual(['foo']);
         });
+
+        it('returns no_end_time event when end is before start after timezone conversion', () => {
+            const item = createEvent('foo', {
+                start: '2026-06-19T22:00:00+0000',
+                end: '2026-06-19T00:00:00+0000',
+                tz: 'America/Vancouver',
+                all_day: false,
+                no_end_time: true,
+            });
+
+            const groupedItems = getGroupedItems([item], moment('2026-06-18'));
+            const itemStartGroup = moment(utils.getStartDate(item)).format('DD-MM-YYYY');
+
+            expect(groupedItems[itemStartGroup]?.items).toEqual(['foo']);
+        });
     });
 
     describe('listItems', () => {
@@ -474,6 +489,35 @@ describe('utils', () => {
 
         expect(groupedItems['24-05-2024'].items).toEqual(['event2', 'event3', 'event4']);
         expect(groupedItems['24-05-2024'].hiddenItems).toEqual([]);
+    });
+
+    it('formatAgendaDate avoids reversed range for no_end_time events with end before start', () => {
+        const item = createEvent('event1', {
+            start: '2026-06-19T22:00:00+0000',
+            end: '2026-06-19T00:00:00+0000',
+            tz: 'America/Vancouver',
+            all_day: false,
+            no_end_time: true,
+        });
+
+        const formatted = utils.formatAgendaDate(item);
+
+        expect(formatted.includes(' - ')).toBe(false);
+    });
+
+    it('formatAgendaDate handles missing end date without using current time', () => {
+        const item = createEvent('event1', {
+            start: '2026-06-19T22:00:00+0000',
+            tz: 'America/Vancouver',
+            all_day: false,
+            no_end_time: true,
+        });
+
+        const formatted = utils.formatAgendaDate(item);
+        const expectedDate = moment(utils.getStartDate(item)).format('DD-MM-YYYY');
+
+        expect(formatted).toContain(expectedDate);
+        expect(formatted.includes(' - ')).toBe(false);
     });
 
     describe('timezone', () => {

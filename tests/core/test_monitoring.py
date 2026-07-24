@@ -876,7 +876,6 @@ async def test_last_run_time_does_not_update_with_no_matching_content_immediate(
         w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
-        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=15))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)

@@ -10,7 +10,7 @@ from quart_babel import gettext
 
 from superdesk.core.app import get_current_async_app
 from superdesk.core.resources import ResourceModel
-from superdesk.core.resources.validators import AsyncValidator
+from superdesk.core.resources.validators import AsyncValidator, validate_data_relation_async
 from newsroom.core import get_current_wsgi_app
 
 
@@ -119,6 +119,32 @@ def validate_multi_field_iunique_value_async(
             )
 
     return AsyncValidator(_validate_iunique_value)
+
+
+def validate_data_relation_allow_missing_async(
+    resource_name: str, external_field: str = "_id", convert_to_objectid: bool = False, error_string: str | None = None
+) -> AsyncValidator:
+    """Validate that the ID points to an existing resource, but ignore missing related items.
+
+    This is intended for audit-style references such as creator fields, where we want to keep
+    the lookup for existing refs without blocking updates when the related user has been deleted.
+    """
+
+    strict_validator = validate_data_relation_async(
+        resource_name,
+        external_field=external_field,
+        convert_to_objectid=convert_to_objectid,
+        error_string=error_string,
+    )
+
+    async def _validate_allow_missing(item: ResourceModel, value: Any) -> None:
+        try:
+            await strict_validator.func(item, value)
+        except PydanticCustomError as error:
+            if error.type != "data_relation":
+                raise
+
+    return AsyncValidator(_validate_allow_missing, resource_name)
 
 
 def validate_valid_objectid(field_name: str) -> BeforeValidator:

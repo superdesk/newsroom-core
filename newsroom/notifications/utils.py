@@ -78,14 +78,23 @@ async def get_notifications_with_items() -> dict[str, Any] | None:
         get_notification_items(TopicService(), item_ids),
     )
 
-    all_items = wire_items + agenda_items + topic_items
-    found_item_ids = {str(item["_id"]) for item in all_items}
-    valid_notifications = [n for n in saved_notifications if str(n.get("item")) in found_item_ids]
+    items = wire_items + agenda_items + topic_items
+    found_ids = {item["_id"] for item in items}
+
+    def has_item(notification: dict[str, Any]) -> bool:
+        return notification["item"] in found_ids or bool((notification.get("data") or {}).get("item"))
+
+    # there is nothing to render for these, so drop them instead of leaving them in the count
+    orphaned_ids = [notification["_id"] for notification in saved_notifications if not has_item(notification)]
+    if orphaned_ids:
+        await NotificationsService().delete_many({"_id": {"$in": orphaned_ids}})
+
+    notifications = [notification for notification in saved_notifications if has_item(notification)]
 
     return {
         "user": str(user_id),
-        "items": all_items,
-        "notifications": valid_notifications,
+        "items": items,
+        "notifications": notifications,
     }
 
 

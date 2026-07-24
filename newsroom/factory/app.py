@@ -13,7 +13,6 @@ import importlib
 from flask_mail import Mail
 from elasticapm.contrib.flask import ElasticAPM
 from pydantic import ValidationError
-from eve.io.mongo import ensure_mongo_indexes
 
 from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
@@ -275,9 +274,6 @@ class BaseNewsroomApp(SuperdeskEve):
             self.apm = ElasticAPM(self)
 
     def register_resource(self, resource, settings):
-        """In superdesk we have a workaround for mongo indexes, so now we need a workaround here."""
-        if settings.get("mongo_indexes__init") and not settings.get("mongo_indexes"):
-            settings["mongo_indexes"] = settings["mongo_indexes__init"]
         super().register_resource(resource, settings)
         if settings.get("regex_url"):  # fix hateoas
             self.config["DOMAIN"][resource]["url"] = settings["regex_url"]
@@ -291,8 +287,3 @@ class BaseNewsroomApp(SuperdeskEve):
             if "localhost" in self.config["CLIENT_URL"] or self.debug:
                 return "testing"
         return "production"
-
-    def init_indexes(self):
-        for resource in self.config["DOMAIN"]:
-            ensure_mongo_indexes(self, resource)
-        self.async_app.mongo.create_indexes_for_all_resources()
