@@ -18,6 +18,7 @@ import {
     userTypeReadOnly,
     getLocaleInputOptions,
     getDefaultLocale,
+    getDefaultLocaleCode,
     isUserCompanyAdmin,
     hasSeatsAvailable,
     seatOccupiedByUser,
@@ -297,7 +298,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 <SelectInput
                                     name={'locale'}
                                     label={gettext('Language')}
-                                    value={user.locale}
+                                    value={user.locale || getDefaultLocaleCode()}
                                     onChange={props.onChange_DEPRECATED}
                                     options={localeOptions}
                                     defaultOption={getDefaultLocale()}

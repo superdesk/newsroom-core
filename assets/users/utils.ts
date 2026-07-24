@@ -1,5 +1,5 @@
 import {ICompany, IProduct, IUser} from 'interfaces';
-import {gettext} from '../utils';
+import {gettext, getConfig, getLocale} from '../utils';
 import {get} from 'lodash';
 import {ISeats} from 'interfaces/seat';
 
@@ -44,12 +44,16 @@ export function canUserManageTopics(user: any) {
 
 export function getLocaleInputOptions() {
     return (window.locales || [])
-        .filter((locale: any) => locale.locale !== window.locale) // this will be default value
+        .filter((locale: any) => locale.locale !== getLocale()) // this will be default value
         .map((locale: any) => ({value: locale.locale, text: locale.name}));
 }
 
 export function getDefaultLocale() {
-    return window.locales.find((locale: any) => locale.locale === window.locale).name;
+    return window.locales.find((locale: any) => locale.locale === getLocale())?.name || getDefaultLocaleCode();
+}
+
+export function getDefaultLocaleCode() {
+    return getConfig('default_language', 'en');
 }
 
 export function canUserUpdateTopic(user: any, topic: any) {
