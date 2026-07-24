@@ -23,13 +23,15 @@
 
     <article class="wire-column__preview__content--item-detal-wrap">
         <div class="wire-column__preview__content">
-            {% if get_picture(item) %}
+            {% set picture = get_picture(item) %}
+            {% set picture_src = picture.get('renditions', {}).get('baseImage', {}).get('href') if picture else None %}
+            {% if picture and picture_src %}
             <figure class="wire-column__preview__image">
                 <span class="wire-column__preview__image-icon">
                     <i class="icon--resize icon--white"></i>
                 </span>
-                <img src="{{ get_picture(item).renditions.baseImage.href }}">
-                <figcaption class="wire-column__preview__caption">{{ get_caption(get_picture(item)) }}</figcaption>
+                <img src="{{ picture_src }}">
+                <figcaption class="wire-column__preview__caption">{{ get_caption(picture) }}</figcaption>
             </figure>
             {% endif %}
 

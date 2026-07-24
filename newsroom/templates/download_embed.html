@@ -228,13 +228,13 @@
 <div class="container">
     <div id="print-content">
 
-        {% if item.associations is defined and item.associations.featuremedia is defined %}
+        {% if feature_image_src %}
             <br>
             <img
                 id="feature-image"
                 style="height: auto; width: 100%; max-width: max-content;"
-                src="{{ item.associations.featuremedia.renditions['16-9'].href }}"
-                alt="{{ item.associations.featuremedia.headline }}"
+                src="{{ feature_image_src }}"
+                alt="{{ feature_image_alt or '' }}"
             >
             <br>
         {% endif %}

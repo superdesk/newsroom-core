@@ -303,6 +303,39 @@ async def test_html_media_formatter_download(client, app):
     )
 
 
+async def test_html_media_formatter_download_falls_back_when_16_9_missing(client, app):
+    """Tests HTMLMediaFormatter fallback when 16-9 rendition is missing"""
+
+    await _setup_company_user_products(client, app)
+
+    fallback_associations = deepcopy(associations)
+    fallback_associations["featuremedia"]["renditions"].pop("16-9", None)
+    await test_utils.update_entries_for("items", item["_id"], {"associations": fallback_associations}, item)
+
+    html_file = await _download_file(client, items_ids[0], "html_media")
+    root = lxml_html.fromstring(html_file.decode("utf-8"))
+
+    featuremedia_elements = root.xpath("//img[@id='feature-image']")
+    assert len(featuremedia_elements) == 1
+    assert featuremedia_elements[0].attrib.get("src", "").startswith("data:image/jpeg;base64,")
+
+
+async def test_html_media_formatter_download_without_featuremedia_image(client, app):
+    """Tests HTMLMediaFormatter when featuremedia has no usable image URL"""
+
+    await _setup_company_user_products(client, app)
+
+    no_image_associations = deepcopy(associations)
+    no_image_associations["featuremedia"] = None
+    await test_utils.update_entries_for("items", item["_id"], {"associations": no_image_associations}, item)
+
+    html_file = await _download_file(client, items_ids[0], "html_media")
+    root = lxml_html.fromstring(html_file.decode("utf-8"))
+
+    assert root.find("body//article/h1").text == item["headline"]
+    assert len(root.xpath("//img[@id='feature-image']")) == 0
+
+
 async def test_html_package_formatter_download(client, app):
     """Test HTMLPackageFormatter"""
 

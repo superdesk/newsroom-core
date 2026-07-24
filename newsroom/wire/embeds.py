@@ -20,6 +20,8 @@ __all__ = [
     "apply_company_permissions_to_embeds",
     "update_embeds_in_body",
     "update_embed_urls",
+    "get_featuremedia_rendition",
+    "get_featuremedia_href",
     "remove_all_embeds",
     "remove_internal_renditions",
     "set_association_links",
@@ -110,6 +112,43 @@ def _get_html_from_string(html_string: bytes | str | None) -> HtmlElement:
 
 EmbedUpdateCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], bool]
 EmbedUpdateAsyncCallback: TypeAlias = Callable[[dict, lxml_html.HtmlElement, str], Awaitable[bool]]
+
+
+def get_featuremedia_rendition(
+    featuremedia: dict | None,
+    preferred_renditions: tuple[str, ...] = ("16-9", "baseImage", "viewImage", "original"),
+) -> dict | None:
+    if not isinstance(featuremedia, dict):
+        return None
+
+    renditions = featuremedia.get("renditions")
+    if not isinstance(renditions, dict):
+        return None
+
+    for rendition_key in preferred_renditions:
+        rendition = renditions.get(rendition_key)
+        if isinstance(rendition, dict) and rendition.get("href"):
+            return rendition
+
+    for rendition in renditions.values():
+        if isinstance(rendition, dict) and rendition.get("href"):
+            return rendition
+
+    return None
+
+
+def get_featuremedia_href(
+    featuremedia: dict | None,
+    preferred_renditions: tuple[str, ...] = ("16-9", "baseImage", "viewImage", "original"),
+) -> str | None:
+    rendition = get_featuremedia_rendition(featuremedia, preferred_renditions)
+    if rendition and isinstance(rendition.get("href"), str):
+        return rendition.get("href")
+
+    if isinstance(featuremedia, dict) and isinstance(featuremedia.get("href"), str):
+        return featuremedia.get("href")
+
+    return None
 
 
 async def update_embeds_in_body(
