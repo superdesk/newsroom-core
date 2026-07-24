@@ -6,7 +6,6 @@ from pytest import fixture
 from superdesk.utc import utcnow
 
 from newsroom.notifications import get_user_notifications, NotificationsService
-from newsroom.tests.test_utils import create_entries_for
 from ..fixtures import PUBLIC_USER_ID, TEST_USER_ID
 from tests.core.utils import create_entries_for
 from tests.utils import login_public
