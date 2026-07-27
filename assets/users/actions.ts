@@ -1,4 +1,4 @@
-import {gettext, notify, errorHandler, updateRouteParams} from 'utils';
+import {gettext, notify, errorHandler, updateRouteParams, getConfig} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
@@ -166,6 +166,19 @@ export function postUser() {
             user.products = user.products
                 .map((product: any) => product._id)
                 .join(',');
+        }
+
+        const availableLocales = (window.locales || []).map((locale: any) => locale.locale);
+        const configuredDefaultLocale = getConfig('default_language', 'en');
+        const hasAvailableLocales = availableLocales.length > 0;
+        const defaultLocale = hasAvailableLocales && availableLocales.includes(configuredDefaultLocale)
+            ? configuredDefaultLocale
+            : (hasAvailableLocales ? availableLocales[0] : configuredDefaultLocale);
+
+        user.locale = user.locale || defaultLocale;
+
+        if (hasAvailableLocales && !availableLocales.includes(user.locale)) {
+            user.locale = defaultLocale;
         }
 
         return server.post(url, user, user._etag)
