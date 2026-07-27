@@ -1,5 +1,6 @@
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
+from newsroom.monitoring.email_delivery_monitor import EmailDeliveryMonitor
 from .cli import newsroom_cli
 
 
@@ -43,3 +44,17 @@ async def send_monitoring_immediate_alerts():
 
     """
     await MonitoringEmailAlerts().run(True)
+
+
+@newsroom_cli.command("send_email_delivery_monitor")
+async def send_email_delivery_monitor():
+    """
+    Send the email delivery monitor message.
+
+    Example:
+    ::
+
+        $ python manage.py send_email_delivery_monitor
+
+    """
+    await EmailDeliveryMonitor().run()
