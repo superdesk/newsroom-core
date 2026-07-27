@@ -169,11 +169,15 @@ export function postUser() {
         }
 
         const availableLocales = (window.locales || []).map((locale: any) => locale.locale);
-        const defaultLocale = getConfig('default_language', 'en');
+        const configuredDefaultLocale = getConfig('default_language', 'en');
+        const hasAvailableLocales = availableLocales.length > 0;
+        const defaultLocale = hasAvailableLocales && availableLocales.includes(configuredDefaultLocale)
+            ? configuredDefaultLocale
+            : (hasAvailableLocales ? availableLocales[0] : configuredDefaultLocale);
 
         user.locale = user.locale || defaultLocale;
 
-        if (!availableLocales.includes(user.locale)) {
+        if (hasAvailableLocales && !availableLocales.includes(user.locale)) {
             user.locale = defaultLocale;
         }
 

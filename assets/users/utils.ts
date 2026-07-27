@@ -43,8 +43,10 @@ export function canUserManageTopics(user: any) {
 }
 
 export function getLocaleInputOptions() {
+    const defaultLocaleCode = getDefaultLocaleCode();
+
     return (window.locales || [])
-        .filter((locale: any) => locale.locale !== getLocale()) // this will be default value
+        .filter((locale: any) => locale.locale === defaultLocaleCode || locale.locale !== getLocale())
         .map((locale: any) => ({value: locale.locale, text: locale.name}));
 }
 
