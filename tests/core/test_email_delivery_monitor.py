@@ -11,7 +11,7 @@ async def test_email_delivery_monitor_sends_mail(app, caplog):
 
     fixed_now = datetime.datetime(2026, 7, 27, 10, 15, 0)
 
-    with mock.patch("newsroom.monitoring.email_delivery_monitor.utcnow", return_value=fixed_now):
+    with mock.patch("newsroom.email_delivery_monitor.utcnow", return_value=fixed_now):
         with mock.patch.object(app.redis, "hset") as hset_mock, mock.patch.object(app.redis, "expire") as expire_mock:
             with app.mail.record_messages() as outbox:
                 async with app.app_context():
