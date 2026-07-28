@@ -16,7 +16,6 @@ REDIS_KEY = "newsroom:email_delivery_monitor"
 
 class EmailDeliveryMonitor:
     def __init__(self):
-        self.started_at = utcnow()
         self.log_msg = "Email delivery monitor"
 
     def get_recipients(self) -> list[str]:

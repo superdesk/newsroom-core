@@ -28,7 +28,6 @@ def init_module(app: SuperdeskAsyncApp) -> None:
 
 
 from . import email_alerts  # noqa
-from . import email_delivery_monitor  # noqa
 
 
 module = Module(

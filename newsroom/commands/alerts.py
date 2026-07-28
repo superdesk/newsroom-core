@@ -1,6 +1,6 @@
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
-from newsroom.monitoring.email_delivery_monitor import EmailDeliveryMonitor
+from newsroom.email_delivery_monitor import EmailDeliveryMonitor
 from .cli import newsroom_cli
 
 

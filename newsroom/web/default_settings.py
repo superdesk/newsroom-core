@@ -219,7 +219,7 @@ MAIL_DEFAULT_SENDER = _MAIL_FROM or "newsroom@localhost"
 # Recipients for the sign up form filled by new users (single or comma separated)
 SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 # Recipients for the periodic email delivery monitor (single or comma separated)
-EMAIL_DELIVERY_MONITOR_RECIPIENTS = os.environ.get("EMAIL_DELIVERY_MONITOR_RECIPIENTS")
+EMAIL_DELIVERY_MONITOR_RECIPIENTS = os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
@@ -468,7 +468,7 @@ CELERY_BEAT_SCHEDULE = {
         "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:email_delivery_monitor": {
-        "task": "newsroom.monitoring.email_delivery_monitor.email_delivery_monitor",
+        "task": "newsroom.email_delivery_monitor.email_delivery_monitor",
         "schedule": crontab(minute="*/5"),
         "options": {"expires": 5 * 60 - 1},
     },
