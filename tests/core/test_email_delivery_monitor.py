@@ -2,7 +2,7 @@ import datetime
 from unittest import mock
 
 
-from newsroom.monitoring.email_delivery_monitor import EmailDeliveryMonitor
+from newsroom.email_delivery_monitor import EmailDeliveryMonitor
 
 
 async def test_email_delivery_monitor_sends_mail(app, caplog):
