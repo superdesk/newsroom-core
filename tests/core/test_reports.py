@@ -3,7 +3,8 @@ from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
 from newsroom.tests.fixtures import COMPANY_1_ID
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, update_entries_for
+from ..fixtures import items
 
 
 @fixture(autouse=True)
@@ -210,6 +211,23 @@ async def test_companies(client):
 
 async def test_content_activity_csv(client):
     today = datetime.now().date()
+
+    for item in items:
+        if item.get("_id") == "tag:weather":
+            await update_entries_for(
+                "items",
+                item["_id"],
+                {"versioncreated": datetime.now() + timedelta(minutes=1), "headline": "New weather"},
+                item,
+            )
+        if item.get("_id") == "tag:weather:old":
+            await update_entries_for(
+                "items",
+                item["_id"],
+                {"versioncreated": datetime.now() + timedelta(minutes=2), "headline": "Old weather"},
+                item,
+            )
+
     resp = await client.get(
         "reports/export/content-activity?export=true&date_from={}&date_to={}".format(
             today.isoformat(), today.isoformat()
@@ -227,3 +245,5 @@ async def test_content_activity_csv(client):
     values = lines[1].split(",")
     assert "Amazon Is Opening More Bookstores" == values[1]
     assert "0" == values[-1]
+    assert "New weather" == lines[2].split(",")[1]
+    assert "Old weather" == lines[3].split(",")[1]

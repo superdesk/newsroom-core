@@ -336,10 +336,13 @@ label:not(.label--no-spacing) {
 .report-thead {
     position: sticky;
     inset-block-start: 0;
+    z-index: 10;
     th {
         position: sticky;
         inset-block-start: 0;
         border: none;
+        background-color: hsl(0, 0%, 96%);
+        z-index: 10;
     }
 }
 
