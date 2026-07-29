@@ -220,6 +220,12 @@ MAIL_DEFAULT_SENDER = _MAIL_FROM or "newsroom@localhost"
 SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 # Recipients for the periodic email delivery monitor (single or comma separated)
 EMAIL_DELIVERY_MONITOR_RECIPIENTS = os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_RECIPIENTS")
+# Runs email delivery monitor every N minutes
+EMAIL_DELIVERY_MONITOR_CRON_MINUTES = max(1, int(os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_CRON_MINUTES", "15")))
+# If the task runs later than this window (seconds), drop it
+EMAIL_DELIVERY_MONITOR_EXPIRES = int(
+    os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_EXPIRES") or (EMAIL_DELIVERY_MONITOR_CRON_MINUTES * 60 - 1)
+)
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
@@ -467,11 +473,17 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(seconds=60),
         "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
-    "newsroom:email_delivery_monitor": {
-        "task": "newsroom.email_delivery_monitor.email_delivery_monitor",
-        "schedule": crontab(minute="*/5"),
-        "options": {"expires": 5 * 60 - 1},
-    },
+    **(
+        {
+            "newsroom:email_delivery_monitor": {
+                "task": "newsroom.email_delivery_monitor.email_delivery_monitor",
+                "schedule": crontab(minute=f"*/{EMAIL_DELIVERY_MONITOR_CRON_MINUTES}"),
+                "options": {"expires": EMAIL_DELIVERY_MONITOR_EXPIRES},
+            }
+        }
+        if EMAIL_DELIVERY_MONITOR_RECIPIENTS
+        else {}
+    ),
     "newsroom:remove_expired_content_api": {
         "task": "content_api.commands.item_expiry",
         "schedule": crontab(hour=local_to_utc_hour(2), minute=0),  # Runs every day at 2am

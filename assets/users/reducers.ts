@@ -17,6 +17,7 @@ import {
     TOGGLE_SORT_DIRECTION,
     EDIT_USER,
 } from './actions';
+import {getDefaultLocaleCode} from './utils';
 
 import {ADD_EDIT_USERS} from 'actions';
 
@@ -81,6 +82,7 @@ export default function userReducer(state: IUserSettingsState = initialState, ac
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
+            locale: getDefaultLocaleCode(),
             first_name: '',
             last_name: '',
             email: '',
@@ -161,6 +163,7 @@ export default function userReducer(state: IUserSettingsState = initialState, ac
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
+            locale: getDefaultLocaleCode(),
             email: '',
             phone: '',
         };
