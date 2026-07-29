@@ -9,6 +9,7 @@ from .alerts import (
     send_company_expiry_alerts,
     send_monitoring_schedule_alerts,
     send_monitoring_immediate_alerts,
+    send_email_delivery_monitor,
 )
 
 from .data_updates import data_generate_update, data_upgrade, data_downgrade

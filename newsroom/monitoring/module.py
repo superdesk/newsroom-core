@@ -27,6 +27,9 @@ def init_module(app: SuperdeskAsyncApp) -> None:
     register_formatter(MonitoringRTFFormatter)
 
 
+from . import email_alerts  # noqa
+
+
 module = Module(
     "newsroom.monitoring",
     endpoints=[monitoring_endpoints],
