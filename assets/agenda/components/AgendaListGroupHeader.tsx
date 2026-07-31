@@ -18,36 +18,32 @@ interface IProps {
 
 export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, toggleHideItems}: IProps) {
     const coverageTypeCount: {[coverageType: string]: number} = {};
-    let itemCount = 0;
 
-    // Filter out Events/Planning that meet the following criteria
-    // * Events with no planning items
-    // * Events or Planning, no coverages at all
-    // * Events or Planning, coverages fall on `group` date
-    for (let itemIndex = 0; itemIndex < itemIds.length; ++itemIndex) {
-        const item = itemsById[itemIds[itemIndex]];
+    // The coverage summary is only rendered while the group is collapsed, so
+    // skip the scan entirely once the items are shown.
+    if (!itemsShown) {
+        // Filter out Events/Planning that meet the following criteria
+        // * Events with no planning items
+        // * Events or Planning, no coverages at all
+        // * Events or Planning, coverages fall on `group` date
+        for (let itemIndex = 0; itemIndex < itemIds.length; ++itemIndex) {
+            const item = itemsById[itemIds[itemIndex]];
 
-        if (item.coverages == null || item.coverages.length === 0) {
-            itemCount += 1;
-            continue;
-        }
-
-        let coverageAdded = false;
-        for (let coverageIndex = 0; coverageIndex < item.coverages.length; ++coverageIndex) {
-            const coverage = item.coverages[coverageIndex];
-
-            if (formatDate(moment(coverage.scheduled)) !== group) {
+            if (item.coverages == null || item.coverages.length === 0) {
                 continue;
-            } else if (coverageTypeCount[coverage.coverage_type] == null) {
-                coverageTypeCount[coverage.coverage_type] = 0;
-                coverageAdded = true;
             }
 
-            coverageTypeCount[coverage.coverage_type] += 1;
-        }
+            for (let coverageIndex = 0; coverageIndex < item.coverages.length; ++coverageIndex) {
+                const coverage = item.coverages[coverageIndex];
 
-        if (coverageAdded) {
-            itemCount += 1;
+                if (formatDate(moment(coverage.scheduled)) !== group) {
+                    continue;
+                } else if (coverageTypeCount[coverage.coverage_type] == null) {
+                    coverageTypeCount[coverage.coverage_type] = 0;
+                }
+
+                coverageTypeCount[coverage.coverage_type] += 1;
+            }
         }
     }
 
