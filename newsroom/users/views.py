@@ -1,5 +1,6 @@
 import re
 import json
+import logging
 
 from copy import deepcopy
 from typing import Any, Dict, Optional, Annotated
@@ -22,7 +23,7 @@ from newsroom.auth.utils import (
     get_company_auth_provider,
     get_user_from_request,
     get_company_from_request,
-    add_token_data,
+    mask_email_for_logs,
 )
 from newsroom.auth import auth_rules
 from newsroom.settings import get_setting
@@ -47,6 +48,9 @@ from newsroom.ui_config_async import UiConfigResourceService
 
 from .service import UsersService, UsersAuthService
 from .module import users_endpoints
+
+
+logger = logging.getLogger(__name__)
 
 
 class RouteArguments(BaseModel):
@@ -189,13 +193,10 @@ async def create(request: Request) -> Response:
 
         company = await new_user.get_company()
         auth_provider = get_company_auth_provider(company)
-        if auth_provider.features["verify_email"]:
-            add_token_data(new_user)
-
         new_users = await UsersAuthService().create([new_user])
 
         if auth_provider.features["verify_email"]:
-            await send_token(new_user, token_type="new_account", update_token=False)
+            await send_token(new_users[0], token_type="new_account")
 
         return Response({"success": True, "_id": new_users[0].id}, 201)
 
@@ -371,13 +372,23 @@ async def validate(args: RouteArguments, params: None, request: None) -> Respons
 
 
 @users_endpoints.endpoint(
-    "/users/<string:user_id>/reset_password", methods=["POST"], auth=[auth_rules.account_manager_or_company_admin_only]
+    "/users/<string:user_id>/reset_password",
+    methods=["POST"],
+    auth=[
+        auth_rules.user_role_required(
+            [
+                UserRole.ADMINISTRATOR,
+                UserRole.ACCOUNT_MANAGEMENT,
+                UserRole.COMPANY_ADMIN,
+            ]
+        )
+    ],
 )
-async def resend_token(args: RouteArguments, params: None, request: None) -> Response:
-    return await _resend_token(args.user_id, token_type="reset_password")
+async def resend_token(args: RouteArguments, params: None, request: Request) -> Response:
+    return await _resend_token(args.user_id, token_type="reset_password", request=request)
 
 
-async def _resend_token(user_id: str | None, token_type: str) -> Response:
+async def _resend_token(user_id: str | None, token_type: str, request: Request | None = None) -> Response:
     """
     Sends a new token for a given user_id
     :param user_id: Id of the user to send the token
@@ -393,8 +404,53 @@ async def _resend_token(user_id: str | None, token_type: str) -> Response:
 
     assert user
 
+    if token_type == "reset_password":
+        requester = get_user_from_request(request) if request is not None else None
+        requester_user_id = str(getattr(requester, "id", "") or "unknown")
+        requester_email = mask_email_for_logs(getattr(requester, "email", None))
+        requester_role = str(getattr(requester, "user_type", "") or "unknown")
+        target_user_id = str(user.id)
+        target_user_email = mask_email_for_logs(user.email)
+
+        logger.info(
+            "User reset password requested from settings by user_id=%s role=%s email=%s for target_user_id=%s target_email=%s",
+            requester_user_id,
+            requester_role,
+            requester_email,
+            target_user_id,
+            target_user_email,
+            extra={
+                "requester_user_id": requester_user_id,
+                "requester_email": requester_email,
+                "requester_role": requester_role,
+                "target_user_id": target_user_id,
+                "target_user_email": target_user_email,
+            },
+        )
+
     if await send_token(user, token_type):
+        if token_type == "reset_password":
+            logger.info(
+                "User reset password request completed for target_user_id=%s target_email=%s",
+                str(user.id),
+                mask_email_for_logs(user.email),
+                extra={
+                    "target_user_id": str(user.id),
+                    "target_user_email": mask_email_for_logs(user.email),
+                },
+            )
         return Response({"success": True})
+
+    if token_type == "reset_password":
+        logger.info(
+            "User reset password request not completed for target_user_id=%s target_email=%s",
+            str(user.id),
+            mask_email_for_logs(user.email),
+            extra={
+                "target_user_id": str(user.id),
+                "target_user_email": mask_email_for_logs(user.email),
+            },
+        )
 
     return Response({"message": "Token could not be sent"}, 400)
 

@@ -342,7 +342,7 @@ async def send_validate_account_email(user: User, token: str) -> None:
     """
     app_name = get_app_config("SITE_NAME")
     url = url_for("auth.validate_account", token=token, _external=True)
-    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE") * 24
+    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user,
@@ -367,7 +367,7 @@ async def send_new_account_email(user: User, token: str) -> None:
     """
     app_name = get_app_config("SITE_NAME")
     url = url_for("auth.reset_password", token=token, _external=True)
-    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE") * 24
+    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user,
@@ -392,7 +392,7 @@ async def send_reset_password_email(user: User, token: str) -> None:
     """
     app_name = get_app_config("SITE_NAME")
     url = url_for("auth.reset_password", token=token, _external=True)
-    hours = get_app_config("RESET_PASSWORD_TOKEN_TIME_TO_LIVE") * 24
+    hours = get_app_config("RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user=user,

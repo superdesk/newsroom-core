@@ -28,11 +28,4 @@
 {% endblock %}
 
 {% block script %}
-    {% if firebase %}
-        {% include "firebase_config.html" %}
-        <script>
-            window.nextUrl = "{{ url_for("auth.login", _external=True) | tojson }}";
-        </script>
-        {{ javascript_tag('firebase_reset_password_js') | safe }}
-    {% endif %}
 {% endblock %}

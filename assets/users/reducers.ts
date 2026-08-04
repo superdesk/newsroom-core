@@ -48,6 +48,7 @@ export interface IUserSettingsState {
         [provider: string]: {
             verify_email: boolean;
             change_password: boolean;
+            reset_password: boolean;
         };
     };
 }

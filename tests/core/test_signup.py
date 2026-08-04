@@ -1,13 +1,21 @@
 from unittest import mock
+import re
 
 from quart import url_for
 
+from newsroom.auth.utils import hash_login_token
 from newsroom.types import CompanyType, Country, SectionEnum, CompanyProduct
 from newsroom.users import UsersAuthService
 from newsroom.companies.companies_async import CompanyService
 
 from tests.utils import get_user_by_email, mock_send_email
 from tests.core.utils import create_entries_for, find_one_for
+
+
+def _extract_reset_token(body: str) -> str:
+    match = re.search(r"/reset_password/([^\s\"]+)", body)
+    assert match is not None
+    return match.group(1)
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -168,7 +176,9 @@ async def test_approve_company_and_users(app, client):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["john@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user.token in outbox[0].body
+        assert auth_user is not None
+        emailed_token = _extract_reset_token(outbox[0].body)
+        assert hash_login_token(emailed_token) == auth_user.token
 
     # Sign up another user for the same company
     response = await client.post(
@@ -212,7 +222,9 @@ async def test_approve_company_and_users(app, client):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["jane@doe.org"]
         assert outbox[0].subject == "Newshub account created"
-        assert auth_user.token in outbox[0].body
+        assert auth_user is not None
+        emailed_token = _extract_reset_token(outbox[0].body)
+        assert hash_login_token(emailed_token) == auth_user.token
 
 
 async def test_signup_not_enabled_without_config(client, app):

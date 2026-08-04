@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+import re
 import pytest
 import pytz
 from bson import ObjectId
@@ -11,15 +14,21 @@ from superdesk.utc import utcnow
 
 from newsroom.types import User, UserResourceModel, CompanyResource, UserRole
 from newsroom.users import UsersService, UsersAuthService
-from newsroom.auth.utils import is_valid_user
+from newsroom.auth.utils import get_token_data, is_valid_user
 from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.core.utils import create_entries_for, find_one_by_id
+from tests.core.utils import create_entries_for
 from tests.utils import get_user_by_email, mock_send_email, login, login_public, logout
+
+
+def _extract_reset_token(body: str) -> str:
+    match = re.search(r"/reset_password/([^\s\"]+)", body)
+    assert match is not None
+    return match.group(1)
 
 
 @pytest.fixture
@@ -182,14 +191,14 @@ async def test_create_new_user_succeeds(app, client):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["New.User@abc.org"]
         assert "account created" in outbox[0].subject
+        reset_token = _extract_reset_token(outbox[0].body)
 
     # get reset password token
-    user = await UsersAuthService().get_by_email("new.user@abc.org")
-    await client.get(url_for("auth.reset_password", token=user.token))
+    await client.get(url_for("auth.reset_password", token=reset_token))
 
     # change the password
     response = await client.post(
-        url_for("auth.reset_password", token=user.token),
+        url_for("auth.reset_password", token=reset_token),
         form={
             "new_password": "abc123def",
             "new_password2": "abc123def",
@@ -526,8 +535,11 @@ async def test_signals(client, app):
     assert user["email"] == updated_user.email
     updated_listener.reset_mock()
 
-    token = (await find_one_by_id("auth_user", user_id))["token"]
-    resp = await client.get(f"/validate/{token}")
+    plain_validate_token = str(uuid4())
+    await UsersAuthService().update(user_id, updates=get_token_data("validate", token=plain_validate_token))
+    updated_listener.reset_mock()
+
+    resp = await client.get(f"/validate/{plain_validate_token}")
     assert 302 == resp.status_code, await resp.get_data(as_text=True)
     updated_listener.assert_called_once()
     updated_listener.reset_mock()

@@ -1,6 +1,9 @@
 -r requirements.txt
 -r mypy-requirements.txt
 
+google-auth>=2.6,<2.50
+firebase-admin>=6.5,<7
+
 flake8==7.3.0
 black~=23.12
 pytest==9.0.3
