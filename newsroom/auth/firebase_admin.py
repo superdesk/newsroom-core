@@ -37,7 +37,7 @@ def _build_credential(credentials_module: Any, config: Any):
         try:
             return credentials_module.Certificate(json.loads(config_value))
         except json.JSONDecodeError as exc:
-            raise FirebaseAdminConfigError("FIREBASE_ADMIN_CONFIG is not valid JSON") from exc
+            raise FirebaseAdminConfigError("FIREBASE_CONFIG is not valid JSON") from exc
 
     return credentials_module.Certificate(config_value)
 
@@ -49,7 +49,7 @@ def _get_firebase_auth_client():
     except ImportError as exc:
         raise FirebaseAdminConfigError("firebase-admin package is not installed") from exc
 
-    config = get_app_config("FIREBASE_ADMIN_CONFIG")
+    config = get_app_config("FIREBASE_CONFIG")
     app_name = "newsroom"
 
     try:

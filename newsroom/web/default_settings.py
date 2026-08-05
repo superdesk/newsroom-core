@@ -731,7 +731,7 @@ FIREBASE_CLIENT_CONFIG = {
 }
 
 # Single admin config value: inline JSON (starts with "{") or a path to a service-account JSON file.
-FIREBASE_ADMIN_CONFIG = env("FIREBASE_ADMIN_CONFIG")
+FIREBASE_CONFIG = env("FIREBASE_CONFIG")
 
 FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])
 
