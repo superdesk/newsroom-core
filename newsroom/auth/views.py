@@ -1,3 +1,4 @@
+import asyncio
 import re
 import bcrypt
 import logging
@@ -396,9 +397,9 @@ async def reset_password(args: LoginTokenRouteArgs, params: None, req: Request) 
 
             if auth_provider.type == AuthProviderType.FIREBASE:
                 try:
-                    update_firebase_password(user.email, form.new_password.data)
+                    await asyncio.to_thread(update_firebase_password, user.email, form.new_password.data)
                 except FirebasePasswordResetError:
-                    logger.exception("Failed to reset Firebase password for %s", user.email)
+                    logger.exception("Failed to reset Firebase password for %s", mask_email_for_logs(user.email))
                     await flash(gettext("Could not change your password. Please contact us for assistance."), "warning")
                     return await render_template("reset_password.html", form=form, token=args.token)
             else:

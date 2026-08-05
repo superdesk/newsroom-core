@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from superdesk.core import get_app_config
+from newsroom.auth.utils import mask_email_for_logs
 
 
 logger = logging.getLogger(__name__)
@@ -70,18 +71,19 @@ def _get_firebase_auth_client():
 
 def update_firebase_password(email: str, password: str) -> str:
     auth, app = _get_firebase_auth_client()
+    masked_email = mask_email_for_logs(email)
 
     try:
         user = auth.get_user_by_email(email, app=app)
     except auth.UserNotFoundError as exc:
-        raise FirebaseUserNotFoundError(f"No Firebase user found for {email}") from exc
+        raise FirebaseUserNotFoundError(f"No Firebase user found for {masked_email}") from exc
     except Exception as exc:
-        raise FirebasePasswordResetError(f"Could not load Firebase user for {email}") from exc
+        raise FirebasePasswordResetError(f"Could not load Firebase user for {masked_email}") from exc
 
     try:
         auth.update_user(user.uid, password=password, app=app)
     except Exception as exc:
-        raise FirebasePasswordResetError(f"Could not update Firebase password for {email}") from exc
+        raise FirebasePasswordResetError(f"Could not update Firebase password for {masked_email}") from exc
 
-    logger.info("Updated Firebase password for %s", email)
+    logger.info("Updated Firebase password for %s", masked_email)
     return user.uid
