@@ -13,6 +13,7 @@ with open(requirements_txt_path, "r") as r:
         line.rsplit("\n", 1)[0] for line in r.readlines() if line.rsplit("\n", 1)[0] and not line.startswith("#")
     ]
 
+
 setup(
     name="Newsroom-Core",
     version="3.1.0-dev",
@@ -24,6 +25,12 @@ setup(
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requirements,
+    extras_require={
+        "firebase": [
+            "google-auth>=2.6,<2.50",
+            "firebase-admin>=6.5,<7",
+        ],
+    },
     scripts=[],
     python_requires=">=3.10",
     classifiers=[

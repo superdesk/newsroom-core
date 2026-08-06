@@ -208,10 +208,10 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 # Enable CSRF protection for forms
 WTF_CSRF_ENABLED = True
 
-#: The number of days a token is valid
-RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 7
-#: The number of days a validation token is valid
-VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 7
+#: The number of hours a reset password token is valid
+RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS = int(env("RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS", 24))
+#: The number of hours a validation token is valid
+VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS = int(env("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS", 168))
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
@@ -729,6 +729,9 @@ FIREBASE_CLIENT_CONFIG = {
     "projectId": env("FIREBASE_PROJECT_ID"),
     "messagingSenderId": env("FIREBASE_SENDER_ID"),
 }
+
+# Single admin config value: inline JSON (starts with "{") or a path to a service-account JSON file.
+FIREBASE_CONFIG = env("FIREBASE_CONFIG")
 
 FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])
 

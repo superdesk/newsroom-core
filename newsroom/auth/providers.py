@@ -8,6 +8,7 @@ from newsroom.types import AuthProviderConfig, AuthProviderType
 class AuthProviderFeatures(TypedDict):
     verify_email: bool
     change_password: bool
+    reset_password: bool
 
 
 class AuthProvider(abc.ABC):
@@ -33,19 +34,19 @@ class AuthProvider(abc.ABC):
 
 class PasswordAuthProvider(AuthProvider):
     type = AuthProviderType.PASSWORD
-    features = AuthProviderFeatures(verify_email=True, change_password=True)
+    features = AuthProviderFeatures(verify_email=True, change_password=True, reset_password=True)
 
 
 class GoogleOauthAuthProvider(AuthProvider):
     type = AuthProviderType.GOOGLE_OAUTH
-    features = AuthProviderFeatures(verify_email=False, change_password=False)
+    features = AuthProviderFeatures(verify_email=False, change_password=False, reset_password=False)
 
 
 class SAMLAuthProvider(AuthProvider):
     type = AuthProviderType.SAML
-    features = AuthProviderFeatures(verify_email=False, change_password=False)
+    features = AuthProviderFeatures(verify_email=False, change_password=False, reset_password=False)
 
 
 class FirebaseAuthProvider(AuthProvider):
     type = AuthProviderType.FIREBASE
-    features = AuthProviderFeatures(verify_email=False, change_password=True)
+    features = AuthProviderFeatures(verify_email=False, change_password=True, reset_password=True)

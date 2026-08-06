@@ -22,7 +22,6 @@ from newsroom.auth.utils import (
     get_user_or_none_from_request,
     get_user_id_from_request,
     get_company_auth_provider,
-    get_token_data,
     send_token,
 )
 from newsroom.core import get_current_wsgi_app
@@ -238,14 +237,9 @@ class UsersAuthService(NewshubAsyncResourceService[UserAuthResourceModel]):
             "is_approved": True,
         }
 
-        if auth_provider.features["verify_email"]:
-            token_data = get_token_data()
-            user_updates["token"] = token_data.get("token") or ""
-            user_updates["token_expiry_date"] = token_data.get("token_expiry_date")
-
         await self.update(user.id, user_updates)
 
         # Send new account / password reset email
         if auth_provider.features["verify_email"]:
             updated_user = user.model_copy(update=user_updates)
-            await send_token(updated_user, token_type="new_account", update_token=False)
+            await send_token(updated_user, token_type="new_account")

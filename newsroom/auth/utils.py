@@ -1,3 +1,6 @@
+import logging
+import hashlib
+
 from typing import cast, TypedDict
 from datetime import datetime, timedelta
 
@@ -30,6 +33,8 @@ from .providers import AuthProvider
 # how often we should check in db if session
 # user is still valid
 SESSION_AUTH_TTL = timedelta(minutes=15)
+
+logger = logging.getLogger(__name__)
 
 
 async def sign_user_by_email(
@@ -196,42 +201,98 @@ class TokenData(TypedDict):
     token_expiry_date: datetime
 
 
-def get_token_data() -> TokenData:
+def generate_login_token() -> str:
+    return str(uuid4())
+
+
+def hash_login_token(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def mask_email_for_logs(email: str | None) -> str:
+    if not email:
+        return "unknown"
+
+    local_part, _, domain = email.strip().lower().partition("@")
+    if not local_part:
+        return "unknown"
+
+    if len(local_part) <= 2:
+        masked_local = f"{local_part[:1]}*"
+    else:
+        masked_local = f"{local_part[:2]}***{local_part[-1]}"
+
+    return f"{masked_local}@{domain}" if domain else masked_local
+
+
+def get_token_data(token_type: str = "validate", token: str | None = None) -> TokenData:
+    ttl_setting = "RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS"
+    if token_type != "reset_password":
+        ttl_setting = "VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS"
+
+    expires_at = utcnow() + timedelta(hours=get_app_config(ttl_setting))
+    token_value = token or generate_login_token()
+
     return {
-        "token": str(uuid4()),
-        "token_expiry_date": utcnow() + timedelta(days=get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE")),
+        "token": hash_login_token(token_value),
+        "token_expiry_date": expires_at,
     }
 
 
-def add_token_data(user: UserAuthResourceModel):
-    for key, val in get_token_data().items():
+def add_token_data(user: UserAuthResourceModel, token_type: str = "validate") -> str:
+    token = generate_login_token()
+    for key, val in get_token_data(token_type, token=token).items():
         setattr(user, key, val)
+    return token
 
 
 async def send_token(user: UserAuthResourceModel | None, token_type: str = "validate", update_token=True) -> bool:
     from newsroom.users import UsersAuthService
 
-    if user is None or not user.is_enabled:
+    if user is None:
+        if token_type == "reset_password":
+            logger.info("Reset password email not sent: user missing")
+        return False
+
+    if not user.is_enabled:
+        if token_type == "reset_password":
+            logger.info(
+                "Reset password email not sent for user=%s: user disabled",
+                mask_email_for_logs(user.email),
+            )
         return False
     elif token_type == "validate" and user.is_validated:
         return False
 
     token = user.token
     if update_token:
-        updates = get_token_data()
+        token = generate_login_token()
+        updates = get_token_data(token_type, token=token)
         await UsersAuthService().system_update(user.id, updates)
-        token = updates["token"]
+    elif token is None:
+        if token_type == "reset_password":
+            logger.info(
+                "Reset password email not sent for user=%s: missing token",
+                mask_email_for_logs(user.email),
+            )
+        return False
 
     assert isinstance(token, str)
 
     user_dict = user.to_dict()
     if token_type == "validate":
         await send_validate_account_email(user_dict, token)
-    if token_type == "new_account":
+    elif token_type == "new_account":
         await send_new_account_email(user_dict, token)
     elif token_type == "reset_password":
         await send_reset_password_email(user_dict, token)
+        logger.info("Reset password email sent for user=%s", mask_email_for_logs(user.email))
     else:
+        logger.warning(
+            "Token email not sent for user=%s: unsupported token type=%s",
+            mask_email_for_logs(user.email),
+            token_type,
+        )
         return False
     return True
 
