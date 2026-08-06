@@ -27,8 +27,8 @@ setup(
     install_requires=requirements,
     extras_require={
         "firebase": [
-            "google-auth>=2.6,<2.50",
-            "firebase-admin>=6.5,<7",
+            "google-auth>=2.6,<2.60",
+            "firebase-admin>=7.1,<8",
         ],
     },
     scripts=[],
