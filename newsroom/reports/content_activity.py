@@ -25,6 +25,7 @@ CHUNK_SIZE = 100
 
 async def get_query_source(args: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
     search_request = NewshubSearchRequest[BaseSearchRequestArgs](section=SectionEnum(args["section"]))
+    search_request.include_updated = True
     query = search_request.search.query
 
     if args.get("genre"):
@@ -75,6 +76,7 @@ async def get_items(args):
                 "subject",
                 "service",
                 "versioncreated",
+                "slugline",
                 "anpa_take_key",
                 "source",
             ],
@@ -209,6 +211,7 @@ def export_csv(args, results):
         [
             gettext("Published"),
             gettext("Headline"),
+            gettext("Slugline"),
             gettext("Take Key"),
             gettext("Place"),
             gettext("Category"),
@@ -260,6 +263,7 @@ def export_csv(args, results):
         row = [
             utc_to_local("Australia/Sydney", item.get("versioncreated")).strftime("%H:%M"),
             item.get("headline"),
+            item.get("slugline"),
             item.get("anpa_take_key") or "",
             "\r\n".join(sorted([place.get("name") or "" for place in item.get("place") or []])),
             "\r\n".join(sorted([service.get("name") or "" for service in item.get("service") or []])),
