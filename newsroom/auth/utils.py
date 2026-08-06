@@ -282,17 +282,17 @@ async def send_token(user: UserAuthResourceModel | None, token_type: str = "vali
     user_dict = user.to_dict()
     if token_type == "validate":
         await send_validate_account_email(user_dict, token)
-    if token_type == "new_account":
+    elif token_type == "new_account":
         await send_new_account_email(user_dict, token)
     elif token_type == "reset_password":
         await send_reset_password_email(user_dict, token)
         logger.info("Reset password email sent for user=%s", mask_email_for_logs(user.email))
     else:
-        if token_type == "reset_password":
-            logger.warning(
-                "Reset password email not sent for user=%s: unsupported token type",
-                mask_email_for_logs(user.email),
-            )
+        logger.warning(
+            "Token email not sent for user=%s: unsupported token type=%s",
+            mask_email_for_logs(user.email),
+            token_type,
+        )
         return False
     return True
 
