@@ -22,6 +22,10 @@ class FirebaseUserNotFoundError(FirebasePasswordResetError):
     pass
 
 
+class FirebaseUserDisabledError(FirebasePasswordResetError):
+    pass
+
+
 def _build_credential(credentials_module: Any, config: Any):
     if isinstance(config, dict):
         config_value = (config.get("credentials_json") or config.get("credentials_path") or "").strip()
@@ -69,7 +73,7 @@ def _get_firebase_auth_client():
     return auth, app
 
 
-def update_firebase_password(email: str, password: str) -> str:
+def _get_firebase_user(email: str):
     auth, app = _get_firebase_auth_client()
     masked_email = mask_email_for_logs(email)
 
@@ -80,8 +84,22 @@ def update_firebase_password(email: str, password: str) -> str:
     except Exception as exc:
         raise FirebasePasswordResetError(f"Could not load Firebase user for {masked_email}") from exc
 
+    if getattr(user, "disabled", False):
+        raise FirebaseUserDisabledError(f"Firebase user is disabled for {masked_email}")
+
+    return auth, app, user, masked_email
+
+
+def ensure_firebase_password_reset_allowed(email: str) -> str:
+    _, _, user, _ = _get_firebase_user(email)
+    return user.uid
+
+
+def update_firebase_password(email: str, password: str) -> str:
+    auth, app, user, masked_email = _get_firebase_user(email)
+
     try:
-        auth.update_user(user.uid, password=password, app=app)
+        auth.update_user(user.uid, password=password, email_verified=True, app=app)
     except Exception as exc:
         raise FirebasePasswordResetError(f"Could not update Firebase password for {masked_email}") from exc
 

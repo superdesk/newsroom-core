@@ -1,3 +1,6 @@
+import pytest
+
+from types import SimpleNamespace
 from unittest.mock import patch
 from datetime import timedelta
 from contextlib import contextmanager
@@ -7,6 +10,7 @@ from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
 from newsroom.auth.utils import get_token_data, hash_login_token
+from newsroom.auth.firebase_admin import FirebaseUserDisabledError, update_firebase_password
 from newsroom.types import AuthProviderType
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.users import UsersAuthService
@@ -47,7 +51,10 @@ async def test_password_reset_uses_firebase_admin_for_firebase_auth(client, app)
     original_user = await users_service.get_by_email("foo@bar.com")
     assert original_user is not None
 
-    with patch("newsroom.auth.utils.send_reset_password_email") as send_email_mock:
+    with (
+        patch("newsroom.auth.views.ensure_firebase_password_reset_allowed", return_value="firebase-user-1"),
+        patch("newsroom.auth.utils.send_reset_password_email") as send_email_mock,
+    ):
         resp = await client.post("/token/reset_password", form={"email": "foo@bar.com"})
         assert 302 == resp.status_code, await resp.get_data(as_text=True)
         send_email_mock.assert_called_once()
@@ -66,6 +73,72 @@ async def test_password_reset_uses_firebase_admin_for_firebase_auth(client, app)
     assert updated_user.token is None
     assert updated_user.token_expiry_date is None
     assert updated_user.password == original_user.password
+
+
+async def test_password_reset_token_not_sent_for_disabled_firebase_user(client, app):
+    app.config["AUTH_PROVIDERS"].append({"_id": "firebase", "name": "Firebase", "auth_type": AuthProviderType.FIREBASE})
+    get_resource_service("companies").patch(COMPANY_1_ID, updates={"auth_provider": "firebase"})
+
+    users_service = UsersAuthService()
+    original_user = await users_service.get_by_email("foo@bar.com")
+    assert original_user is not None
+
+    with (
+        patch("newsroom.auth.utils.send_reset_password_email") as send_email_mock,
+        patch(
+            "newsroom.auth.views.ensure_firebase_password_reset_allowed",
+            side_effect=FirebaseUserDisabledError("disabled"),
+        ) as ensure_firebase_password_reset_allowed_mock,
+    ):
+        resp = await client.post("/token/reset_password", form={"email": "foo@bar.com"})
+        assert 302 == resp.status_code, await resp.get_data(as_text=True)
+
+    ensure_firebase_password_reset_allowed_mock.assert_called_once_with("foo@bar.com")
+    send_email_mock.assert_not_called()
+
+    updated_user = await users_service.get_by_email("foo@bar.com")
+    assert updated_user is not None
+    assert updated_user.token == original_user.token
+    assert updated_user.token_expiry_date == original_user.token_expiry_date
+
+
+def test_update_firebase_password_marks_email_verified():
+    auth = SimpleNamespace()
+    app = object()
+    user = SimpleNamespace(uid="firebase-user-1", disabled=False)
+
+    with (
+        patch("newsroom.auth.firebase_admin._get_firebase_auth_client", return_value=(auth, app)),
+        patch.object(auth, "get_user_by_email", return_value=user, create=True) as get_user_by_email_mock,
+        patch.object(auth, "update_user", create=True) as update_user_mock,
+    ):
+        returned_uid = update_firebase_password("foo@bar.com", "newpassword")
+
+    assert returned_uid == "firebase-user-1"
+    get_user_by_email_mock.assert_called_once_with("foo@bar.com", app=app)
+    update_user_mock.assert_called_once_with(
+        "firebase-user-1",
+        password="newpassword",
+        email_verified=True,
+        app=app,
+    )
+
+
+def test_update_firebase_password_rejects_disabled_user():
+    auth = SimpleNamespace()
+    app = object()
+    user = SimpleNamespace(uid="firebase-user-1", disabled=True)
+
+    with (
+        patch("newsroom.auth.firebase_admin._get_firebase_auth_client", return_value=(auth, app)),
+        patch.object(auth, "get_user_by_email", return_value=user, create=True) as get_user_by_email_mock,
+        patch.object(auth, "update_user", create=True) as update_user_mock,
+    ):
+        with pytest.raises(FirebaseUserDisabledError, match="disabled"):
+            update_firebase_password("foo@bar.com", "newpassword")
+
+    get_user_by_email_mock.assert_called_once_with("foo@bar.com", app=app)
+    update_user_mock.assert_not_called()
 
 
 async def test_reset_password_tokens_use_dedicated_ttl(app):

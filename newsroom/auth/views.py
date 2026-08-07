@@ -22,7 +22,11 @@ from newsroom.flask import flash
 from newsroom.types import AuthProviderType, UserAuthResourceModel, User, UserRole, Company
 from newsroom.core import get_current_wsgi_app
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.auth.firebase_admin import FirebasePasswordResetError, update_firebase_password
+from newsroom.auth.firebase_admin import (
+    FirebasePasswordResetError,
+    ensure_firebase_password_reset_allowed,
+    update_firebase_password,
+)
 from newsroom.template_loaders import template_locale
 from newsroom.auth.utils import (
     redirect_to_next_url,
@@ -436,7 +440,20 @@ async def token(args: LoginTokenTypeRouteArgs, params: None, req: Request) -> An
             auth_provider = get_company_auth_provider(company)
 
             if args.token_type == "reset_password" and auth_provider.features["reset_password"]:
-                sent = await send_token(user, args.token_type)
+                if auth_provider.type == AuthProviderType.FIREBASE:
+                    try:
+                        await asyncio.to_thread(ensure_firebase_password_reset_allowed, user.email)
+                    except FirebasePasswordResetError:
+                        logger.info(
+                            "Reset password email not sent for user=%s: Firebase password reset not allowed",
+                            mask_email_for_logs(user.email),
+                        )
+                        sent = False
+                    else:
+                        sent = await send_token(user, args.token_type)
+                else:
+                    sent = await send_token(user, args.token_type)
+
                 if not sent:
                     logger.info(
                         "Reset password email not sent for user=%s: token dispatch declined",
