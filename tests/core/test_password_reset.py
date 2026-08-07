@@ -51,7 +51,10 @@ async def test_password_reset_uses_firebase_admin_for_firebase_auth(client, app)
     original_user = await users_service.get_by_email("foo@bar.com")
     assert original_user is not None
 
-    with patch("newsroom.auth.utils.send_reset_password_email") as send_email_mock:
+    with (
+        patch("newsroom.auth.views.ensure_firebase_password_reset_allowed", return_value="firebase-user-1"),
+        patch("newsroom.auth.utils.send_reset_password_email") as send_email_mock,
+    ):
         resp = await client.post("/token/reset_password", form={"email": "foo@bar.com"})
         assert 302 == resp.status_code, await resp.get_data(as_text=True)
         send_email_mock.assert_called_once()
