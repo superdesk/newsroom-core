@@ -81,7 +81,7 @@ def update_firebase_password(email: str, password: str) -> str:
         raise FirebasePasswordResetError(f"Could not load Firebase user for {masked_email}") from exc
 
     try:
-        auth.update_user(user.uid, password=password, app=app)
+        auth.update_user(user.uid, password=password, email_verified=True, app=app)
     except Exception as exc:
         raise FirebasePasswordResetError(f"Could not update Firebase password for {masked_email}") from exc
 
