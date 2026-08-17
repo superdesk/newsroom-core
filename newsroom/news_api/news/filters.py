@@ -11,6 +11,7 @@ from newsroom.products.service import ProductsService
 from newsroom.search.types import NewshubSearchRequest
 from newsroom.products.utils import get_products_by_company_async
 from newsroom.auth.utils import get_company_or_none_from_request
+from newsroom.settings import get_setting
 
 from .filters_utils import create_date_range_filter, get_date_range
 from .types import NewsApiSearchRequestArgs, default_allowed_exclude_fields
@@ -109,6 +110,32 @@ def apply_date_filter(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
 
     if date_filter:
         request.search.query.filter.append(date_filter)
+
+
+def apply_api_limit_filter(request: NewshubSearchRequest[NewsApiSearchRequestArgs]) -> None:
+    """
+    Appends a hard time-limit filter to the search request, restricting access to data
+    older than the configured news_api_time_limit_days setting.
+
+    :param request:
+    :return:
+    """
+    time_limit = int(get_setting("news_api_time_limit_days") or 0)
+
+    if time_limit > 0:
+        # Ensure request filter list is initialized
+        if request.search.query.filter is None:
+            request.search.query.filter = []
+
+        request.search.query.filter.append(
+            {
+                "range": {
+                    "versioncreated": {
+                        "gte": f"now-{time_limit}d",
+                    }
+                }
+            }
+        )
 
 
 def apply_request_filter(request: NewshubSearchRequest[NewsApiSearchRequestArgs]):
