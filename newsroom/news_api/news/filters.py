@@ -131,7 +131,7 @@ def apply_api_limit_filter(request: NewshubSearchRequest[NewsApiSearchRequestArg
             {
                 "range": {
                     "versioncreated": {
-                        "gte": f"now-{time_limit}d",
+                        "gte": f"now-{time_limit}d/d",
                     }
                 }
             }

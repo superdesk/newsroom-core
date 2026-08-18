@@ -87,7 +87,6 @@ Feature: News API News Search
      ]}
      """
 
-  @skip
   Scenario: Absolute start and end date query
     Given "items"
         """
@@ -106,14 +105,14 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=#DATE-1#&end_date=2018-11-12T02:48:40&include_fields=body_html"
+    When we get "news/search?start_date=now-3d&end_date=now-1d&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
          {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"}
      ]}
      """
-    When we get "news/search?start_date=2018-11-11&include_fields=body_html"
+    When we get "news/search?start_date=now-3d&include_fields=body_html"
     Then we get list with 2 items
     """
      {"_items": [
