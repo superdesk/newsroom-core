@@ -164,6 +164,29 @@ describe('wire actions', () => {
         expect(store.getState().newItems).toEqual(['foo', 'baz']);
     });
 
+    it('does not count already loaded items with an unchanged version as new', () => {
+        const unchanged = {
+            ...testArticle,
+            _id: 'urn:newsml:localhost:2023-06-27T11:07:17.123456:abc',
+        };
+        const updated = {
+            ...testArticle,
+            _id: 'urn:newsml:localhost:2023-06-27T11:07:17.123456:def',
+        };
+
+        store.dispatch({type: actions.RECEIVE_ITEM, data: unchanged});
+        store.dispatch({type: actions.RECEIVE_ITEM, data: updated});
+        store.dispatch(actions.setNewItems({
+            _items: [
+                unchanged,
+                {...updated, versioncreated: '2023-06-27T12:00:00+0000'},
+                {_id: 'new-one', type: 'text'},
+            ],
+        }));
+
+        expect(store.getState().newItems).toEqual([updated._id, 'new-one']);
+    });
+
     it('can open item', () => {
         fetchMock.post('/history/new', {});
         store.dispatch(actions.openItem(testArticle));

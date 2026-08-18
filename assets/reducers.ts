@@ -350,12 +350,20 @@ export function defaultReducer(state: any = {}, action: any) {
     }
 
     case SET_NEW_ITEMS: {
+        const isNew = (item: any) => {
+            // item ids contain dots, so they can't be used as a lodash path
+            const existing = state.itemsById[item._id];
+
+            return existing == null ?
+                !item.nextversion :
+                existing.versioncreated !== item.versioncreated;
+        };
+
         return {
             ...state,
             newItems: uniq([
                 ...state.newItems,
-                ...(action.data._items.filter((item: any) => (!item.nextversion && !state.itemsById[item._id]
-                ) || get(state.itemsById, `${item._id}.versioncreated`) !== item.versioncreated).map((item: any) => item._id))
+                ...action.data._items.filter(isNew).map((item: any) => item._id),
             ]),
         };
     }
