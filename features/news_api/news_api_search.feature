@@ -503,11 +503,15 @@ Feature: News API News Search
       """
 
   Scenario: Parameter validation
-#    When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
-#    Then we get error 400
-#        """
-#        {"code": 400, "message": "Invalid search query"}
-#        """
+    Given "items"
+    """
+    [{"body_html": "<p>One potential story within the time limit</p>", "versioncreated": "#DATE#"}]
+    """
+    When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
+    Then we get error 400
+        """
+        {"code": 400, "message": "Invalid search query"}
+        """
     When we get "/news/search?include_fields=secret"
     Then we get error 400
         """
