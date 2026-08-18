@@ -749,3 +749,30 @@ Feature: News API News Search
          {"body_html": "<p>Once upon a time there was a fish who could swim 3</p>"}
      ]}
      """
+
+ Scenario: Ensure item older than the API time limit are not returned
+    Given "items"
+        """
+        [
+        {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>", "versioncreated":  "2018-11-09 03:48:39.000Z"}
+        ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?include_fields=body_html"
+    Then we get list with 1 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>"}
+     ]}
+     """
