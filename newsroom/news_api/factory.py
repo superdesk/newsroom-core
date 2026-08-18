@@ -9,7 +9,7 @@ from werkzeug.exceptions import HTTPException
 
 from newsroom.exceptions import AuthorizationError
 from newsroom.utils import parse_validation_error
-from superdesk.flask import Config, jsonify, g, request
+from superdesk.flask import Config, jsonify, g
 from superdesk.errors import SuperdeskApiError
 from superdesk.utc import utcnow
 
