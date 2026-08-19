@@ -17,7 +17,7 @@ import {
     GET_USER,
     HIDE_MODAL,
     INIT_DATA,
-    RECIEVE_FOLDERS,
+    RECEIVE_FOLDERS,
     SELECT_MENU,
     SELECT_MENU_ITEM,
     SELECT_PROFILE_MENU,
@@ -35,7 +35,7 @@ export {
     GET_USER,
     HIDE_MODAL,
     INIT_DATA,
-    RECIEVE_FOLDERS,
+    RECEIVE_FOLDERS,
     SELECT_MENU,
     SELECT_MENU_ITEM,
     SELECT_PROFILE_MENU,
@@ -342,7 +342,7 @@ export function fetchFolders(): (dispatch: any, getState: any) => Promise<IFolde
             server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
         ]).then(([companyFolders, userFolders]) => {
             dispatch({
-                type: RECIEVE_FOLDERS,
+                type: RECEIVE_FOLDERS,
                 payload: {
                     companyFolders: companyFolders,
                     userFolders: userFolders,

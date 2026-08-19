@@ -8,7 +8,7 @@ import {
     SELECT_MENU_ITEM,
     SELECT_PROFILE_MENU,
     SET_TOPIC_EDITOR_FULLSCREEN,
-    RECIEVE_FOLDERS,
+    RECEIVE_FOLDERS,
     TOPIC_UPDATED,
     FOLDER_UPDATED,
     FOLDER_DELETED,
@@ -201,7 +201,7 @@ export default function itemReducer(state: IUserProfileState = initialState, act
             editorFullscreen: action.payload,
         };
 
-    case RECIEVE_FOLDERS:
+    case RECEIVE_FOLDERS:
         return {
             ...state,
             companyFolders: action.payload.companyFolders,
