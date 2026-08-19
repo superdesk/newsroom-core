@@ -8,17 +8,17 @@ import {
     SELECT_MENU_ITEM,
     SELECT_PROFILE_MENU,
     SET_TOPIC_EDITOR_FULLSCREEN,
-    RECIEVE_FOLDERS,
+    RECEIVE_FOLDERS,
     TOPIC_UPDATED,
     FOLDER_UPDATED,
     FOLDER_DELETED,
-} from './actions';
+} from './constants';
 
 import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
 
 import {IModalState, modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
-import {SET_TOPICS} from '../search/actions';
+import {SET_TOPICS} from '../search/constants';
 import {ISection, ITopic, ITopicFolder, IUser} from 'interfaces';
 import {GET_COMPANY_USERS} from 'companies/actions';
 
@@ -201,7 +201,7 @@ export default function itemReducer(state: IUserProfileState = initialState, act
             editorFullscreen: action.payload,
         };
 
-    case RECIEVE_FOLDERS:
+    case RECEIVE_FOLDERS:
         return {
             ...state,
             companyFolders: action.payload.companyFolders,

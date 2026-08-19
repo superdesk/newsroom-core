@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Proptypes from 'prop-types';
-import * as DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 
 export function HTMLContent({text}) {
     return (
