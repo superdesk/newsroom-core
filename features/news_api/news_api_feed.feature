@@ -129,6 +129,7 @@ Feature: News API News Feed
             }
         }
         """
+    Then we check feed href for #DATE-4# and urn:test2
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 3 items
@@ -145,6 +146,7 @@ Feature: News API News Feed
             }
         }
         """
+    Then we check feed href for #DATE-2# and urn:test4
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 1 items
@@ -160,6 +162,7 @@ Feature: News API News Feed
             }
         }
         """
+    Then we check feed href for #DATE-1# and urn:test5
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 0 items

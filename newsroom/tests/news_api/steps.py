@@ -1,5 +1,8 @@
 import json
 import lxml.etree
+from datetime import datetime, timedelta, timezone
+import re
+from urllib.parse import quote
 
 from behave import when, then
 from behave.api.async_step import async_run_until_complete
@@ -84,3 +87,25 @@ async def we_get_text_in_rss_xml_response(context, get, text):
             assert text in body, f"{text} not in {body}"
         else:
             assert text not in body, f"{text} found in {body}"
+
+
+@then("we check feed href for {date} and {exclude}")
+@async_run_until_complete
+async def we_check_feed_href(context, date, exclude):
+    data = await get_json_data(context.response)
+    links = data.get("_links", {})
+    next_link = links.get("next") or links.get("next_page")
+    href = next_link.get("href") if next_link else None
+
+    match = re.match(r"^#DATE(?:([+-])(\d+))?#$", date)
+    if match:
+        sign, days = match.groups()
+        days_offset = int(days) if days else 0
+        if sign == "-":
+            days_offset = -days_offset
+
+        target_date = datetime.now(timezone.utc) + timedelta(days=days_offset)
+        expected_date = target_date.strftime("%Y-%m-%d")
+
+    assert f"start_date={expected_date}" in href
+    assert f"exclude_ids={quote(exclude)}" in href
