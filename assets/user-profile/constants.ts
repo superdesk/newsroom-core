@@ -1,1 +1,16 @@
 export const WIRE_TOPIC_FOLDERS_UPDATED = 'reload-wire-folders';
+export const GET_TOPICS = 'GET_TOPICS';
+export const GET_USER = 'GET_USER';
+export const EDIT_USER = 'EDIT_USER';
+export const INIT_DATA = 'INIT_DATA';
+export const SET_ERROR = 'SET_ERROR';
+export const SELECT_MENU = 'SELECT_MENU';
+export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
+export const SELECT_MENU_ITEM = 'SELECT_MENU_ITEM';
+export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
+export const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN';
+export const HIDE_MODAL = 'HIDE_MODAL';
+export const FOLDER_UPDATED = 'FOLDER_UPDATED';
+export const FOLDER_DELETED = 'FOLDER_DELETED';
+export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
+export const TOPIC_UPDATED = 'TOPIC_UPDATED';

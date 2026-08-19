@@ -9,33 +9,62 @@ import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
 import {IUserProfileUpdates} from 'interfaces/user';
 import {postNotificationSchedule} from 'helpers/notification';
+import {
+    EDIT_USER,
+    FOLDER_DELETED,
+    FOLDER_UPDATED,
+    GET_TOPICS,
+    GET_USER,
+    HIDE_MODAL,
+    INIT_DATA,
+    RECIEVE_FOLDERS,
+    SELECT_MENU,
+    SELECT_MENU_ITEM,
+    SELECT_PROFILE_MENU,
+    SET_ERROR,
+    SET_TOPIC_EDITOR_FULLSCREEN,
+    TOGGLE_DROPDOWN,
+    TOPIC_UPDATED,
+} from './constants';
 
-export const GET_TOPICS = 'GET_TOPICS';
+export {
+    EDIT_USER,
+    FOLDER_DELETED,
+    FOLDER_UPDATED,
+    GET_TOPICS,
+    GET_USER,
+    HIDE_MODAL,
+    INIT_DATA,
+    RECIEVE_FOLDERS,
+    SELECT_MENU,
+    SELECT_MENU_ITEM,
+    SELECT_PROFILE_MENU,
+    SET_ERROR,
+    SET_TOPIC_EDITOR_FULLSCREEN,
+    TOGGLE_DROPDOWN,
+    TOPIC_UPDATED,
+};
+
 export function getTopics(topics: any) {
     return {type: GET_TOPICS, topics};
 }
 
-export const GET_USER = 'GET_USER';
 export function getUser(user: any) {
     return {type: GET_USER, user};
 }
 
-export const EDIT_USER = 'EDIT_USER';
 export function editUser(payload: IUserProfileUpdates) {
     return {type: EDIT_USER, payload};
 }
 
-export const INIT_DATA = 'INIT_DATA';
 export function initData(data: any) {
     return {type: INIT_DATA, data};
 }
 
-export const SET_ERROR = 'SET_ERROR';
 export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
-export const SELECT_MENU = 'SELECT_MENU';
 export function selectMenu(data: any): any {
     return function(dispatch: any) {
         dispatch({type: SELECT_MENU, data});
@@ -43,12 +72,10 @@ export function selectMenu(data: any): any {
     };
 }
 
-export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
 export function setTopicEditorFullscreen(fullscreen: any) {
     return {type: SET_TOPIC_EDITOR_FULLSCREEN, payload: fullscreen};
 }
 
-export const SELECT_MENU_ITEM = 'SELECT_MENU_ITEM';
 export function selectMenuItem(item: any) {
     return {type: SELECT_MENU_ITEM, item};
 }
@@ -59,7 +86,6 @@ export function createOrUpdateTopic(menu: any, item: any, fullscreen: any) {
     userProfileStore.dispatch(setTopicEditorFullscreen(fullscreen));
 }
 
-export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
 export function selectProfileMenu({menu, item}: any) {
     userProfileStore.dispatch({
         type: SELECT_PROFILE_MENU,
@@ -68,12 +94,10 @@ export function selectProfileMenu({menu, item}: any) {
     });
 }
 
-export const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN';
 export function toggleDropdown() {
     return {type: TOGGLE_DROPDOWN};
 }
 
-export const HIDE_MODAL = 'HIDE_MODAL';
 export function hideModal() {
     return {type: HIDE_MODAL};
 }
@@ -261,7 +285,6 @@ export function mergeUpdates(updates: any, response: any) {
     updates._updated = response._updated;
 }
 
-export const FOLDER_UPDATED = 'FOLDER_UPDATED';
 export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
@@ -284,7 +307,6 @@ export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: 
     };
 }
 
-export const FOLDER_DELETED = 'FOLDER_DELETED';
 export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolean) {
 
     return (dispatch: any, getState: any) => {
@@ -299,8 +321,6 @@ export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolea
             .then(() => dispatch({type: FOLDER_DELETED, payload: {folder}}));
     };
 }
-
-export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
 
 /**
  * @param {bool} global - fetch company or user folders
@@ -340,7 +360,6 @@ export function fetchFolders(): (dispatch: any, getState: any) => Promise<IFolde
     };
 }
 
-export const TOPIC_UPDATED = 'TOPIC_UPDATED';
 export function moveTopic(topicId: any, folder: ITopicFolder | null) {
     return (dispatch: any, getState: any) => {
         const state = getState();

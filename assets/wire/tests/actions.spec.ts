@@ -32,6 +32,13 @@ const testArticle: IArticle = {
     description_text: 'test',
 };
 
+function getLastHistoryPayload() {
+    const options = fetchMock.lastOptions('/history/new');
+
+    expect(options).toBeDefined();
+    return JSON.parse((options && options.body) as unknown as string);
+}
+
 describe('wire actions', () => {
     let store: any;
     const response: any = {
@@ -174,24 +181,24 @@ describe('wire actions', () => {
 
     it('open item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
-            expect(item).toEqual({_id: 'foo'});
-            expect(action).toEqual('open');
-            expect(section).toEqual('wire');
-        });
         store.dispatch(actions.openItem(testArticle));
+        expect(getLastHistoryPayload()).toEqual({
+            item: testArticle,
+            action: 'open',
+            section: 'wire',
+        });
         expect(store.getState().openItem._id).toBe('foo');
         fetchMock.reset();
     });
 
     it('preview item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
-            expect(item).toEqual({_id: 'foo'});
-            expect(action).toEqual('preview');
-            expect(section).toEqual('wire');
-        });
         store.dispatch(actions.previewItem({_id: 'foo'}));
+        expect(getLastHistoryPayload()).toEqual({
+            item: {_id: 'foo'},
+            action: 'preview',
+            section: 'wire',
+        });
         fetchMock.reset();
     });
 
