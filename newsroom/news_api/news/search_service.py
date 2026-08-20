@@ -31,6 +31,7 @@ from .filters import (
     prefill_products,
     validate_page,
     prefill_search_latest_version,
+    apply_api_limit_filter,
 )
 from .types import NewsApiSearchRequestArgs
 
@@ -43,6 +44,7 @@ default_search_filters: list[SearchFilterFunction] = [
     apply_products_filter,
     apply_filter_fields,
     apply_date_filter,
+    apply_api_limit_filter,
     apply_request_filter,
     apply_projection,
     validate_page,

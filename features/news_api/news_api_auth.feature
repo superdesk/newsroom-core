@@ -43,8 +43,8 @@ Feature: News API Authorization
   Scenario: Proxy forward situation is handled appropirately
     Given "items"
         """
-        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>"},
-        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
@@ -87,8 +87,8 @@ Feature: News API Authorization
   Scenario: Supports subnet in allowed_ip_list from request
     Given "items"
         """
-        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>"},
-        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
@@ -132,8 +132,8 @@ Feature: News API Authorization
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
     Given "items"
         """
-        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>"},
-        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
