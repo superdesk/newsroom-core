@@ -174,6 +174,19 @@ class NewsroomNewsAPI(BaseNewsroomApp):
 def get_app(config=None, **kwargs):
     app = NewsroomNewsAPI(__name__, config=config, **kwargs)
 
+    if "https://" in app.config["CLIENT_URL"]:
+        original_asgi_app = app.asgi_app
+
+        async def force_https_asgi(scope, receive, send):
+            if scope["type"] == "http":
+                # Check for header from Nginx, or default to https
+                headers = dict(scope.get("headers", []))
+                proto = headers.get(b"x-forwarded-proto", b"https").decode("utf-8")
+                scope["scheme"] = proto
+            await original_asgi_app(scope, receive, send)
+
+        app.asgi_app = force_https_asgi
+
     @app.after_request
     def after_request(response):
         if g.get("rate_limit_requests"):
