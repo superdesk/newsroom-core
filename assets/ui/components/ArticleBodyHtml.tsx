@@ -58,7 +58,14 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
         }
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: IProps) {
+        // re-inject the body when the item changes (detail view reuses this instance)
+        if (
+            prevProps.item._id !== this.props.item._id ||
+            prevProps.item.body_html !== this.props.item.body_html
+        ) {
+            this.renderPreview();
+        }
         this.loadIframely();
         this.executeScripts();
         this.initializeMediaPlayers();

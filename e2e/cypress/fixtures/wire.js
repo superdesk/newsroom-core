@@ -56,3 +56,34 @@ export const WIRE_ITEMS = {
         source: 'sofab',
     },
 }
+
+// a chain of segments linked by ancestors + nextversion, each with a distinct body
+const SEGMENT_ROOT = 'urn:localhost:rdi-segment';
+const mediaformat = {code: 'tvstation', name: 'Station de télé', scheme: 'mediaformat'};
+
+function segment(index, {ancestors, nextversion}) {
+    return {
+        _id: `${SEGMENT_ROOT}.${index}`,
+        type: 'text',
+        version: index + 1,
+        versioncreated: `2026-08-24T0${index}:00:00+0000`,
+        headline: `RDI segment wire #${index + 1}`,
+        slugline: 'rdi-segment wire',
+        body_html: `<p>Distinct body of segment ${index + 1} of 3.</p>`,
+        original_id: `${SEGMENT_ROOT}.0`,
+        ancestors,
+        nextversion,
+        subject: [mediaformat],
+        urgency: 3,
+        priority: 5,
+        language: 'fr',
+        pubstatus: 'usable',
+        source: 'RDI',
+    };
+}
+
+export const WIRE_SEGMENTS = {
+    first: segment(0, {ancestors: [], nextversion: `${SEGMENT_ROOT}.1`}),
+    second: segment(1, {ancestors: [`${SEGMENT_ROOT}.0`], nextversion: `${SEGMENT_ROOT}.2`}),
+    third: segment(2, {ancestors: [`${SEGMENT_ROOT}.0`, `${SEGMENT_ROOT}.1`], nextversion: null}),
+};
