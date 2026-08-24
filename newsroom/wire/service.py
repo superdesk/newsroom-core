@@ -458,6 +458,7 @@ class WireSearchServiceAsync(BaseWebSearchService[WireSearchRequestArgs, WireIte
             filters=[
                 apply_section_filter,
                 apply_item_type_filter,
+                apply_products_filter,
                 apply_not_canceled_filter,
             ],
         )
