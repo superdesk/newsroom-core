@@ -209,6 +209,47 @@ async def test_companies(client):
     assert report["results"][3]["name"] == "Paper Co."
 
 
+async def test_product_stories(client):
+    # sd_product_id matches an item's products.code: "1" -> tag:foo (today),
+    # "7" -> urn:localhost:flood (~5 days ago)
+    await create_entries_for(
+        "products",
+        [
+            {
+                "_id": ObjectId("5e65964bf5db68883df56201"),
+                "name": "Wire Product A",
+                "sd_product_id": "1",
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": ObjectId("5e65964bf5db68883df56202"),
+                "name": "Wire Product B",
+                "sd_product_id": "7",
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+        ],
+    )
+
+    resp = await client.get("reports/product-stories")
+    report = json.loads(await resp.get_data())
+    assert report["name"] == "Stories per product"
+
+    results = {result["name"]: result for result in report["results"]}
+    product_a = results["Wire Product A"]
+    product_b = results["Wire Product B"]
+
+    # Counts must be scoped per product, not whole-index totals
+    assert product_a["today"] == 1
+    assert product_a["last_7_days"] == 1
+    assert product_a["last_6_months"] == 1
+
+    assert product_b["today"] == 0
+    assert product_b["last_7_days"] == 1
+    assert product_b["last_6_months"] == 1
+
+
 async def test_content_activity_csv(client):
     today = datetime.now().date()
 
