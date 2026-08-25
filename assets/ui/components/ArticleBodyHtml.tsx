@@ -49,20 +49,20 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
     }
 
     componentDidMount() {
-        if (this.renderPreview()) {
-            this.loadIframely();
-            this.executeScripts();
-            this.initializeMediaPlayers();
-            document.addEventListener('copy', this.copyClicked);
-            document.addEventListener('click', this.clickClicked);
-        }
+        this.renderPreview();
+        this.loadIframely();
+        this.executeScripts();
+        this.initializeMediaPlayers();
+        document.addEventListener('copy', this.copyClicked);
+        document.addEventListener('click', this.clickClicked);
     }
 
     componentDidUpdate(prevProps: IProps) {
         // re-inject the body when the item changes (detail view reuses this instance)
         if (
             prevProps.item._id !== this.props.item._id ||
-            prevProps.item.body_html !== this.props.item.body_html
+            prevProps.item.body_html !== this.props.item.body_html ||
+            prevProps.item.es_highlight !== this.props.item.es_highlight
         ) {
             this.renderPreview();
         }
