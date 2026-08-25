@@ -595,7 +595,7 @@ export function fetchNext(item: IArticle): Promise<IArticle> {
         return Promise.reject();
     }
 
-    return server.get(`/wire/${item.nextversion}?format=json`);
+    return server.get(`/wire/${item.nextversion}?format=json&ignore_latest=1`);
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
