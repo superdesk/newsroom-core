@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 from pydantic import AliasChoices
 
-from content_api.errors import UnexpectedParameterError
+from content_api.errors import UnexpectedParameterError, BadParameterValueError
 from superdesk.flask import request as flask_request
 from superdesk.core.types.web import Request, Response
 from superdesk.core import get_app_config
@@ -62,6 +62,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         self.service = WireItemService()
 
     async def process_web_request(self, request: Request):
+        self._validate_first_page(request)
         self._validate_unknown_fields()
         resp = await super().process_web_request(request)
 
@@ -69,6 +70,19 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         await self.process_response_enhancements(request, resp)
 
         return resp
+
+    def _validate_first_page(self, request: Request):
+        """
+        Ensures that if a page number is provided in the URL, it is a valid integer >= 1.
+        (Note: 1-indexed pagination is enforced; missing page arguments default to 1 downstream).
+        """
+        page = request.get_url_arg("page")
+        if page is not None:
+            try:
+                if int(page) < 1:
+                    raise BadParameterValueError(desc="Page number must be greater than or equal to 1")
+            except ValueError:
+                raise BadParameterValueError(desc="Page number must be a valid integer")
 
     def _validate_unknown_fields(self):
         """
@@ -138,7 +152,8 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         }
 
         total_items = resp.body.get("_meta", {}).get("total", 0)
-        current_page = search_req.args.page
+        current_page = search_req.args.page if search_req.args.page > 0 else 1
+        resp.body["_meta"]["page"] = current_page
         page_size = search_req.args.page_size
 
         # add next page if there are more items
