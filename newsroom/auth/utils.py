@@ -217,7 +217,9 @@ def mask_email_for_logs(email: str | None) -> str:
     if not local_part:
         return "unknown"
 
-    if len(local_part) <= 5:
+    if len(local_part) <= 2:
+        masked_local = f"{local_part[0]}*"
+    elif len(local_part) <= 5:
         masked_local = f"{local_part[:2]}*{local_part[-1:]}"
     else:
         masked_local = f"{local_part[:3]}***{local_part[-2:]}"

@@ -21,6 +21,8 @@ company_id = ObjectId()
 
 
 def test_mask_email_for_logs_masks_short_local_parts():
+    assert mask_email_for_logs("a@example.com") == "a*@example.com"
+    assert mask_email_for_logs("ab@example.com") == "a*@example.com"
     assert mask_email_for_logs("abcd@example.com") == "ab*d@example.com"
     assert mask_email_for_logs("abcde@example.com") == "ab*e@example.com"
     assert mask_email_for_logs("abcdef@example.com") == "abc***ef@example.com"
