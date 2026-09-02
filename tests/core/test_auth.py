@@ -7,7 +7,7 @@ from superdesk.utils import get_hash
 
 from newsroom.types import UserAuthResourceModel, UserResourceModel, CompanyResource, UserRole
 from newsroom.auth.token import verify_auth_token
-from newsroom.auth.utils import get_user_sections
+from newsroom.auth.utils import get_user_sections, mask_email_for_logs
 from newsroom.auth.views import _is_password_valid
 from newsroom.users import UsersService
 from newsroom.tests.users import ADMIN_USER_EMAIL
@@ -18,6 +18,12 @@ from tests.core.utils import create_entries_for
 disabled_company = ObjectId()
 expired_company = ObjectId()
 company_id = ObjectId()
+
+
+def test_mask_email_for_logs_masks_short_local_parts():
+    assert mask_email_for_logs("abcd@example.com") == "ab*d@example.com"
+    assert mask_email_for_logs("abcde@example.com") == "ab*e@example.com"
+    assert mask_email_for_logs("abcdef@example.com") == "abc***ef@example.com"
 
 
 @fixture(autouse=True)

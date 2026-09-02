@@ -448,7 +448,6 @@ async def token(args: LoginTokenTypeRouteArgs, params: None, req: Request) -> An
                             "Reset password email not sent for user=%s: Firebase password reset not allowed: %s",
                             mask_email_for_logs(user.email),
                             exc,
-                            exc_info=True,
                         )
                         sent = False
                     else:
