@@ -443,10 +443,11 @@ async def token(args: LoginTokenTypeRouteArgs, params: None, req: Request) -> An
                 if auth_provider.type == AuthProviderType.FIREBASE:
                     try:
                         await asyncio.to_thread(ensure_firebase_password_reset_allowed, user.email)
-                    except FirebasePasswordResetError:
+                    except FirebasePasswordResetError as exc:
                         logger.info(
-                            "Reset password email not sent for user=%s: Firebase password reset not allowed",
+                            "Reset password email not sent for user=%s: Firebase password reset not allowed: %s",
                             mask_email_for_logs(user.email),
+                            exc,
                         )
                         sent = False
                     else:
