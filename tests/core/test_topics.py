@@ -338,6 +338,33 @@ async def test_topic_folders_unique_validation(client):
     assert await resp.get_json() == {"name": "Name must be unique"}
 
 
+async def test_topic_folders_list_returns_all_folders(client):
+    await utils.login(client, {"email": PUBLIC_USER_EMAIL})
+
+    for folders_url in (user_topic_folders_url, company_topic_folders_url):
+        # more than the default page size (25), mixing sections like real users do
+        for i in range(15):
+            resp = await client.post(folders_url, json={"name": f"agenda {i}", "section": "agenda"})
+            assert 201 == resp.status_code, await resp.get_data(as_text=True)
+        for i in range(15):
+            resp = await client.post(folders_url, json={"name": f"wire {i}", "section": "wire"})
+            assert 201 == resp.status_code, await resp.get_data(as_text=True)
+
+        resp = await client.get(folders_url)
+        assert 200 == resp.status_code
+        data = await resp.get_json()
+        assert 30 == data["_meta"]["total"]
+        assert 30 == len(data["_items"])
+        assert 15 == len([folder for folder in data["_items"] if folder["section"] == "wire"])
+
+        # explicit max_results still wins
+        resp = await client.get(folders_url + "?max_results=10")
+        assert 200 == resp.status_code
+        data = await resp.get_json()
+        assert 10 == len(data["_items"])
+        assert 30 == data["_meta"]["total"]
+
+
 async def test_topic_subscriber_auto_enable_user_emails(app, client, navigation_items):
     await utils.login_public(client)
     users_service = UsersService()

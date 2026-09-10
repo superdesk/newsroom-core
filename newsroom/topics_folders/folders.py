@@ -128,6 +128,7 @@ user_topic_folders_resource_config = ResourceConfig(
     service=UserFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
+    default_max_results=500,
     rest_endpoints=RestEndpointConfig(
         endpoints_class=FolderRestEndpoints,
         parent_links=[RestParentLink(resource_name="users", model_id_field="user")],
@@ -147,6 +148,7 @@ company_topic_folder_resource_config = ResourceConfig(
     service=CompanyFoldersResourceService,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
     datasource_name="topic_folders",
+    default_max_results=500,
     rest_endpoints=RestEndpointConfig(
         endpoints_class=FolderRestEndpoints,
         parent_links=[RestParentLink(resource_name="companies", model_id_field="company")],
