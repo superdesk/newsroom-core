@@ -81,6 +81,9 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
         allowed_fields = set(model.model_fields.keys())
 
         for field, info in model.model_fields.items():
+            if info.exclude:
+                continue
+
             if isinstance(info.validation_alias, AliasChoices):
                 # Exclude `AliasPath` instances from choices, as we won't be able to
                 # translate that into a field name
@@ -139,6 +142,7 @@ class NewsApiSearchServiceAsync(BaseNewshubSearchService[NewsApiSearchRequestArg
 
         total_items = resp.body.get("_meta", {}).get("total", 0)
         current_page = search_req.args.page
+        resp.body["_meta"]["page"] = search_req.args.page
         page_size = search_req.args.page_size
 
         # add next page if there are more items

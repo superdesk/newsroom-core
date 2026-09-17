@@ -181,7 +181,7 @@ class BaseSearchRequestArgs(BaseModel):
     #: Pagination, the number of items to return per page
     page_size: int = Field(validation_alias=AliasChoices("page_size", "size", "max_results"), default=25)
 
-    #: Pagination, the page number to return
+    #: Pagination, the page number to return, 0 is used for aggregate only queries
     page: int = 0
 
     #: Pagination, the item number to return from - internally is converted to a page number

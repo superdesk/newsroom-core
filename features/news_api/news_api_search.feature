@@ -780,3 +780,81 @@ Feature: News API News Search
          {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>"}
      ]}
      """
+
+  Scenario: Ensure first page defaults to one
+    Given "items"
+        """
+        [
+            {
+                "_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim",
+                "versioncreated": "#DATE#"
+            }, {
+                "_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim",
+                "versioncreated": "#DATE#"
+            }
+        ]
+        """
+    When we get "news/search?q=upon&page_size=1"
+    Then we get list with 2 items
+      """
+      {
+        "_links": {
+        "next": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "next page"
+        },
+        "last": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "last page"
+        }
+        }
+      }
+      """
+    When we get "news/search?q=upon&page_size=1&page=1"
+    Then we get list with 2 items
+      """
+      {
+        "_links": {
+        "next": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "next page"
+        },
+        "last": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "last page"
+        }
+        }
+      }
+      """
+
+  Scenario: Parameter validation
+    When we get "/news/search?page_size=0"
+    Then we get error 400
+        """
+        {"code": 400, "message": "One or more fields did not pass validation."}
+        """
+    When we get "/news/search?page_size=101"
+    Then we get error 400
+        """
+        {"code": 400, "message": "Requested maximum number of results exceeds 100"}
+        """
+    When we get "/news/search?page=0"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?page=one"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?from=1"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): from"}
+      """
+    When we get "/news/search?size=10"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): size"}
+      """

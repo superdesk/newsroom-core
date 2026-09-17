@@ -1,7 +1,7 @@
 import functools
 from typing import Any, ClassVar
 from typing_extensions import Self
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator, AliasChoices
 
 from content_api.errors import BadParameterValueError
 from newsroom.search.types import BaseSearchRequestArgs
@@ -66,6 +66,15 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     priority: str | None = None
     genre: str | None = None
     item_source: str | None = None
+
+    # Overload the page number for the API, the base class allows 0 for aggregate only queries
+    page: int = Field(default=1, ge=1)
+
+    # Overload page_size to remove the "size" alias and validate value range.
+    page_size: int = Field(validation_alias=AliasChoices("page_size", "max_results"), default=25, ge=1)
+
+    # the from argument is not exposed to by the API
+    from_item_number: int | None = Field(alias="from", default=None, exclude=True)
 
     def to_dict(self, flatten_lists: bool = False, **kwargs):
         data = super().to_dict(**kwargs)
