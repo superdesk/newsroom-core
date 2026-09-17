@@ -68,7 +68,7 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     item_source: str | None = None
 
     # Overload the page number for the API, the base class allows 0 for aggregate only queries
-    page: int | None = Field(default=1, ge=1)
+    page: int = Field(default=1, ge=1)
 
     # Overload page_size to remove the "size" alias and validate value range.
     page_size: int = Field(validation_alias=AliasChoices("page_size", "max_results"), default=25, ge=1)
@@ -141,4 +141,3 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
             raise BadParameterValueError("Only one of `include_fields` or `exclude_fields` can be provided, not both.")
 
         return values
-
