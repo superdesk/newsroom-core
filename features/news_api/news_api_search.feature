@@ -833,18 +833,28 @@ Feature: News API News Search
         """
         {"code": 400, "message": "One or more fields did not pass validation."}
         """
-    When we get "/news/search?page_size=51"
+    When we get "/news/search?page_size=101"
     Then we get error 400
         """
-        {"code": 400, "message": "One or more fields did not pass validation."}
+        {"code": 400, "message": "Requested maximum number of results exceeds 100"}
         """
     When we get "/news/search?page=0"
     Then we get error 400
       """
-      {"code": 400, "message": "Page number must be an integer greater than or equal to 1"}
+      {"code": 400, "message": "One or more fields did not pass validation."}
       """
     When we get "/news/search?page=one"
     Then we get error 400
       """
-      {"code": 400, "message": "Page number must be an integer greater than or equal to 1"}
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?from=1"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): from"}
+      """
+    When we get "/news/search?size=10"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): size"}
       """
