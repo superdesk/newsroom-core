@@ -67,14 +67,14 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
     genre: str | None = None
     item_source: str | None = None
 
-    page: int = 1
-    page_size: int = Field(
-        validation_alias=AliasChoices("page_size", "size", "max_results"),
-        default=25,
-        ge=1,
-        le=50,
-        description="page_size greater than or equal to 1 ",
-    )
+    # Overload the page number for the API, the base class allows 0 for aggregate only queries
+    page: int | None = Field(default=1, ge=1)
+
+    # Overload page_size to remove the "size" alias and validate value range.
+    page_size: int = Field(validation_alias=AliasChoices("page_size", "max_results"), default=25, ge=1)
+
+    # the from argument is not exposed to by the API
+    from_item_number: int | None = Field(alias="from", default=None, exclude=True)
 
     def to_dict(self, flatten_lists: bool = False, **kwargs):
         data = super().to_dict(**kwargs)
@@ -142,18 +142,3 @@ class NewsApiSearchRequestArgs(BaseSearchRequestArgs):
 
         return values
 
-    @field_validator("page", mode="before")
-    def validate_page(cls, value) -> int:
-        """
-        :param value: The value of the page argument to validate must be a positive integer >= 1
-        :return: integer page value
-        """
-        try:
-            parsed_value = int(value)
-        except (ValueError, TypeError):
-            raise BadParameterValueError("Page number must be an integer greater than or equal to 1")
-
-        if parsed_value < 1:
-            raise BadParameterValueError("Page number must be an integer greater than or equal to 1")
-
-        return parsed_value

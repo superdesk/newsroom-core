@@ -15,4 +15,4 @@ class NewsApiAuditResourceModel(NewshubResourceModel):
     endpoint: fields.Keyword
     items_id: Annotated[list[str], fields.keyword_mapping()]
     created: datetime = Field(default_factory=utcnow)
-    subscriber: fields.ObjectId | None = None
+    subscriber: Annotated[fields.ObjectId | None, fields.keyword_mapping()] = None
