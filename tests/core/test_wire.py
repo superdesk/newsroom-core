@@ -1058,3 +1058,33 @@ async def test_sorting_wire_items(app, client):
     assert json_data[0]["_id"] == "item3"
     assert json_data[1]["_id"] == "item2"
     assert json_data[2]["_id"] == "item1"
+
+async def test_share_link_original_wire_item(app, client):
+    now = datetime.now(tz=pytz.UTC)
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "item1",
+                "headline": "First Item",
+                "body_html": "<p>test one</p>",
+                "type": "text",
+                "version": 1,
+                "nextversion": "item2",
+                "versioncreated": now - timedelta(days=1),
+            },
+            {
+                "_id": "item2",
+                "type": "text",
+                "headline": "Second Item",
+                "body_html": "<p>test updated</p>",
+                "versioncreated": now,
+            }
+        ],
+    )
+
+    resp = await client.get("/wire/item1?format=json")
+    assert resp.status_code == 200
+    json_data = await resp.get_json()
+    assert json_data.get("body_html") == "<p>test one</p>"
+
