@@ -673,7 +673,10 @@ async def item_view_endpoint(
     if not wire_item:
         return await request.abort(404)
 
-    await set_permissions(wire_item, params.ignore_latest)
+    # If the item is not the latest set the permissions on this version not the latest
+    ignore_latest = (getattr(wire_item, "nextversion", None) is not None) or params.ignore_latest
+    await set_permissions(wire_item, ignore_latest)
+
     wire_item_dict = wire_item.to_dict()
     await apply_company_permissions_to_embeds([wire_item_dict], params.type)
     ui_config_service = UiConfigResourceService()
