@@ -9,7 +9,7 @@ interface IProps {
 }
 
 export default function ToBeConfirmedLabel({item, size}: IProps) {
-    const classes = classNames('label label--rounded label--orange', {
+    const classes = classNames('label label--rounded label--translucent label--orange', {
         'label--big': size === 'big',
         'mb-2': size === 'big',
     });

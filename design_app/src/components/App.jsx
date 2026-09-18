@@ -14,6 +14,7 @@ import SaveTopic from '../pages/SaveTopic';
 import MyDashboard from '../pages/MyDashboard';
 import Login from '../pages/Login';
 import Drafts from '../pages/Drafts';
+import Labels from '../pages/Labels';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="mydashboard" element={<MyDashboard />} />
           <Route path="login" element={<Login />} />
           <Route path="drafts" element={<Drafts />} />
+          <Route path="labels" element={<Labels />} />
         </Route>          
       </Routes>      
     </BrowserRouter>

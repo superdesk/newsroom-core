@@ -148,6 +148,29 @@ $container-max-widths: (
 
     --main-blue:        hsl(196, 100%, 34%);
 
+    // LEGACY PALETTE
+    // CSS siblings of the Sass colour variables at the top of this file, in LCH.
+    // Converted from the Sass values, so no colour change is intended; a couple of
+    // them can paint 1/255 off, which is not visible.
+    --color-gray-light:      lch(80.964% 0.0157333 356.612);   // $gray-light
+    --color-gray-mid:        lch(63.601% 0.0128965 356.662);   // $gray-mid
+    --color-gray-dark:       lch(48.8397% 0.0105087 356.618);  // $gray-dark
+    --color-cool-gray-dark:  lch(35.7265% 8.94341 259.635);    // $cool-gray-dark
+    --color-cool-gray-mid:   lch(49.8791% 11.8719 259.746);    // $cool-gray-mid
+    --color-main-blue:       lch(48.8708% 37.7149 243.67);     // $main-blue, same value as --main-blue above
+    --color-mid-blue:        lch(39.3598% 31.6902 242.15);     // $mid-blue
+    --color-mid-blue-light:  lch(48.0432% 22.7132 230.327);    // $mid-blue-light
+    --color-pink:            lch(47.3919% 76.1549 350.296);    // $pink
+    --color-red:             lch(43.1981% 89.5182 40.498);     // $red
+    --color-green:           lch(49.6989% 55.277 123.141);     // $green
+    --color-green-dark:      lch(42.9261% 55.4582 124.202);    // $green-dark
+    --color-orange:          lch(50.2145% 65.7759 62.618);     // $orange
+    --color-orange2:         lch(59.33% 71.3731 66.9517);      // $orange2
+    --color-cyan:            lch(49.5626% 31.4251 196.552);    // $cyan
+    --color-purple:          lch(48.9748% 90.6293 317.918);    // $purple
+    --color-yellow:          lch(49.7065% 55.4758 84.8796);    // $yellow
+    // $background-color has no sibling: it is already var(--color-background)
+
     // CORE: FOCUS - focus color for interactive elements -- input fields, search, selected elements etc.
     --color-interactive-focus-base: 196, 100%;
     --color-interactive-focus-l: 34%;

@@ -312,7 +312,7 @@ class WireListItem extends React.Component<IProps, IState> {
                             >
                                 <button
                                     className={classNames(
-                                        'label label-rounded label--green mt-1 mt-md-2',
+                                        'label label--rounded label--green mt-1 mt-md-2',
                                         {
                                             'bg-transparent': !matchedIds.length,
                                             'text-primary': !matchedIds.length,

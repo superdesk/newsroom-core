@@ -156,7 +156,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                 {toolbar ? toolbar : (
                     <div className="list-item__preview-toolbar">
                         <div className="list-item__preview-toolbar-left">
-                            <label className={`label label--${stateLabelDetails.colour} label--big label--rounded`}>
+                            <label className={`label label--${stateLabelDetails.colour} label--big label--rounded label--translucent`}>
                                 {stateLabelDetails.text}
                             </label>
                             {user.user_type !== 'administrator' ? null : (
