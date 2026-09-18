@@ -1,12 +1,10 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get} from 'lodash';
 
 import {gettext} from 'utils';
-import {getName, getInternalNote} from '../utils';
-import {fetchItem} from '../actions';
+import {getName, getInternalNote, getFilteredItems} from '../utils';
+import {fetchItemsByIdToRedux} from '../actions';
 
 import AgendaTime from './AgendaTime';
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -16,101 +14,138 @@ import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaTags from './AgendaTags';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
+import {IAgendaItem} from 'interfaces';
 
-class AgendaPreviewEventComponent extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface AgendaPreviewEventProps {
+    item: IAgendaItem;
+    itemsById: Array<IAgendaItem>;
+    eventIds: Array<string>;
+    fetchItemsByIdToRedux: (ids: Array<string>) => Promise<void>;
+}
+
+interface AgendaPreviewEventState {
+    loading: boolean;
+    expandedEvents: Record<string, boolean>;
+}
+
+class AgendaPreviewEventComponent extends React.Component<AgendaPreviewEventProps, AgendaPreviewEventState> {
+    constructor(props: AgendaPreviewEventProps) {
         super(props);
 
         this.state = {
             loading: true,
-            expanded: false,
+            expandedEvents: {},
         };
+
         this.toggleExpanded = this.toggleExpanded.bind(this);
+        this.reloadEvent = this.reloadEvent.bind(this);
     }
 
     componentDidMount() {
         this.reloadEvent();
     }
 
-    componentDidUpdate(prevProps: any) {
-        if (get(prevProps.item, 'event_id') !== get(this.props.item, 'event_id')) {
+    componentDidUpdate(prevProps: AgendaPreviewEventProps) {
+        if (prevProps.eventIds !== this.props.eventIds) {
             this.reloadEvent();
         }
     }
 
     reloadEvent() {
-        this.setState({loading: true}, () => {
-            this.props
-                .fetchEvent(this.props.item.event_id)
-                .finally(() => {
-                    this.setState({loading: false});
-                });
-        });
+        const {eventIds, fetchItemsByIdToRedux} = this.props;
+    
+        if (eventIds == null || eventIds.length == 0) {
+            this.setState({loading: false});
+            return;
+        }
+        
+    
+        this.setState({loading: true});
+        
+        fetchItemsByIdToRedux(eventIds)
+            .finally(() => {
+                this.setState({loading: false});
+            })
+            .catch((error) => {
+                console.error('Error fetching items:', error);
+                this.setState({loading: false});
+            });
     }
 
-    toggleExpanded() {
-        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
+    toggleExpanded(eventId: string) {
+        this.setState((prevState) => ({
+            expandedEvents: {
+                ...prevState.expandedEvents,
+                [eventId]: !prevState.expandedEvents[eventId],
+            },
+        }));
+    }
+
+    renderEvent(item: IAgendaItem) {
+        const isExpanded = this.state.expandedEvents[item._id] || false;
+
+        return (
+            <div
+                key={item._id}
+                className={classNames('agenda-planning__preview', {
+                    'agenda-planning__preview--expanded': isExpanded,
+                })}
+            >
+                <div className="agenda-planning__preview-header">
+                    <a href="#" onClick={() => this.toggleExpanded(item._id)}>
+                        <i
+                            className={classNames('icon-small--arrow-down me-1', {
+                                'rotate-90-ccw': !isExpanded,
+                            })}
+                        />
+                    </a>
+                    <h3 onClick={() => this.toggleExpanded(item._id)}>{getName(item)}</h3>
+                </div>
+                <div className="agenda-planning__preview-date">
+                    <AgendaTime item={item}>
+                        <AgendaListItemLabels item={item} />
+                    </AgendaTime>
+                </div>
+                {!isExpanded ? null : (
+                    <div className="agenda-planning__preview-metadata">
+                        <AgendaMeta item={item} />
+                        <AgendaLongDescription item={item} />
+                        <AgendaPreviewAttachments item={item} />
+                        <AgendaTags item={item} isItemDetail={false} />
+                        <AgendaEdNote
+                            item={item}
+                            plan={{}}
+                            secondaryNoteField="state_reason"
+                        />
+                        <AgendaInternalNote
+                            internalNote={getInternalNote(item, {})}
+                            mt2={!!(item.ednote || item.state_reason)}
+                        />
+                    </div>
+                )}
+            </div>
+        );
     }
 
     render() {
-        if (!this.state.loading && this.props.event == null) {
-            // If we're not loading and there is no event,
-            // then an error has occurred (user already notified via props.fetchEvent)
-            return null;
-        }
+        const {itemsById, eventIds} = this.props;
+
+        const filteredEvents = getFilteredItems(eventIds, itemsById);
 
         return (
             <div className="agenda-planning__container">
                 <div className="preview__content-block">
                     <div className="preview__content-block-title">
-                        {gettext('Associated Event')}
+                        {gettext('Related Events')}
                     </div>
-                    <div className='agenda-planning__preview-list'>
-                        <div className={classNames(
-                            'agenda-planning__preview',
-                            {'agenda-planning__preview--expanded': this.state.expanded}
-                        )}>
-                            {this.state.loading ? (
-                                <div className="spinner-border text-success" />
-                            ) : (
-                                <React.Fragment>
-                                    <div className="agenda-planning__preview-header">
-                                        <a href='#' onClick={this.toggleExpanded}>
-                                            <i className={classNames('icon-small--arrow-down me-1', {
-                                                'rotate-90-ccw': !this.state.expanded,
-                                            })} />
-                                        </a>
-                                        <h3 onClick={this.toggleExpanded}>{getName(this.props.event)}</h3>
-                                    </div>
-                                    <div className="agenda-planning__preview-date">
-                                        <AgendaTime item={this.props.event}>
-                                            <AgendaListItemLabels item={this.props.event} />
-                                        </AgendaTime>
-                                    </div>
-                                    {!this.state.expanded ? null : (
-                                        <div className="agenda-planning__preview-metadata">
-                                            <AgendaMeta item={this.props.event} />
-                                            <AgendaLongDescription item={this.props.event} />
-                                            <AgendaPreviewAttachments item={this.props.event} />
-                                            <AgendaTags
-                                                item={this.props.event}
-                                                isItemDetail={false}
-                                            />
-                                            <AgendaEdNote
-                                                item={this.props.event}
-                                                plan={{}}
-                                                secondaryNoteField="state_reason"
-                                            />
-                                            <AgendaInternalNote
-                                                internalNote={getInternalNote(this.props.event, {})}
-                                                mt2={!!(this.props.event.ednote || this.props.event.state_reason)}
-                                            />
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            )}
-                        </div>
+                    <div className="agenda-planning__preview-list">
+                        {this.state.loading ? (
+                            <div className="spinner-border text-success" />
+                        ) : filteredEvents.length === 0 ? (
+                            <div>{gettext('No Related Events')}</div>
+                        ) : (
+                            filteredEvents.map((event) => this.renderEvent(event))
+                        )}
                     </div>
                 </div>
             </div>
@@ -118,18 +153,13 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
     }
 }
 
-AgendaPreviewEventComponent.propTypes = {
-    item: PropTypes.object,
-    event: PropTypes.object,
-    fetchEvent: PropTypes.func,
-};
-
 const mapStateToProps = (state: any, ownProps: any) => ({
-    event: state.itemsById[ownProps.item.event_id],
+    itemsById: state.itemsById,
+    eventIds: ownProps.item.event_ids || [],
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    fetchEvent: (eventId: any) => dispatch(fetchItem(eventId)),
+    fetchItemsByIdToRedux: (ids: Array<string>) => dispatch(fetchItemsByIdToRedux(ids)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

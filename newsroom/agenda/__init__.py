@@ -1,12 +1,7 @@
-import superdesk
-from flask import Blueprint
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from newsroom.utils import url_for_agenda
-from .agenda import AgendaResource, AgendaService, aggregations, PRIVATE_FIELDS
-from newsroom.search.config import init_nested_aggregation
-from .featured import FeaturedResource, FeaturedService
-from . import formatters
+
 from .utils import (
     get_coverage_email_text,
     get_coverage_content_type_name,
@@ -16,17 +11,22 @@ from .utils import (
     get_coverage_status,
     get_event_state,
 )
+from .filters import AgendaSearchRequestArgs
+from .agenda_service import AgendaItemService
+from .agenda_search import AgendaSearchServiceAsync
 
-
-blueprint = Blueprint("agenda", __name__)
 
 from . import views  # noqa
+from .module import module  # noqa
+
+__all__ = [
+    "AgendaSearchServiceAsync",
+    "AgendaItemService",
+    "AgendaSearchRequestArgs",
+]
 
 
 def init_app(app):
-    superdesk.register_resource("agenda", AgendaResource, AgendaService, _app=app)
-    superdesk.register_resource("agenda_featured", FeaturedResource, FeaturedService, _app=app)
-
     app.section("agenda", app.config["AGENDA_SECTION"], "agenda")
     app.sidenav(app.config["AGENDA_SECTION"], "agenda.index", "calendar", section="agenda")
     app.sidenav(
@@ -38,8 +38,6 @@ def init_app(app):
         badge="saved-items-count",
     )
 
-    app.download_formatter("ical", formatters.iCalFormatter(), "iCalendar", ["agenda"])
-    app.download_formatter("Csv", formatters.CSVFormatter(), "CSV", ["agenda"])
     app.add_template_global(url_for_agenda)
     app.add_template_global(get_coverage_email_text)
     app.add_template_global(get_coverage_content_type_name, "get_coverage_content_type")
@@ -78,12 +76,3 @@ def init_app(app):
                 "label": lazy_gettext("Place"),
             },
         ]
-
-    init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)
-
-    if app.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
-        PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])
-
-    app.config["CLIENT_CONFIG"]["agenda_default_filter_hide_planning"] = app.config.get(
-        "AGENDA_DEFAULT_FILTER_HIDE_PLANNING", False
-    )

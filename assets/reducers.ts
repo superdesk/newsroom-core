@@ -13,7 +13,7 @@ import {
     PREVIEW_ITEM,
     PRINT_ITEMS,
     QUERY_ITEMS,
-    RECIEVE_ITEM,
+    RECEIVE_ITEM,
     RECIEVE_NEXT_ITEMS,
     REMOVE_BOOKMARK,
     SELECT_ALL,
@@ -191,7 +191,7 @@ export function defaultReducer(state: any = {}, action: any) {
         };
     }
 
-    case RECIEVE_ITEM: {
+    case RECEIVE_ITEM: {
         const itemsById = Object.assign({}, state.itemsById);
         itemsById[action.data._id] = action.data;
         return  {...state, itemsById};

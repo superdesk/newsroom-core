@@ -28,6 +28,7 @@ function UsersApp(props: any): any {
             onNewItem={props.newUser}
             setQuery={props.setQuery}
             fetch={props.fetchUsers}
+            testId="users-topbar"
         >
             <UserListCompanyFilter
                 companies={props.companies}

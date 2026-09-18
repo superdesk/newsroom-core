@@ -1,4 +1,6 @@
-from newsroom.utils import short_highlighted_text, get_groups
+from newsroom.users import UsersService
+from newsroom.utils import short_highlighted_text, get_groups, get_user_dict_async
+from newsroom.tests.fixtures import PUBLIC_USER_ID
 
 
 def test_short_highlighted_text():
@@ -113,3 +115,19 @@ def test_filter_groups():
 
     company["restrict_coverage_info"] = False
     assert len(get_groups(agenda_groups, company)) == 2
+
+
+async def test_get_user_dict_async_skips_invalid_user(app):
+    users = await get_user_dict_async(use_globals=False)
+
+    assert PUBLIC_USER_ID in users
+    user_count = len(users)
+    assert user_count > 1
+
+    # bypass the service so the invalid locale is not rejected on the way in
+    await UsersService().mongo_async.update_one({"_id": PUBLIC_USER_ID}, {"$set": {"locale": "xx_XX"}})
+
+    users = await get_user_dict_async(use_globals=False)
+
+    assert PUBLIC_USER_ID not in users
+    assert len(users) == user_count - 1

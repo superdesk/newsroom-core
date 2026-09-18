@@ -20,6 +20,7 @@ interface IProps {
     user: IUser['_id'];
     coverage: ICoverage;
     showBorder?: boolean;
+    restrictCoverageInfo?: boolean;
 }
 
 interface IState {
@@ -59,7 +60,7 @@ class AgendaListCoverageItem extends React.Component<IProps, IState> {
             isWatched: watched,
             watchText: watchText,
             isCoverageForExtraDay: isCoverageForExtraDay(this.props.coverage, this.props.group),
-            tooltip: `${watchText} ${getCoverageTooltip(this.props.coverage, beingUpdated)}`,
+            tooltip: `${watchText} ${getCoverageTooltip(this.props.coverage, beingUpdated, this.props.restrictCoverageInfo)}`,
         };
     }
 

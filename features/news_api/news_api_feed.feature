@@ -45,16 +45,16 @@ Feature: News API News Feed
         [
             {
                 "_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim",
-                "versioncreated": "2015-06-01T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }, {
                 "_id": "urn:test2", "body_html": "Once upon a time there was an aardvark that could not swim",
-                "versioncreated": "2015-06-02T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }, {
                 "_id": "urn:test3", "body_html": "Once upon a time there were 2 fish who could swim",
-                "versioncreated": "2015-06-02T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }, {
                 "_id": "urn:test4", "body_html": "Once upon a time there were 2 aardvark that could not swim",
-                "versioncreated": "2015-06-03T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }
         ]
         """
@@ -75,76 +75,94 @@ Feature: News API News Feed
         """
 
   Scenario: Response provides a link to the next page
+    Given "products"
+        """
+        [{
+            "_id": "5e4cade4d69954b6d55ac09a",
+            "name": "A fishy product",
+            "description": "A product for those interested in fish",
+            "companies": ["#companies._id#"],
+            "query": "fish",
+            "product_type": "news_api"
+        }, {
+            "_id": "5e4cade4d69954b6d55ac09b",
+            "name": "An aardvark product",
+            "description": "A product for those interested in aardvarks",
+            "companies": ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
     Given "items"
         """
         [
             {
                 "_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim",
-                "versioncreated": "2015-06-01T03:48:39.000Z"
+                "versioncreated": "#DATE-5#"
             }, {
                 "_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim",
-                "versioncreated": "2015-06-02T03:48:39.000Z"
+                "versioncreated": "#DATE-4#"
             }, {
                 "_id": "urn:test3", "body_html": "Once upon a time there were 3 fish who could swim",
-                "versioncreated": "2015-06-02T03:48:39.000Z"
+                "versioncreated": "#DATE-3#"
             }, {
                 "_id": "urn:test4", "body_html": "Once upon a time there were 4 fish who could swim",
-                "versioncreated": "2015-06-03T03:48:39.000Z"
+                "versioncreated": "#DATE-2#"
             }, {
                 "_id": "urn:test5", "body_html": "Once upon a time there were 5 fish who could swim",
-                "versioncreated": "2015-06-04T03:48:39.000Z"
+                "versioncreated": "#DATE-1#"
             }
         ]
         """
-    When we get "news/feed?include_fields=body_html&max_results=2&products=#products._id#"
+    When we get "news/feed?include_fields=body_html&max_results=2&products=5e4cade4d69954b6d55ac09a,5e4cade4d69954b6d55ac09b"
     Then we get list with 5 items
         """
         {
             "_items": [
-                {"_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim"},
-                {"_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim"}
+                {"_id": "urn:test1", "body_html": "<p>Once upon a time there was a single fish who could swim</p>"},
+                {"_id": "urn:test2", "body_html": "<p>Once upon a time there were 2 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
-                    "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test2&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-02T03:48:39"
+                    "title": "News Feed"
                 }
             }
         }
         """
+    Then we check feed href for #DATE-4# and urn:test2
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 3 items
         """
         {
             "_items": [
-                {"_id": "urn:test3", "body_html": "Once upon a time there were 3 fish who could swim"},
-                {"_id": "urn:test4", "body_html": "Once upon a time there were 4 fish who could swim"}
+                {"_id": "urn:test3", "body_html": "<p>Once upon a time there were 3 fish who could swim</p>"},
+                {"_id": "urn:test4", "body_html": "<p>Once upon a time there were 4 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
-                    "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test4&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-03T03:48:39"
+                    "title": "News Feed"
                 }
             }
         }
         """
+    Then we check feed href for #DATE-2# and urn:test4
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 1 items
         """
         {
             "_items": [
-                {"_id": "urn:test5", "body_html": "Once upon a time there were 5 fish who could swim"}
+                {"_id": "urn:test5", "body_html": "<p>Once upon a time there were 5 fish who could swim</p>"}
             ],
             "_links": {
                 "next_page": {
-                    "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test5&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-04T03:48:39"
+                    "title": "News Feed"
                 }
             }
         }
         """
+    Then we check feed href for #DATE-1# and urn:test5
     Then we store NEXT_PAGE from HATEOAS
     When we get "#NEXT_PAGE#"
     Then we get list with 0 items
@@ -153,8 +171,7 @@ Feature: News API News Feed
             "_items": [],
             "_links": {
                 "next_page": {
-                    "title": "News Feed",
-                    "href": "news/feed?exclude_ids=urn:test5&include_fields=body_html&max_results=2&products=#products._id#&start_date=2015-06-04T03:48:39"
+                    "title": "News Feed"
                 }
             }
         }
@@ -166,10 +183,10 @@ Feature: News API News Feed
         [
             {
                 "_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim",
-                "versioncreated": "2015-06-01T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }, {
                 "_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim",
-                "versioncreated": "2015-06-02T03:48:39.000Z"
+                "versioncreated": "#DATE#"
             }
         ]
         """
@@ -203,5 +220,5 @@ Feature: News API News Feed
     When we get "/news/feed?exclude_fields=versioncreated"
     Then we get error 400
         """
-        {"code": 400, "message": "Exclude fields contains a non-allowed value"}
+        {"code": 400, "message": "`exclude_fields` contains non-allowed values: versioncreated"}
         """

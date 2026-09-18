@@ -12,13 +12,13 @@ import {
     WORKFLOW_COLORS,
 } from 'agenda/utils';
 
-export function CoverageMetadataPreviewHeader({coverage}: ICoverageMetadataPreviewProps) {
+export function CoverageMetadataPreviewHeader({coverage, restrictCoverageInfo}: ICoverageMetadataPreviewProps) {
     const slugline = coverage.slugline || '';
 
     return (
         <div
             className='coverage-item__row coverage-item__row--header-row'
-            title={getCoverageTooltip(coverage, isCoverageBeingUpdated(coverage))}
+            title={getCoverageTooltip(coverage, isCoverageBeingUpdated(coverage), restrictCoverageInfo)}
         >
             <span
                 className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>

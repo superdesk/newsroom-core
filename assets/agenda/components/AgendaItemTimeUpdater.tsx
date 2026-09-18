@@ -21,7 +21,7 @@ class AgendaItemTimeUpdater extends React.Component<IProps, IState> {
     interval: number;
     timerIntervalId: number;
 
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {timeText: ''};
@@ -37,8 +37,8 @@ class AgendaItemTimeUpdater extends React.Component<IProps, IState> {
 
     componentDidUpdate(prevProps: Readonly<IProps>) {
         if (
-            this.props.item._created !== prevProps.item._created ||
-            this.props.item._updated !== prevProps.item._updated
+            this.props.item.firstcreated !== prevProps.item.firstcreated ||
+            this.props.item.versioncreated !== prevProps.item.versioncreated
         ) {
             this.activateTimer(this.props.item);
         }
@@ -70,10 +70,10 @@ class AgendaItemTimeUpdater extends React.Component<IProps, IState> {
         }
     }
 
-    isItemPastTime(item: any) {
+    isItemPastTime(item: IAgendaItem) {
         // Check if the updated (and created) time is past the interval duration
-        return item && (moment().diff(moment(item._created), 'minutes') >= this.interval &&
-            moment().diff(moment(item._updated), 'minutes') >= this.interval);
+        return item && (moment().diff(moment(item.firstcreated), 'minutes') >= this.interval &&
+            moment().diff(moment(item.versioncreated), 'minutes') >= this.interval);
     }
 
     updateState(item: IAgendaItem, checkPastTime = true) {

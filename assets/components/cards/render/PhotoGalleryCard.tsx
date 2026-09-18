@@ -8,7 +8,7 @@ const getMediaPanel = (photo: any, index: any) => {
             onClick={()=>{window.open(photo.href,'_blank');}}>
             <img className='card-img-top' src={photo.media_url} alt={photo.description} />
             <div className='card-body'>
-                <h4 className='card-title'>{photo.description}</h4>
+                <h4 className='card-title card-title--overlaid'>{photo.description}</h4>
             </div>
         </div>
     </div>);

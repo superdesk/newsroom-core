@@ -4,6 +4,7 @@ import {Tooltip} from 'bootstrap';
 import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
 import {NotificationPopup, IProps as INotificationPopupProps} from './NotificationPopup';
+import {ErrorBoundary} from './ErrorBoundary';
 
 interface IState {
     displayItems: boolean;
@@ -97,17 +98,19 @@ class NotificationList extends React.Component<IProps, IState> {
                 </span>
 
                 {this.state.displayItems === true && (
-                    <NotificationPopup
-                        fullUser={this.props.fullUser}
-                        items={this.props.items}
-                        count={this.props.count}
-                        notifications={this.props.notifications}
-                        loading={this.props.loading}
-                        clearNotification={this.props.clearNotification}
-                        clearAll={this.props.clearAll}
-                        loadNotifications={this.props.loadNotifications}
-                        resumeNotifications={this.props.resumeNotifications}
-                    />
+                    <ErrorBoundary label="notification popup">
+                        <NotificationPopup
+                            fullUser={this.props.fullUser}
+                            items={this.props.items}
+                            count={this.props.count}
+                            notifications={this.props.notifications}
+                            loading={this.props.loading}
+                            clearNotification={this.props.clearNotification}
+                            clearAll={this.props.clearAll}
+                            loadNotifications={this.props.loadNotifications}
+                            resumeNotifications={this.props.resumeNotifications}
+                        />
+                    </ErrorBoundary>
                 )}
             </div>
         );

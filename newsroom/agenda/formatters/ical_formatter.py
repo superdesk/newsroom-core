@@ -1,12 +1,16 @@
+from typing import Any
+from datetime import timedelta
+
 import arrow
 import icalendar
+from quart_babel import lazy_gettext
 
-from flask import url_for
+from superdesk.flask import url_for
 from superdesk.utc import utcnow
 
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
-from newsroom.formatter import BaseFormatter
-from datetime import timedelta
 
 
 def datetime(value):
@@ -31,12 +35,17 @@ def guid(item):
 
 
 class iCalFormatter(BaseFormatter):
+    format_id = "ical"
+    name = lazy_gettext("iCalendar")
+    sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
+
     VERSION = "2.0"
     PRODID = "Newshub"
     FILE_EXTENSION = "ical"
     MIMETYPE = "text/calendar"
 
-    def format_item(self, item, item_type=None):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = None) -> bytes:
         cal = icalendar.Calendar()
         cal["version"] = self.VERSION
         cal["prodid"] = self.PRODID
@@ -83,7 +92,7 @@ class iCalFormatter(BaseFormatter):
             if media.get("media"):
                 event.add(
                     "attach",
-                    url_for("upload.get_upload", media_id=media["media"], _external=True),
+                    url_for("assets.download_file", media_id=media["media"], _external=True),
                 )
 
         # geo
@@ -93,7 +102,7 @@ class iCalFormatter(BaseFormatter):
                     event.add("location", loc["name"])
                 try:
                     event.add("geo", (loc["location"]["lat"], loc["location"]["lon"]))
-                except KeyError:
+                except (KeyError, TypeError):
                     pass
 
         # links

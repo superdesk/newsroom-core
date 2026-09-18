@@ -22,6 +22,9 @@ import {
 } from './selectors';
 
 import {context} from 'selectors';
+import {SET_TOPICS} from './constants';
+
+export {SET_TOPICS};
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any) {
@@ -65,7 +68,6 @@ export function loadMyTopics() {
     return server.get('/topics/my_topics');
 }
 
-export const SET_TOPICS = 'SET_TOPICS';
 export function setTopics(topics: any) {
     return {type: SET_TOPICS, topics};
 }

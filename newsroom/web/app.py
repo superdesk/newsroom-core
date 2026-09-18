@@ -1,5 +1,4 @@
 import os
-
 from .factory import get_app
 
 

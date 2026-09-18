@@ -86,14 +86,21 @@ export const NotificationPopup = (props: IProps) => {
                             {gettext('Loading...')}
                         </div>
                     ) : (
-                        props.notifications.map((notification, index) => (
-                            <NotificationListItem
-                                key={notification._id || index}
-                                item={notification.item in props.items ? props.items[notification.item] : notification.data?.item}
-                                notification={notification}
-                                clearNotification={props.clearNotification}
-                            />
-                        ))
+                        props.notifications
+                            .map((notification) => ({
+                                notification,
+                                item: props.items[notification.item] ?? notification.data?.item,
+                            }))
+                            // drop notifications whose item is gone, there is nothing to render for those
+                            .filter((entry): entry is {notification: INotification; item: IArticle} => entry.item != null)
+                            .map(({notification, item}) => (
+                                <NotificationListItem
+                                    key={notification._id}
+                                    item={item}
+                                    notification={notification}
+                                    clearNotification={props.clearNotification}
+                                />
+                            ))
                     )}
                 </div>
             );

@@ -32,14 +32,22 @@ const testArticle: IArticle = {
     description_text: 'test',
 };
 
+function getLastHistoryPayload() {
+    const options = fetchMock.lastOptions('/history/new');
+
+    expect(options).toBeDefined();
+    return JSON.parse((options && options.body) as unknown as string);
+}
+
 describe('wire actions', () => {
     let store: any;
     const response: any = {
         _meta: {total: 2},
-        _items: [{_id: 'foo'}],
+        _items: [{_id: 'foo', type: 'text'}],
     };
 
     beforeEach(() => {
+        actions.resetFetchNewItemsThrottleForTests();
         (spyOn(utils.now, 'utcOffset') as any).and.returnValue('');
         fetchMock.get('/wire/search', response, {
             name: 'wire_search:from_0',
@@ -49,6 +57,7 @@ describe('wire actions', () => {
     });
 
     afterEach(() => {
+        actions.resetFetchNewItemsThrottleForTests();
         fetchMock.restore();
     });
 
@@ -110,10 +119,44 @@ describe('wire actions', () => {
     });
 
     it('can populate new items on update', () => {
+        const searchSpy = spyOn(server, 'get').and.callThrough();
+
         expect(store.getState().newItems).toEqual([]);
         return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
             .then(() => {
                 expect(store.getState().newItems).toEqual(['foo']);
+                expect(searchSpy).toHaveBeenCalled();
+            });
+    });
+
+    it('sets an error message when throttled new item fetch gets a 403', () => {
+        spyOn(server, 'get').and.returnValue(Promise.reject({status: 403, statusText: 'Forbidden'} as Response));
+
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
+            .then(() => {
+                expect(store.getState().errorMessage).toBe(
+                    'There is no product associated with your user. Please reach out to your Company Admin'
+                );
+            });
+    });
+
+    it('throttles new item update fetches during bursts', () => {
+        const searchSpy = spyOn(server, 'get').and.callThrough();
+        jasmine.clock().install();
+        jasmine.clock().mockDate();
+
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
+            .then(() => {
+                store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'bar', 'type': 'text'} ]}}));
+
+                expect(searchSpy.calls.count()).toBe(1);
+
+                jasmine.clock().tick(2000);
+
+                expect(searchSpy.calls.count()).toBe(2);
+            })
+            .finally(() => {
+                jasmine.clock().uninstall();
             });
     });
 
@@ -138,24 +181,24 @@ describe('wire actions', () => {
 
     it('open item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
-            expect(item).toEqual({_id: 'foo'});
-            expect(action).toEqual('open');
-            expect(section).toEqual('wire');
-        });
         store.dispatch(actions.openItem(testArticle));
+        expect(getLastHistoryPayload()).toEqual({
+            item: testArticle,
+            action: 'open',
+            section: 'wire',
+        });
         expect(store.getState().openItem._id).toBe('foo');
         fetchMock.reset();
     });
 
     it('preview item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
-            expect(item).toEqual({_id: 'foo'});
-            expect(action).toEqual('preview');
-            expect(section).toEqual('wire');
-        });
         store.dispatch(actions.previewItem({_id: 'foo'}));
+        expect(getLastHistoryPayload()).toEqual({
+            item: {_id: 'foo'},
+            action: 'preview',
+            section: 'wire',
+        });
         fetchMock.reset();
     });
 
@@ -172,7 +215,7 @@ describe('wire actions', () => {
 
     it('can fetch next item version', () => {
         const next: any = {};
-        fetchMock.get('/wire/bar?format=json', next);
+        fetchMock.get('/wire/bar?format=json&ignore_latest=1', next);
 
         return actions.fetchNext({...testArticle, nextversion: 'bar'})
             .then((_next) => {

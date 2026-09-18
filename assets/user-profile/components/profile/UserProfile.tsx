@@ -7,7 +7,7 @@ import {gettext, getSubscriptionTimesString, formatDate, parseISODate, notificat
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
-import {getLocaleInputOptions, getDefaultLocale} from 'users/utils';
+import {getLocaleInputOptions, getDefaultLocale, getDefaultLocaleCode} from 'users/utils';
 
 import {
     fetchUser,
@@ -233,7 +233,7 @@ class UserProfile extends React.PureComponent<IProps> {
                                     <SelectInput
                                         name='locale'
                                         label={gettext('Language')}
-                                        value={user.locale}
+                                        value={user.locale || getDefaultLocaleCode()}
                                         onChange={(event) => onChange({locale: event.target.value})}
                                         options={localeOptions}
                                         defaultOption={getDefaultLocale()}

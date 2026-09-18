@@ -1,5 +1,6 @@
 import {auth} from './init';
 import {signInWithEmailAndPassword, updatePassword, AuthError} from 'firebase/auth';
+import {reportFirebaseAuthError} from './sentry';
 
 declare const firebaseUserEmail : string;
 
@@ -26,6 +27,11 @@ if (form != null) {
                 form.submit();
             });
         }).catch((reason: AuthError) => {
+            reportFirebaseAuthError(reason, {
+                action: 'change_password',
+                email: firebaseUserEmail,
+                ignoredCodes: ['auth/invalid-credential'],
+            });
             firebaseStatus.value = reason.code;
             form.submit();
         });

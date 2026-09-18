@@ -1,10 +1,11 @@
-import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IService, IUser} from 'interfaces';
+import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IService, IUser, IEmbedContentType, IEmbedPermissionUserAction} from 'interfaces';
 import {cloneDeep} from 'lodash';
 import {
     EDIT_COMPANY,
     TOGGLE_COMPANY_SECTION,
     TOGGLE_COMPANY_PRODUCT,
     UPDATE_COMPANY_SEATS,
+    TOGGLE_COMPANY_EMBED_PERMISSIONS,
     NEW_COMPANY,
     QUERY_COMPANIES,
     SELECT_COMPANY,
@@ -19,6 +20,15 @@ import {
 import {ADD_EDIT_USERS} from 'actions';
 
 import {searchReducer} from 'search/reducers';
+
+const defaultEmbedPermissions: {[contentType: string]: Array<IEmbedPermissionUserAction>} = {
+    featuremedia: ['display', 'download'],
+    video: ['display', 'download'],
+    audio: ['display', 'download'],
+    embed_code: ['display'],
+    picture: ['display'],
+    sd_product: [],
+};
 
 export interface ICompanySettingsStore {
     query: string | null;
@@ -103,6 +113,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             country: '',
             contact_email: '',
             url: '',
+            embed_permissions: {...defaultEmbedPermissions},
         };
 
         return {
@@ -172,6 +183,23 @@ export default function companyReducer(state: any = initialState, action: any) {
                 product.seats = seats;
             }
         });
+
+        return {...state, companyToEdit: company};
+    }
+
+    case TOGGLE_COMPANY_EMBED_PERMISSIONS: {
+        const company = cloneDeep(state.companyToEdit);
+        const {contentType, userAction} = action.payload;
+
+        const permissions: Array<IEmbedPermissionUserAction> = company.embed_permissions?.[contentType]
+            ?? defaultEmbedPermissions[contentType]
+            ?? [];
+
+        if (permissions.includes(userAction)) {
+            company.embed_permissions[contentType] = permissions.filter((permission) => permission !== userAction);
+        } else {
+            company.embed_permissions[contentType].push(userAction);
+        }
 
         return {...state, companyToEdit: company};
     }

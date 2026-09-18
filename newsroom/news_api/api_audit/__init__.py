@@ -1,36 +1,25 @@
-from superdesk import register_resource
-from superdesk.resource import not_analyzed
+from superdesk.core.module import Module, SuperdeskAsyncApp
+from superdesk.core.resources import ResourceConfig, MongoResourceConfig, ElasticResourceConfig
 
-from newsroom import Resource, Service
-
-
-not_analayzed_mapping = {"type": "string", "mapping": not_analyzed}
+from newsroom import MONGO_PREFIX, ELASTIC_PREFIX
+from newsroom.types import NewsApiAuditResourceModel
 
 
-class NewsApiAuditService(Service):
-    pass
+news_api_audit_resource_config = ResourceConfig(
+    name="api_audit",
+    data_class=NewsApiAuditResourceModel,
+    mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
+    elastic=ElasticResourceConfig(prefix=ELASTIC_PREFIX),
+)
 
 
-class NewsApiAuditResource(Resource):
-    schema = {
-        "type": not_analayzed_mapping,
-        "subscriber": not_analayzed_mapping,
-        "uri": not_analayzed_mapping,
-        "version": not_analayzed_mapping,
-        "remote_addr": not_analayzed_mapping,
-        "endpoint": not_analayzed_mapping,
-    }
-    schema.update(
-        {
-            "items_id": {"type": "list", "mapping": not_analyzed},
-            "created": {"type": "datetime"},
-        }
-    )
-
-    datasource = {"source": "api_audit", "search_backend": "elastic"}
-    internal_resource = True
+def init_app(app: SuperdeskAsyncApp) -> None:
+    if app.wsgi.config.get("NEWS_API_ENABLED"):
+        # Manually register the resource, as ``Module.init`` runs after ``Module.resources`` registration
+        app.resources.register(news_api_audit_resource_config)
 
 
-def init_app(app):
-    if app.config.get("NEWS_API_ENABLED"):
-        register_resource("api_audit", NewsApiAuditResource, NewsApiAuditService, _app=app)
+module = Module(
+    "newsroom.news_api.api_audit",
+    init=init_app,
+)

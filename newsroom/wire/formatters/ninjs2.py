@@ -1,10 +1,8 @@
-from newsroom.auth import get_company
-from newsroom.news_api.utils import (
-    remove_internal_renditions,
-    check_association_permission,
-)
-from newsroom.products.products import get_products_by_company
+from quart_babel import lazy_gettext
+
+from newsroom.wire.embeds import remove_internal_renditions
 from .ninjs import NINJSFormatter
+from newsroom.types import SectionEnum
 
 
 class NINJSFormatter2(NINJSFormatter):
@@ -12,12 +10,11 @@ class NINJSFormatter2(NINJSFormatter):
     Overload the NINJSFormatter and add the associations as a field to copy
     """
 
-    def __init__(self):
-        self.direct_copy_properties += ("associations",)
+    format_id = "ninjs2"
+    name = lazy_gettext("Ninjs v2")
+    # Sections set this is an API only format
+    sections = [SectionEnum.NEWS_API]
+    direct_copy_properties: set[str] = NINJSFormatter.direct_copy_properties.union(["associations"])
 
-    def _transform_to_ninjs(self, item):
-        company = get_company()
-        products = get_products_by_company(company)
-        if not check_association_permission(item, products):
-            item.pop("associations", None)
-        return remove_internal_renditions(super()._transform_to_ninjs(item))
+    async def _transform_to_ninjs(self, item):
+        return remove_internal_renditions(await super()._transform_to_ninjs(item))

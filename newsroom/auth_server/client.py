@@ -1,5 +1,7 @@
-from . import oauth2
+from superdesk.core.module import Module
+from .oauth2 import NewshubOAuth2Server
 
 
-def init_app(app):
-    oauth2.config_oauth(app)
+authorization = NewshubOAuth2Server("/api/auth_server/token")
+
+module = Module(name="newsroom.auth_server.client", init=authorization.init_app)

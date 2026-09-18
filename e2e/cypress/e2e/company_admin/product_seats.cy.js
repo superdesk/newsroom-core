@@ -38,7 +38,7 @@ describe('CompanyAdmin - Product Seats', function () {
             role: '',
             user_type: USERS.foobar.monkey.user_type,
             company_read_only: COMPANIES.foobar.name,
-            locale: '',
+            locale: 'en',
             expiry_alert: false,
             manage_company_topics: false,
         });
@@ -77,7 +77,7 @@ describe('CompanyAdmin - Product Seats', function () {
                 role: 'test user',
                 user_type: 'public',
                 company_read_only: 'Foo Bar & Co',
-                locale: '',
+                locale: 'en',
                 expiry_alert: true,
                 manage_company_topics: false,
             });

@@ -98,6 +98,7 @@ describe('Wire - Topics', function () {
         WirePage.filterPanel.getCurrentPanel('[data-test-id="edit-btn"]').click();
         profileTopics.createNewFolder('Weather');
         profileTopics.createNewFolder('Traffic');
+
         profileTopics.dragTopicToFolder('Sofab Weather', 'Weather');
         profileTopics
             .getTopicCardAction('Sofab Weather', 'Remove from folder')

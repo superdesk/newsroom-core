@@ -67,9 +67,11 @@ interface IClientConfig {
     show_default_time_frame_label?: boolean;
     agenda_default_filter_hide_planning: boolean;
     show_coverage_latest_version_only?: boolean;
+    embed_permissions_enabled?: boolean;
 }
 
 interface Window {
+    __newsroomWebSocketManager?: INewsroomWebSocketManager;
     sectionNames: {
         home: string;
         wire: string;
@@ -111,6 +113,27 @@ interface Window {
 
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
     sitename: string;
+    Sentry?: {
+        captureException: (error: unknown, context?: {
+            tags?: Record<string, string>;
+            extra?: Record<string, unknown>;
+        }) => void;
+    };
+}
+
+interface IWebSocketListener {
+    store: any;
+    action: any;
+}
+
+interface INewsroomWebSocketManager {
+    firstConnection: boolean;
+    wsConnection: WebSocket | null;
+    connectInterval: ReturnType<typeof setInterval> | null;
+    listeners: IWebSocketListener[];
+    shuttingDown: boolean;
+    unloadHandlerAttached: boolean;
+    unloadHandler: (() => void) | null;
 }
 
 type Dictionary<T> = {[key: string]: T};

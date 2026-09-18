@@ -1,56 +1,69 @@
-from flask import json
+from quart import json, url_for
 from bson import ObjectId
 import urllib.parse
 
+from tests.core.utils import create_entries_for
 
-def test_api_tokens_create(client):
-    response = client.post(
+from ..utils import login
+
+
+async def test_api_tokens_create(client):
+    response = await client.post(
         "/news_api_tokens",
-        data=json.dumps({"company": "5b504318975bd5227e5ea0b9"}),
-        content_type="application/json",
+        json={"company": "5b504318975bd5227e5ea0b9"},
     )
-    data = json.loads(response.get_data())
+    data = json.loads(await response.get_data())
     assert "token" in data
     assert response.status_code == 201
 
 
-def test_api_tokens_create_expired(client):
-    response = client.post(
+async def test_api_tokens_create_public_user_fails(client, app, public_user):
+    await login(client, public_user)
+    response = await client.post(
         "/news_api_tokens",
-        data=json.dumps(
-            {
-                "company": "5b504318975bd5227e5ea0b9",
-                "expiry": "1999-08-22T04:23:06+0000",
-            }
-        ),
-        content_type="application/json",
+        json={"company": "5b504318975bd5227e5ea0b9"},
     )
-    data = json.loads(response.get_data())
+    assert response.status_code == 403
+
+
+async def test_api_tokens_create_with_no_session(client, app, public_user):
+    await client.get(url_for("auth.logout"), follow_redirects=True)
+    response = await client.post("/news_api_tokens", json={"company": "5b504318975bd5227e5ea0b9"})
+    assert response.status_code == 403
+
+
+async def test_api_tokens_create_expired(client):
+    response = await client.post(
+        "/news_api_tokens",
+        json={
+            "company": "5b504318975bd5227e5ea0b9",
+            "expiry": "1999-08-22T04:23:06+0000",
+        },
+    )
+    data = json.loads(await response.get_data())
     assert "error" in data
     assert response.status_code == 400
 
 
-def test_api_tokens_create_only_one_per_company(client):
-    response = client.post(
+async def test_api_tokens_create_only_one_per_company(client):
+    response = await client.post(
         "/news_api_tokens",
-        data=json.dumps({"company": "5b504318975bd5227e5ea0b9"}),
-        content_type="application/json",
+        json={"company": "5b504318975bd5227e5ea0b9"},
     )
-    data = json.loads(response.get_data())
+    data = json.loads(await response.get_data())
     assert "token" in data
     assert response.status_code == 201
-    response = client.post(
+    response = await client.post(
         "/news_api_tokens",
-        data=json.dumps({"company": "5b504318975bd5227e5ea0b9"}),
-        content_type="application/json",
+        json={"company": "5b504318975bd5227e5ea0b9"},
     )
-    data = json.loads(response.get_data())
+    data = json.loads(await response.get_data())
     assert "error" in data
     assert response.status_code == 400
 
 
-def test_api_tokens_patch(client, app):
-    data = app.data.insert(
+async def test_api_tokens_patch(client, app):
+    data = await create_entries_for(
         "news_api_tokens",
         [
             {
@@ -59,11 +72,44 @@ def test_api_tokens_patch(client, app):
             }
         ],
     )
-    response = client.patch(
+    response = await client.patch(
         "/news_api_tokens?token={}".format(urllib.parse.quote(data[0])),
-        data=json.dumps({"enabled": False, "expiry": "2023-08-22T04:23:06+0000"}),
-        content_type="application/json",
+        json={"enabled": False, "expiry": "2023-08-22T04:23:06+0000"},
     )
-    data = json.loads(response.get_data())
+    data = json.loads(await response.get_data())
     assert data.get("enabled") is False
+    assert response.status_code == 200
+
+
+async def test_api_tokens_delete(client, app):
+    await create_entries_for(
+        "news_api_tokens",
+        [
+            {
+                "company": ObjectId("5b504318975bd5227e5ea0b9"),
+                "enabled": True,
+            }
+        ],
+    )
+
+    response = await client.delete("/news_api_tokens?company={}".format("5b504318975bd5227e5ea0b9"))
+    data = json.loads(await response.get_data())
+    print(data)
+    assert response.status_code == 200
+
+
+async def test_api_tokens_get(client, app):
+    await create_entries_for(
+        "news_api_tokens",
+        [
+            {
+                "company": ObjectId("5b504318975bd5227e5ea0b9"),
+                "enabled": True,
+            }
+        ],
+    )
+
+    response = await client.get("/news_api_tokens?company={}".format("5b504318975bd5227e5ea0b9"))
+    data = json.loads(await response.get_data())
+    print(data)
     assert response.status_code == 200

@@ -1,17 +1,30 @@
 import os
-import pymongo
-from flask import Config, Flask
 from pathlib import Path
 from pytest import fixture
 
+from bson import ObjectId
+from quart import Quart, Config
+
 from superdesk.cache import cache
+
 from newsroom.web.factory import get_app
 from newsroom.tests import markers
+from newsroom.limiter import limiter
+
+from .db import reset_elastic, drop_mongo
 
 root = (Path(__file__).parent / "..").resolve()
 
 
+def use_config_file(file_path: str):
+    setattr(update_config, "_config_path", file_path)
+
+
 def update_config(conf):
+    config_path = getattr(update_config, "_config_path", None)
+    if config_path:
+        conf.from_pyfile(config_path)
+
     conf["CONTENTAPI_URL"] = "http://localhost:5400"
     conf["ELASTICSEARCH_INDEX"] = conf["CONTENTAPI_ELASTICSEARCH_INDEX"] = "newsroom_test"
     conf["MONGO_DBNAME"] = conf["CONTENTAPI_MONGO_DBNAME"] = "newsroom_test"
@@ -41,21 +54,18 @@ def get_mongo_uri(key, dbname):
     return "/".join([env_host, dbname])
 
 
-def reset_elastic(app):
-    indices = "%s*" % app.config["CONTENTAPI_ELASTICSEARCH_INDEX"]
-    es = app.data.elastic.es
-    es.indices.delete(indices, ignore=[404])
-    with app.app_context():
-        app.data.init_elastic(app)
-
-
-def drop_mongo(config: Config):
-    client = pymongo.MongoClient(config["CONTENTAPI_MONGO_URI"])
-    client.drop_database(config["CONTENTAPI_MONGO_DBNAME"])
-
-
 @fixture
-def app(request):
+async def app(request):
+    # Make sure old DB connections are closed
+    prev_instance = getattr(app, "instance", None)
+    if prev_instance:
+        # Close all PyMongo Connections (new ones will be created with ``app_factory`` call)
+        for key, val in prev_instance.extensions["pymongo"].items():
+            val[0].close()
+
+        prev_instance.async_app.stop()
+        await prev_instance.async_app.elastic.stop()
+
     cfg = Config(root)
     update_config(cfg)
 
@@ -70,13 +80,36 @@ def app(request):
     # drop mongodb now, indexes will be created during app init
     drop_mongo(cfg)
 
-    app = get_app(config=cfg, testing=True)
-    with app.app_context():
-        reset_elastic(app)
+    app_instance = get_app(config=cfg, testing=True)
+    setattr(app, "instance", app_instance)
+    limiter_key = str(ObjectId())
+
+    async def limiter_key_function():
+        return limiter_key
+
+    limiter.key_function = limiter_key_function
+
+    async with app_instance.app_context():
+        await reset_elastic(app_instance)
         cache.clean()
-        yield app
+        app_instance.init_indexes()
+        yield app_instance
+
+    # Clean up blueprints, so they can be re-registered
+    import importlib
+
+    for name in app_instance.config["BLUEPRINTS"]:
+        mod = importlib.import_module(name)
+        if getattr(mod, "blueprint"):
+            mod.blueprint._got_registered_once = False
 
 
 @fixture
-def client(app: Flask):
+def client(app: Quart):
     return app.test_client()
+
+
+@fixture
+def runner(app: Quart):
+    """Necessary fixture to invoke click commands from unit tests"""
+    return app.test_cli_runner()

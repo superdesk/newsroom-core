@@ -1,5 +1,5 @@
 import superdesk
-from flask import Blueprint
+from superdesk.flask import Blueprint
 
 blueprint = Blueprint("factcheck", __name__)
 

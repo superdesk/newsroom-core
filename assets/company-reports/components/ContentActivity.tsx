@@ -23,6 +23,7 @@ interface IResultItem {
     _id: string;
     versioncreated: string;
     headline: string;
+    slugline: string;
     anpa_take_key: string;
     source: string;
     place: Array<{name: string}>;
@@ -56,6 +57,7 @@ class ContentActivity extends React.Component<IProps, any> {
         const headers = [
             gettext('Published'),
             gettext('Headline'),
+            gettext('Slugline'),
             gettext('Take Key'),
             gettext('Place'),
             gettext('Category'),
@@ -121,6 +123,7 @@ class ContentActivity extends React.Component<IProps, any> {
                     <tr key={item._id}>
                         <td>{formatTime(item?.versioncreated || '')}</td>
                         <td>{item.headline || ''}</td>
+                        <td>{item.slugline || ''}</td>
                         <td>{item.anpa_take_key || ''}</td>
                         <td>{this.renderNamesSorted(item?.place)}</td>
                         <td>{this.renderNamesSorted(item?.service)}</td>

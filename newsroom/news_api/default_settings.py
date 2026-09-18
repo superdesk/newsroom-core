@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from superdesk.default_settings import strtobool
 from newsroom.web.default_settings import (  # noqa
     env,
     ELASTICSEARCH_URL,
@@ -7,14 +8,20 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     CLIENT_URL,
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
+    LOG_CONFIG_FILE,
+    CACHE_REDIS_URL,
 )
 
+SITE_NAME = env("SITE_NAME", "NEWSHUB")
 NEWSAPI_URL = env("NEWSAPI_URL", "http://localhost:5400")
 server_url = urlparse(NEWSAPI_URL)
 URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or "api/v1"
 
-QUERY_MAX_PAGE_SIZE = 100
+# fix superdesk cache config
+CACHE_URL = CACHE_REDIS_URL
 
+QUERY_MAX_PAGE_SIZE = 100
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+00:00"
 BLUEPRINTS = []
 
 CORE_APPS = [
@@ -24,18 +31,26 @@ CORE_APPS = [
     "newsroom.news_api.items",
     "content_api.items_versions",
     "newsroom.news_api.section_filters",
-    "newsroom.news_api.products",
-    "newsroom.news_api.formatters",
     "newsroom.news_api.news",
-    "newsroom.news_api.news.item.item",
+]
+
+MODULES = [
+    "newsroom.assets.module",
+    ("newsroom.companies", dict(register_endpoints=False)),
+    ("newsroom.history_async", dict(register_endpoints=False)),
+    # Register ``settings`` module, so we can call ``get_setting`` in NewsAPI
+    ("newsroom.settings", dict(register_endpoints=False, register_settings=False)),
+    ("newsroom.wire.module", dict(register_endpoints=False)),
+    ("newsroom.section_filters", dict(register_endpoints=False)),
+    "newsroom.news_api.news.assets",
+    "newsroom.news_api.news.atom",
+    "newsroom.news_api.news.rss",
     "newsroom.news_api.news.search",
     "newsroom.news_api.news.feed",
-    "newsroom.products",
     "newsroom.news_api.api_audit",
-    "newsroom.news_api.news.assets.assets",
-    "newsroom.upload",
-    "newsroom.news_api.news.atom.atom",
-    "newsroom.history",
+    "newsroom.news_api.news.item.item",
+    ("newsroom.products", dict(register_endpoints=False)),
+    "newsroom.news_api.products",
 ]
 
 INSTALLED_APPS = []
@@ -55,3 +70,11 @@ CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBN
 FILTER_AGGREGATIONS = False
 ELASTIC_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ELASTICSEARCH_FIX_QUERY = False
+
+# Disable upload endpoint from ``newsroom.assets.module``,
+# as NewsAPI will implement a custom one
+ASSETS_REGISTER_UPLOAD_ENDPOINT = False
+
+ASYNC_AUTH_CLASS = "newsroom.news_api.api_tokens.auth:CompanyTokenAuth"
+
+WIRE_EMBED_PERMISSIONS = strtobool(env("WIRE_EMBED_PERMISSIONS", True))

@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import {IArticle, IItemAction, IUser, IListConfig, IAgendaItem} from 'interfaces';
+import {IArticle, IItemAction, IUser, IListConfig, IAgendaItem, IDisplayFieldsConfig} from 'interfaces';
 import {
     gettext,
     wordCount,
@@ -30,8 +30,8 @@ import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
 import {FieldComponents} from './fields';
 import WireLabel from './WireLabel';
 
-export const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
-export const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
+export const DEFAULT_META_FIELDS: IDisplayFieldsConfig = ['source', 'charcount', 'versioncreated'];
+export const DEFAULT_COMPACT_META_FIELDS: IDisplayFieldsConfig = ['versioncreated'];
 
 function getShowVersionText(
     item: IArticle,

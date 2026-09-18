@@ -7,6 +7,7 @@ import {
     IAgendaListGroup,
     IAgendaListGroupItem,
     ICoverage,
+    IFullCoverage,
     IUser,
     IAgendaState
 } from 'interfaces';
@@ -280,11 +281,11 @@ export function hasLocation(item: any) {
 }
 
 export function hasLocationNotes(item: IAgendaItem) {
-    return get(item, 'location[0].details[0].length', 0) > 0;
+    return get(item, 'location[0].details', '').trim().length > 0;
 }
 
 export function getLocationDetails(item: IAgendaItem) {
-    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details.trim();
 }
 
 /**
@@ -329,7 +330,7 @@ export function isPlanningItem(item: any) {
 }
 
 export function planHasEvent(item: any) {
-    return isPlanningItem(item) && item.event_id != null;
+    return isPlanningItem(item) && item.event_ids != null;
 }
 
 /**
@@ -485,38 +486,45 @@ export function getInternalNote(item: any, plan: any) {
     return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
-export const getNextPendingScheduledUpdate = (coverage: any) => {
-    if (coverage.scheduled == null) {
+export const getNextPendingScheduledUpdate = (coverage?: IFullCoverage) => {
+    if (coverage == null) {
+        return null;
+    }
+
+    const scheduledUpdates = coverage.scheduled_updates || [];
+    const deliveries = coverage.deliveries || [];
+
+    if (coverage.planning?.scheduled == null) {
         // Not privileged to see coverage details
         return null;
     } else if (
-        get(coverage, 'scheduled_updates.length', 0) === 0 ||
-        get(coverage, 'deliveries.length', 0) === 0
+        scheduledUpdates.length === 0 ||
+        deliveries.length === 0
     ) {
         // No scheduled_updates or deliveries
         return null;
-    } else if (get(coverage, 'deliveries.length', 0) === 1) {
+    } else if (deliveries.length === 1) {
         // Only one delivery: no scheduled_update was published
-        return coverage.scheduled_updates[0];
+        return scheduledUpdates[0];
     }
 
-    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d: any) => d.scheduled_update_id);
+    const lastScheduledDelivery = (deliveries.reverse()).find((d) => d.scheduled_update_id);
     // More deliveries, but no scheduled_update was published
     if (!lastScheduledDelivery) {
-        return coverage.scheduled_updates[0];
+        return scheduledUpdates[0];
     }
 
-    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s: any) =>
+    const lastPublishedScheduledUpdateIndex = scheduledUpdates.findIndex((s) =>
         s.scheduled_update_id === lastScheduledDelivery.scheduled_update_id);
 
-    if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
+    if (lastPublishedScheduledUpdateIndex === scheduledUpdates.length - 1) {
         // Last scheduled_update was published, nothing pending
         return;
     }
 
-    if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
+    if (lastPublishedScheduledUpdateIndex < scheduledUpdates.length - 1){
         // There is a pending scheduled_update
-        return coverage.scheduled_updates[lastPublishedShceduledUpdateIndex + 1];
+        return scheduledUpdates[lastPublishedScheduledUpdateIndex + 1];
     }
 };
 
@@ -677,9 +685,18 @@ export function getStartDate(item: IAgendaItem): moment.Moment {
 
 // get end date in utc mode if there is no end time info
 export function getEndDate(item: IAgendaItem): moment.Moment {
-    return item.dates.all_day === true ?
-        moment.utc(item.dates.end || item.dates.start) :
-        moment(item.dates.end || item.dates.start);
+    if (item.dates.all_day === true) {
+        return moment.utc(item.dates.end || item.dates.start);
+    }
+
+    if (item.dates.no_end_time === true) {
+        const start = getStartDate(item);
+        const localEndDate = moment(moment.utc(item.dates.end || item.dates.start).format('YYYY-MM-DD')).endOf('day');
+
+        return localEndDate.isBefore(start) ? start.clone() : localEndDate;
+    }
+
+    return moment(item.dates.end || item.dates.start);
 }
 
 // compare days without being affected by timezone
@@ -989,10 +1006,10 @@ export function formatCoverageDate(coverage: ICoverage) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
-export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
+const prepareTooltipData = (coverage: any) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
-    const coverageScheduled = moment(coverage.scheduled);
+    const coverageScheduled = coverage.scheduled ? moment(coverage.scheduled) : null;
     const assignee = getCoverageAsigneeName(coverage);
     const desk = getCoverageDeskName(coverage);
     const assignedDetails = [
@@ -1000,43 +1017,70 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
         desk ? gettext('desk: {{name}}', {name: desk}) : '',
     ].filter((x) => x !== '').join(', ');
 
-    if (coverage.coverage_status !== COVERAGE_INTENDED) {
-        return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
-    } else if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+    return {slugline, coverageType, coverageScheduled, assignedDetails};
+};
+
+const handleStatus = (coverage: any, data: any, beingUpdated?: any, restrictCoverageInfo?: boolean) => {
+    const {slugline, coverageType, coverageScheduled, assignedDetails} = data;
+    const {workflow_status} = coverage;
+
+    const showScheduledInfo = !restrictCoverageInfo && coverageScheduled;
+
+    switch (workflow_status) {
+    case WORKFLOW_STATUS.DRAFT:
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             status_text: getCoverageStatusText(coverage),
             assignedDetails,
         });
-    } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
-        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
-            type: coverageType,
-            slugline: slugline,
-            date: formatDate(coverageScheduled),
-            time: formatTime(coverageScheduled),
-            assignedDetails,
-        });
-    } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
-        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
-            type: coverageType,
-            slugline: slugline,
-            date: formatDate(coverageScheduled),
-            time: formatTime(coverageScheduled),
-            assignedDetails,
-        });
-    } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+
+    case WORKFLOW_STATUS.ASSIGNED:
+        if (showScheduledInfo) {
+            return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
+                type: coverageType,
+                slugline: slugline,
+                date: formatDate(coverageScheduled),
+                time: formatTime(coverageScheduled),
+                assignedDetails,
+            });
+        } else {
+            return gettext('Planned {{ type }} coverage {{ slugline }} {{assignedDetails}}', {
+                type: coverageType,
+                slugline: slugline,
+                assignedDetails,
+            });
+        }
+
+    case WORKFLOW_STATUS.ACTIVE:
+        if (showScheduledInfo) {
+            return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
+                type: coverageType,
+                slugline: slugline,
+                date: formatDate(coverageScheduled),
+                time: formatTime(coverageScheduled),
+                assignedDetails,
+            });
+        } else {
+            return gettext('{{ type }} coverage {{ slugline }} in progress {{assignedDetails}}', {
+                type: coverageType,
+                slugline: slugline,
+                assignedDetails,
+            });
+        }
+
+    case WORKFLOW_STATUS.CANCELLED:
         return gettext('{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             assignedDetails,
         });
-    } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
+
+    case WORKFLOW_STATUS.COMPLETED: {
         let deliveryState: any;
         if (get(coverage, 'deliveries.length', 0) > 1) {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }
-
         return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
@@ -1045,7 +1089,18 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
         });
     }
 
-    return gettext('{{ type }} coverage {{assignedDetails}}', {type: coverageType, assignedDetails});
+    default:
+        return gettext('{{ type }} coverage {{assignedDetails}}', {type: coverageType, assignedDetails});
+    }
+};
+
+export const getCoverageTooltip = (coverage: any, beingUpdated?: any, restrictCoverageInfo?: boolean) => {
+    if (coverage.coverage_status !== COVERAGE_INTENDED) {
+        return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    }
+
+    const data = prepareTooltipData(coverage);
+    return handleStatus(coverage, data, beingUpdated, restrictCoverageInfo);
 };
 
 function getScheduleType(item: IAgendaItem): string {
@@ -1104,7 +1159,11 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
     const isTBCItem = isItemTBC(item);
     const start = parseDate(item.dates.start, item.dates.all_day);
-    const end = parseDate(item.dates.end, item.dates.all_day);
+    const endDateString = item.dates.end || item.dates.start;
+    const parsedEnd = parseDate(endDateString, item.dates.all_day);
+    const end = item.dates.no_end_time && parsedEnd.isBefore(start) ?
+        getEndDate(item) :
+        parsedEnd;
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);
@@ -1180,3 +1239,13 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
 export const isTopStory = (subj: ISubject) => subj.scheme === window.newsroom.client_config.agenda_top_story_scheme;
 export const wireLabel = (subj: ISubject) => subj.scheme === window.newsroom.client_config.wire_labels_scheme;
+
+export const getFilteredItems = (itemIds: Array<IAgendaItem['_id']>, items: Array<IAgendaItem>) => {
+    if (!itemIds || itemIds.length === 0) {
+        return [];
+    }
+
+    return itemIds
+        .map((id:any) => items[id])
+        .filter((item) => item != null);
+};

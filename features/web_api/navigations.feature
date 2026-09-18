@@ -25,7 +25,7 @@ Feature: Navigations
             "navigations": ["#NAV_ID#"]
         }
         """
-        When we delete "/navigations/#NAV_ID#"
+        When we delete link "/navigations/#NAV_ID#"
         And we get "/products"
         Then we get existing resource
         """

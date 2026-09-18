@@ -1,6 +1,7 @@
+from quart_babel import lazy_gettext
+
 import superdesk
-from flask import Blueprint
-from flask_babel import lazy_gettext
+from superdesk.flask import Blueprint
 
 SECTION_ID = "aapX"
 SECTION_NAME = lazy_gettext("aapX")

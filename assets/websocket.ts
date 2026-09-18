@@ -4,13 +4,30 @@ import {notify, gettext} from './utils';
 const DEFAULT_WS_URL = 'ws://localhost:5150';
 const RECONNECT_INTERVAL = 5000;
 
-let firstConnection = true;
-let wsConnection: any;
-let connectInterval: any;
-const listeners: any = [];
+function getWebSocketManager(): INewsroomWebSocketManager {
+    if (!window.__newsroomWebSocketManager) {
+        window.__newsroomWebSocketManager = {
+            firstConnection: true,
+            wsConnection: null,
+            connectInterval: null,
+            listeners: [],
+            shuttingDown: false,
+            unloadHandlerAttached: false,
+            unloadHandler: null,
+        };
+    }
+
+    return window.__newsroomWebSocketManager;
+}
 
 function connectToNotificationServer() {
-    if (wsConnection == null || wsConnection.readyState === WebSocket.CLOSED) {
+    const manager = getWebSocketManager();
+
+    if (manager.shuttingDown) {
+        return;
+    }
+
+    if (manager.wsConnection == null || manager.wsConnection.readyState === WebSocket.CLOSED) {
         const baseURL = window.newsroom && window.newsroom.websocket ?
             window.newsroom.websocket :
             DEFAULT_WS_URL;
@@ -23,21 +40,48 @@ function connectToNotificationServer() {
             wsURL.searchParams.append('company', window.profileData.company);
         }
 
-        wsConnection = new WebSocket(wsURL.href);
-        wsConnection.onerror = onWebsocketError;
-        wsConnection.onopen = onWebsocketOpen;
-        wsConnection.onclose = onWebsocketClose;
-        wsConnection.onmessage = onWebsocketMessage;
+        manager.wsConnection = new WebSocket(wsURL.href);
+        manager.wsConnection.onerror = onWebsocketError;
+        manager.wsConnection.onopen = onWebsocketOpen;
+        manager.wsConnection.onclose = onWebsocketClose;
+        manager.wsConnection.onmessage = onWebsocketMessage;
     }
 }
 
-window.addEventListener('beforeunload', () => {
-    wsConnection = null;
-});
+function shutdownNotificationServer() {
+    const manager = getWebSocketManager();
+
+    manager.shuttingDown = true;
+
+    if (manager.connectInterval != null) {
+        clearInterval(manager.connectInterval);
+        manager.connectInterval = null;
+    }
+
+    if (manager.wsConnection != null) {
+        manager.wsConnection.close();
+        manager.wsConnection = null;
+    }
+}
+
+function ensureUnloadHandler() {
+    const manager = getWebSocketManager();
+
+    if (manager.unloadHandlerAttached) {
+        return;
+    }
+
+    manager.unloadHandlerAttached = true;
+    manager.unloadHandler = shutdownNotificationServer;
+    window.addEventListener('beforeunload', manager.unloadHandler);
+}
 
 export function initWebSocket(store: any, action: any) {
+    const manager = getWebSocketManager();
+
+    ensureUnloadHandler();
+    manager.listeners.push({store, action});
     connectToNotificationServer();
-    listeners.push({store, action});
 }
 
 function onWebsocketError(event: any) {
@@ -45,30 +89,48 @@ function onWebsocketError(event: any) {
 }
 
 function onWebsocketOpen() {
-    if (!firstConnection) {
+    const manager = getWebSocketManager();
+
+    if (!manager.firstConnection) {
         // Only show notification if the connection was re-established
         // otherwise a notification will be shown when navigating to each page
         notify.success(gettext('Connected to Notification Server!'));
     }
 
-    firstConnection = false;
-    clearInterval(connectInterval);
-    connectInterval = null;
+    manager.firstConnection = false;
+
+    if (manager.connectInterval != null) {
+        clearInterval(manager.connectInterval);
+        manager.connectInterval = null;
+    }
+
     window.dispatchEvent(new Event('websocket:connected'));
 }
 
 function onWebsocketClose() {
-    if (connectInterval != null || wsConnection == null) {
+    const manager = getWebSocketManager();
+
+    if (manager.shuttingDown) {
+        if (manager.connectInterval != null) {
+            clearInterval(manager.connectInterval);
+            manager.connectInterval = null;
+        }
+
+        manager.wsConnection = null;
+        return;
+    }
+
+    if (manager.connectInterval != null || manager.wsConnection == null) {
         // Already attempting to reconnect to the Notification Server
         // No need to add another interval
         return;
     }
 
-    wsConnection = null;
+    manager.wsConnection = null;
     notify.error(gettext('Disconnected from Notification Server!'));
     window.dispatchEvent(new Event('websocket:disconnected'));
 
-    connectInterval = setInterval(() => {
+    manager.connectInterval = setInterval(() => {
         connectToNotificationServer();
     }, RECONNECT_INTERVAL);
 }
@@ -86,7 +148,9 @@ function onWebsocketMessage(message: any) {
         return;
     }
 
-    listeners.forEach(({store, action}: any) => {
+    const manager = getWebSocketManager();
+
+    manager.listeners.forEach(({store, action}: IWebSocketListener) => {
         store.dispatch(action(data));
     });
 }

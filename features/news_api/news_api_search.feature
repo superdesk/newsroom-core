@@ -14,13 +14,13 @@ Feature: News API News Search
   Scenario: Simple query string request for fish
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#"}]
         """
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -32,20 +32,20 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
 
   Scenario: Simple start date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -57,21 +57,21 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a aardvark that could not swim"}
+         {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}
      ]}
      """
 
   Scenario: Simple start and end date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "#DATE-5#" },
-        {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "#DATE-3#" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>", "versioncreated": "#DATE-3#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -83,21 +83,21 @@ Feature: News API News Search
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a quokka who could swim"}
+         {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"}
      ]}
      """
 
   Scenario: Absolute start and end date query
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim", "versioncreated": "2018-11-09 03:48:39.000Z" },
-        {"body_html": "Once upon a time there was a quokka who could swim", "versioncreated": "2018-11-11 03:48:39.000Z" },
-        {"body_html": "Once upon a time there was a aardvark that could not swim", "versioncreated": "2018-11-13 03:48:39.000Z" }]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE-4#" },
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>", "versioncreated": "#DATE-2#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -105,28 +105,28 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=2018-11-11T03:48:38&end_date=2018-11-12T02:48:40&include_fields=body_html"
+    When we get "news/search?start_date=now-3d&end_date=now-1d&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a quokka who could swim"}
+         {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"}
      ]}
      """
-    When we get "news/search?start_date=2018-11-11&include_fields=body_html"
+    When we get "news/search?start_date=now-3d&include_fields=body_html"
     Then we get list with 2 items
     """
      {"_items": [
-        {"body_html": "Once upon a time there was a quokka who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"}
      ]}
      """
     When we get "news/search?start_date=2018-11-09T10:48:39&timezone=Australia/Sydney&include_fields=body_html"
     Then we get list with 3 items
     """
      {"_items": [
-        {"body_html": "Once upon a time there was a quokka who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"},
-        {"body_html": "Once upon a time there was a fish who could swim"}
+        {"body_html": "<p>Once upon a time there was a quokka who could swim</p>"},
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
     When we get "news/search?start_date=2018-11-12T01:48:38&end_date=2018-11-12T02:48:40"
@@ -139,14 +139,14 @@ Feature: News API News Search
   Scenario: Can sort results
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#" },
-        {"body_html": "One", "versioncreated": "#DATE-1#" }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#" },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#" }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -158,23 +158,23 @@ Feature: News API News Search
     Then we get list ordered by versioncreated with 3 items
     """
      {"_items": [
-        {"body_html": "Five"},
-        {"body_html": "Three"},
-        {"body_html": "One"}
+        {"body_html": "<p>Five</p>"},
+        {"body_html": "<p>Three</p>"},
+        {"body_html": "<p>One</p>"}
      ]}
      """
 
   Scenario: include fields
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
-        {"body_html": "One", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "headline": "Headline 1" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "headline": "Headline 2"  },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "headline": "Headline 3"  }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -186,9 +186,9 @@ Feature: News API News Search
     Then we get list with 3 items
     """
      {"_items": [
-        {"body_html": "One"},
-        {"body_html": "Three"},
-        {"body_html": "Five"}
+        {"body_html": "<p>One</p>"},
+        {"body_html": "<p>Three</p>"},
+        {"body_html": "<p>Five</p>"}
      ]}
      """
 
@@ -202,7 +202,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -210,20 +210,20 @@ Feature: News API News Search
         "product_type": "news_api"
         }]
         """
-    When we get "news/search?start_date=now-10d&include_fields=headline"
+    When we get "news/search?start_date=now-10d&include_fields=slugline"
     Then we get response code 400
 
   Scenario: exclude fields
     Given "items"
         """
-        [{"body_html": "Three", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
-        {"body_html": "Five", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
-        {"body_html": "One", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
+        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
+        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
+        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
         """
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -252,7 +252,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -318,7 +318,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -376,7 +376,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -396,7 +396,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A Product",
-        "decsription": "a product for text",
+        "description": "a product for text",
         "companies" : [
           "#companies._id#"
         ],
@@ -464,7 +464,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -488,7 +488,7 @@ Feature: News API News Search
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -503,6 +503,10 @@ Feature: News API News Search
       """
 
   Scenario: Parameter validation
+    Given "items"
+    """
+    [{"body_html": "<p>One potential story within the time limit</p>", "versioncreated": "#DATE#"}]
+    """
     When we get "/news/search?q=[[h.ldofdjsafalkjsdfkjlsdf\\[[**@#"
     Then we get error 400
         """
@@ -511,22 +515,17 @@ Feature: News API News Search
     When we get "/news/search?include_fields=secret"
     Then we get error 400
         """
-        {"code": 400, "message": "Include fields contains a non-allowed value"}
+        {"code": 400, "message": "`include_fields` contains non-allowed values: secret"}
         """
     When we get "/news/search?exclude_fields=copyrightnotice"
     Then we get error 400
         """
-        {"code": 400, "message": "Exclude fields contains a non-allowed value"}
-        """
-    When we get "/news/search?include_fields=type&include_fields=genre"
-    Then we get error 400
-        """
-        {"code": 400, "message": "Multiple values received for parameter (include_fields)"}
+        {"code": 400, "message": "`exclude_fields` contains non-allowed values: copyrightnotice"}
         """
     When we get "/news/search?filter=123,456"
     Then we get error 400
         """
-        {"code": 400, "message": "Bad parameter value for Parameter (filter)"}
+        {"code": 400, "message": "Incorrect type supplied for filter parameter"}
         """
     When we get "/news/search?genre=null"
     Then we get error 400
@@ -549,8 +548,22 @@ Feature: News API News Search
         {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
         """
 
-    Scenario: Search request response restricted by featured image product
-      Given "items"
+  Scenario: Search request response restricted by featured image product
+    Given "companies"
+      """
+      [{
+        "name": "Test Company", "is_enabled" : true,
+        "embed_permissions": {
+          "sd_product": ["display", "download"]
+        }
+      }]
+      """
+    Given "news_api_tokens"
+      """
+      [{"company" : "#companies._id#", "enabled" : true}]
+      """
+    When we save API token
+    Given "items"
           """
           [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
            "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
@@ -559,10 +572,10 @@ Feature: News API News Search
           "firstpublished": "#DATE-1#", "versioncreated": "#DATE#",
            "associations": {"featuremedia": {"products": [{"code": "4321"}], "renditions": {"original": {}} }}}]
           """
-      Given "products"
+    Given "products"
           """
           [{"name": "A fishy Product",
-          "decsription": "a product for those interested in fish",
+          "description": "a product for those interested in fish",
           "companies" : [
             "#companies._id#"
           ],
@@ -579,19 +592,269 @@ Feature: News API News Search
           }
           ]
           """
-      When we get "news/search?q=fish&include_fields=associations"
-      Then we get list with 1 items
+    When we get "news/search?q=fish&include_fields=associations"
+    Then we get list with 1 items
       """
         {"_items": [
         {"_id": "111",
         "associations": {"featuremedia": {"renditions": {"original": {}} }}}
         ]}
       """
-      When we get "news/search?q=aardvark&include_fields=associations"
-      Then we get list with 1 items
+    When we get "news/search?q=aardvark&include_fields=associations"
+    Then we get list with 1 items
       """
         {"_items": [
         {"_id": "222",
         "associations": "__no_value__"}
         ]}
+      """
+
+  Scenario: search by not allowed product raises error
+    Given "products"
+        """
+        [{
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?start_date=now-10d&products=111111111111111111111111"
+    Then we get response code 400
+
+  Scenario: search by empty product uses all company products
+    Given "products"
+        """
+        [{
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "NOT aardvark",
+            "product_type": "news_api"
+        }]
+        """
+    Given "items"
+        """
+        [{
+            "body_html": "Three aardvark story",
+            "versioncreated": "#DATE-3#",
+            "headline": "Headline 1",
+            "products": [
+                {"code": "#products._id#", "name": "A Product"},
+                {"code": "1234", "name": "Product b"}
+            ]
+        }]
+        """
+    When we get "news/search?start_date=now-10d&products="
+    Then we get OK response
+    Then we get list with 0 items
+
+  Scenario: Search returns the latest version only
+    Given "items"
+        """
+        [{"_id":"urn:test:1234567890",
+        "body_html": "<p>Original fish story</p>", "headline": "headline 1",
+         "firstpublished": "#DATE-1#", "versioncreated": "#DATE-1#",
+         "nextversion": "urn-1234567891"},
+
+         {"_id":"urn:test:1234567891",
+        "body_html": "<p>Updated fish story</p>",
+         "firstpublished": "#DATE#", "versioncreated": "#DATE#",
+         "evolved_from": "urn:test:1234567890",
+         "ancestors": ["urn:test:1234567890"]}
+         ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&include_fields=body_html"
+    Then we get list with 1 items
+     """
+     {"_items": [
+         {"body_html": "<p>Updated fish story</p>"}
+     ]}
+     """
+
+  Scenario: search with multiple products
+    Given "products"
+        """
+        [{
+            "_id": "111111111111111111111111",
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "NOT aardvark",
+            "product_type": "news_api"
+        },
+        {
+            "_id": "222222222222222222222222",
+            "name": "A Product",
+            "decsription": "a product for text",
+            "companies" : ["#companies._id#"],
+            "query": "aardvark",
+            "product_type": "news_api"
+        }]
+        """
+    Given "items"
+        """
+        [{
+            "body_html": "Three aardvark story",
+            "versioncreated": "#DATE-3#",
+            "headline": "Headline 1"
+        }]
+        """
+    When we get "news/search?start_date=now-10d&products=222222222222222222222222,111111111111111111111111"
+    Then we get OK response
+    Then we get list with 1 items
+
+ Scenario: Search pagination with sort in request
+    Given "items"
+        """
+        [
+        {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 3</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 4</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 5</p>", "versioncreated": "#DATE#"}
+        ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?q=fish&sort=versioncreated:desc&page_size=1&page=2&include_fields=body_html"
+    Then we get list with 5 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>"}
+     ]}
+     """
+     Then we store NEXT_PAGE from HATEOAS
+     When we get "#NEXT_PAGE#"
+     Then we get list with 5 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 3</p>"}
+     ]}
+     """
+
+ Scenario: Ensure item older than the API time limit are not returned
+    Given "items"
+        """
+        [
+        {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>", "versioncreated": "#DATE#"},
+        {"body_html": "<p>Once upon a time there was a fish who could swim 2</p>", "versioncreated":  "2018-11-09 03:48:39.000Z"}
+        ]
+        """
+    Given "products"
+        """
+        [{"name": "A fishy Product",
+        "description": "a product for those interested in fish",
+        "companies" : [
+          "#companies._id#"
+        ],
+        "query": "fish",
+        "product_type": "news_api"
+        }]
+        """
+    When we get "news/search?include_fields=body_html"
+    Then we get list with 1 items
+     """
+     {"_items": [
+         {"body_html": "<p>Once upon a time there was a fish who could swim 1</p>"}
+     ]}
+     """
+
+  Scenario: Ensure first page defaults to one
+    Given "items"
+        """
+        [
+            {
+                "_id": "urn:test1", "body_html": "Once upon a time there was a single fish who could swim",
+                "versioncreated": "#DATE#"
+            }, {
+                "_id": "urn:test2", "body_html": "Once upon a time there were 2 fish who could swim",
+                "versioncreated": "#DATE#"
+            }
+        ]
+        """
+    When we get "news/search?q=upon&page_size=1"
+    Then we get list with 2 items
+      """
+      {
+        "_links": {
+        "next": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "next page"
+        },
+        "last": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "last page"
+        }
+        }
+      }
+      """
+    When we get "news/search?q=upon&page_size=1&page=1"
+    Then we get list with 2 items
+      """
+      {
+        "_links": {
+        "next": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "next page"
+        },
+        "last": {
+            "href": "/news/search?q=upon&page_size=1&page=2",
+            "title": "last page"
+        }
+        }
+      }
+      """
+
+  Scenario: Parameter validation
+    When we get "/news/search?page_size=0"
+    Then we get error 400
+        """
+        {"code": 400, "message": "One or more fields did not pass validation."}
+        """
+    When we get "/news/search?page_size=101"
+    Then we get error 400
+        """
+        {"code": 400, "message": "Requested maximum number of results exceeds 100"}
+        """
+    When we get "/news/search?page=0"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?page=one"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?from=1"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): from"}
+      """
+    When we get "/news/search?size=10"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): size"}
       """

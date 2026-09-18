@@ -1,86 +1,102 @@
 import re
+from typing import Any, Dict, Optional
+from pydantic import BaseModel, field_validator
 
-import flask
-from bson import ObjectId
-from flask import jsonify, current_app
-from flask_babel import gettext
-from superdesk import get_resource_service
+from superdesk.core import json
+from superdesk.core.types import Response, Request
+from superdesk.core.web import EndpointGroup
 
-from newsroom.decorator import admin_only
-from newsroom.section_filters import blueprint
-from newsroom.utils import (
-    get_json_or_400,
-    get_entity_or_404,
-    set_original_creator,
-    set_version_creator,
-)
-from newsroom.utils import query_resource
+from newsroom.types import SectionFilterModel
+from newsroom.auth import auth_rules
+from newsroom.core import get_current_wsgi_app
+from newsroom.utils import get_json_or_400
+
+from .service import SectionFiltersService
+
+section_filters_endpoints = EndpointGroup("section_filters", __name__)
 
 
-def get_settings_data():
+async def get_settings_data():
     """Get the settings data for section filter
 
     :param context
     """
+    all_filters = [obj async for obj in SectionFiltersService().get_all_raw()]
+
     data = {
-        "section_filters": list(query_resource("section_filters")),
-        "sections": current_app.sections,
+        "section_filters": all_filters,
+        "sections": get_current_wsgi_app().sections,
     }
+
     return data
 
 
-@blueprint.route("/section_filters", methods=["GET"])
-@admin_only
-def index():
-    lookup = None
-    if flask.request.args.get("q"):
-        lookup = flask.request.args.get("q")
-    section_filters = list(query_resource("section_filters", lookup=lookup))
-    return jsonify(section_filters), 200
+async def get_section_filter_or_abort(id: str, request: Request) -> SectionFilterModel:
+    section_filter = await SectionFiltersService().find_by_id(id)
+    if section_filter is None:
+        await request.abort(404)
+
+    return section_filter
 
 
-@blueprint.route("/section_filters/search", methods=["GET"])
-@admin_only
-def search():
+class IndexParams(BaseModel):
+    q: Optional[Dict[str, Any]] = None
+
+    @field_validator("q", mode="before")
+    def parse_where(cls, value):
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+
+@section_filters_endpoints.endpoint("/section_filters", methods=["GET"], auth=[auth_rules.admin_only])
+async def index(_a: None, params: IndexParams, _r: None):
+    cursor = await SectionFiltersService().search(lookup=params.q)
+    section_filters = await cursor.to_list_raw()
+    return Response(section_filters)
+
+
+class SearchParams(BaseModel):
+    q: str | None = None
+
+
+@section_filters_endpoints.endpoint("/section_filters/search", methods=["GET"], auth=[auth_rules.admin_only])
+async def search(_a: None, params: SearchParams, _r: None):
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if params.q:
+        regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
         lookup = {"name": regex}
-    section_filters = list(query_resource("section_filters", lookup=lookup))
-    return jsonify(section_filters), 200
+
+    cursor = await SectionFiltersService().search(lookup=lookup)
+    section_filters = await cursor.to_list_raw()
+    return Response(section_filters)
 
 
-def validate_section_filter(section_filter):
-    if not section_filter.get("name"):
-        return jsonify({"name": gettext("Name not found")}), 400
-
-
-@blueprint.route("/section_filters/new", methods=["POST"])
-@admin_only
-def create():
-    section_filter = get_json_or_400()
-
-    validation = validate_section_filter(section_filter)
-    if validation:
-        return validation
+@section_filters_endpoints.endpoint("/section_filters/new", methods=["POST"], auth=[auth_rules.admin_only])
+async def create():
+    creation_data = await get_json_or_400()
+    app_sections = get_current_wsgi_app().sections
 
     section = next(
-        (s for s in current_app.sections if s["_id"] == section_filter.get("filter_type")),
+        (s for s in app_sections if s["_id"] == creation_data.get("filter_type")),
         None,
     )
     if section and section.get("search_type"):
-        section_filter["search_type"] = section["search_type"]
+        creation_data["search_type"] = section["search_type"]
 
-    set_original_creator(section_filter)
-    ids = get_resource_service("section_filters").post([section_filter])
-    return jsonify({"success": True, "_id": ids[0]}), 201
+    new_section_filters = await SectionFiltersService().create([creation_data])
+    return Response({"success": True, "_id": new_section_filters[0].id}, 201)
 
 
-@blueprint.route("/section_filters/<id>", methods=["POST"])
-@admin_only
-def edit(id):
-    get_entity_or_404(ObjectId(id), "section_filters")
-    data = get_json_or_400()
+class DetailArgs(BaseModel):
+    id: str
+
+
+@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["POST"], auth=[auth_rules.admin_only])
+async def edit(args: DetailArgs, _p: None, request: Request):
+    await get_section_filter_or_abort(args.id, request)
+
+    data = await get_json_or_400()
     updates = {
         "name": data.get("name"),
         "description": data.get("description"),
@@ -90,19 +106,15 @@ def edit(id):
         "filter_type": data.get("filter_type", "wire"),
     }
 
-    validation = validate_section_filter(updates)
-    if validation:
-        return validation
-
-    set_version_creator(updates)
-    get_resource_service("section_filters").patch(id=ObjectId(id), updates=updates)
-    return jsonify({"success": True}), 200
+    await SectionFiltersService().update(args.id, updates)
+    return Response({"success": True})
 
 
-@blueprint.route("/section_filters/<id>", methods=["DELETE"])
-@admin_only
-def delete(id):
+@section_filters_endpoints.endpoint("/section_filters/<string:id>", methods=["DELETE"], auth=[auth_rules.admin_only])
+async def delete(args: DetailArgs, _p: None, request: Request):
     """Deletes the section_filters by given id"""
-    get_entity_or_404(ObjectId(id), "section_filters")
-    get_resource_service("section_filters").delete_action({"_id": ObjectId(id)})
-    return jsonify({"success": True}), 200
+
+    section_filter = await get_section_filter_or_abort(args.id, request)
+    await SectionFiltersService().delete(section_filter)
+
+    return Response({"success": True})

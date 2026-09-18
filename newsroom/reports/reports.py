@@ -1,39 +1,47 @@
-import io
-import csv
+from typing import cast
 from collections import defaultdict
 from copy import deepcopy
 
 from bson import ObjectId
-from flask import abort
-from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app, json
-from eve.utils import ParsedRequest
-from werkzeug.utils import secure_filename
-import superdesk
-from superdesk.utc import utcnow
+from quart_babel import gettext
+from superdesk import get_app_config
 
+from superdesk.core import get_current_app
+from superdesk.core.resources.cursor import ElasticsearchResourceCursorAsync, ResourceCursorAsync
+from superdesk.flask import abort, request
+from superdesk.utc import utcnow, utc_to_local, get_date
 
-from newsroom.auth import get_user
+from newsroom.types import CompanyResource, NewsApiAuditResourceModel, AgendaItem, WireItem
+from newsroom.history_async import HistoryService
+from newsroom.auth.utils import get_company_from_request
 from newsroom.utils import (
     query_resource,
     get_entity_dict,
-    get_items_by_id,
     MAX_TERMS_SIZE,
 )
-from newsroom.agenda.agenda import get_date_filters
+from newsroom.companies.companies_async import CompanyService
+from newsroom.search.types import BaseSearchRequestArgs
+from newsroom.agenda.filters import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
 from newsroom.companies.utils import get_companies_id_by_product
+from newsroom.topics.topics_async import TopicService
+from newsroom.companies import CompanyServiceAsync
+from newsroom.users.service import UsersService
+from newsroom.products.service import ProductsService
+from newsroom.wire import WireSearchServiceAsync, WireSearchRequestArgs
+from newsroom.agenda.agenda_service import AgendaItemService
 from .content_activity import get_content_activity_report  # noqa
 
 
-def get_company_saved_searches():
+async def get_company_saved_searches():
     """Returns number of saved searches by company"""
     results = []
     company_topics = defaultdict(int)
-    companies = get_entity_dict(query_resource("companies"))
-    users = get_entity_dict(query_resource("users"))
-    topics = query_resource("topics")
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    users = get_entity_dict(await UsersService().get_all_raw_as_list())
+
+    topics = await TopicService().get_all_raw_as_list()
 
     for topic in topics:
         company = users.get(topic.get("user", ""), {}).get("company")
@@ -54,13 +62,14 @@ def get_company_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved searches per company")}
 
 
-def get_user_saved_searches():
+async def get_user_saved_searches():
     """Returns number of saved searches by user"""
     results = []
     user_topics = defaultdict(int)
-    companies = get_entity_dict(query_resource("companies"))
-    users = get_entity_dict(query_resource("users"))
-    topics = query_resource("topics")
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    users = get_entity_dict(await UsersService().get_all_raw_as_list())
+
+    topics = await TopicService().get_all_raw_as_list()
 
     for topic in topics:
         company = users.get(topic.get("user", ""), {}).get("company")
@@ -85,16 +94,20 @@ def get_user_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved searches per user")}
 
 
-def get_company_and_user_saved_searches():
+async def get_company_and_user_saved_searches():
     """
     Returns saved My topics and Company topics per user in their company
     """
 
     results = []
-    current_company = get_user().get("company")
-    lookup_company = dict(company=current_company)
-    users = get_entity_dict(query_resource("users", lookup=lookup_company))
-    topics = query_resource("topics", lookup=lookup_company)
+    current_company = get_company_from_request(None)
+    lookup_company = dict(company=current_company.id if current_company else None)
+
+    users_cursor = await UsersService().find(lookup_company)
+    users = get_entity_dict(await users_cursor.to_list_raw())
+
+    cursor = await TopicService().find(lookup_company)
+    topics = await cursor.to_list_raw()
 
     saved_topics = defaultdict(lambda: dict(my_topics=0, company_topics=0))
 
@@ -120,11 +133,11 @@ def get_company_and_user_saved_searches():
     return {"results": sorted_results, "name": gettext("Saved My Topics and Company Topics")}
 
 
-def get_company_products():
+async def get_company_products():
     """Returns products by company"""
     results = []
-    companies = get_entity_dict(query_resource("companies"))
-    products_data = get_entity_dict(query_resource("products"))
+    companies = get_entity_dict(await CompanyServiceAsync().get_all_raw_as_list())
+    products_data = get_entity_dict(await ProductsService().get_all_raw_as_list())
     for company_id, company_details in companies.items():
         company_result = {
             "_id": str(company_id),
@@ -140,20 +153,18 @@ def get_company_products():
     return {"results": sorted_results, "name": gettext("Products per company")}
 
 
-def get_product_stories():
+async def get_product_stories():
     """Returns the story count per product for today, this week, this month ..."""
 
     results = []
-    products = query_resource("products")
-    section_filters = superdesk.get_resource_service("section_filters").get_section_filters_dict()
 
-    for product in products:
+    async for product in ProductsService().get_all():
         product_stories = {
-            "_id": product["_id"],
-            "name": product.get("name"),
-            "is_enabled": product.get("is_enabled"),
+            "_id": product.id,
+            "name": product.name,
+            "is_enabled": product.is_enabled,
         }
-        counts = superdesk.get_resource_service("wire_search").get_product_item_report(product, section_filters)
+        counts = await WireSearchServiceAsync().get_product_item_report(product)
         for key, value in counts.hits["aggregations"].items():
             product_stories[key] = value["buckets"][0]["doc_count"]
 
@@ -163,15 +174,17 @@ def get_product_stories():
     return {"results": sorted_results, "name": gettext("Stories per product")}
 
 
-def get_company_report():
+async def get_company_report():
     """Returns products by company"""
     results = []
-    companies = list(query_resource("companies"))
-    products_data = get_entity_dict(query_resource("products"))
+    companies = await CompanyServiceAsync().get_all_raw_as_list()
+    products_data = get_entity_dict(await ProductsService().get_all_raw_as_list())
+    users_service = UsersService()
 
     for company in companies:
         company_id = str(company["_id"])
-        users = list(query_resource("users", lookup={"company": company_id}))
+        cursor = await users_service.find({"company": company_id})
+        users = await cursor.to_list_raw()
 
         company_result = {
             "_id": company_id,
@@ -188,11 +201,10 @@ def get_company_report():
     return {"results": sorted_results, "name": gettext("Company")}
 
 
-def get_subscriber_activity_report():
+async def get_subscriber_activity_report():
     args = deepcopy(request.args.to_dict())
 
     # Elastic query
-    aggregations = {"action": {"terms": {"field": "action", "size": MAX_TERMS_SIZE}}}
     must_terms = []
     source = {}
 
@@ -205,7 +217,13 @@ def get_subscriber_activity_report():
     if args.get("section"):
         must_terms.append({"term": {"section": args.get("section")}})
 
-    date_range = get_date_filters(args)
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_to"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
     if date_range.get("gt") or date_range.get("lt"):
         must_terms.append({"range": {"versioncreated": date_range}})
 
@@ -215,16 +233,22 @@ def get_subscriber_activity_report():
 
     source["size"] = 25
     source["from"] = int(args.get("from", 0))
-    source["aggs"] = aggregations
 
-    if source["from"] >= 1000:
+    if source["from"] >= 5000:
         # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
         return abort(400)
 
-    # Get the results
-    results = superdesk.get_resource_service("history").fetch_history(source, args.get("export"))
-    docs = results["items"]
-    hits = results["hits"]
+    history_cursor = await HistoryService().search(source)
+    docs = await history_cursor.to_list_raw()
+    if args.get("export", "").lower() == "true":
+        while True:
+            source["from"] = len(docs)
+            history_cursor = await HistoryService().search(source)
+            next_items = await history_cursor.to_list_raw()
+            if next_items:
+                docs.extend(next_items)
+            else:
+                break
 
     # Enhance the results
     wire_ids = []
@@ -240,37 +264,101 @@ def get_subscriber_activity_report():
         if doc.get("company"):
             company_ids.append(ObjectId(doc.get("company")))
         user_ids.append(ObjectId(doc.get("user")))
-    agenda_items = get_entity_dict(get_items_by_id(agenda_ids, "agenda"))
-    wire_items = get_entity_dict(get_items_by_id(wire_ids, "items"))
-    company_items = get_entity_dict(get_items_by_id(company_ids, "companies"), True)
-    user_items = get_entity_dict(get_items_by_id(user_ids, "users"), True)
+    # remove duplicates for efficiency
+    wire_ids = list(set(wire_ids))
+    agenda_ids = list(set(agenda_ids))
+
+    AGENDAITEM_CHUNK_SIZE: int = 100
+    agenda_items: dict[str, AgendaItem] = {}
+    for i in range(0, len(agenda_ids), AGENDAITEM_CHUNK_SIZE):
+        agenda_cursor: ResourceCursorAsync[AgendaItem] = await AgendaItemService().search(
+            {"_id": {"$in": agenda_ids[i : i + AGENDAITEM_CHUNK_SIZE]}}, use_mongo=True
+        )
+        agenda_items.update({agenda_item.id: agenda_item async for agenda_item in agenda_cursor})
+
+    # request the wire_items in chunks, in the case of export the list may be quite long
+    WIREITEM_CHUNK_SIZE: int = 100
+    wire_items: dict[str, WireItem] = {}
+    args = WireSearchRequestArgs(ignore_latest=True)
+    args.page_size = WIREITEM_CHUNK_SIZE
+    for i in range(0, len(wire_ids), WIREITEM_CHUNK_SIZE):
+        wire_cursor: ElasticsearchResourceCursorAsync[WireItem] = await WireSearchServiceAsync().get_items_by_id(
+            wire_ids[i : i + WIREITEM_CHUNK_SIZE], args=args
+        )
+        wire_items.update({wire_item.id: wire_item async for wire_item in wire_cursor})
+
+    company_items = {
+        str(company.id): company for company in await CompanyService().find_items_by_ids(list(set(company_ids)))
+    }
+    user_items = {str(user.id): user for user in await UsersService().find_items_by_ids(list(set(user_ids)))}
 
     def get_section_name(s):
-        return next((sec for sec in newsroom_app.sections if sec.get("_id") == s), {}).get("name")
+        return next((sec for sec in get_current_app().as_any().sections if sec.get("_id") == s), {}).get("name")
 
     for doc in docs:
         if doc.get("item") in wire_items:
+            item_data = wire_items[doc["item"]]
             doc["item"] = {
-                "item_text": wire_items[doc["item"]].get("headline"),
-                "_id": wire_items[doc["item"]]["_id"],
+                "item_text": item_data.headline,
+                "_id": item_data.id,
                 "item_href": "/{}?item={}".format(
                     doc["section"] if doc["section"] != "news_api" else "wire",
                     doc["item"],
                 ),
+                "published": item_data.versioncreated,
+                "place": "\r\n".join(_p.name for _p in (item_data.place or []) if _p.name),
+                "service": "\r\n".join(_s.name for _s in (item_data.service or []) if _s.name),
+                "subject": "\r\n".join(_s.name for _s in (item_data.subject or []) if _s.name),
+                "anpa_take_key": item_data.anpa_take_key,
+                "slugline": item_data.slugline,
+                "source": item_data.source,
+                "urgency": item_data.urgency,
+                "priority": item_data.priority,
+                "keywords": ",".join(item_data.keywords or []),
+                "byline": item_data.byline,
             }
+            try:
+                if "download" in doc.get("action", "") and doc.get("extra_data") is not None:
+                    wire_item = wire_items.get(doc.get("item", {}).get("_id"))
+                    if wire_item:
+                        association_key = doc.get("extra_data", {}).get("association")
+                        association_detail = wire_item.associations.get(association_key, {})
+                        association_value = (
+                            gettext("Feature")
+                            if association_key == "featuremedia"
+                            else gettext("Embedded")
+                            if association_key and association_key.startswith("editor_")
+                            else ""
+                        )
+                        guid_value = association_detail.get("guid", "")
+                        doc["association"] = {
+                            "text": association_detail.get("headline", "N/A"),
+                            "href": "/assets/{}".format(
+                                association_detail.get("renditions", {}).get("original", {}).get("media", "")
+                            ),
+                            "type": association_detail.get("type"),  # get() here if type might be missing
+                            "reference": f"{association_value}:{guid_value}" if association_value or guid_value else "",
+                        }
+            except Exception:
+                pass
         elif doc.get("item") in agenda_items:
+            item_data = agenda_items[doc["item"]]
             doc["item"] = {
-                "item_text": (agenda_items[doc["item"]].get("name") or agenda_items[doc["item"]].get("slugline")),
-                "_id": agenda_items[doc["item"]]["_id"],
-                "item_href": "/agenda?item={}".format(doc["item"]),
+                "item_text": item_data.name or item_data.headline or item_data.slugline,
+                "_id": item_data.id,
+                "item_href": "/agenda?item={}".format(doc["item"]),  # doc["item"] is the original ID
+                "place": "\r\n".join([_p.name or "" for _p in item_data.place or []]),
+                "service": "\r\n".join([_s.name or "" for _s in item_data.service or []]),
+                "subject": "\r\n".join([_s.name or "" for _s in item_data.subject or []]),
+                "published": item_data.versioncreated,
             }
 
         if doc.get("company") in company_items:
-            doc["company"] = company_items[doc.get("company")].get("name")
+            doc["company"] = company_items[doc.get("company")].name
 
         if doc.get("user") in user_items:
             user = user_items[doc.get("user")]
-            doc["user"] = "{0} {1}".format(user.get("first_name"), user.get("last_name"))
+            doc["user"] = "{0} {1}".format(user.first_name, user.last_name)
 
         doc["section"] = get_section_name(doc["section"])
         doc["action"] = doc["action"].capitalize() if doc["action"].lower() != "api" else "API retrieval"
@@ -279,75 +367,109 @@ def get_subscriber_activity_report():
         results = {
             "results": docs,
             "name": gettext("SubscriberActivity"),
-            "aggregations": hits.get("aggregations"),
         }
         return results
     else:
-        field_names = ["Company", "Section", "Item", "Action", "User", "Created"]
-        temp_file = io.StringIO()
-        attachment_filename = "%s.csv" % utcnow().strftime("%Y%m%d%H%M%S")
-        writer = csv.DictWriter(temp_file, delimiter=",", fieldnames=field_names)
-        writer.writeheader()
+        field_names = [
+            "Company",
+            "Section",
+            "Item",
+            "Action",
+            "User",
+            "Published",
+            "Place",
+            "Slugline",
+            "Takekey",
+            "Category",
+            "Subject",
+            "Reference",
+            "Created",
+            "Source",
+            "News Value",
+            "Priority",
+            "Keywords",
+            "Byline",
+        ]
+        default_tz = get_app_config("DEFAULT_TIMEZONE")
+        rows = []
+        rows.append(field_names)
         for doc in docs:
-            row = {
-                "Company": doc.get("company"),
-                "Section": doc.get("section"),
-                "Item": (doc.get("item") or {})["item_text"],
-                "Action": doc.get("action"),
-                "User": doc.get("user"),
-                "Created": doc.get("versioncreated").strftime("%H:%M %d/%m/%y"),
-            }
+            item_value = doc.get("item")
+            is_dict = isinstance(item_value, dict)
+            published_date = item_value.get("published") if is_dict else None
+            row = [
+                doc.get("company", "") or "",
+                doc.get("section", "") or "",
+                item_value.get("item_text", "") if is_dict else (item_value or ""),
+                doc.get("action", "") or "",
+                doc.get("user", "N/A") or "",
+                utc_to_local(default_tz, published_date).strftime("%H:%M %d/%m/%y") if published_date else "",
+                item_value.get("place") if is_dict else "",
+                item_value.get("slugline") if is_dict else "",
+                item_value.get("anpa_take_key") if is_dict else "",
+                item_value.get("service") if is_dict else "",
+                item_value.get("subject") if is_dict else "",
+                doc.get("association", {}).get("reference", "") or "",
+                utc_to_local(default_tz, get_date(doc.get("versioncreated"))).strftime("%H:%M %d/%m/%y"),
+                item_value.get("source", "") if is_dict else "",
+                item_value.get("urgency") if is_dict else "",
+                item_value.get("priority") if is_dict else "",
+                item_value.get("keywords") if is_dict else "",
+                item_value.get("byline") if is_dict else "",
+            ]
+            rows.append(row)
+        return rows
 
-            writer.writerow(row)
-        temp_file.seek(0)
-        mimetype = "text/plain"
-        # Creating the byteIO object from the StringIO Object
-        mem = io.BytesIO()
-        mem.write(temp_file.getvalue().encode("utf-8"))
-        # seeking was necessary. Python 3.5.2, Flask 0.12.2
-        mem.seek(0)
-        temp_file.close()
-        attachment_filename = secure_filename(attachment_filename)
-        return send_file(
-            mem,
-            mimetype=mimetype,
-            attachment_filename=attachment_filename,
-            as_attachment=True,
-        )
 
-
-def get_company_api_usage():
+async def get_company_api_usage():
     args = deepcopy(request.args.to_dict())
-    date_range = get_date_filters(args)
+    date_range = get_date_filters(
+        BaseSearchRequestArgs(
+            start_date=args["date_from"],
+            end_date=args["date_to"],
+            timezone_offset=args.get("timezone_offset"),
+        )
+    )
 
     if not date_range.get("gt") and date_range.get("lt"):
         abort(400, "No date range specified.")
 
-    source = {}
-    must_terms = [{"range": {"created": date_range}}]
-    source["query"] = {"bool": {"filter": must_terms}}
-    source["sort"] = [{"created": "desc"}]
-    source["size"] = 200
-    source["from"] = int(args.get("from", 0))
-    source["aggs"] = {
-        "items": {
-            "aggs": {"endpoints": {"terms": {"size": 0, "field": "endpoint"}}},
-            "terms": {"size": 0, "field": "subscriber"},
-        }
-    }
-    company_ids = [t["company"] for t in query_resource(API_TOKENS)]
-    source["query"]["bool"]["filter"].append({"terms": {"subscriber": company_ids}})
-    companies = get_entity_dict(query_resource("companies", lookup={"_id": {"$in": company_ids}}), str_id=True)
-    req = ParsedRequest()
-    req.args = {"source": json.dumps(source)}
-
-    if source["from"] >= 1000:
+    page_from = int(args.get("from", 0))
+    if page_from >= 1000:
         # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
         return abort(400)
 
+    # TODO-ASYNC: Change this when CompanyTokenAuth is upgraded to async
+    company_ids = [t["company"] for t in query_resource(API_TOKENS)]
+    companies = {str(company.id): company for company in await CompanyResource.get_service().find_by_ids(company_ids)}
+
+    cursor = cast(
+        ElasticsearchResourceCursorAsync[NewsApiAuditResourceModel],
+        await NewsApiAuditResourceModel.get_service().search(
+            {
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"range": {"created": date_range}},
+                            {"terms": {"subscriber": company_ids}},
+                        ],
+                    },
+                },
+                "sort": [{"created": "desc"}],
+                "size": 200,
+                "from": page_from,
+                "aggs": {
+                    "items": {
+                        "aggs": {"endpoints": {"terms": {"size": MAX_TERMS_SIZE, "field": "endpoint.keyword"}}},
+                        "terms": {"size": MAX_TERMS_SIZE, "field": "subscriber.keyword"},
+                    },
+                },
+            }
+        ),
+    )
+
     unique_endpoints = []
-    search_result = superdesk.get_resource_service("api_audit").get(req, None)
-    results = format_report_results(search_result, unique_endpoints, companies)
+    results = format_report_results(cursor, unique_endpoints, companies)
 
     results = {
         "results": results,
@@ -357,12 +479,12 @@ def get_company_api_usage():
     return results
 
 
-def get_company_names(company_ids):
-    service = superdesk.get_resource_service("companies")
+async def get_company_names(company_ids):
+    service_async = CompanyServiceAsync()
     enabled_companies = []
     disabled_companies = []
     for company_id in company_ids:
-        company = service.find_one(req=None, _id=company_id)
+        company = await service_async.find_by_id_raw(company_id)
         if company:
             if not company.get("is_enabled"):
                 disabled_companies.append(company.get("name"))
@@ -374,33 +496,32 @@ def get_company_names(company_ids):
     }
 
 
-def get_product_company():
+async def get_product_company():
     args = deepcopy(request.args.to_dict())
     lookup = {"_id": ObjectId(args.get("product"))} if args.get("product") else None
-    products = query_resource("products", lookup=lookup)
+    cursor = await ProductsService().find(lookup)
+    products = await cursor.to_list_raw()
 
     res = [
         {
             "_id": product.get("_id"),
             "product": product.get("name"),
-            "companies": get_companies_id_by_product(product.get("_id")),
+            "companies": await get_companies_id_by_product(product.get("_id")),
         }
         for product in products
     ]
 
     for r in res:
-        r.update(get_company_names(r.get("companies", [])))
+        r.update(await get_company_names(r.get("companies", [])))
 
     results = {"results": res, "name": gettext("Companies permissioned per product")}
     return results
 
 
-def get_expired_companies():
-    expired = list(
-        superdesk.get_resource_service("companies").find(
-            {"expiry_date": {"$lte": utcnow().replace(hour=0, minute=0, second=0)}}
-        )
-    )
+async def get_expired_companies():
+    lookup = {"expiry_date": {"$lte": utcnow().replace(hour=0, minute=0, second=0)}}
+    cursor = await CompanyServiceAsync().find(lookup)
+    expired = await cursor.to_list_raw()
 
     results = {"results": expired, "name": gettext("Expired companies")}
     return results

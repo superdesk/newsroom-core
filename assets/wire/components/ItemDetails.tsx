@@ -46,6 +46,7 @@ interface IProps {
     followStory: any;
     listConfig: any;
     filterGroupLabels: any;
+    restrictCoverageInfo?: boolean;
 }
 function ItemDetails({
     item,
@@ -58,6 +59,7 @@ function ItemDetails({
     followStory,
     listConfig,
     filterGroupLabels,
+    restrictCoverageInfo,
 }: IProps) {
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
@@ -144,7 +146,7 @@ function ItemDetails({
                                 <ListItemPreviousVersions item={item} displayConfig={detailsConfig} isPreview={true}/>
                             }
 
-                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}
+                            {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} restrictCoverageInfo={restrictCoverageInfo} />}
                         </ArticleContentInfoWrapper>
                     </ArticleContentWrapper>
                 </ArticleContent>
@@ -161,6 +163,7 @@ ItemDetails.propTypes = {
     listConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
     filterGroupLabels: PropTypes.object,
+    restrictCoverageInfo: PropTypes.bool,
 
     onClose: PropTypes.func,
     downloadMedia: PropTypes.func,

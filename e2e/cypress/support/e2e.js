@@ -59,7 +59,8 @@ export function addResources(resources) {
 
 export function addDefaultResources() {
     addResources([{
-        resource: 'navigations', items: [
+        resource: 'navigations',
+        items: [
             NAVIGATIONS.wire.all,
             NAVIGATIONS.wire.sports,
             NAVIGATIONS.agenda.sports,
@@ -76,7 +77,7 @@ export function addDefaultResources() {
             COMPANIES.foobar,
         ],
     }, {
-        resource: 'users', items: [
+        resource: 'auth_user', items: [
             USERS.foobar.admin,
             USERS.foobar.monkey,
         ],

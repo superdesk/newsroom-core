@@ -15,7 +15,7 @@ class UserSettingsPageWrapper {
     }
 
     getNewUserButton() {
-        return cy.get('[data-test-id="new-item-btn"]');
+        return cy.get('[data-test-id="users-topbar"] [data-test-id="new-item-btn"]');
     }
 
     getPreview() {

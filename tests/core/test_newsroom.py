@@ -1,26 +1,31 @@
 import json
+from tests.utils import logout
 
 
-def test_homepage_requires_auth(client, anonymous_user):
-    response = client.get("/")
+async def test_homepage_requires_auth(client, anonymous_user):
+    await logout(client)
+    response = await client.get("/")
     assert 302 == response.status_code
-    assert b"login" in response.data
+    assert b"login" in await response.get_data()
 
 
-def test_api_home(client, anonymous_user):
-    response = client.get("/api")
+async def test_api_home(client, anonymous_user):
+    await logout(client)
+    response = await client.get("/api")
     assert 401 == response.status_code
-    data = json.loads(response.data.decode())
+    data = json.loads(await response.get_data())
     assert "_error" in data
 
 
-def test_news_search_fails_for_anonymous_user(client, anonymous_user):
-    response = client.get("/wire/search")
+async def test_news_search_fails_for_anonymous_user(client, anonymous_user):
+    await logout(client)
+    response = await client.get("/wire/search")
     assert 302 == response.status_code
-    assert b"login" in response.data
+    assert b"login" in await response.get_data()
 
 
-def test_agenda_search_fails_for_anonymous_user(client, anonymous_user):
-    response = client.get("/agenda/search")
+async def test_agenda_search_fails_for_anonymous_user(client, anonymous_user):
+    await logout(client)
+    response = await client.get("/agenda/search")
     assert 302 == response.status_code
-    assert b"login" in response.data
+    assert b"login" in await response.get_data()

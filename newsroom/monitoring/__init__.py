@@ -1,29 +1,20 @@
-from flask import Blueprint
-from flask_babel import lazy_gettext
-import superdesk
+from .service import MonitoringProfileService
+from os import path
 
-from newsroom.monitoring import email_alerts  # noqa
-
-from .monitoring import MonitoringResource, MonitoringService
-from .search import MonitoringSearchResource, MonitoringSearchService
-from .formatters.pdf_formatter import MonitoringPDFFormatter
-from .formatters.rtf_formatter import MonitoringRTFFormatter
-from .utils import get_keywords_in_text
-
-
-blueprint = Blueprint("monitoring", __name__)
-
-from . import views  # noqa
+__all__ = ["MonitoringProfileService"]
 
 
 def init_app(app):
-    superdesk.register_resource("monitoring", MonitoringResource, MonitoringService, _app=app)
+    # Import things inside this function to reduce circular imports
+    from .utils import get_keywords_in_text
+    from .views import get_settings_data
+
     app.section("monitoring", app.config["MONITORING_SECTION"], "monitoring", "wire")
     app.settings_app(
         "monitoring",
         app.config["MONITORING_SECTION"],
         weight=200,
-        data=views.get_settings_data,
+        data=get_settings_data,
         allow_account_mgr=True,
     )
     app.sidenav(app.config["MONITORING_SECTION"], "monitoring.index", "monitoring", section="monitoring")
@@ -36,9 +27,7 @@ def init_app(app):
         badge="saved-items-count",
     )
 
-    app.download_formatter("monitoring_pdf", MonitoringPDFFormatter(), lazy_gettext("PDF"), ["monitoring"])
-    app.download_formatter("monitoring_rtf", MonitoringRTFFormatter(), lazy_gettext("RTF"), ["monitoring"])
-
-    superdesk.register_resource("monitoring_search", MonitoringSearchResource, MonitoringSearchService, _app=app)
-
     app.add_template_global(get_keywords_in_text, "get_keywords_in_text")
+    # Add the theme path in order to be able to reference logo images in templates
+    theme_folder = getattr(app, "theme_folder", None) or path.join(app.config["SERVER_PATH"], "theme")
+    app.add_template_global(theme_folder, "monitoring_image_path")

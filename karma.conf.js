@@ -9,6 +9,8 @@ module.exports = function(config) {
 
     config.set({
         files: [
+            // Load a simple video.js mock before tests
+            {pattern: 'node_modules/video.js/dist/video.js', included: true, served: true},
             'assets/tests.ts',
         ],
 
@@ -18,9 +20,29 @@ module.exports = function(config) {
 
         webpack: {
             module: webpackConfig.module,
-            resolve: webpackConfig.resolve,
+            resolve: {
+                ...webpackConfig.resolve,
+                alias: {
+                    ...webpackConfig.resolve.alias,
+                    'sinon': require.resolve('sinon/lib/sinon.js'),
+                    'fetch-mock': require.resolve('fetch-mock/cjs/client.js'),
+                },
+                fallback: {
+                    'assert': require.resolve('assert/'),
+                    'util': require.resolve('util/'),
+                    'timers': false,
+                },
+            },
+            plugins: [
+                new webpack.ProvidePlugin({
+                    process: 'process/browser',
+                }),
+            ],
             devtool: 'inline-source-map',
             mode: 'development',
+            externals: {
+                'video.js': 'videojs',
+            },
         },
 
         webpackMiddleware: {

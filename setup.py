@@ -13,9 +13,10 @@ with open(requirements_txt_path, "r") as r:
         line.rsplit("\n", 1)[0] for line in r.readlines() if line.rsplit("\n", 1)[0] and not line.startswith("#")
     ]
 
+
 setup(
     name="Newsroom-Core",
-    version="2.9.1",
+    version="3.1.0",
     description="Newsroom Core library",
     author="Sourcefabric",
     url="https://github.com/superdesk/newsroom-core",
@@ -24,16 +25,22 @@ setup(
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requirements,
+    extras_require={
+        "firebase": [
+            "google-auth>=2.6,<2.60",
+            "firebase-admin>=7.1,<8",
+        ],
+    },
     scripts=[],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
 )

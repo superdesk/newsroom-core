@@ -7,29 +7,33 @@ To enable:
 
 """
 
+from typing import Dict, List, Any
+
 import logging
 import pathlib
-import superdesk
 
-from typing import Dict, List
-
+from pydantic import BaseModel
 from urllib.parse import urlparse
-from flask import (
-    current_app as app,
+import quart
+from quart_babel import gettext
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
+
+import superdesk
+from superdesk.core import get_app_config
+from superdesk.core.types import Request
+from superdesk.flask import (
     request,
     redirect,
     make_response,
     session,
-    flash,
     url_for,
     render_template,
     abort,
 )
-from flask_babel import _
-from newsroom.types import AuthProviderType, UserData
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from newsroom.auth.utils import sign_user_by_email
 
+from newsroom.flask import flash
+from newsroom.types import AuthProviderType, UserData
+from newsroom.auth.utils import sign_user_by_email
 from .views import blueprint
 
 
@@ -44,29 +48,30 @@ logger = logging.getLogger(__name__)
 
 def init_saml_auth(req):
     saml_client = session.get(SESSION_SAML_CLIENT)
+    saml_clients_config = get_app_config("SAML_CLIENTS")
 
-    if app.config.get("SAML_CLIENTS") and saml_client and saml_client in app.config["SAML_CLIENTS"]:
+    if saml_clients_config and saml_client and saml_client in saml_clients_config:
         logging.info("Using SAML config for %s", saml_client)
-        config_path = pathlib.Path(app.config["SAML_BASE_PATH"]).joinpath(saml_client)
+        config_path = pathlib.Path(get_app_config("SAML_BASE_PATH")).joinpath(saml_client)
         if config_path.exists():
             return OneLogin_Saml2_Auth(req, custom_base_path=str(config_path))
         logger.error("SAML config not found in %s", config_path)
     elif saml_client:
         logging.warn("Unknown SAML client %s", saml_client)
 
-    auth = OneLogin_Saml2_Auth(req, custom_base_path=str(app.config["SAML_PATH"]))
+    auth = OneLogin_Saml2_Auth(req, custom_base_path=str(get_app_config("SAML_PATH")))
     return auth
 
 
-def prepare_flask_request(request):
+async def prepare_request(request: quart.Request) -> dict:
     url_data = urlparse(request.url)
     return {
-        "https": "off" if "http://localhost" in app.config.get("CLIENT_URL", "") else "on",
+        "https": "off" if "http://localhost" in get_app_config("CLIENT_URL", "") else "on",
         "http_host": request.host,
         "server_port": url_data.port,
         "script_name": request.path,
         "get_data": request.args.copy(),
-        "post_data": request.form.copy(),
+        "post_data": (await request.form).copy(),
     }
 
 
@@ -78,7 +83,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
         user_type="internal",
     )
 
-    for saml_key, user_key in app.config["SAML_USER_MAPPING"].items():
+    for saml_key, user_key in get_app_config("SAML_USER_MAPPING").items():
         if saml_data.get(saml_key):
             userdata[user_key] = saml_data[saml_key][0]  # type: ignore
 
@@ -97,6 +102,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
             if not company.get("internal"):
                 userdata["user_type"] = "public"
+            return userdata
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
@@ -107,23 +113,27 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
             if not company.get("internal"):
                 userdata["user_type"] = "public"
+            return userdata
 
     # last option is global env variable
-    if app.config.get("SAML_COMPANY") and not userdata.get("company"):
-        company = superdesk.get_resource_service("companies").find_one(req=None, name=app.config["SAML_COMPANY"])
+    saml_company_config = get_app_config("SAML_COMPANY")
+    if saml_company_config and not userdata.get("company"):
+        company = superdesk.get_resource_service("companies").find_one(req=None, name=saml_company_config)
         if company is not None:
             userdata["company"] = company["_id"]
         else:
-            logger.warning("Company %s not found", app.config["SAML_COMPANY"])
+            logger.warning("Company %s not found", saml_company_config)
+        return userdata
 
     return userdata
 
 
-@blueprint.route("/login/saml", methods=["GET", "POST"])
-def saml():
-    req = prepare_flask_request(request)
+@blueprint.endpoint("/login/saml", methods=["GET", "POST"], auth=False)
+async def saml():
+    req = await prepare_request(request)
     auth = init_saml_auth(req)
     errors = []
+    form = await request.form
 
     if "slo" in request.args:
         name_id = None
@@ -133,7 +143,7 @@ def saml():
         if SESSION_SESSION_ID in session:
             session_index = session[SESSION_SESSION_ID]
         return redirect(auth.logout(name_id=name_id, session_index=session_index))
-    elif "acs" in request.args or request.form:
+    elif "acs" in request.args or form:
         auth.process_response()
         errors = auth.get_errors()
         if len(errors) == 0:
@@ -142,7 +152,7 @@ def saml():
             session[SESSION_USERDATA_KEY] = auth.get_attributes()
         else:
             logger.error("SAML %s reason=%s", errors, auth.get_last_error_reason())
-            flash(_("There was an error when using SSO"), "danger")
+            await flash(gettext("There was an error when using SSO"), "danger")
             return redirect(url_for("auth.login", user_error=1))
     elif "sls" in request.args:
 
@@ -156,7 +166,7 @@ def saml():
                 return redirect(url)
 
     if session.get(SESSION_NAME_ID):
-        return sign_user_by_email(
+        return await sign_user_by_email(
             session[SESSION_NAME_ID],
             auth_type=AuthProviderType.SAML,
             create_missing=True,
@@ -167,9 +177,9 @@ def saml():
     return redirect(auth.login())
 
 
-@blueprint.route("/login/saml_metadata")
-def saml_metadata():
-    req = prepare_flask_request(request)
+@blueprint.endpoint("/login/saml_metadata", auth=False)
+async def saml_metadata():
+    req = await prepare_request(request)
     auth = init_saml_auth(req)
     settings = auth.get_settings()
     metadata = settings.get_sp_metadata()
@@ -183,9 +193,14 @@ def saml_metadata():
     return resp
 
 
-@blueprint.route("/login/<client>", methods=["GET"])
-def client_login(client):
-    if not client or client not in app.config["SAML_CLIENTS"]:
+class ClientLoginUrlArgs(BaseModel):
+    client: str
+
+
+@blueprint.endpoint("/login/<client>", methods=["GET"], auth=False)
+async def client_login(args: ClientLoginUrlArgs, params: None, req: Request) -> Any:
+    client = args.client
+    if not client or client not in get_app_config("SAML_CLIENTS"):
         return abort(404)
     session[SESSION_SAML_CLIENT] = client
-    return render_template("login_client.html", client=client)
+    return await render_template("login_client.html", client=client)

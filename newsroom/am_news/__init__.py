@@ -1,5 +1,5 @@
 import superdesk
-from flask import Blueprint
+from superdesk.flask import Blueprint
 
 blueprint = Blueprint("am_news", __name__)
 

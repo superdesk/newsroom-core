@@ -11,8 +11,6 @@
 import datetime
 import logging
 
-from superdesk import config
-from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
@@ -26,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class CompanyExpiryAlerts:
-    def send_alerts(self):
+    async def send_alerts(self):
         self.log_msg = "Company Expiry Alerts: {}".format(utcnow())
         logger.info("{} Starting to send alerts.".format(self.log_msg))
 
@@ -36,16 +34,18 @@ class CompanyExpiryAlerts:
             return
 
         try:
-            self.worker()
+            await self.worker()
         except Exception as e:
             logger.exception(e)
         finally:
             unlock(lock_name)
 
-        logger.info("{} Completed sending alerts.".format(self.log_msg))
+        logger.info(f"{self.log_msg} Completed sending alerts.")
 
-    def worker(self):
+    async def worker(self):
         from newsroom.email import send_template_email
+        from newsroom.companies import CompanyServiceAsync
+        from newsroom.users import UsersService
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
@@ -54,28 +54,29 @@ class CompanyExpiryAlerts:
         except (KeyError, TypeError):
             logger.warning("there are no alert expiry recipients")
             return
-        expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
-        companies_service = get_resource_service("companies")
-        companies = list(companies_service.find({"expiry_date": {"$lte": expiry_time}, "is_enabled": True}))
 
-        if len(companies) > 0:
+        expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
+        companies_service = CompanyServiceAsync()
+
+        companies_cursor = await companies_service.search({"expiry_date": {"$lte": expiry_time}, "is_enabled": True})
+
+        if (await companies_cursor.count()) > 0:
+            users_service = UsersService()
+            companies = await companies_cursor.to_list_raw()
+
             # Send notifications to users who are nominated to receive expiry alerts
             for company in companies:
-                users = get_resource_service("users").find(
-                    {"company": company.get(config.ID_FIELD), "expiry_alert": True}
-                )
-                if users.count() > 0:
+                users_cursor = await users_service.search({"company": company["_id"], "expiry_alert": True})
+
+                if (await users_cursor.count()) > 0:
                     template_kwargs = {
-                        "expiry_date": company.get("expiry_date"),
-                        "expires_on": company.get("expiry_date").strftime("%d-%m-%Y"),
+                        "expiry_date": company["expiry_date"],
+                        "expires_on": company["expiry_date"].strftime("%d-%m-%Y"),
                     }
-                    logger.info(
-                        "{} Sending to following users of company {}: {}".format(
-                            self.log_msg, company.get("name"), recipients
-                        )
-                    )
-                    for user in users:
-                        send_user_email(
+                    logger.info(f"{self.log_msg} Sending to following users of company {company['name']}: {recipients}")
+
+                    for user in await users_cursor.to_list():
+                        await send_user_email(
                             user,
                             template="company_expiry_alert_user",
                             template_kwargs=template_kwargs,
@@ -90,7 +91,7 @@ class CompanyExpiryAlerts:
                 "expires_on": expiry_time.strftime("%d-%m-%Y"),
             }
             logger.info("{} Sending to following expiry administrators: {}".format(self.log_msg, recipients))
-            send_template_email(
+            await send_template_email(
                 to=recipients,
                 template="company_expiry_email",
                 template_kwargs=template_kwargs,
@@ -98,5 +99,5 @@ class CompanyExpiryAlerts:
 
 
 @celery.task(soft_time_limit=600)
-def company_expiry():
-    CompanyExpiryAlerts().send_alerts()
+async def company_expiry():
+    await CompanyExpiryAlerts().send_alerts()

@@ -385,7 +385,7 @@ const mapStateToProps = (state: any) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
-    restrictCoverageInfo: get(state, 'agenda.restrictCoverageInfo', false),
+    restrictCoverageInfo: state.agenda ? state.agenda.restrictCoverageInfo : false,
     itemTypeFilter: get(state, 'agenda.itemType'),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,

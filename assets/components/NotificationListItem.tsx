@@ -1,22 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
+import {IArticle} from 'interfaces';
+import {INotification} from 'interfaces/notification';
 
 import CloseModalButton from './CloseModalButton';
 import {renderNotificationComponent} from 'notifications/components/notificationItems';
 
-function NotificationListItem({notification, item, clearNotification}: any) {
-    return (
-        <div key={item._id} className='notif__list__item'>
-            <CloseModalButton onClick={() => clearNotification(item._id)}/>
-            {renderNotificationComponent(notification, item)}
-        </div>);
-
+interface IProps {
+    notification: INotification;
+    item: IArticle;
+    clearNotification(id: string): void;
 }
 
-NotificationListItem.propTypes = {
-    notification: PropTypes.object,
-    item: PropTypes.object,
-    clearNotification: PropTypes.func,
-};
+function NotificationListItem({notification, item, clearNotification}: IProps) {
+    return (
+        <div className='notif__list__item'>
+            <CloseModalButton onClick={() => clearNotification(notification.item)}/>
+            {renderNotificationComponent(notification, item)}
+        </div>
+    );
+}
 
 export default NotificationListItem;

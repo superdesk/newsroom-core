@@ -18,6 +18,7 @@ import {
     userTypeReadOnly,
     getLocaleInputOptions,
     getDefaultLocale,
+    getDefaultLocaleCode,
     isUserCompanyAdmin,
     hasSeatsAvailable,
     seatOccupiedByUser,
@@ -297,7 +298,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 <SelectInput
                                     name={'locale'}
                                     label={gettext('Language')}
-                                    value={user.locale}
+                                    value={user.locale || getDefaultLocaleCode()}
                                     onChange={props.onChange_DEPRECATED}
                                     options={localeOptions}
                                     defaultOption={getDefaultLocale()}
@@ -460,7 +461,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures.verify_email === false
+                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures?.reset_password === false
                             ? null
                             : (
                                 <Button

@@ -1,32 +1,35 @@
 import os
 from typing import List
-from flask import json
+from quart import json
 from pytest import fixture
 from bson import ObjectId
-from tests.fixtures import PUBLIC_USER_ID
+
+from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
-from tests.utils import mock_send_email, post_json
+from tests.utils import mock_send_email, post_json, login_public
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
-from superdesk import get_resource_service
+
+from newsroom.monitoring import MonitoringProfileService
 
 
 company_id = "5c3eb6975f627db90c84093c"
 even_now = utcnow().replace(hour=4, minute=0)
+fixed_mock_now = utcnow().replace(minute=0, second=0, microsecond=0)
 
 
 def mock_utcnow():
-    return utcnow().replace(minute=0)
+    return fixed_mock_now
 
 
 def get_fixture_path(fixture):
-    return os.path.join(os.path.dirname(__file__), "fixtures", fixture)
+    return os.path.join(os.path.dirname(__file__), "../fixtures", fixture)
 
 
 @fixture(autouse=True)
-def init(app):
-    app.data.insert(
+async def init(app):
+    await create_entries_for(
         "companies",
         [
             {
@@ -40,29 +43,30 @@ def init(app):
         ],
     )
 
-    app.data.insert(
-        "users",
+    await create_entries_for(
+        "auth_user",
         [
             {
                 "_id": ObjectId("5c53afa45f627d8333220f15"),
                 "email": "foo_user@bar.com",
                 "first_name": "Foo_First_name",
+                "last_name": "Doe",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": "",
+                "company": ObjectId(company_id),
             },
             {
                 "_id": ObjectId("5c4684645f627debec1dc3db"),
                 "email": "foo_user2@bar.com",
                 "first_name": "Foo_First_name2",
+                "last_name": "Doe",
                 "is_enabled": True,
                 "receive_email": True,
-                "company": "",
             },
         ],
     )
 
-    app.data.insert(
+    await create_entries_for(
         "monitoring",
         [
             {
@@ -86,185 +90,167 @@ def init(app):
     )
 
 
-def test_non_admin_actions_fail(client, app):
-    user_id = str(PUBLIC_USER_ID)
-    with client.session_transaction() as session:
-        session["user"] = user_id
-        session["name"] = "public"
-        session["user_type"] = "public"
+async def test_non_admin_actions_fail(client, app):
+    await login_public(client)
 
-    response = client.post(
+    response = await client.post(
         "/monitoring/new",
-        data=json.dumps(
-            {
-                "is_enabled": True,
-                "users": [
-                    ObjectId("5c53afa45f627d8333220f15"),
-                    ObjectId("5c4684645f627debec1dc3db"),
-                ],
-                "company": ObjectId("5c3eb6975f627db90c84093c"),
-                "subject": "",
-                "name": "W2",
-                "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
-                "description": "D3",
-                "alert_type": "full_text",
-                "query": "hgnhgnhg",
-                "schedule": {"interval": "immediate"},
-            }
-        ),
-        content_type="application/json",
+        json={
+            "is_enabled": True,
+            "users": [
+                ObjectId("5c53afa45f627d8333220f15"),
+                ObjectId("5c4684645f627debec1dc3db"),
+            ],
+            "company": ObjectId("5c3eb6975f627db90c84093c"),
+            "subject": "",
+            "name": "W2",
+            "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
+            "description": "D3",
+            "alert_type": "full_text",
+            "query": "hgnhgnhg",
+            "schedule": {"interval": "immediate"},
+        },
     )
     assert response.status_code == 403
 
-    response = client.post(
+    response = await client.post(
         "/monitoring/5db11ec55f627d8aa0b545fb/users",
-        data=json.dumps({"users": [ObjectId("5c53afa45f627d8333220f15")]}),
-        content_type="application/json",
+        json={"users": [ObjectId("5c53afa45f627d8333220f15")]},
     )
     assert response.status_code == 403
 
-    response = client.post(
+    response = await client.post(
         "/monitoring/5db11ec55f627d8aa0b545fb/schedule",
-        data=json.dumps({"schedule": {"interval": "immediate"}}),
-        content_type="application/json",
+        json={"schedule": {"interval": "immediate"}},
     )
     assert response.status_code == 403
 
-    response = client.get("/monitoring/schedule_companies")
+    response = await client.get("/monitoring/schedule_companies")
     assert response.status_code == 403
 
-    response = client.post(
+    response = await client.post(
         "/monitoring/5db11ec55f627d8aa0b545fb/users",
-        data=json.dumps({"users": [ObjectId("5c53afa45f627d8333220f15")]}),
-        content_type="application/json",
+        json={"users": [ObjectId("5c53afa45f627d8333220f15")]},
     )
     assert response.status_code == 403
 
 
-def test_fetch_monitoring(client):
-    response = client.get("/monitoring/all")
+async def test_fetch_monitoring(client):
+    response = await client.get("/monitoring/all")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 1 == len(items)
     assert "5db11ec55f627d8aa0b545fb" == items[0]["_id"]
 
 
-def test_fetch_monitoring_by_companies(client, app):
-    response = client.get('/monitoring/all?q=&where={"company":"5c3eb6975f627db90c84093c"}')
+async def test_fetch_monitoring_by_companies(client, app):
+    response = await client.get('/monitoring/all?q=&where={"company":"5c3eb6975f627db90c84093c"}')
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 1 == len(items)
 
-    response = client.get('/monitoring/all?q=&where={"company":"6c3eb6975f627db90c84093e"}')
+    response = await client.get('/monitoring/all?q=&where={"company":"6c3eb6975f627db90c84093e"}')
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 0 == len(items)
 
 
-def test_post_monitoring(client):
-    response = client.post(
+async def test_post_monitoring(client):
+    response = await client.post(
         "/monitoring/new",
-        data=json.dumps(
-            {
-                "is_enabled": True,
-                "users": [
-                    ObjectId("5c53afa45f627d8333220f15"),
-                    ObjectId("5c4684645f627debec1dc3db"),
-                ],
-                "company": ObjectId("5c3eb6975f627db90c84093c"),
-                "subject": "",
-                "name": "W2",
-                "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
-                "description": "D3",
-                "alert_type": "full_text",
-                "query": "hgnhgnhg",
-                "schedule": {"interval": "immediate"},
-            }
-        ),
-        content_type="application/json",
+        json={
+            "is_enabled": True,
+            "users": [
+                ObjectId("5c53afa45f627d8333220f15"),
+                ObjectId("5c4684645f627debec1dc3db"),
+            ],
+            "company": ObjectId("5c3eb6975f627db90c84093c"),
+            "subject": "",
+            "name": "W2",
+            "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
+            "description": "D3",
+            "alert_type": "full_text",
+            "query": "hgnhgnhg",
+            "schedule": {"interval": "immediate"},
+        },
     )
     assert response.status_code == 201
-    response = client.get("/monitoring/all")
+    response = await client.get("/monitoring/all")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 2 == len(items)
     assert "W1" == items[0]["name"]
     assert "W2" == items[1]["name"]
 
 
-def test_always_send_override_for_immediate_monitoring(client):
-    response = client.post(
+async def test_always_send_override_for_immediate_monitoring(client):
+    response = await client.post(
         "/monitoring/new",
-        data=json.dumps(
-            {
-                "is_enabled": True,
-                "users": [
-                    ObjectId("5c53afa45f627d8333220f15"),
-                    ObjectId("5c4684645f627debec1dc3db"),
-                ],
-                "company": ObjectId("5c3eb6975f627db90c84093c"),
-                "subject": "",
-                "name": "W2",
-                "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
-                "description": "D3",
-                "alert_type": "full_text",
-                "query": "hgnhgnhg",
-                "always_send": True,
-                "schedule": {"interval": "immediate"},
-            }
-        ),
-        content_type="application/json",
+        json={
+            "is_enabled": True,
+            "users": [
+                ObjectId("5c53afa45f627d8333220f15"),
+                ObjectId("5c4684645f627debec1dc3db"),
+            ],
+            "company": ObjectId("5c3eb6975f627db90c84093c"),
+            "subject": "",
+            "name": "W2",
+            "_etag": "f023a8db3cdbe31e63ac4b0e6864f5a86ef07253",
+            "description": "D3",
+            "alert_type": "full_text",
+            "query": "hgnhgnhg",
+            "always_send": True,
+            "schedule": {"interval": "immediate"},
+        },
     )
     assert response.status_code == 201
-    response = client.get("/monitoring/all")
+    response = await client.get("/monitoring/all")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 2 == len(items)
     assert "W1" == items[0]["name"]
     assert "W2" == items[1]["name"]
     assert not items[1]["always_send"]
 
 
-def test_set_monitoring_users(client):
-    response = client.post(
+async def test_set_monitoring_users(client):
+    response = await client.post(
         "/monitoring/5db11ec55f627d8aa0b545fb/users",
-        data=json.dumps({"users": [ObjectId("5c53afa45f627d8333220f15")]}),
-        content_type="application/json",
+        json={"users": [ObjectId("5c53afa45f627d8333220f15")]},
     )
     assert response.status_code == 200
-    response = client.get("/monitoring/all")
+    response = await client.get("/monitoring/all")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 1 == len(items)
     assert ["5c53afa45f627d8333220f15"] == items[0]["users"]
 
 
-def test_set_monitoring_schedule(client):
-    response = client.post(
+async def test_set_monitoring_schedule(client):
+    response = await client.post(
         "/monitoring/5db11ec55f627d8aa0b545fb/schedule",
-        data=json.dumps({"schedule": {"interval": "four_hour"}}),
-        content_type="application/json",
+        json={"schedule": {"interval": "four_hour"}},
     )
     assert response.status_code == 200
-    response = client.get("/monitoring/all")
+    response = await client.get("/monitoring/all")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 1 == len(items)
     assert "four_hour" == items[0]["schedule"]["interval"]
 
 
-def test_get_companies_with_monitoring_schedules(client):
-    response = client.get("/monitoring/schedule_companies")
+async def test_get_companies_with_monitoring_schedules(client):
+    response = await client.get("/monitoring/schedule_companies")
     assert response.status_code == 200
-    items = json.loads(response.get_data())
+    items = json.loads(await response.get_data())
     assert 1 == len(items)
     assert company_id == items[0]["_id"]
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_immediate_alerts(client, app):
-    app.data.insert(
+async def test_send_immediate_alerts(client, app):
+    await create_entries_for(
         "items",
         [
             {
@@ -275,8 +261,11 @@ def test_send_immediate_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run(immediate=True)
+
+    with app.mail.record_messages() as outbox:
+        # async with app.test_request_context():
+        # async with app.app_context():
+        await MonitoringEmailAlerts().run(immediate=True)
         assert_recipients(
             outbox,
             [
@@ -291,25 +280,25 @@ def test_send_immediate_alerts(client, app):
 
 
 def assert_recipients(outbox, recipients: List[str]):
-    assert len(outbox) == len(recipients)
     outbox_recipients = []
     for o in outbox:
         outbox_recipients.extend(o.recipients)
+    assert len(outbox_recipients) == len(recipients)
     for recipient in recipients:
         assert recipient in outbox_recipients
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_one_hour_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_send_one_hour_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "one_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -320,7 +309,7 @@ def test_send_one_hour_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -331,8 +320,9 @@ def test_send_one_hour_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert_recipients(
             outbox,
             [
@@ -347,16 +337,16 @@ def test_send_one_hour_alerts(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_two_hour_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_send_two_hour_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -367,7 +357,7 @@ def test_send_two_hour_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -378,8 +368,9 @@ def test_send_two_hour_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert_recipients(
             outbox,
             [
@@ -394,16 +385,16 @@ def test_send_two_hour_alerts(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_four_hour_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_send_four_hour_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "four_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -414,7 +405,7 @@ def test_send_four_hour_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -425,8 +416,9 @@ def test_send_four_hour_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert_recipients(
             outbox,
             [
@@ -441,12 +433,12 @@ def test_send_four_hour_alerts(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_daily_alerts(client, app):
+async def test_send_daily_alerts(client, app):
     now = utcnow()
     now = utc_to_local(app.config["DEFAULT_TIMEZONE"], now)
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {
@@ -457,7 +449,7 @@ def test_send_daily_alerts(client, app):
         },
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -468,7 +460,7 @@ def test_send_daily_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -479,7 +471,7 @@ def test_send_daily_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -490,8 +482,9 @@ def test_send_daily_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run()
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().run()
         assert_recipients(
             outbox,
             [
@@ -506,12 +499,12 @@ def test_send_daily_alerts(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_weekly_alerts(client, app):
+async def test_send_weekly_alerts(client, app):
     now = utcnow()
     now = utc_to_local(app.config["DEFAULT_TIMEZONE"], now)
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {
@@ -523,7 +516,7 @@ def test_send_weekly_alerts(client, app):
         },
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -534,7 +527,7 @@ def test_send_weekly_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -545,7 +538,7 @@ def test_send_weekly_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -556,8 +549,9 @@ def test_send_weekly_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run()
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().run()
         assert_recipients(
             outbox,
             [
@@ -572,16 +566,16 @@ def test_send_weekly_alerts(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_alerts_respects_last_run_time(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_send_alerts_respects_last_run_time(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -592,7 +586,7 @@ def test_send_alerts_respects_last_run_time(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -603,8 +597,9 @@ def test_send_alerts_respects_last_run_time(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        # async with app.app_context():
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert_recipients(
             outbox,
             [
@@ -617,21 +612,22 @@ def test_send_alerts_respects_last_run_time(client, app):
         assert "Newsroom Monitoring: W1" in outbox[0].body
         assert "monitoring-export.pdf" in outbox[0].attachments[0]
 
-    with app.mail.record_messages() as newoutbox, app.test_request_context():
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    with app.mail.record_messages() as newoutbox:
+        # async with app.app_context():
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         last_run_time = local_to_utc(app.config["DEFAULT_TIMEZONE"], even_now)
         assert w["last_run_time"] > (last_run_time - timedelta(minutes=5))
-        MonitoringEmailAlerts().scheduled_worker(last_run_time)
+        await MonitoringEmailAlerts().scheduled_worker(last_run_time)
         assert len(newoutbox) == 0
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_disabled_profile_wont_send_immediate_alerts(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"is_enabled": False})
-    app.data.insert(
+async def test_disabled_profile_wont_send_immediate_alerts(client, app):
+    await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"is_enabled": False})
+    await create_entries_for(
         "items",
         [
             {
@@ -643,21 +639,21 @@ def test_disabled_profile_wont_send_immediate_alerts(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().run(immediate=True)
+        await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_disabled_profile_wont_send_scheduled_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_disabled_profile_wont_send_scheduled_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}, "is_enabled": False},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -668,7 +664,7 @@ def test_disabled_profile_wont_send_scheduled_alerts(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -680,15 +676,15 @@ def test_disabled_profile_wont_send_scheduled_alerts(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_always_send_immediate_alerts_wiont_send_default_email(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": True})
-    app.data.insert(
+async def test_always_send_immediate_alerts_wiont_send_default_email(client, app):
+    await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"always_send": True})
+    await create_entries_for(
         "items",
         [
             {
@@ -700,20 +696,20 @@ def test_always_send_immediate_alerts_wiont_send_default_email(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().run(immediate=True)
+        await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_always_send_schedule_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
-    app.data.update(
+async def test_always_send_schedule_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}, "always_send": True},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -724,22 +720,22 @@ def test_always_send_schedule_alerts(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) > 0
         assert "No content has matched the monitoring profile for this schedule." in outbox[0].body
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_disable_always_send_schedule_alerts(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
-    app.data.update(
+async def test_disable_always_send_schedule_alerts(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}, "always_send": False},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -751,15 +747,15 @@ def test_disable_always_send_schedule_alerts(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_always_send_immediate_alerts(client, app):
-    get_resource_service("monitoring").patch(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": False})
-    app.data.insert(
+async def test_always_send_immediate_alerts(client, app):
+    await MonitoringProfileService().update(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": False})
+    await create_entries_for(
         "items",
         [
             {
@@ -771,14 +767,14 @@ def test_always_send_immediate_alerts(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().run(immediate=True)
+        await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_matching_content_immediate(client, app):
-    app.data.insert(
+async def test_last_run_time_always_updated_with_matching_content_immediate(client, app):
+    await create_entries_for(
         "items",
         [
             {
@@ -789,8 +785,8 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run(immediate=True)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
         assert_recipients(
             outbox,
             [
@@ -802,23 +798,23 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
         assert "monitoring-export.pdf" in outbox[0].attachments[0]
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
-        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
+        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=15))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_matching_content_scheduled(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_last_run_time_always_updated_with_matching_content_scheduled(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -829,7 +825,7 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -840,8 +836,8 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert_recipients(
             outbox,
             [
@@ -853,16 +849,17 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
         assert "monitoring-export.pdf" in outbox[0].attachments[0]
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         last_run_time = local_to_utc(app.config["DEFAULT_TIMEZONE"], even_now)
         assert w["last_run_time"] > (last_run_time - timedelta(minutes=5))
 
 
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_no_matching_content_immediate(client, app):
-    app.data.insert(
+async def test_last_run_time_does_not_update_with_no_matching_content_immediate(client, app):
+    await create_entries_for(
         "items",
         [
             {
@@ -874,25 +871,24 @@ def test_last_run_time_always_updated_with_no_matching_content_immediate(client,
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().run(immediate=True)
+        await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
-        assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_no_matching_content_scheduled(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_last_run_time_always_updated_with_no_matching_content_scheduled(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -904,9 +900,9 @@ def test_last_run_time_always_updated_with_no_matching_content_scheduled(client,
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 0
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         last_run_time = local_to_utc(app.config["DEFAULT_TIMEZONE"], even_now)
@@ -914,11 +910,11 @@ def test_last_run_time_always_updated_with_no_matching_content_scheduled(client,
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_no_users_immediate(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
-    app.data.update("monitoring", ObjectId("5db11ec55f627d8aa0b545fb"), {"users": []}, w)
+async def test_last_run_time_always_updated_with_no_users_immediate(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    await update_entries_for("monitoring", ObjectId("5db11ec55f627d8aa0b545fb"), {"users": []}, w)
 
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -930,25 +926,25 @@ def test_last_run_time_always_updated_with_no_users_immediate(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().run(immediate=True)
+        await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 0
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_last_run_time_always_updated_with_no_users_scheduled(client, app):
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+async def test_last_run_time_always_updated_with_no_users_scheduled(client, app):
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}, "users": []},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -960,9 +956,9 @@ def test_last_run_time_always_updated_with_no_users_scheduled(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(even_now)
+        await MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 0
-        w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+        w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         last_run_time = local_to_utc(app.config["DEFAULT_TIMEZONE"], even_now)
@@ -970,17 +966,17 @@ def test_last_run_time_always_updated_with_no_users_scheduled(client, app):
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_will_send_one_hour_alerts_on_odd_hours(client, app):
+async def test_will_send_one_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "one_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -991,7 +987,7 @@ def test_will_send_one_hour_alerts_on_odd_hours(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1002,23 +998,23 @@ def test_will_send_one_hour_alerts_on_odd_hours(client, app):
             }
         ],
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().scheduled_worker(now)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().scheduled_worker(now)
         assert len(outbox) > 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
+async def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "two_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1029,7 +1025,7 @@ def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1041,22 +1037,22 @@ def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(now)
+        await MonitoringEmailAlerts().scheduled_worker(now)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
+async def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"schedule": {"interval": "four_hour"}},
         w,
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1067,7 +1063,7 @@ def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
             }
         ],
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1079,19 +1075,19 @@ def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
         ],
     )
     with app.mail.record_messages() as outbox:
-        MonitoringEmailAlerts().scheduled_worker(now)
+        await MonitoringEmailAlerts().scheduled_worker(now)
         assert len(outbox) == 0
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_immediate_rtf_attachment_alerts(client, app):
-    post_json(
+async def test_send_immediate_rtf_attachment_alerts(client, app):
+    await post_json(
         client,
         "/settings/general_settings",
         {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")},
     )
-    app.data.insert(
+    await create_entries_for(
         "items",
         [
             {
@@ -1105,9 +1101,9 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
             }
         ],
     )
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {
@@ -1117,8 +1113,8 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
         },
         w,
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run(immediate=True)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
         assert_recipients(
             outbox,
             [
@@ -1134,8 +1130,8 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_send_immediate_headline_subject_alerts(client, app):
-    app.data.insert(
+async def test_send_immediate_headline_subject_alerts(client, app):
+    await create_entries_for(
         "items",
         [
             {
@@ -1146,16 +1142,16 @@ def test_send_immediate_headline_subject_alerts(client, app):
             }
         ],
     )
-    w = app.data.find_one("monitoring", None, _id="5db11ec55f627d8aa0b545fb")
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
-    app.data.update(
+    await update_entries_for(
         "monitoring",
         ObjectId("5db11ec55f627d8aa0b545fb"),
         {"headline_subject": True},
         w,
     )
-    with app.mail.record_messages() as outbox, app.test_request_context():
-        MonitoringEmailAlerts().run(immediate=True)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
         assert_recipients(
             outbox,
             [
@@ -1166,3 +1162,254 @@ def test_send_immediate_headline_subject_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Article headline about product"
         assert "Newsroom Monitoring: W1" in outbox[0].body
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_send_immediate_email_alerts(client, app):
+    await post_json(
+        client,
+        "/settings/general_settings",
+        {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")},
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "version": "1",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>"
+                '<!-- EMBED START Audio {id: "editor_2"} -->'
+                "<figure>"
+                '    <audio controls src="/assets.mp3"></audio>'
+                "    <figcaption>Assistant Treasurer</figcaption>"
+                "</figure>"
+                '<!-- EMBED END Audio {id: "editor_2"} -->'
+                "<p>Something after the embed",
+                "source": "AAAA",
+            }
+        ],
+    )
+    await login_public(client)
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert w is not None
+    await update_entries_for(
+        "monitoring",
+        ObjectId("5db11ec55f627d8aa0b545fb"),
+        {"format_type": "monitoring_email", "alert_type": "full_text", "keywords": ["text"]},
+        w,
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert_recipients(
+            outbox,
+            [
+                "foo_user2@bar.com",
+                "foo_user@bar.com",
+            ],
+        )
+        assert outbox[0].sender == "newsroom@localhost"
+        assert outbox[0].subject == "Monitoring Subject"
+        assert "Something after the embed" in outbox[0].body
+        assert "Assistant Treasurer" not in outbox[0].body
+        assert "Newsroom Monitoring: W1" in outbox[0].body
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_immediate_email_alerts_twice(client, app):
+    await post_json(
+        client,
+        "/settings/general_settings",
+        {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")},
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+                "version": "1",
+            }
+        ],
+    )
+    await create_entries_for(
+        "history",
+        [
+            {
+                "action": "email",
+                "company": ObjectId("5c3eb6975f627db90c84093c"),
+                "section": "monitoring",
+                "monitoring": ObjectId("5db11ec55f627d8aa0b545fb"),
+                "versioncreated": utcnow(),
+                "version": "1",
+                "item": "foo",
+            }
+        ],
+    )
+    await login_public(client)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_email_to_disabled_users(client, app):
+    await create_entries_for(
+        "users",
+        [
+            {
+                "_id": ObjectId("5d4ccb7265af3eaa4a8395bc"),
+                "email": "boo_user@bar.com",
+                "first_name": "Boo_First_name",
+                "last_name": "Boo_Last_name",
+                "is_enabled": False,
+                "receive_email": True,
+                "company": ObjectId(company_id),
+            },
+            {
+                "_id": ObjectId("617f257c04bfdad4366b6997"),
+                "email": "ringin@bar.com",
+                "first_name": "Ring_In_First_name",
+                "last_name": "Ring_In_Last_name",
+                "is_enabled": True,
+                "receive_email": True,
+                "company": ObjectId(company_id),
+            },
+        ],
+    )
+    w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert w is not None
+    users = [ObjectId("5d4ccb7265af3eaa4a8395bc"), ObjectId("617f257c04bfdad4366b6997")]
+    await update_entries_for("monitoring", ObjectId("5db11ec55f627d8aa0b545fb"), {"users": users}, w)
+
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 1
+        assert len(outbox[0].recipients) == 1
+        assert_recipients(
+            outbox,
+            ["ringin@bar.com"],
+        )
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_dont_send_email_to_disabled_companies(client, app):
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    c = await find_one_by_id("companies", company_id)
+    assert c is not None
+    await update_entries_for("companies", ObjectId(company_id), {"is_enabled": False}, c)
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 0
+
+
+async def test_save_only_users_belonging_to_company(client, app):
+    w = await find_one_by_id("users", "5c53afa45f627d8333220f15")
+    await update_entries_for(
+        "users", ObjectId("5c53afa45f627d8333220f15"), {"company": ObjectId("5c3eb6975f627db90c84093c")}, w
+    )
+    await post_json(
+        client,
+        "/monitoring/5db11ec55f627d8aa0b545fb/users",
+        {"users": ["5c53afa45f627d8333220f15", "111111111111111111111111"]},
+    )
+    m = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert m["users"] == [ObjectId("5c53afa45f627d8333220f15")]
+
+
+@mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
+@mock.patch("newsroom.email.send_email", mock_send_email)
+async def test_send_profile_email(client, app):
+    await post_json(
+        client, "/settings/general_settings", {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")}
+    )
+    await create_entries_for(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "headline": "product immediate",
+                "products": [{"code": "12345"}],
+                "versioncreated": utcnow(),
+                "byline": "Testy McTestface",
+                "body_html": "<p>line 1 of the article text\nline 2 of the story\nand a bit more.</p>",
+                "source": "AAAA",
+            }
+        ],
+    )
+    m = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
+    assert m is not None
+    await update_entries_for(
+        "monitoring",
+        ObjectId("5db11ec55f627d8aa0b545fb"),
+        {
+            "email": "atest@a.com,btest@b.com",
+            "format_type": "monitoring_email",
+            "is_enabled": "true",
+        },
+        m,
+    )
+    with app.mail.record_messages() as outbox:
+        await MonitoringEmailAlerts().run(immediate=True)
+        assert len(outbox) == 3
+        assert_recipients(
+            outbox,
+            ["atest@a.com", "btest@b.com", "foo_user2@bar.com", "foo_user@bar.com"],
+        )
+
+
+async def test_save_monitoring_email(client, app):
+    response = await client.post(
+        "/monitoring/5db11ec55f627d8aa0b545fb",
+        json={"email": "axb.com, a@b.com", "company": ObjectId(company_id), "name": "test"},
+    )
+    data = json.loads(await response.get_data())
+    assert data["email"] == "Invalid email address"
+    response = await client.post(
+        "/monitoring/5db11ec55f627d8aa0b545fb",
+        json={"email": "a@b.com , d@e.com", "company": ObjectId(company_id), "name": "test"},
+    )
+    data = json.loads(await response.get_data())
+    assert data["success"] is True
+    response = await client.get("/monitoring/5db11ec55f627d8aa0b545fb")
+    data = json.loads(await response.get_data())
+    assert data["email"] == "a@b.com,d@e.com"

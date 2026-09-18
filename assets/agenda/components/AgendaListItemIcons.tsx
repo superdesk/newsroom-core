@@ -30,6 +30,7 @@ interface IProps {
     row?: boolean;
     isMobilePhone?: boolean;
     listConfig: IListConfig;
+    restrictCoverageInfo?: boolean;
 }
 
 interface IState {
@@ -120,6 +121,7 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
                                 planningItem={props.planningItem}
+                                restrictCoverageInfo={props.restrictCoverageInfo}
                             />
                         ))}
                     </div>

@@ -6,14 +6,14 @@ from bson import ObjectId
 import newsroom
 import superdesk
 from superdesk.services import CacheableService
-from .types import PRODUCT_TYPES
 
-from newsroom.types import Company, Product, User, NavigationIds
+from newsroom.types import Company, Product, User, NavigationIds, SectionEnum
 from newsroom.utils import any_objectid_in_list, parse_objectid
 
 IdsList = NavigationIds
 
 
+# TODO-ASYNC: Create Products async resource
 class ProductsResource(newsroom.Resource):
     """
     Products schema
@@ -35,7 +35,7 @@ class ProductsResource(newsroom.Resource):
             "schema": newsroom.Resource.rel("companies"),
             "nullable": True,
         },
-        "product_type": {"type": "string", "default": "wire", "allowed": PRODUCT_TYPES},
+        "product_type": {"type": "string", "default": "wire", "allowed": [t.value for t in SectionEnum]},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
     }
@@ -110,6 +110,8 @@ def get_product_by_id(
     return product
 
 
+# Obsolete: This method has been migrated to async and it is located under `.utils.py`
+# TODO-ASYNC: remove when everything is async.
 def get_products_by_company(
     company: Optional[Company],
     navigation_ids: Optional[NavigationIds] = None,
@@ -140,6 +142,7 @@ def get_products_by_company(
     return []
 
 
+# TODO-ASYNC: Convert to use UserResourceModel instead of a dict
 def get_products_by_user(user: User, section: str, navigation_ids: Optional[NavigationIds]) -> List[Product]:
     if user.get("products"):
         ids = [parse_objectid(p["_id"]) for p in user["products"] if p["section"] == section]

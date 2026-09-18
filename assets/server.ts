@@ -149,6 +149,17 @@ class Server {
             })
         ).then(checkStatus);
     }
+
+    /**
+     * Make HEAD request to url
+     *
+     * @param {String} url
+     * @return {Promise}
+    */
+    head(url: string) {
+        return fetch(url, options({method: 'HEAD'}))
+            .then(checkStatus);
+    }
 }
 
 export default new Server();

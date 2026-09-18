@@ -1,109 +1,43 @@
-import logging
+from newsroom.types import SectionEnum
+from newsroom.wire import WireSearchServiceAsync
 
-from flask import abort
-from flask_babel import gettext
-from superdesk import get_resource_service
-
-from newsroom.search.service import query_string
-from newsroom.wire.search import WireSearchResource, WireSearchService
-from newsroom.utils import query_resource
-from newsroom.products.products import get_products_by_company
-
-logger = logging.getLogger(__name__)
+from newsroom.wire.filters import apply_highlights
+from .filters import MonitoringSearchRequestArgs, default_monitoring_filters, filter_replacements
+from newsroom.auth.utils import get_user_or_none_from_request
+from newsroom.search.types import NewshubSearchRequest
 
 
-class MonitoringSearchResource(WireSearchResource):
-    pass
+class MonitoringSearchService(WireSearchServiceAsync):
+    search_args_class = MonitoringSearchRequestArgs
+    section = SectionEnum.MONITORING
+    filters = default_monitoring_filters
 
+    get_topic_items_query_execute_filters = [
+        filter_replacements.get(filter_function) or filter_function
+        for filter_function in WireSearchServiceAsync.get_topic_items_query_execute_filters
+        if filter_function != apply_highlights
+    ]
 
-class MonitoringSearchService(WireSearchService):
-    section = "monitoring"
+    async def get_current_monitoring_bookmarks_count(self, navigations: list[dict]) -> int:
+        """Returns the number of items that have been bookmarked by the current user.
 
-    def prefill_search_user(self, search):
-        """Prefill the search user
+        The count is scoped to items found in enabled monitoring navigations.
 
-        :param SearchQuery search: The search query instance
+        :param navigations: The monitoring profiles defined for the Company.
+        :returns: The number of items that have been bookmarked by the current user
+            within the enabled monitoring navigations.
         """
 
-        if search.args.get("skip_user_validation"):
-            search.user = None
-            return
+        user = get_user_or_none_from_request(None)
+        if not user:
+            return 0
 
-        return super().prefill_search_user(search)
+        navigation_ids = [nav.get("_id") for nav in navigations if nav.get("is_enabled")]
 
-    def prefill_search_section(self, search):
-        """Prefill the search section
-
-        :param SearchQuery search: The search query instance
-        """
-
-        search.section = "wire"
-
-    def prefill_search_products(self, search):
-        """Prefill the search products
-
-        :param SearchQuery search: The search query instance
-        """
-
-        if search.company:
-            search.products = get_products_by_company(
-                search.company,
-                search.navigation_ids,
-                product_type=search.section,
+        cursor = await self.search(
+            NewshubSearchRequest(
+                section=self.section,
+                args=self.search_args_class(bookmarks=[user.id], page_size=0, navigation_ids=navigation_ids),
             )
-        else:
-            search.products = []
-
-    def validate_request(self, search):
-        """Validate the request parameters
-
-        :param SearchQuery search: The search query instance
-        """
-
-        if not search.is_admin:
-            if search.args.get("requested_products"):
-                # Ensure that all the provided products are permissioned for this request
-                if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
-                    abort(404, gettext("Invalid product parameter"))
-
-    def apply_products_filter(self, search):
-        """Generate the product filters
-
-        :param newsroom.wire.service.SearchQuery search: the search query instance
-        """
-
-        monitoring_list = []
-
-        if search.req:
-            if len(search.navigation_ids) > 0:
-                monitoring_list.append(
-                    get_resource_service("monitoring").find_one(req=None, _id=search.navigation_ids[0])
-                )
-            else:
-                abort(403, gettext("No monitoring profile requested."))
-        else:
-            monitoring_list = list(query_resource("monitoring"))
-
-        if len(monitoring_list) < 1:
-            return
-
-        for mlist in monitoring_list:
-            search.query["bool"]["should"].append(query_string(mlist["query"]))
-
-        if search.navigation_ids and len(monitoring_list[0].get("keywords") or []) > 0 and search.source is not None:
-            search.source["highlight"] = {"fields": {}}
-            fields = ["body_html"]
-            for field in fields:
-                search.source["highlight"]["fields"][field] = {
-                    "number_of_fragments": 0,
-                    "highlight_query": {
-                        "query_string": {
-                            "query": " ".join(monitoring_list[0]["keywords"]),
-                            "default_operator": "AND",
-                            "lenient": True,
-                        }
-                    },
-                }
-            search.source["highlight"]["pre_tags"] = ["<span class='es-highlight'>"]
-            search.source["highlight"]["post_tags"] = ["</span>"]
-            search.source["highlight"]["require_field_match"] = False
+        )
+        return await cursor.count()

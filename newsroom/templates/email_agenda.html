@@ -68,3 +68,24 @@
         {% endif %}
     </div>
 {% endfor %}
+
+{% if related_events %}
+    <p>Related Events:</p>
+    {% for event in related_events %}
+        <div>
+            URL: <a href="{{ url_for_agenda(event) }}">{{ url_for_agenda(event) }}</a>
+            {% if event.name %}
+                <div>{{ event.name }}</div>
+            {% endif %}
+            {% if event.slugline %}
+                <div>Slugline: {{ event.slugline }}</div>
+            {% endif %}
+            {% if event.headline %}
+                <div>Headline: {{ event.headline }}</div>
+            {% endif %}
+            {% if event.definition_long %}
+                <div>{{ event.definition_long }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}

@@ -29,10 +29,10 @@ const getPictureTextPanel = (item: IArticle, picture: IArticle | null, openItem:
 };
 
 const LargePictureTextCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
-    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
+    const {items, title, id, openItem, isActive, cardId, listConfig, kind} = props;
 
     return (
-        <CardRow title={title} id={id} isActive={isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
+        <CardRow title={title} id={id} isActive={isActive} kind={kind} onMoreNewsClicked={props.onMoreNewsClicked}>
             {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );

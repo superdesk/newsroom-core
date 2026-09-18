@@ -1,82 +1,127 @@
 import re
-
-import flask
-from bson import ObjectId
 import bcrypt
-from flask import jsonify, current_app as app
-from flask_babel import gettext
-from superdesk import get_resource_service
+from typing import Optional
+
+from quart_babel import gettext
+from pydantic import BaseModel, ValidationError
 from werkzeug.exceptions import NotFound
 
-from newsroom.decorator import admin_only, account_manager_only
-from newsroom.oauth_clients import blueprint
-from newsroom.utils import query_resource, find_one, get_json_or_400
 from superdesk.utils import gen_password
+from superdesk.core.types import Request, Response
+from superdesk.core.resources.fields import ObjectId
+from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
+
+from newsroom.auth import auth_rules
+from newsroom.utils import get_json_or_400_async
+from .clients_async import clients_endpoints, ClientService
 
 
-def get_settings_data():
+async def get_settings_data():
+    data = await ClientService().get_all_clients()
     return {
-        "oauth_clients": list(query_resource("oauth_clients")),
+        "oauth_clients": data,
     }
 
 
-@blueprint.route("/oauth_clients/search", methods=["GET"])
-@account_manager_only
-def search():
+class ClientSearchArgs(BaseModel):
+    q: Optional[str] = None
+
+
+class ClientArgs(BaseModel):
+    client_id: ObjectId
+
+
+@clients_endpoints.endpoint(
+    "/oauth_clients/search",
+    methods=["GET"],
+    auth=[auth_rules.account_manager_only],
+)
+async def search(args: None, params: ClientSearchArgs, request: Request) -> Response:
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if params.q:
+        regex = re.compile(f".*{re.escape(params.q)}.*", re.IGNORECASE)
         lookup = {"name": regex}
-    companies = list(query_resource("oauth_clients", lookup=lookup))
-    return jsonify(companies), 200
+    cursor = await ClientService().search(lookup)
+    data = await cursor.to_list_raw()
+    return Response(data)
 
 
-@blueprint.route("/oauth_clients/new", methods=["POST"])
-@account_manager_only
-def create():
+@clients_endpoints.endpoint(
+    "/oauth_clients/new",
+    methods=["POST"],
+    auth=[auth_rules.account_manager_only],
+)
+async def create(request: Request) -> Response:
     """
     Creates the client with given client id
     """
-    client = get_json_or_400()
+    client = await get_json_or_400_async(request)
+    if not isinstance(client, dict):
+        return await request.abort(400)
 
     password = gen_password()
-    new_company = {
+    doc = {
+        "_id": ObjectId(),
         "name": client.get("name"),
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
+    try:
+        new_items = await ClientService().create([doc])
+    except ValidationError as error:
+        return Response(
+            {
+                field: list(errors.values())[0]
+                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
+            },
+            400,
+            (),
+        )
 
-    ids = get_resource_service("oauth_clients").post([new_company])
-    return jsonify({"success": True, "_id": ids[0], "password": password}), 201
+    return Response({"success": True, "_id": new_items[0].id, "password": password}, 201)
 
 
-@blueprint.route("/oauth_clients/<_id>", methods=["GET", "POST"])
-@account_manager_only
-def edit(_id):
+@clients_endpoints.endpoint(
+    "/oauth_clients/<string:client_id>",
+    methods=["GET", "POST"],
+    auth=[auth_rules.account_manager_only],
+)
+async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Edits the client with given client id
     """
-    client = find_one("oauth_clients", _id=ObjectId(_id))
+    service = ClientService()
+    original = await service.find_by_id(args.client_id)
+    if not original:
+        raise NotFound(gettext("Client not found"))
+    elif request.method == "GET":
+        return Response(original)
 
-    if not client:
-        return NotFound(gettext("Client not found"))
+    request_json = await get_json_or_400_async(request)
+    if not isinstance(request_json, dict):
+        return await request.abort(400)
 
-    if flask.request.method == "POST":
-        client = get_json_or_400()
-        updates = {}
-        updates["name"] = client.get("name")
-        get_resource_service("oauth_clients").patch(ObjectId(_id), updates=updates)
-        app.cache.delete(_id)
-        return jsonify({"success": True}), 200
-    return jsonify(client), 200
+    updates = {}
+    updates["name"] = request_json.get("name")
+    await service.update(args.client_id, updates)
+    return Response({"success": True})
 
 
-@blueprint.route("/oauth_clients/<_id>", methods=["DELETE"])
-@admin_only
-def delete(_id):
+@clients_endpoints.endpoint(
+    "/oauth_clients/<string:client_id>",
+    methods=["DELETE"],
+    auth=[auth_rules.admin_only],
+)
+async def delete(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Deletes the client with given client id
     """
-    get_resource_service("oauth_clients").delete_action(lookup={"_id": ObjectId(_id)})
+    service = ClientService()
+    original = await service.find_by_id(args.client_id)
 
-    app.cache.delete(_id)
-    return jsonify({"success": True}), 200
+    if not original:
+        raise NotFound(gettext("Client not found"))
+    try:
+        await service.delete(original)
+    except Exception as e:
+        return Response({"error": str(e)}, 400)
+    return Response({"success": True})

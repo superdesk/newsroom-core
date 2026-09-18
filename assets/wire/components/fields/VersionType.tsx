@@ -1,13 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-export function VersionType({value}: any) {
+interface IProps {
+    value: string
+}
+
+export function VersionType({value}: IProps) {
     return (
         <span>{gettext('Version type: {{version}}', {version: value})}</span>
     );
 }
 
-VersionType.propTypes = {
-    value: PropTypes.string,
-};

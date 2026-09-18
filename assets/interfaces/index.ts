@@ -9,7 +9,7 @@ export {
     IRestApiResponse,
 } from './common';
 export {IListConfig, IPreviewConfig, IDisplayFieldsConfig, IAgendaPreviewConfig} from './configs';
-export {ICompany, ICompanyType, IAuthProvider, IService} from './company';
+export {ICompany, ICompanyType, IAuthProvider, IService, IEmbedPermissionUserAction, IEmbedContentType} from './company';
 export {INavigation} from './navigation';
 export {ITopicNotificationScheduleType, ITopicFolder, ITopic, ISearchParams, ISearchFields} from './topic';
 export {IUserDashboard, IUser, IUserType} from './user';

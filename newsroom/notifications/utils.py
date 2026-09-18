@@ -1,0 +1,122 @@
+import datetime
+from asyncio import gather
+
+from bson import ObjectId
+from typing import Any
+
+from superdesk.core.resources import AsyncResourceService
+from superdesk.utc import utcnow
+from superdesk.core import get_app_config
+from superdesk.notification import push_notification
+
+from newsroom.exceptions import AuthorizationError
+from newsroom.auth.utils import get_user_id_from_request
+from newsroom.types import WireItem, AgendaItem
+from newsroom.topics.topics_async import TopicService
+from .services import NotificationsService
+from superdesk.resource_fields import ID_FIELD
+
+
+def user_notifications_lookup(user_id: ObjectId) -> dict[str, Any]:
+    ttl = get_app_config("NOTIFICATIONS_TTL", 1)
+    return {
+        "user": user_id,
+        "_created": {"$gte": utcnow() - datetime.timedelta(days=ttl)},
+    }
+
+
+async def get_user_notifications(user_id: ObjectId) -> list[dict[str, Any]]:
+    """
+    Returns the notification entries for the given user
+    """
+    lookup = user_notifications_lookup(user_id)
+    cursor = await NotificationsService().search(lookup)
+    return await cursor.to_list_raw()
+
+
+async def get_initial_notifications() -> dict[str, Any] | None:
+    """
+    Returns the stories that user has notifications for
+    :return: List of stories. None if there is not user session.
+    """
+
+    try:
+        user_id = get_user_id_from_request(None)
+    except AuthorizationError:
+        return None
+
+    lookup = user_notifications_lookup(user_id)
+    notifications = await NotificationsService().search(lookup)
+
+    return {
+        "user": str(user_id),
+        "notificationCount": await notifications.count(),
+    }
+
+
+async def get_notifications_with_items() -> dict[str, Any] | None:
+    """
+    Returns the stories that user has notifications for
+    :return: List of stories. None if there is not user session.
+    """
+
+    async def get_notification_items(service: AsyncResourceService, ids: list[str]) -> list[dict[str, Any]]:
+        cursor = await service.find({ID_FIELD: {"$in": ids}}, use_mongo=True, max_results=500)
+        return await cursor.to_list_raw()
+
+    try:
+        user_id = get_user_id_from_request(None)
+    except AuthorizationError:
+        return None
+
+    saved_notifications = await get_user_notifications(user_id)
+    item_ids = [n["item"] for n in saved_notifications]
+
+    wire_items, agenda_items, topic_items = await gather(
+        get_notification_items(WireItem.get_service(), item_ids),
+        get_notification_items(AgendaItem.get_service(), item_ids),
+        get_notification_items(TopicService(), item_ids),
+    )
+
+    items = wire_items + agenda_items + topic_items
+    found_ids = {item["_id"] for item in items}
+
+    def has_item(notification: dict[str, Any]) -> bool:
+        return notification["item"] in found_ids or bool((notification.get("data") or {}).get("item"))
+
+    # there is nothing to render for these, so drop them instead of leaving them in the count
+    orphaned_ids = [notification["_id"] for notification in saved_notifications if not has_item(notification)]
+    if orphaned_ids:
+        await NotificationsService().delete_many({"_id": {"$in": orphaned_ids}})
+
+    notifications = [notification for notification in saved_notifications if has_item(notification)]
+
+    return {
+        "user": str(user_id),
+        "items": items,
+        "notifications": notifications,
+    }
+
+
+async def save_user_notifications(entries: list[dict[str, Any]]):
+    """
+    Saves the given notification entries and notify via push with the
+    count of the saved notifications
+    """
+    service = NotificationsService()
+
+    notification_ids = await service.create_or_update(entries)
+    new_notifications = await service.find_items_by_ids(notification_ids)
+
+    # iterate over the new notifications and collect the number
+    # of new notifications per user
+    notification_counts: dict[str, int] = {}
+
+    for entry in new_notifications:
+        user_id = str(entry.user)
+        notification_counts.setdefault(user_id, 0)
+        notification_counts[user_id] += 1
+
+    # We only send the additional notification counts, and leave it up to the client
+    # to request the list of notifications, when required
+    push_notification("new_notifications", counts=notification_counts)

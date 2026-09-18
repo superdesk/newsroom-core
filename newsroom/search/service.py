@@ -1,38 +1,50 @@
 import logging
-from typing import List, Literal, Optional, Union, Dict, Any, TypedDict
+from typing import List, Optional, Union, Dict, Any
 from copy import deepcopy
 
-from flask import current_app as app, json, abort
-from flask_babel import gettext
+from quart_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
+from superdesk.core import json, get_app_config, get_current_app
+from superdesk.flask import abort
 from newsroom.types import Company, Section, SectionFilter, Topic, User
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
+from newsroom.types import CompanyResource, UserResourceModel, AdvancedSearchParams
 from newsroom import Service
-from newsroom.auth.utils import user_has_section_allowed
-from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
-from newsroom.search.config import (
-    SearchGroupNestedConfig,
-    get_nested_config,
-    is_search_field_nested,
-    get_advanced_search_fields,
-)
+from newsroom.auth.utils import get_user_or_none_from_request, get_company_or_none_from_request, get_user_sections
+from newsroom.companies import CompanyServiceAsync
+
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
     get_product_by_id,
     get_products_by_user,
 )
-from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
-from newsroom.users import users_service
+
+from .types import (
+    BoolQuery,
+    BoolQueryParams,
+    QueryStringQuery,
+    SearchArgs,
+    ElasticDefaultOperator,
+    ElasticQueryStringType,
+)
+from .config import (
+    get_nested_config,
+    is_search_field_nested,
+    get_advanced_search_fields,
+)
+from .utils import query_string, get_filter_query
+
+# from newsroom.users import users_service
 
 logger = logging.getLogger(__name__)
 
@@ -43,46 +55,6 @@ def strtobool(val):
     elif isinstance(val, int):
         return val != 0
     return _strtobool(val)
-
-
-def query_string(
-    query: str,
-    default_operator: Literal["AND", "OR"] = "AND",
-    fields: List[str] = ["*"],
-    multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
-    analyze_wildcard=False,
-) -> QueryStringQuery:
-    query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-    return {
-        "query_string": {
-            "query": query,
-            "default_operator": default_operator,
-            "analyze_wildcard": query_string_settings["analyze_wildcard"] or analyze_wildcard,
-            "lenient": True,
-            "fields": fields,
-            "type": multimatch_type,
-        }
-    }
-
-
-def get_filter_query(
-    key: str, val: List[str], aggregation_field: str, nested_config: Optional[SearchGroupNestedConfig]
-):
-    if nested_config:
-        return {
-            "nested": {
-                "path": nested_config["parent"],
-                "query": {
-                    "bool": {
-                        "filter": [
-                            {"term": {f"{nested_config['parent']}.{nested_config['field']}": nested_config["value"]}},
-                            {"terms": {f"{nested_config['parent']}.{nested_config['searchfield']}": val}},
-                        ],
-                    },
-                },
-            },
-        }
-    return {"terms": {aggregation_field: val}}
 
 
 def parse_sort(value):
@@ -100,23 +72,6 @@ def parse_sort(value):
             return field_spec
 
     return list(filter(None, [parse_field(field) for field in value.split(",")]))
-
-
-class AdvancedSearchParams(TypedDict):
-    all: str
-    any: str
-    exclude: str
-    fields: List[str]
-
-
-class SearchArgs(TypedDict, total=False):
-    q: str
-    id: str
-    ids: List[str]
-    size: int
-    bookmarks: str
-    ignore_latest: bool
-    filter: Union[Dict[str, str], str]
 
 
 class SearchQuery(object):
@@ -356,7 +311,7 @@ class BaseSearchService(Service):
             )
 
     def get_aggregations(self):
-        return app.config.get("WIRE_AGGS") or {}
+        return get_app_config("WIRE_AGGS") or {}
 
     def get_aggregation_field(self, key):
         aggregations = self.get_aggregations()
@@ -436,15 +391,15 @@ class BaseSearchService(Service):
             search.is_admin = is_admin(search.user)
             return
 
-        current_user = get_user(required=False)
+        current_user = get_user_or_none_from_request(None)
         if current_user:
-            search.is_admin = is_admin(current_user)
+            search.is_admin = current_user.is_admin()
 
         if search.is_admin and search.args.get("user"):
             search.user = get_resource_service("users").find_one(req=None, _id=search.args["user"])
             search.is_admin = is_admin(search.user)
         else:
-            search.user = current_user
+            search.user = current_user.to_dict(context={"use_objectid": True}) if current_user else None
 
     def prefill_search_company(self, search):
         """Prefill the search company
@@ -452,7 +407,13 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
-        search.company = get_company(search.user) if search.company is None else search.company
+        if search.company is None:
+            current_user = get_user_or_none_from_request(None)
+            if current_user and current_user.id == search.user["_id"]:
+                company = get_company_or_none_from_request(None)
+                search.company = company.to_dict(context={"use_objectid": True}) if company else None
+            elif search.user and search.user.get("company"):
+                search.company = CompanyServiceAsync().mongo.find_one({"_id": ObjectId(search.user.get("company"))})
 
     def prefill_search_page(self, search):
         """Prefill the search page parameters
@@ -537,6 +498,7 @@ class BaseSearchService(Service):
                         search.products += user_products
 
                 # add unlimited (seats=0) company products
+                # TODO-ASYNC: replace once Search is async
                 company_products = get_products_by_company(
                     search.company,
                     search.navigation_ids,
@@ -581,6 +543,7 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query = search.args.get("q")
         advanced_search = search.advanced or {}
+        app = get_current_app()
 
         if app.data.elastic.should_highlight(search) and (
             query or advanced_search.get("all") or advanced_search.get("any")
@@ -700,7 +663,7 @@ class BaseSearchService(Service):
         if search.is_admin or not search.company or not search.company.get("company_type"):
             return
 
-        for company_type in app.config.get("COMPANY_TYPES", []):
+        for company_type in get_app_config("COMPANY_TYPES", []):
             if company_type["id"] == search.company["company_type"]:
                 if company_type.get("wire_must"):
                     search.query["bool"]["filter"].append(company_type["wire_must"])
@@ -781,14 +744,21 @@ class BaseSearchService(Service):
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
+        if search.args.get("bookmarks"):
+            search.query["bool"]["must"].append(
+                {
+                    "term": {"bookmarks": str(search.args["bookmarks"])},
+                }
+            )
+
         if search.args.get("ids"):
             search.query["bool"]["must"].append({"ids": {"values": search.args["ids"]}})
 
         filters = self.parse_filters(search)
 
-        if not app.config.get("FILTER_BY_POST_FILTER", False):
+        if not get_app_config("FILTER_BY_POST_FILTER", False):
             if filters:
-                if app.config.get("FILTER_AGGREGATIONS", True):
+                if get_app_config("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 elif isinstance(filters, dict):
                     search.query["bool"]["must"].append(filters)  # type: ignore
@@ -799,7 +769,7 @@ class BaseSearchService(Service):
             search.source["post_filter"] = {"bool": {"must": []}}
 
             if filters:
-                if app.config.get("FILTER_AGGREGATIONS", True):
+                if get_app_config("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
                     search.source["post_filter"]["bool"]["must"].append(filters)
@@ -824,14 +794,22 @@ class BaseSearchService(Service):
         if search.advanced.get("all"):
             search.query["bool"].setdefault("must", []).append(
                 query_string(
-                    search.advanced["all"], "AND", fields=fields, multimatch_type="cross_fields", analyze_wildcard=True
+                    search.advanced["all"],
+                    ElasticDefaultOperator.AND,
+                    fields=fields,
+                    multimatch_type=ElasticQueryStringType.CROSS_FIELDS,
+                    analyze_wildcard=True,
                 )
             )
 
         if search.advanced.get("any"):
             search.query["bool"].setdefault("must", []).append(
                 query_string(
-                    search.advanced["any"], "OR", fields=fields, multimatch_type="best_fields", analyze_wildcard=True
+                    search.advanced["any"],
+                    ElasticDefaultOperator.OR,
+                    fields=fields,
+                    multimatch_type=ElasticQueryStringType.BEST_FIELDS,
+                    analyze_wildcard=True,
                 )
             )
 
@@ -839,9 +817,9 @@ class BaseSearchService(Service):
             search.query["bool"]["must_not"].append(
                 query_string(
                     search.advanced["exclude"],
-                    "OR",
+                    ElasticDefaultOperator.OR,
                     fields=fields,
-                    multimatch_type="best_fields",
+                    multimatch_type=ElasticQueryStringType.BEST_FIELDS,
                     analyze_wildcard=True,
                 )
             )
@@ -849,7 +827,7 @@ class BaseSearchService(Service):
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
 
-        embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
+        embargo_query_rounding = get_app_config("EMBARGO_QUERY_ROUNDING")
         if search.args.get("exclude_embargoed"):
             search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
         elif search.args.get("embargoed_only"):
@@ -879,23 +857,29 @@ class BaseSearchService(Service):
         topic_matches = []
         topics_checked = set()
 
-        for user in users.values():
-            if not user_has_section_allowed(user, self.section):
+        for user_dict in users.values():
+            # TODO-ASYNC: pass in UserResourceModel and CompanyResource instances instead
+            user = UserResourceModel.from_dict(user_dict)
+            company_dict = companies.get(str(user.company)) if user.company else None
+            company = CompanyResource.from_dict(company_dict) if company_dict else None
+
+            user_sections = get_user_sections(user, company)
+            if not user_sections.get(self.section):
                 continue
 
-            if users_service.user_has_paused_notifications(user):
-                continue
+            # if users_service.user_has_paused_notifications(user):
+            #     continue
 
             aggs = {"topics": {"filters": {"filters": {}}}}
-            company = companies.get(str(user.get("company", "")))
+
             # there will be one base search for a user with aggs for user topics
-            search = self.get_topic_query(None, user, company, query=query)
+            search = self.get_topic_query(None, user_dict, company_dict, query=query)
             if not search:
                 continue
             queried_topics = []
             for topic in topics:
-                topic_subscribers = {subscriber["user_id"] for subscriber in topic.get("subscribers") or []}
-                if user["_id"] not in topic_subscribers and str(topic.get("user")) != str(user["_id"]):
+                user_id = str(topic["user"])
+                if not user_id or str(user.id) != user_id:
                     continue
                 if topic["_id"] in topics_checked:
                     continue
@@ -928,7 +912,7 @@ class BaseSearchService(Service):
                     "Error in get_matching_topics",
                     extra=dict(
                         query=source,
-                        user=user["_id"],
+                        user=user_dict["_id"],
                     ),
                 )
                 continue
@@ -1020,5 +1004,5 @@ class BaseSearchService(Service):
 
     def query_string(self, query, default_operator="AND") -> QueryStringQuery:
         fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
-        fields = app.config.get(fields_config_key, ["*"])
+        fields = get_app_config(fields_config_key, ["*"])
         return query_string(query, default_operator=default_operator, fields=fields)

@@ -1,11 +1,20 @@
+from typing import Any
 import mimetypes
+from quart_babel import lazy_gettext
 
-from newsroom.wire.formatters.base import BaseFormatter
+from superdesk.core import get_app_config
+
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
 from newsroom.wire.utils import get_picture
-from flask import current_app as app
 
 
 class PictureFormatter(BaseFormatter):
+    format_id = "picture"
+    name = lazy_gettext("Story Image")
+    sections = [SectionEnum.WIRE]
+    assets = [FormatterAssetType.PICTURE]
+
     MIMETYPE = "image/jpeg"
     MEDIATYPE = "picture"
 
@@ -19,7 +28,7 @@ class PictureFormatter(BaseFormatter):
 
         raise ValueError("Undefined extension")
 
-    def format_item(self, item, item_type="items"):
+    def get_picture_rendition(self, item: dict[str, Any], item_type: str | None = "items") -> tuple[str, str]:
         if item_type == "agenda":
             raise TypeError("Undefined format for agenda")
 
@@ -29,12 +38,11 @@ class PictureFormatter(BaseFormatter):
             raise ValueError("Undefined picture")
 
         renditions = picture.get("renditions", {})
-        picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
+        picture_details = renditions.get(get_app_config("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
 
         if picture_details is None:
             raise ValueError("Unable to find picture renditions")
 
         self.MIMETYPE = picture_details.get("mimetype", "image/jpeg")
-        picture_details["file_extension"] = self.update_extension()
 
-        return picture_details
+        return picture_details["media"], self.update_extension()

@@ -1,10 +1,15 @@
+from typing import Any
 from copy import deepcopy
 
-from flask import json
+from quart_babel import lazy_gettext
+
+from superdesk.core import json
 from planning.output_formatters.json_event import JsonEventFormatter
 from planning.output_formatters.utils import expand_contact_info
-
-from .base import BaseFormatter
+from newsroom.template_filters import format_event_datetime
+from newsroom.types import SectionEnum
+from newsroom.formatters import BaseFormatter, FormatterAssetType
+from newsroom.utils import url_for_agenda
 
 
 agenda_json_fields = [
@@ -18,10 +23,16 @@ agenda_json_fields = [
     "category",
     "place",
     "content_type",
+    "related_events",
 ]
 
 
 class JsonFormatter(BaseFormatter):
+    format_id = "json"
+    name = lazy_gettext("JSON")
+    sections = [SectionEnum.AGENDA]
+    assets = [FormatterAssetType.TEXT]
+
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"
 
@@ -41,7 +52,9 @@ class JsonFormatter(BaseFormatter):
             for field in fields:
                 coverage.pop(field, None)
 
-    def format_item(self, item, item_type="items"):
+    async def format_item(self, item: dict[str, Any], item_type: str | None = "items") -> bytes:
+        from newsroom.agenda.utils import get_related_events
+
         if item_type == "wire":
             raise Exception("Undefined format for wire")
 
@@ -61,6 +74,23 @@ class JsonFormatter(BaseFormatter):
 
         if output_item.get("genre"):
             output_item["content_type"] = output_item.get("genre")
+
+        if output_item.get("event_ids"):
+            related_events = await get_related_events(output_item)
+            if related_events:
+                filtered_related_events = []
+                for event in related_events:
+                    filtered_event = {
+                        "url": url_for_agenda(event),
+                        "name": event.get("name"),
+                        "slugline": event.get("slugline"),
+                        "headline": event.get("headline"),
+                        "definition": event.get("definition_long"),
+                        "dates": format_event_datetime(event),
+                    }
+                    filtered_related_events.append(filtered_event)
+
+                output_item["related_events"] = filtered_related_events
 
         filtered_output_item = {k: output_item[k] for k in agenda_json_fields if k in output_item}
 

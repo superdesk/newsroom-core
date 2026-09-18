@@ -33,7 +33,7 @@ Feature: News API Item
     }]
     """
     When we get "/news/item/#items._id#?format=bogus"
-    Then we get response code 404
+    Then we get response code 400
 
   Scenario: Retrieve an item that does not exist
     Given "items"
@@ -46,19 +46,6 @@ Feature: News API Item
     """
     When we get "/news/item/999"
     Then we get response code 404
-
-  Scenario: Retrieve a version of an item
-    Given "items_versions"
-    """
-    [{
-      "_id_document": "111",
-      "pubstatus": "usable",
-      "headline": "Headline of the story",
-      "version" : "5"
-    }]
-    """
-    When we get "/news/item/111?version=5"
-    Then we get OK response
 
   Scenario: Retrieve an item in ninjs
     Given "items"
@@ -111,7 +98,8 @@ Feature: News API Item
           "#companies._id#"
         ],
         "sd_product_id": "12345",
-        "product_type": "news_api"
+        "product_type": "news_api",
+        "name": "news_api"
         }
         ]
         """
@@ -158,6 +146,20 @@ Feature: News API Item
     """
 
   Scenario: Item request response restricted by featured image product
+    Given "companies"
+    """
+    [{
+      "name": "Test Company", "is_enabled": true,
+      "embed_permissions": {
+        "sd_product": ["display", "download"]
+      }
+    }]
+    """
+    Given "news_api_tokens"
+      """
+      [{"company" : "#companies._id#", "enabled" : true}]
+      """
+    When we save API token
     Given "items"
         """
         [{"_id": "111", "body_html": "Once upon a time there was a fish who could swim", "headline": "headline 1",
@@ -170,7 +172,7 @@ Feature: News API Item
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],

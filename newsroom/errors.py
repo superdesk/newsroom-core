@@ -1,2 +1,0 @@
-class LockedError(RuntimeError):
-    pass

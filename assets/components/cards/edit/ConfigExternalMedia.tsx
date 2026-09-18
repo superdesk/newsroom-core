@@ -15,7 +15,7 @@ function ConfigExternalMedia ({card, onChange, errors}: any) {
                 label={gettext('More button label')}
                 value={card.config.more_url_label}
                 onChange={onChange}
-                error={errors ? get(errors, 'config.more_url_label', null) : null}/>,
+                error={errors ? get(errors, 'config.more_url_label', null) : null}/>
             <TextInput
                 key="more_url"
                 name="config.more_url"

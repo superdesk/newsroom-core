@@ -1,37 +1,34 @@
 import superdesk
+from quart_babel import lazy_gettext
 
-from flask import Blueprint, current_app as newsroom_app, json
-from flask_babel import lazy_gettext
-from newsroom.auth import get_company
-from newsroom.user_roles import UserRole
-from .companies import CompaniesResource, CompaniesService
+from superdesk.core import json, get_current_app
 from apps.prepopulate.app_initialize import get_filepath
 
-blueprint = Blueprint("companies", __name__)
+from newsroom.types import CompanyResource, UserResourceModel, UserRole
+
+from .companies import CompaniesResource, CompaniesService
+from .companies_async import CompanyService as CompanyServiceAsync
+
+from .module import module  # noqa
+
+__all__ = [
+    "CompanyServiceAsync",
+]
 
 
-def get_company_sections_monitoring_data(company_id, user):
+async def get_company_sections_monitoring_data(company: CompanyResource, user: UserResourceModel):
     """get the section configured for the company"""
-    if not company_id or user["user_type"] == UserRole.ADMINISTRATOR.value:
-        return {"userSections": newsroom_app.sections}
+    app = get_current_app().as_any()
 
-    company = superdesk.get_resource_service("companies").find_one(req=None, _id=company_id)
+    if not company or user.user_type == UserRole.ADMINISTRATOR:
+        return {"userSections": app.sections}
 
-    rv = {
-        "monitoring_administrator": (company or {}).get("monitoring_administrator"),
-        "userSections": newsroom_app.sections,
-    }
-    if company and company.get("sections"):
-        rv["userSections"] = [s for s in newsroom_app.sections if company.get("sections").get(s["_id"])]
+    data = {"monitoring_administrator": company.monitoring_administrator, "userSections": app.sections}
 
-    return rv
+    if company and company.sections:
+        data["userSections"] = [s for s in app.sections if company.sections.get(s["_id"])]
 
-
-def get_user_company_name(user) -> str:
-    company = get_company(user)
-    if company:
-        return company.get("name", "")
-    return ""
+    return data
 
 
 def load_countries_list():
@@ -49,7 +46,6 @@ def load_countries_list():
 
 def init_app(app):
     superdesk.register_resource("companies", CompaniesResource, CompaniesService, _app=app)
-    app.add_template_global(get_user_company_name)
     app.settings_app(
         "companies",
         lazy_gettext("Company Management"),
@@ -59,8 +55,7 @@ def init_app(app):
     )
 
     # Populate countries data based on superdesk-core vocabularies.json file.
-    with app.app_context():
-        app.countries = load_countries_list()
+    app.countries = load_countries_list()
 
 
 from . import views  # noqa

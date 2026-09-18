@@ -1,21 +1,26 @@
 from contextlib import contextmanager
 
-import flask
+import pytz
 import jinja2
 
 from typing import Optional
-from flask_babel import get_locale, get_timezone, _get_current_context, Locale, force_locale
-import pytz
+from quart_babel import get_timezone, force_locale
+from quart_babel.utils import _get_current_context
+
+from superdesk.flask import g
 
 TEMPLATE_LOCALE = "template_locale"
 
 
 def set_template_locale(language: Optional[str] = None) -> None:
-    setattr(flask.g, TEMPLATE_LOCALE, language)
+    setattr(g, TEMPLATE_LOCALE, language)
 
 
 def get_template_locale() -> Optional[str]:
-    return getattr(flask.g, TEMPLATE_LOCALE, None)
+    try:
+        return getattr(g, TEMPLATE_LOCALE, None)
+    except RuntimeError:
+        return None
 
 
 def noop():
@@ -25,30 +30,28 @@ def noop():
 @contextmanager
 def template_locale(locale: Optional[str] = None, timezone: Optional[str] = None):
     """Overriding babel locale and timezone using internals, but there is no public api for that."""
+
     ctx = _get_current_context()
-    if not ctx:
+
+    if ctx is None or (locale is None and timezone is None):
         yield
         return
 
-    old_locale = get_locale()
     old_tzinfo = get_timezone()
 
-    if locale:
-        ctx.babel_locale = Locale.parse(locale)
-        set_template_locale(locale)
-
-    if timezone:
-        ctx.babel_tzinfo = pytz.timezone(timezone)
-
-    with force_locale(locale):
-        yield
-
-    if locale:
+    try:
+        if timezone:
+            ctx.babel_tzinfo = pytz.timezone(timezone)
+        if locale:
+            set_template_locale(locale)
+            with force_locale(locale):
+                yield
+        else:
+            yield
+    finally:
+        if timezone:
+            ctx.babel_tzinfo = old_tzinfo
         set_template_locale(None)
-    if old_locale:
-        ctx.babel_locale = old_locale
-    if old_tzinfo:
-        ctx.babel_tzinfo = old_tzinfo
 
 
 class LocaleTemplateLoader(jinja2.FileSystemLoader):
@@ -56,14 +59,14 @@ class LocaleTemplateLoader(jinja2.FileSystemLoader):
         source = None
         filename = None
         file_uptodate = noop
-        template_locale = get_template_locale()
+        template_locale_str = get_template_locale()
 
-        if template_locale and f".{template_locale}." not in template:
+        if template_locale_str and f".{template_locale_str}." not in template:
             template_name, extension = template.rsplit(".", maxsplit=1)
 
             try:
                 source, filename, file_uptodate = super().get_source(
-                    environment, f"{template_name}.{template_locale}.{extension}"
+                    environment, f"{template_name}.{template_locale_str}.{extension}"
                 )
             except jinja2.TemplateNotFound:
                 # no template for selected locale
@@ -74,6 +77,6 @@ class LocaleTemplateLoader(jinja2.FileSystemLoader):
 
         def uptodate():
             """Must return False when locale changes to reload template."""
-            return template_locale == get_template_locale() and file_uptodate()
+            return template_locale_str == get_template_locale() and file_uptodate()
 
         return source, filename, uptodate

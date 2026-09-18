@@ -8,7 +8,7 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
-from flask_babel import lazy_gettext
+from quart_babel import lazy_gettext
 
 from superdesk.default_settings import (  # noqa
     VERSION,
@@ -51,7 +51,11 @@ from superdesk.default_settings import (  # noqa
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
+    SENTRY_TRACES_SAMPLE_RATE,
+    SENTRY_PROFILES_SAMPLE_RATE,
     CACHE_URL,
+    CACHE_REDIS_TIMEOUT,
+    CACHE_REDIS_CONNECT_TIMEOUT,
 )
 
 from newsroom.types import AuthProviderConfig, AuthProviderType
@@ -107,7 +111,7 @@ PUSH_KEY = os.environ.get("PUSH_KEY", "").encode()
 DEFAULT_TIMEZONE = os.environ.get("DEFAULT_TIMEZONE")
 
 if DEFAULT_TIMEZONE is None:
-    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+    DEFAULT_TIMEZONE = tzlocal.get_localzone_name()
 
 if not DEFAULT_TIMEZONE:
     raise ValueError("DEFAULT_TIMEZONE is empty")
@@ -115,29 +119,7 @@ if not DEFAULT_TIMEZONE:
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
-    "newsroom.wire",
-    "newsroom.auth.views",
-    "newsroom.users",
-    "newsroom.companies",
-    "newsroom.design",
-    "newsroom.history",
-    "newsroom.push",
-    "newsroom.topics",
-    "newsroom.upload",
-    "newsroom.notifications",
-    "newsroom.products",
-    "newsroom.section_filters",
-    "newsroom.navigations",
-    "newsroom.cards",
-    "newsroom.reports",
-    "newsroom.public",
-    "newsroom.agenda",
-    "newsroom.settings",
     "newsroom.news_api.api_tokens",
-    "newsroom.monitoring",
-    "newsroom.oauth_clients",
-    "newsroom.auth_server.oauth2",
-    "newsroom.company_admin",
 ]
 
 CORE_APPS = [
@@ -152,32 +134,56 @@ CORE_APPS = [
     "newsroom.companies",
     "newsroom.wire",
     "newsroom.topics",
-    "newsroom.upload",
     "newsroom.history",
-    "newsroom.ui_config",
-    "newsroom.notifications",
-    "newsroom.products",
     "newsroom.section_filters",
-    "newsroom.navigations",
-    "newsroom.cards",
     "newsroom.reports",
-    "newsroom.public",
     "newsroom.agenda",
-    "newsroom.settings",
     "newsroom.photos",
     "newsroom.media_utils",
     "newsroom.news_api",
     "newsroom.news_api.api_tokens",
-    "newsroom.news_api.api_audit",
     "newsroom.monitoring",
     "newsroom.company_expiry_alerts",
     "newsroom.oauth_clients",
-    "newsroom.auth_server.client",
     "newsroom.email_templates",
-    "newsroom.company_admin",
     "newsroom.search",
-    "newsroom.notifications.send_scheduled_notifications",
+    "newsroom.notifications.commands",
 ]
+
+ASYNC_AUTH_CLASS = "newsroom.auth.session_auth:NewshubSessionAuth"
+
+MODULES = [
+    "newsroom.auth.views",
+    "newsroom.settings",
+    "newsroom.ui_config_async",
+    "newsroom.oauth_clients",
+    "newsroom.companies",
+    "newsroom.assets",
+    "newsroom.users",
+    "newsroom.topics",
+    "newsroom.section_filters",
+    "newsroom.cards.module",
+    "newsroom.navigations",
+    "newsroom.notifications",
+    "newsroom.topics_folders",
+    "newsroom.push",
+    "newsroom.history_async",
+    "newsroom.wire.module",
+    "newsroom.company_admin",
+    "newsroom.public",
+    "newsroom.agenda.module",
+    "newsroom.products",
+    "newsroom.design",
+    "newsroom.auth_server.client",
+    "newsroom.reports",
+    "newsroom.monitoring.module",
+    "newsroom.news_api.api_audit",
+    "newsroom.mgmt_api.mgmt_api_docs",
+    "newsroom.system",
+]
+
+ASYNC_POPULATE_HATEOAS = False
+ASYNC_RESPOND_NESTED_VALIDATION_ERRORS = False
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"
@@ -202,16 +208,24 @@ NEW_ACCOUNT_ACTIVE_DAYS = 14
 # Enable CSRF protection for forms
 WTF_CSRF_ENABLED = True
 
-#: The number of days a token is valid
-RESET_PASSWORD_TOKEN_TIME_TO_LIVE = 7
-#: The number of days a validation token is valid
-VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 7
+#: The number of hours a reset password token is valid
+RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS = int(env("RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS", 24))
+#: The number of hours a validation token is valid
+VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS = int(env("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS", 168))
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
 MAIL_DEFAULT_SENDER = _MAIL_FROM or "newsroom@localhost"
 # Recipients for the sign up form filled by new users (single or comma separated)
 SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
+# Recipients for the periodic email delivery monitor (single or comma separated)
+EMAIL_DELIVERY_MONITOR_RECIPIENTS = os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_RECIPIENTS")
+# Runs email delivery monitor every N minutes
+EMAIL_DELIVERY_MONITOR_CRON_MINUTES = max(1, int(os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_CRON_MINUTES", "15")))
+# If the task runs later than this window (seconds), drop it
+EMAIL_DELIVERY_MONITOR_EXPIRES = int(
+    os.environ.get("NEWSROOM_EMAIL_DELIVERY_MONITOR_EXPIRES") or (EMAIL_DELIVERY_MONITOR_CRON_MINUTES * 60 - 1)
+)
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
@@ -220,12 +234,11 @@ PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "ht
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
 # Flask Limiter Settings
-RATELIMIT_ENABLED = True
-RATELIMIT_STRATEGY = "fixed-window"
+QUART_RATE_LIMITER_ENABLED = True
 
 # Cache Settings
 # https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
-CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")  # in-memory cache
+CACHE_TYPE = os.environ.get("CACHE_TYPE", "redis")  # Redis cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
@@ -460,6 +473,17 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(seconds=60),
         "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
+    **(
+        {
+            "newsroom:email_delivery_monitor": {
+                "task": "newsroom.email_delivery_monitor.email_delivery_monitor",
+                "schedule": crontab(minute=f"*/{EMAIL_DELIVERY_MONITOR_CRON_MINUTES}"),
+                "options": {"expires": EMAIL_DELIVERY_MONITOR_EXPIRES},
+            }
+        }
+        if EMAIL_DELIVERY_MONITOR_RECIPIENTS
+        else {}
+    ),
     "newsroom:remove_expired_content_api": {
         "task": "content_api.commands.item_expiry",
         "schedule": crontab(hour=local_to_utc_hour(2), minute=0),  # Runs every day at 2am
@@ -469,7 +493,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
     },
     "newsroom:send_scheduled_notifications": {
-        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "task": "newsroom.notifications.commands.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
         "options": {"expires": 5 * 60 - 1},
     },
@@ -481,16 +505,13 @@ CONTENT_API_EXPIRY_QUERY_LIMIT = int(os.environ.get("CONTENT_API_EXPIRY_QUERY_LI
 
 NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 
-# Enables the application of product filtering to image references in the API and ATOM responses
-NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", "false"))
-
-ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
+ELASTICSEARCH_QUERY_STRING_DEFAULT_PARAMS = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
-    "analyze_wildcard": False
+    "analyze_wildcard": False,
 }
 
 # count above 10k
-ELASTICSEARCH_TRACK_TOTAL_HITS = True
+CONTENTAPI_ELASTICSEARCH_TRACK_TOTAL_HITS = True
 
 ELASTICSEARCH_FIX_QUERY = False
 
@@ -686,6 +707,7 @@ AGENDA_SEARCH_FIELDS = [
     "definition_long",
     "description_text",
     "location.name",
+    "location.details",
 ]
 
 
@@ -707,6 +729,9 @@ FIREBASE_CLIENT_CONFIG = {
     "projectId": env("FIREBASE_PROJECT_ID"),
     "messagingSenderId": env("FIREBASE_SENDER_ID"),
 }
+
+# Single admin config value: inline JSON (starts with "{") or a path to a service-account JSON file.
+FIREBASE_CONFIG = env("FIREBASE_CONFIG")
 
 FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])
 
@@ -845,7 +870,6 @@ NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
 #: .. versionadded: 2.8
 #:
 AGENDA_TIME_FILTERS = [
-    {"name": lazy_gettext("Selected day"), "query": ""},
     {"name": lazy_gettext("Today"), "query": "now/d"},
     {
         "name": lazy_gettext("This Week"),
@@ -873,3 +897,28 @@ CALENDAR_LOCATIONS_FILTER_OPTIONS = {
     "country": True,
     "place": True,
 }
+
+#: Enable/Disable Wire embedded permissions
+#:
+#: .. versionadded: 3.1
+#:
+WIRE_EMBED_PERMISSIONS = False
+
+#: Enable/Disable using Wire Embed permissions in the Dashboard
+#:
+#: .. versionadded: 3.1
+#:
+USE_EMBED_PERMISSIONS_IN_DASHBOARD = True
+
+#: Maximum allowed content length for file uploads (in bytes)
+#:
+#: .. versionadded: 3.0
+#:
+MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 1024 * 1024 * 1000))  # 1GB
+
+#: Enable/Disable the application of setting the "user_has_access"/"_access" flag on items in the dashboard cards
+#: If true Items that are not permissioned for the Company will have the _access flag set to False
+#:
+#: .. versionadded: 3.?
+#:
+PERMISSION_DASHBOARD_CARDS = False

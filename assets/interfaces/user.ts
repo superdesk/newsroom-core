@@ -35,7 +35,7 @@ export interface IUser {
 
     original_creator?: IUser['_id'];
     version_creator?: IUser['_id'];
-    products: Array<{
+    products?: Array<{
         _id: string;
         section: 'wire' | 'agenda';
     }>;

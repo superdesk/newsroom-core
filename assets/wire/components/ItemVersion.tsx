@@ -6,7 +6,12 @@ import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed,
 
 export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig, matchedIds}: any) {
     return (
-        <div className={`${baseClass}__versions__item`} onClick={(event: any) => onClick(version, event)}>
+        <div
+            className={`${baseClass}__versions__item`}
+            data-test-id="wire-version-item"
+            data-test-value={version._id}
+            onClick={(event: any) => onClick(version, event)}
+        >
             <div className={`${baseClass}__versions__wrap`}>
                 {!matchedIds.includes(version._id) ? null : (
                     <MatchLabel />

@@ -53,6 +53,9 @@ const config = {
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
                     process.cwd(), // for app
                 ],
+                exclude: [
+                    path.resolve('node_modules', 'video.js'),
+                ],
                 loader: 'ts-loader',
                 options: {
                     transpileOnly: true,
@@ -73,7 +76,9 @@ const config = {
                     {
                         loader: 'css-loader',
                         options: {
-                            url: (url, resourcePath) => url.startsWith('/') === false,
+                            url: {
+                                filter: (url, resourcePath) => url.startsWith('/') === false,
+                            },
                         },
                     },
                     {loader: 'sass-loader'},
@@ -81,9 +86,7 @@ const config = {
             },
             {
                 test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
-                use: [
-                    'file-loader',
-                ],
+                type: 'asset/resource',
             },
         ]
     },

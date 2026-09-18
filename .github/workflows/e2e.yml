@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.10']
-        node-version: ['14']
+        node-version: ['22']
 
     services:
       redis:
@@ -31,16 +31,16 @@ jobs:
             discovery.type: single-node
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
       - name: Install node_modules
-        run: npm install
+        run: npm ci
       - name: Install APT packages
         run: |
              sudo apt-get update
@@ -50,7 +50,7 @@ jobs:
       - name: Install python modules
         run: pip install -e .
       - name: Install CypressIO
-        run: cd e2e && npm install
+        run: cd e2e && npm ci
       - name: Build Client
         run: cd e2e && npm run build
       - name: Start Services
@@ -62,7 +62,7 @@ jobs:
           CYPRESS_SCREENSHOTS_FOLDER: /tmp/cypress
       - name: Upload screenshots
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots-e2e
           path: /tmp/cypress/**/*.png

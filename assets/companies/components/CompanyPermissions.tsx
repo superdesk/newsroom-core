@@ -5,6 +5,8 @@ import {gettext, noop} from 'utils';
 import CheckboxInput from 'components/CheckboxInput';
 import {Button} from 'components/Button';
 
+import {CompanyContentPermissions} from './CompanyContentPermissions';
+
 function CompanyPermissions({
     company,
     sections,
@@ -14,6 +16,7 @@ function CompanyPermissions({
     toggleCompanySection,
     toggleCompanyProduct,
     updateCompanySeats,
+    toggleCompanyEmbedPermission,
 }: any) {
     const productsEnabled = (company.products || []).map((product: any) => product._id);
     const seats = (company.products || []).reduce((productSeats: any, product: any) => {
@@ -159,6 +162,13 @@ function CompanyPermissions({
                         ))}
                     </div>
 
+                    {window.newsroom.client_config.embed_permissions_enabled !== true ? null : (
+                        <CompanyContentPermissions
+                            company={company}
+                            toggleCompanyEmbedPermission={toggleCompanyEmbedPermission}
+                        />
+                    )}
+
                 </div>
                 <div className='list-item__preview-footer'>
                     <Button
@@ -199,6 +209,7 @@ CompanyPermissions.propTypes = {
     toggleCompanySection: PropTypes.func.isRequired,
     toggleCompanyProduct: PropTypes.func.isRequired,
     updateCompanySeats: PropTypes.func.isRequired,
+    toggleCompanyEmbedPermission: PropTypes.func.isRequired,
 };
 
 export default CompanyPermissions;

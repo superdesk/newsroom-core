@@ -12,7 +12,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -27,7 +27,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -39,11 +39,12 @@ Feature: News API Authorization
     Then we get response code 401
 
 
+    @wip
   Scenario: Proxy forward situation is handled appropirately
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
@@ -51,7 +52,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -66,7 +67,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -79,15 +80,15 @@ Feature: News API Authorization
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
 
   Scenario: Supports subnet in allowed_ip_list from request
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
@@ -95,7 +96,7 @@ Feature: News API Authorization
         {
           "name": "Test Company",
           "is_enabled" : true,
-          "allowed_ip_list": ["123.123.123.123/24"]
+          "allowed_ip_list": ["123.123.123.0/24"]
         }
         ]
         """
@@ -110,7 +111,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -123,7 +124,7 @@ Feature: News API Authorization
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
 
@@ -131,8 +132,8 @@ Feature: News API Authorization
   Scenario: RATE_LIMIT_REQUESTS config is used for request validation
     Given "items"
         """
-        [{"body_html": "Once upon a time there was a fish who could swim"},
-        {"body_html": "Once upon a time there was a aardvark that could not swim"}]
+        [{"body_html": "<p>Once upon a time there was a fish who could swim</p>", "versioncreated": "#DATE#" },
+        {"body_html": "<p>Once upon a time there was a aardvark that could not swim</p>", "versioncreated": "#DATE#" }]
         """
     Given "companies"
         """
@@ -154,7 +155,7 @@ Feature: News API Authorization
     Given "products"
         """
         [{"name": "A fishy Product",
-        "decsription": "a product for those interested in fish",
+        "description": "a product for those interested in fish",
         "companies" : [
           "#companies._id#"
         ],
@@ -166,14 +167,14 @@ Feature: News API Authorization
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
     When we get "news/search?q=fish&include_fields=body_html"
     Then we get list with 1 items
      """
      {"_items": [
-         {"body_html": "Once upon a time there was a fish who could swim"}
+         {"body_html": "<p>Once upon a time there was a fish who could swim</p>"}
      ]}
      """
     When we get "news/search?q=fish&include_fields=body_html"

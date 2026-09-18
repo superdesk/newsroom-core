@@ -1,8 +1,10 @@
-from .manager import app, manager
+from newsroom.wire import WireSearchServiceAsync
+
+from .cli import newsroom_cli
 
 
-@manager.command
-def content_reset():
+@newsroom_cli.command("content_reset")
+async def content_reset():
     """Removes all data from 'items' and 'items_versions' indexes/collections.
 
     Example:
@@ -11,5 +13,4 @@ def content_reset():
         $ python manage.py content_reset
 
     """
-    app.data.remove("items")
-    app.data.remove("items_versions")
+    await WireSearchServiceAsync().service.delete_many({})

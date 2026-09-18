@@ -1,11 +1,18 @@
-from superdesk import get_resource_service
+import click
+from bson import ObjectId
 
-from newsroom.auth import get_user_by_email
-from .manager import manager
+from newsroom.users.service import UsersAuthService
+
+from .cli import newsroom_cli
 
 
-@manager.command
-def create_user(email, password, first_name, last_name, is_admin):
+@newsroom_cli.command("create_user")
+@click.argument("email")
+@click.argument("password")
+@click.argument("first_name")
+@click.argument("last_name")
+@click.argument("is_admin", type=bool)
+async def create_user(email, password, first_name, last_name, is_admin):
     """Create a user with given email, password, first_name, last_name and is_admin flag.
 
     If user with given username exists it's noop.
@@ -14,9 +21,7 @@ def create_user(email, password, first_name, last_name, is_admin):
     ::
 
         $ python manage.py create_user admin@admin.com adminadmin admin admin True
-
     """
-
     new_user = {
         "email": email,
         "password": password,
@@ -25,15 +30,16 @@ def create_user(email, password, first_name, last_name, is_admin):
         "user_type": "administrator" if is_admin else "public",
         "is_enabled": True,
         "is_approved": True,
+        "_id": ObjectId(),
     }
-
-    user = get_user_by_email(email)
+    service = UsersAuthService()
+    user = await service.get_by_email(email)
 
     if user:
-        print("user already exists %s" % str(new_user))
+        print(f"User already exists {new_user}")
     else:
-        print("creating user %s" % str(new_user))
-        get_resource_service("users").post([new_user])
-        print("user saved %s" % (new_user))
+        print("Creating user...")
+        await service.create([new_user])
+        print(f"User created successfully {new_user}")
 
     return new_user

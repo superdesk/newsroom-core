@@ -35,7 +35,7 @@ export interface ILocation {
     type?: string;
     qcode: string;
     location?: {lat: number; lon: number};
-    details?: string[];
+    details?: string;
     address?: {
         area?: string;
         locality?: string;
@@ -224,6 +224,8 @@ export interface IAgendaItem extends IResourceItem {
     firstcreated: string;
     versioncreated: string;
     internal_note?: string;
+    planning_ids?: Array<IAgendaItem['_id']>;
+    event_ids?: Array<IAgendaItem['_id']>;
 }
 
 export interface IPlanningItem extends Omit<IAgendaItem, 'coverages'> {
@@ -292,6 +294,7 @@ export interface IAgendaState {
         itemType?: 'events' | 'planning';
         featuredOnly: boolean;
         agendaWireItems: Array<IArticle>;
+        restrictCoverageInfo: boolean;
     };
     search: ISearchState;
     detail: boolean;
@@ -346,4 +349,5 @@ export interface ICoverageMetadataPreviewProps {
     actions?: Array<ICoverageItemAction>;
     user?: IUser['_id'];
     hideViewContentItems?: Array<IArticle['_id']>;
+    restrictCoverageInfo?: boolean;
 }

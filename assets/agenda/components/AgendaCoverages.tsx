@@ -22,6 +22,7 @@ interface IProps {
     hideViewContentItems?: Array<IArticle['_id']>;
     previewConfig?: IAgendaPreviewConfig;
     onClick?(): void;
+    restrictCoverageInfo?: boolean;
 }
 
 export default function AgendaCoverages({
@@ -33,6 +34,7 @@ export default function AgendaCoverages({
     onClick,
     hideViewContentItems,
     previewConfig,
+    restrictCoverageInfo,
 }: IProps) {
     if (coverages == null || coverages.length === 0) {
         return null;
@@ -50,7 +52,7 @@ export default function AgendaCoverages({
                         <i
                             className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
                             key={coverage.coverage_id}
-                            title={getCoverageTooltip(coverage)}
+                            title={getCoverageTooltip(coverage, undefined, restrictCoverageInfo)}
                         />
                     ))}
                 </div>
@@ -84,6 +86,7 @@ export default function AgendaCoverages({
                                         actions={actions}
                                         user={user}
                                         hideViewContentItems={hideViewContentItems}
+                                        restrictCoverageInfo={restrictCoverageInfo}
                                         fullCoverage={
                                             (item.planning_items || [])
                                                 .find((planningItem) => planningItem._id === coverage.planning_id)

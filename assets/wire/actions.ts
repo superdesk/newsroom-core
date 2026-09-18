@@ -1,4 +1,5 @@
 import {get, isEmpty} from 'lodash';
+import throttle from 'lodash/throttle';
 
 import {IArticle} from 'interfaces';
 import server from 'server';
@@ -29,6 +30,22 @@ import {
     loadMyTopic,
 } from 'search/actions';
 import {getFoldersUrl} from 'user-profile/actions';
+
+const NEW_ITEMS_FETCH_THROTTLE_MS = 2000;
+
+const throttledFetchNewItems = throttle(
+    (dispatch: any) => dispatch(fetchNewItems()).catch((error: any) => errorHandler(error, dispatch)),
+    NEW_ITEMS_FETCH_THROTTLE_MS,
+    {leading: true, trailing: true}
+);
+
+export function resetFetchNewItemsThrottleForTests() {
+    throttledFetchNewItems.cancel();
+}
+
+export function fetchNewItemsThrottled() {
+    return (dispatch: any) => throttledFetchNewItems(dispatch) || Promise.resolve();
+}
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state: any) {
@@ -86,8 +103,8 @@ export function openItem(item: any) {
 }
 
 export function selectCopy(item: any) {
-    return () => {
-        recordAction(item, 'clipboard');
+    return (dispatch: any, getState: any) => {
+        recordAction(item, 'clipboard', getState().context, getState());
     };
 }
 
@@ -111,9 +128,9 @@ function recieveAggs(data: any) {
     return {type: RECIEVE_AGGS, data};
 }
 
-export const RECIEVE_ITEM = 'RECIEVE_ITEM';
+export const RECEIVE_ITEM = 'RECEIVE_ITEM';
 export function recieveItem(data: any) {
-    return {type: RECIEVE_ITEM, data};
+    return {type: RECEIVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';
@@ -448,10 +465,20 @@ export function submitDownloadItems(items: any, params: any) {
         else{
             try {
                 const response = await server.post(url, payload, undefined, {parseJson: false});
+
+                let filename = '';
+                const contentDisposition = response.headers.get('content-disposition');
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="?([^";]+)"?/);
+                    if (match && match.length > 1) {
+                        filename = match[1];
+                    }
+                }
+
                 const blob = await response.blob();
-                initiateDownload(blob);
-            } catch (error) {
-                console.error('Error downloading file:', error);
+                initiateDownload(blob, filename);
+            } catch (error: any) {
+                errorHandler(error);
             }
         }
         dispatch(setDownloadItems(items));
@@ -460,11 +487,25 @@ export function submitDownloadItems(items: any, params: any) {
     };
 }
 
-function initiateDownload(source: string | Blob) {
+function initiateDownload(source: string | Blob, filename = '') {
     const link = document.createElement('a');
-    link.download = '';
-    link.href = typeof source === 'string' ? source : URL.createObjectURL(source);
+
+    if (filename) {
+        link.setAttribute('download', filename);
+    } else {
+        link.setAttribute('download', '');
+    }
+
+    const url = typeof source === 'string' ? source : URL.createObjectURL(source);
+    link.href = url;
+
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+
+    if (typeof source !== 'string') {
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+    }
 }
 
 
@@ -488,7 +529,7 @@ export function pushNotification(push: any): any {
             return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
-            return dispatch(setNewItems(push.extra));
+            return dispatch(fetchNewItemsThrottled());
 
         case `topics:${user}`:
             return dispatch(reloadMyTopics());
@@ -578,7 +619,7 @@ export function fetchNext(item: IArticle): Promise<IArticle> {
         return Promise.reject();
     }
 
-    return server.get(`/wire/${item.nextversion}?format=json`);
+    return server.get(`/wire/${item.nextversion}?format=json&ignore_latest=1`);
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';

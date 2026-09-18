@@ -103,6 +103,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
         // activate logs actions for non production instances.
         // (this should always be the last middleware)
         middlewares.push(
+            // @ts-ignore
             createLogger({
                 duration: true,
                 collapsed: true,

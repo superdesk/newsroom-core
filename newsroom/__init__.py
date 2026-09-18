@@ -10,7 +10,7 @@ import superdesk
 from superdesk import register_resource  # noqa
 from typing import Dict, List, Tuple
 
-from newsroom.user_roles import UserRole
+from newsroom.types import UserRole
 
 # reuse content api dbs
 MONGO_PREFIX = "CONTENTAPI_MONGO"
@@ -32,7 +32,6 @@ class Resource(superdesk.Resource):
     mongo_prefix = MONGO_PREFIX
     elastic_prefix = ELASTIC_PREFIX
     mongo_indexes: MongoIndexes = {}
-    SUPPORTED_NESTED_SEARCH_FIELDS: List[str] = []
 
     # Disable resource websocket notifications
     # as we aren't using them in Newshub

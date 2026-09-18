@@ -1,3 +1,5 @@
+# TODO-ASYNC :- Remove this resource when Reports module is converted to async
+
 from typing import Optional, List, Dict, Any
 import enum
 
@@ -5,11 +7,10 @@ import newsroom
 import superdesk
 
 from bson import ObjectId
-from newsroom.auth import get_user
-from newsroom.types import Topic, User
-from newsroom.user_roles import UserRole
+
+from newsroom.auth.utils import get_user_or_none_from_request
+from newsroom.types import Topic, User, UserRole
 from newsroom.utils import set_original_creator, set_version_creator
-from newsroom.signals import user_deleted
 
 
 class TopicNotificationType(enum.Enum):
@@ -65,13 +66,10 @@ class TopicsResource(newsroom.Resource):
     datasource = {"source": "topics", "default_sort": [("label", 1)]}
     allowed_roles = [role for role in UserRole]
     allowed_item_roles = allowed_roles
+    internal_resource = True
 
 
 class TopicsService(newsroom.Service):
-    def __init__(self, datasource: Optional[str] = None, backend=None):
-        super().__init__(datasource, backend)
-        user_deleted.connect(self.on_user_deleted)
-
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
@@ -82,7 +80,9 @@ class TopicsService(newsroom.Service):
 
     def on_update(self, updates, original):
         super().on_update(updates, original)
-        set_version_creator(updates)
+        current_user = get_user_or_none_from_request(None)
+        if current_user:
+            set_version_creator(updates)
 
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
@@ -104,9 +104,9 @@ class TopicsService(newsroom.Service):
             updates["folder"] = ObjectId(updates["folder"])
 
     def on_updated(self, updates, original):
-        current_user = get_user()
+        current_user = get_user_or_none_from_request(None)
         if current_user:
-            auto_enable_user_emails(updates, original, current_user)
+            auto_enable_user_emails(updates, original, current_user.to_dict())
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
@@ -127,12 +127,15 @@ class TopicsService(newsroom.Service):
 
         # remove user topic subscriptions from existing topics
         topics = self.get(req=None, lookup={"subscribers.user_id": user["_id"]})
+
+        user_object_id = ObjectId(user["_id"])
+
         for topic in topics:
             updates = dict(
-                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user["_id"]],
+                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user_object_id],
             )
 
-            if topic.get("user") == user["_id"]:
+            if topic.get("user") == user_object_id:
                 topic["user"] = None
 
             self.system_update(topic["_id"], updates, topic)
