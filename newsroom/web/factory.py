@@ -41,6 +41,7 @@ from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications import get_initial_notifications
 
 from newsroom.limiter import limiter
+from quart_rate_limiter.redis_store import RedisStore
 from newsroom.celery_app import init_celery
 from newsroom.settings import SettingsApp
 from newsroom.webpack import NewsroomWebpack
@@ -163,6 +164,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 
     def _setup_limiter(self):
+        limiter.store = RedisStore(self.config["CACHE_REDIS_URL"])
         limiter.init_app(self)
 
     def _setup_celery(self):
