@@ -51,10 +51,11 @@ export function UrgencyLabel ({item, listConfig, filterGroupLabels, alwaysShow =
 
     return (
         <span
-            className={'label label--orange2 label--rounded'}
+            className={'label label--rounded'}
             style={{
                 color: urgencyHighlightColor,
-                backgroundColor: urgencyHighlightColor + '15', // color + alpha channel
+                // 8.24% is the old '15' hex alpha (21/255), but works for any valid CSS color
+                backgroundColor: `color-mix(in srgb, ${urgencyHighlightColor} 8.24%, transparent)`,
             }}
         >{text}</span>
     );

@@ -12,11 +12,12 @@ function DesignNav() {
         { path: '/mydashboard', title: 'My Dashboard' },
         { path: '/login', title: 'Login' },
         { path: '/drafts', title: 'Drafts' },
+        { path: '/labels', title: 'Labels' },
     ];
     
     return (        
         <nav className="navbar design navbar-expand-lg ms-5">
-                <h6>Design Navigation:</h6>
+                <h6>Nav:</h6>
                 <ul className="navbar-nav">
                     {
                     items.map((item, i) => (

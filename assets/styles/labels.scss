@@ -1,58 +1,29 @@
 // Labels
 
-$label-bg-colors: (
-    default:        var(--color-neutral-500),
-    warning:        var(--color-warning),
-    alert:          var(--color-alert),
-    success:        var(--color-success),
-    info:           var(--color-info),
-    highlight:      var(--color-highlight2),
+// Each label color class only sets `--label-color`;
+// the fill, hollow and translucent styles derive everything from it.
+$label-colors: (
+    'default':      var(--color-neutral-500),
+    'warning':      var(--color-warning),
+    'alert':        var(--color-alert),
+    'success':      var(--color-success),
+    'info':         var(--color-info),
+    'highlight':    var(--color-highlight2),
+    'top-story':    var(--color-top-story),
+    'blue':         var(--color-main-blue),
+    'green':        var(--color-green),
+    'green-dark':   var(--color-green-dark),
+    'orange':       var(--color-orange),
+    'orange2':      var(--color-orange2),
+    'red':          var(--color-red),
+    'available':    var(--color-green),
+    'restricted':   var(--color-text--muted),
+    'yellow':       var(--color-yellow),
+    'gray-dark':    var(--color-cool-gray-dark),
+    'gray-mid':     var(--color-cool-gray-mid),
 );
 
-$label-bg-colors-translucent: (
-    default:        alpha(var(--color-neutral-500), 0.25),
-    warning:        alpha(var(--color-warning), 0.25),
-    alert:          alpha(var(--color-alert), 0.25),
-    success:        alpha(var(--color-success), 0.25),
-    info:           alpha(var(--color-info), 0.25),
-    highlight:      alpha(var(--color-highlight), 0.25),
-);
-
-$label-text-colors: (
-    default:        var(--tag-label-txt-default),
-    warning:        lightness(var(--color-warning), 0.65),
-    alert:          lightness(var(--color-alert), 0.65),
-    success:        lightness(var(--color-success), 0.65),
-    info:           lightness(var(--color-info), 0.65),
-    highlight:      var(--tag-label-txt-inverse),
-);
-
-$labels-palette: (
-  'top-story': var(--color-top-story),
-  'blue': $main-blue,
-  'green': $green,
-  'green-dark': $green-dark,
-  'orange': $orange,
-  'orange2': $orange2,
-  'red': $red,
-  'available': $green,
-  'restricted': var(--color-text--muted),
-  'yellow': $yellow,
-  'gray-dark': $cool-gray-dark,
-  'gray-mid': $cool-gray-mid,
-);
-
-$flex-justify: (
-    justify-start: start,
-    justify-center: center,
-    justify-end: end,
-);
-
-$flex-align: (
-    align-start: start,
-    align-center: center,
-    align-end: end,
-);
+$label-wire-types: ('latest', 'alert', 'advisory', 'press-release');
 
 /// Generates base styles for a label.
 @mixin label {
@@ -69,120 +40,70 @@ $flex-align: (
     white-space: nowrap;
     cursor: default;
     border: 1px solid transparent;
-    font-weight: 600;
+    font-weight: 500;
     font-family: var(--font-family-core--sans);
     height: var(--label-height);
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
 }
 
 .label {
     @include label;
     --label-height: 20px;
+    --label-color: var(--color-neutral-500);
+    // Caps perceptual lightness so the text stays readable (WCAG AA) on the translucent background
+    --label-translucent-text-color: oklch(from var(--label-color) min(l, 0.45) c h);
+    color: hsl(0, 0%, 100%);
+    background-color: var(--label-color);
 
-    @each $name, $color in $label-bg-colors {
+    @each $name, $color in $label-colors {
         &.label--#{$name} {
-            color: $white;
-            background-color: $color;
+            --label-color: #{$color};
         }
     }
 
-    @each $name, $color in $labels-palette {
-        &.label--#{$name} {
-            border-color: transparent;
-            color: $color;
-            text-decoration-color: $color;
-            background-color: rgba($color, 0.2);
+    &.label--default {
+        --label-translucent-text-color: var(--color-text);
+    }
+
+    @each $type in $label-wire-types {
+        &.label-wire--#{$type} {
+            --label-color: var(--label-color-bg-wire-#{$type});
+            border-color: var(--label-color);
         }
     }
 
-    @each $name, $color in $labels-palette {
-        &.label--rounded.label--#{$name} {
-            background-color: rgba($color, 0.2);
-        }
-    }
-
-    &.label--big {
-        --label-height: 24px;
-        font-size: 11px;
-        line-height: 1;
-        padding: 0 var(--space--1-5);
-    }
-
-    &.label--hollow {
-        @each $name, $color in $label-bg-colors {
-            &.label--#{"" + $name} {
-                border: 1px solid $color;
-                background-color: transparent !important;
-                color: $color;
-            }
-        }
-    }
-
-    &.label--translucent {
-        @each $name, $color in $label-bg-colors-translucent {
-            &.label--#{"" + $name} {
-                background-color: $color;
-            }
-        }
-
-        @each $name, $color in $label-text-colors {
-            &.label--#{"" + $name} {
-                color: $color;
-            }
-        }
-    }
-
-    &.label-wire--latest {
-        background-color:  var(--label-color-bg-wire-latest);
-        border-color: var(--label-color-bg-wire-latest);
-        color: white;
-    }
-    &.label-wire--alert {
-        background-color:  var(--label-color-bg-wire-alert);
-        border-color: var(--label-color-bg-wire-alert);
-        color: white;
-    }
-    &.label-wire--advisory {
-        background-color:  var(--label-color-bg-wire-advisory);
-        border-color: var(--label-color-bg-wire-advisory);
-        color: white;
-    }
-    &.label-wire--press-release {
-        background-color:  var(--label-color-bg-wire-press-release);
-        border-color: var(--label-color-bg-wire-press-release);
-        color: white;
-    }
-}
-
-.label--rounded {
-    border-radius: var(--border-radius--full);
-    font-size: 10px;
-    letter-spacing: 0.125em;
-    line-height: 1;
-    text-transform: uppercase;
-    white-space: nowrap;
-    cursor: default;
-    border-color: transparent;
-    font-weight: 600;
-    background-color: hsla(0, 0%, 60%, 0.25);
-    color: var(--color-text--muted);
-    &.label--alert {
-        background-color: alpha(var(--color-alert), 0.25);
-        color: lightness(var(--color-alert), 0.85);
-    }
     &.label--big,
     &.label--large {
         --label-height: 24px;
-        font-size: 11px;
-        line-height: 1;
-        padding: 0 var(--space--1-5);
-    }
-    &.label--top-story {
-        padding: 0 var(--space--1-5) 0 var(--space--3);
-        background-image: url('/static/star.svg');
-        background-repeat: no-repeat;
-        background-position: 8px center;
+        font-size: 12px;
+        letter-spacing: 0.085em;
+        padding: 0 var(--space--2);
     }
 
+    &.label--hollow {
+        border-color: var(--label-color);
+        color: var(--label-color);
+        background-color: transparent;
+    }
+
+    &.label--translucent {
+        color: var(--label-translucent-text-color);
+        background-color: hsl(from var(--label-color) h s l / 0.25);
+    }
+
+    &.label--top-story {
+        gap: var(--space--0-5);
+        padding-inline: var(--space--1) var(--space--1-5);
+        &:before {
+            content: '\2605';
+            font-size: 12px;
+            color: currentColor;
+        }
+    }
+    &.label--rounded {
+        border-radius: var(--border-radius--full);
+    }
 }
 
 .label + .label {
@@ -192,20 +113,20 @@ $flex-align: (
 .label-group {
     display: flex;
     gap: var(--space--0-5);
-}
 
-.label-group--vertical {
-    flex-direction: column;
-}
-
-@each $flex, $position in $flex-justify {
-    .label-group--#{$flex} {
-        justify-content: $position;
+    &--vertical {
+        flex-direction: column;
     }
-}
 
-@each $flex, $position in $flex-align {
-    .label-group--#{$flex} {
-        align-items: $position;
+    &--justify-start { justify-content: start; }
+    &--justify-center { justify-content: center; }
+    &--justify-end { justify-content: end; }
+
+    &--align-start { align-items: start; }
+    &--align-center { align-items: center; }
+    &--align-end { align-items: end; }
+
+    & .label + .label {
+        margin-inline-start: 0;
     }
 }

@@ -56,7 +56,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
                 </div>
             </td>
             <td>
-                <label className={`label label--${stateLabelDetails.colour} label--rounded`}>
+                <label className={`label label--${stateLabelDetails.colour} label--rounded label--translucent`}>
                     {stateLabelDetails.text}
                 </label>
             </td>
