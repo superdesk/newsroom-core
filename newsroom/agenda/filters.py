@@ -214,6 +214,20 @@ def apply_item_type_filter(request: NewshubSearchRequest[AgendaSearchRequestArgs
         )
 
 
+# ``products.<field>:<value>`` in a query string, value is a term, a phrase or a group
+PRODUCTS_FIELD_QUERY = re.compile(r"""(?<![\w.])(products\.(?:code|name)):(\([^()]*\)|"[^"]*"|[^\s()]+)""")
+
+
+def include_planning_items_products(query: str) -> str:
+    """Make product field queries also match products of linked planning items
+
+    An Event with linked Planning items only has the Event products at the top level,
+    products of its Planning items are under ``planning_items.products``.
+    """
+
+    return PRODUCTS_FIELD_QUERY.sub(r"(\1:\2 OR planning_items.\1:\2)", query)
+
+
 def planning_items_query_string(query: str, fields: list[str] | None = None, nested: bool = False) -> QueryStringQuery:
     if nested:
         # when searching nested planning items we need to prefix field names
@@ -229,7 +243,9 @@ def planning_items_query_string(query: str, fields: list[str] | None = None, nes
                 headline|
                 slugline|
                 description_text|
-                guid
+                guid|
+                products\.code|
+                products\.name
             ):""",
             r"planning_items.\1:",
             query,
@@ -283,11 +299,11 @@ def apply_agenda_query_string(request: NewshubSearchRequest[AgendaSearchRequestA
 
     if not isinstance(q_dict, dict):
         # Normal query string query
-        query = query_string_for_section(SectionEnum.AGENDA, search_text)
         if request.args.item_type == AgendaItemType.EVENT:
             # Events Only
-            request.search.query.filter.append(query)
+            request.search.query.filter.append(query_string_for_section(SectionEnum.AGENDA, search_text))
         else:
+            query = query_string_for_section(SectionEnum.AGENDA, include_planning_items_products(search_text))
             request.search.query.filter.append(
                 {
                     "bool": {
