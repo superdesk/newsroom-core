@@ -1,7 +1,7 @@
 import pytest
 from urllib.parse import quote
 
-from newsroom.agenda.filters import include_planning_items_products
+from newsroom.agenda.filters import include_planning_items_products, planning_items_query_string
 
 from tests.utils import get_json
 
@@ -108,6 +108,10 @@ async def search_ids(client, query: str, item_type: str | None = None) -> set[st
             "products.code:all-events",
             {"event-canada", "event-usa", "event-budget", "event-only"},
         ),
+        (
+            "planning_items.products.code:planning-items",
+            {"event-canada", "event-usa", "event-budget", "plan-adhoc", "plan-adhoc-markets"},
+        ),
     ],
 )
 async def test_search_by_products_includes_linked_planning_items(client, agenda_items, query, expected):
@@ -152,3 +156,20 @@ async def test_search_by_products_events_only(client, agenda_items):
 )
 def test_include_planning_items_products(query, expected):
     assert include_planning_items_products(query) == expected
+
+
+@pytest.mark.parametrize(
+    "query, expected",
+    [
+        ("products.code:abc", "planning_items.products.code:abc"),
+        (
+            "slugline:abc AND NOT products.name:def",
+            "planning_items.slugline:abc AND NOT planning_items.products.name:def",
+        ),
+        ("planning_items.products.code:abc", "planning_items.products.code:abc"),
+        ("planning_items.slugline:abc", "planning_items.slugline:abc"),
+        ("event.slugline:abc", "event.slugline:abc"),
+    ],
+)
+def test_planning_items_query_string_prefixes_nested_fields(query, expected):
+    assert planning_items_query_string(query, nested=True)["query_string"]["query"] == expected

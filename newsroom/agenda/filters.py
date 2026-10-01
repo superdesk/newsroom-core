@@ -233,9 +233,9 @@ def planning_items_query_string(query: str, fields: list[str] | None = None, nes
         # when searching nested planning items we need to prefix field names
         # in query with `planning_items.` otherwise it will never match in nested
         # field and negative queries eg. NOT service.name:Sport will match all
-        # nested planning items
+        # nested planning items, skip fields which are already qualified
         query = re.sub(
-            r"""\b(
+            r"""(?<![\w.])(
                 service\.name|
                 service\.code|
                 subject\.name|
