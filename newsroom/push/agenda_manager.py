@@ -150,6 +150,14 @@ class AgendaManager:
                         "assigned_user_email": assigned_user.get("email"),
                     }
 
+                    # Code to handle duplicated coverage items that are sent with no name in the news_coverage_status
+                    news_status = coverage.get("news_coverage_status") or {}
+                    status_name = news_status.get("name") or (
+                        "coverage intended" if news_status.get("qcode") == "ncostat:int" else None
+                    )
+                    if status_name:
+                        new_coverage["coverage_status"] = status_name
+
                     if TO_BE_CONFIRMED_FIELD in coverage:
                         new_coverage[TO_BE_CONFIRMED_FIELD] = coverage[TO_BE_CONFIRMED_FIELD]
 
