@@ -383,11 +383,11 @@ async def reset_password(args: LoginTokenRouteArgs, params: None, req: Request) 
     if not user:
         return await render_template("password_reset_link_expiry.html")
 
-    if user.token_expiry_date and user.token_expiry_date <= utcnow():
-        return await render_template("password_reset_link_expiry.html")
-
     user_locale = user.locale or get_app_config("DEFAULT_LANGUAGE")
     with template_locale(locale=user_locale):
+        if user.token_expiry_date and user.token_expiry_date <= utcnow():
+            return await render_template("password_reset_link_expiry.html")
+
         company = await user.get_company()
         auth_provider = get_company_auth_provider(company)
 

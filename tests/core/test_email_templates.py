@@ -1,9 +1,21 @@
 import pytest
+from quart import render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
 from superdesk import get_resource_service
 from newsroom.email_templates import RESOURCE
 from tests.core.utils import create_entries_for
+
+
+@pytest.mark.parametrize(
+    ("recipient_language", "expected_language"),
+    [(None, "en"), ("fi", "fi"), ("fr_ca", "fr-ca"), ("fr_CA", "fr-CA")],
+)
+async def test_email_layout_language(app, recipient_language, expected_language):
+    async with app.test_request_context("/"):
+        html = await render_template("email_layout.html", recipient_language=recipient_language)
+
+    assert f'<html lang="{expected_language}">' in html
 
 
 async def test_email_template_find_one(app):
