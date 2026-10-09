@@ -11,6 +11,7 @@ async def test_load_template_with_locale():
         "test.html": "default template",
         "test.fr.html": "fr template",
         "test.en.html": "en template",
+        "test.fr_ca.html": "Canadian French template",
         "with_layout.fr.html": "{% extends 'test.html' %}",
     }
 
@@ -33,6 +34,10 @@ async def test_load_template_with_locale():
         assert "en template" == env.get_template("test.html").render()
 
         assert "fr template" == env.get_template("test.fr.html").render()
+
+        set_template_locale("fr_CA")
+
+        assert "Canadian French template" == env.get_template("test.html").render()
 
         set_template_locale("fr")
 
