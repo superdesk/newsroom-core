@@ -186,7 +186,14 @@ async def test_reset_password_page_uses_target_user_locale(client, app):
     assert locale_calls[0][0] == "fi"
 
 
-async def test_expired_reset_password_link_shows_expiry_page(client, app):
+@pytest.mark.parametrize(
+    ("locale", "expected_content"),
+    [
+        ("en", "The link in the email has already expired. Please request to reset your password again."),
+        ("fi", "Sähköpostin linkki on vanhentunut. Tilaa uusi linkki vaihtaaksesi salasanasi."),
+    ],
+)
+async def test_expired_reset_password_link_shows_expiry_page(client, app, locale, expected_content):
     users_service = UsersAuthService()
     user = await users_service.get_by_email("foo@bar.com")
     assert user is not None
@@ -196,6 +203,7 @@ async def test_expired_reset_password_link_shows_expiry_page(client, app):
     await users_service.update(
         user.id,
         updates={
+            "locale": locale,
             "token": token_data["token"],
             "token_expiry_date": utcnow() - timedelta(minutes=1),
         },
@@ -204,4 +212,4 @@ async def test_expired_reset_password_link_shows_expiry_page(client, app):
     resp = await client.get(f"/reset_password/{plain_token}")
     assert 200 == resp.status_code, await resp.get_data(as_text=True)
     body = await resp.get_data(as_text=True)
-    assert "The link in the email has already expired" in body
+    assert expected_content in body

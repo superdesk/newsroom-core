@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ (recipient_language or get_locale())|replace('_', '-') }}">
 <head>
 <title></title>
 {% block htmlhead %}{% endblock %}
