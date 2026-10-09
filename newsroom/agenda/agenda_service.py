@@ -270,6 +270,11 @@ class AgendaItemService(AsyncResourceService[AgendaItem]):
         # then only count Planning based filters when checking ``_inner_hits``
         if doc["_hits"]["matched_event"]:
             inner_hits = {key: val for key, val in inner_hits.items() if key in planning_filters}
+        elif "query" in inner_hits and not inner_hits["query"]:
+            # The item matched the query on fields copied from its Planning items
+            # (e.g. ``planning_items.products``), not on a single nested Planning item,
+            # so there are no inner hits to filter by, keep all Planning items
+            inner_hits.pop("query")
 
         if not inner_hits or not doc.get("planning_items"):
             return
