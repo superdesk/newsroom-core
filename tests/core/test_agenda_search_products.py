@@ -69,12 +69,15 @@ async def agenda_items(client, init_agenda_items):
         assert resp.status_code == 200, await resp.get_data(as_text=True)
 
 
-async def search_ids(client, query: str, item_type: str | None = None) -> set[str]:
+async def search(client, query: str, item_type: str | None = None) -> list[dict]:
     url = f"/agenda/search?date_from=2038-05-01&q={quote(query)}"
     if item_type:
         url += f"&itemType={item_type}"
-    data = await get_json(client, url)
-    return {item["_id"] for item in data["_items"]}
+    return (await get_json(client, url))["_items"]
+
+
+async def search_ids(client, query: str, item_type: str | None = None) -> set[str]:
+    return {item["_id"] for item in await search(client, query, item_type)}
 
 
 @pytest.mark.parametrize(
@@ -116,6 +119,21 @@ async def search_ids(client, query: str, item_type: str | None = None) -> set[st
 )
 async def test_search_by_products_includes_linked_planning_items(client, agenda_items, query, expected):
     assert await search_ids(client, query) == expected
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "products.code:planning-items",
+        'products.code:planning-items AND "data centres"',
+        '(location.address.country:Canada OR products.code:planning-items) AND "data centres"',
+    ],
+)
+async def test_search_by_products_hits_include_linked_planning_items(client, agenda_items, query):
+    # the client hides items with planning items when none of them is in ``matched_planning_items``
+    items = {item["_id"]: item for item in await search(client, query)}
+    assert items["event-canada"]["_hits"]["matched_planning_items"] == ["plan-canada"]
+    assert items["event-usa"]["_hits"]["matched_planning_items"] == ["plan-usa"]
 
 
 async def test_search_by_products_events_only(client, agenda_items):
