@@ -60,13 +60,14 @@ class LocaleTemplateLoader(jinja2.FileSystemLoader):
         filename = None
         file_uptodate = noop
         template_locale_str = get_template_locale()
+        template_locale_suffix = template_locale_str.lower() if template_locale_str else None
 
-        if template_locale_str and f".{template_locale_str}." not in template:
+        if template_locale_suffix and f".{template_locale_suffix}." not in template.lower():
             template_name, extension = template.rsplit(".", maxsplit=1)
 
             try:
                 source, filename, file_uptodate = super().get_source(
-                    environment, f"{template_name}.{template_locale_str}.{extension}"
+                    environment, f"{template_name}.{template_locale_suffix}.{extension}"
                 )
             except jinja2.TemplateNotFound:
                 # no template for selected locale
