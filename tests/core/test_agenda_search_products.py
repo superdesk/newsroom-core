@@ -1,3 +1,4 @@
+import json
 import pytest
 from urllib.parse import quote
 
@@ -47,6 +48,15 @@ def get_planning(guid: str, name: str, products: list[dict[str, str]], event_ite
     }
 
 
+def get_coverage(coverage_id: str, coverage_type: str):
+    return {
+        "coverage_id": coverage_id,
+        "workflow_status": "assigned",
+        "news_coverage_status": {"name": "coverage intended", "label": "Planned", "qcode": "ncostat:int"},
+        "planning": {"g2_content_type": coverage_type, "scheduled": "2038-05-28T05:00:00+0000"},
+    }
+
+
 @pytest.fixture
 async def agenda_items(client, init_agenda_items):
     items = [
@@ -69,12 +79,17 @@ async def agenda_items(client, init_agenda_items):
         assert resp.status_code == 200, await resp.get_data(as_text=True)
 
 
-async def search_ids(client, query: str, item_type: str | None = None) -> set[str]:
+async def search(client, query: str, item_type: str | None = None, filters: dict | None = None) -> list[dict]:
     url = f"/agenda/search?date_from=2038-05-01&q={quote(query)}"
     if item_type:
         url += f"&itemType={item_type}"
-    data = await get_json(client, url)
-    return {item["_id"] for item in data["_items"]}
+    if filters:
+        url += f"&filter={quote(json.dumps(filters))}"
+    return (await get_json(client, url))["_items"]
+
+
+async def search_ids(client, query: str, item_type: str | None = None, filters: dict | None = None) -> set[str]:
+    return {item["_id"] for item in await search(client, query, item_type, filters)}
 
 
 @pytest.mark.parametrize(
@@ -116,6 +131,64 @@ async def search_ids(client, query: str, item_type: str | None = None) -> set[st
 )
 async def test_search_by_products_includes_linked_planning_items(client, agenda_items, query, expected):
     assert await search_ids(client, query) == expected
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "products.code:planning-items",
+        'products.code:planning-items AND "data centres"',
+        '(location.address.country:Canada OR products.code:planning-items) AND "data centres"',
+    ],
+)
+async def test_search_by_products_hits_include_linked_planning_items(client, agenda_items, query):
+    # the client hides items with planning items when none of them is in ``matched_planning_items``
+    items = {item["_id"]: item for item in await search(client, query)}
+    assert items["event-canada"]["_hits"]["matched_planning_items"] == ["plan-canada"]
+    assert items["event-usa"]["_hits"]["matched_planning_items"] == ["plan-usa"]
+
+
+@pytest.fixture
+async def event_with_two_planning_items(client, agenda_items):
+    # only the planning item with the text coverage has the product
+    name = "Budget lockup on data centres"
+    plan_text = get_planning("plan-two-text", name, [PLANNING_ITEMS], event_item="event-two")
+    plan_text["coverages"] = [get_coverage("cov-two-text", "text")]
+    plan_video = get_planning("plan-two-video", name, [], event_item="event-two")
+    plan_video["coverages"] = [get_coverage("cov-two-video", "video")]
+
+    for item in [get_event("event-two", name, "Canada", [ALL_EVENTS]), plan_text, plan_video]:
+        resp = await client.post("/push", json=item)
+        assert resp.status_code == 200, await resp.get_data(as_text=True)
+
+
+async def get_hits(client, query: str, filters: dict | None = None) -> dict:
+    items = {item["_id"]: item for item in await search(client, query, filters=filters)}
+    return items["event-two"]["_hits"]
+
+
+async def test_search_by_products_hits_with_multiple_planning_items(client, event_with_two_planning_items):
+    # product only, the nested query tells which planning item has the product
+    hits = await get_hits(client, "products.code:planning-items")
+    assert hits["matched_planning_items"] == ["plan-two-text"]
+
+    # product and keyword, the match is on the parent so all planning items are kept
+    hits = await get_hits(client, 'products.code:planning-items AND "data centres"')
+    assert sorted(hits["matched_planning_items"]) == ["plan-two-text", "plan-two-video"]
+
+    # sidebar filters still narrow the planning items and coverages
+    hits = await get_hits(client, 'products.code:planning-items AND "data centres"', {"coverage": ["text"]})
+    assert hits["matched_planning_items"] == ["plan-two-text"]
+    assert hits["matched_coverages"] == ["cov-two-text"]
+
+    hits = await get_hits(client, 'products.code:planning-items AND "data centres"', {"coverage": ["video"]})
+    assert hits["matched_planning_items"] == ["plan-two-video"]
+    assert hits["matched_coverages"] == ["cov-two-video"]
+
+    assert (
+        await search_ids(client, 'products.code:planning-items AND "data centres"', filters={"coverage": ["picture"]})
+        == set()
+    )
 
 
 async def test_search_by_products_events_only(client, agenda_items):
