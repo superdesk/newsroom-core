@@ -19,7 +19,7 @@ async def setup_embeds():
             "renditions": {
                 "original": {
                     "mimetype": "video/mp4",
-                    "href": "/assets/640ff0bdfb5122dcf06a6fc3",
+                    "href": "http://a.b.c/upload/assets/640ff0bdfb5122dcf06a6fc3",
                     "media": media_id,
                 }
             },
@@ -56,7 +56,7 @@ async def setup_embeds():
             "<p>Par 2</p>"
             '<!-- EMBED START Video {id: "editor_1"} -->'
             "<figure>"
-            '<video controls src="/assets/640ff0bdfb5122dcf06a6fc3" '
+            '<video controls src="http://a.b.c/upload/assets/640ff0bdfb5122dcf06a6fc3" '
             'alt="Scomo text" width="100%" height="100%">'
             "</video>"
             "<figcaption>Scomo whinging</figcaption>"
@@ -141,7 +141,6 @@ async def test_embed_mark_disable_download(client, app):
     resp = await client.get("/wire/search?type=wire")
 
     data = await resp.get_json()
-
     test_utils.test_embed_permissions(
         data["_items"][0],
         {
@@ -221,3 +220,37 @@ async def test_html_starts_with_embed_comment(client, app):
             "editor_1": ["display"],
         },
     )
+
+
+async def test_embed_fully_qualified_url_rewritten(client, app):
+    app.config["WIRE_EMBED_PERMISSIONS"] = True
+    await login(client, {"email": PUBLIC_USER_EMAIL})
+    await test_utils.update_entries_for(
+        "companies",
+        COMPANY_1_ID,
+        {
+            "embed_permissions": {"video": ["display"], "audio": ["display"], "sd_product": ["display"]},
+        },
+    )
+    await test_utils.add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "Service A",
+                "is_enabled": True,
+                "query": "service.code: a",
+                "product_type": "wire",
+            },
+            {
+                "name": "product test",
+                "is_enabled": True,
+                "sd_product_id": "123",
+                "product_type": "wire",
+            },
+        ],
+    )
+    await setup_embeds()
+    resp = await client.get("/wire/search?type=wire")
+    data = await resp.get_json()
+    assert "http" not in data["_items"][0]["body_html"]
