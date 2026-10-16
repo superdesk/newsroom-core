@@ -10,6 +10,7 @@ from superdesk.flask import url_for
 from superdesk.core import get_app_config
 from superdesk.etree import to_string
 
+from newsroom.core import get_current_wsgi_app
 from newsroom.types import SectionEnum, CompanyResource, EmbedPermissionUserAction
 from newsroom.settings import get_setting
 from newsroom.auth.utils import get_company_from_request
@@ -80,7 +81,6 @@ async def apply_company_permissions_to_embeds(
     items: list[dict], section: SectionEnum, use_download_as_view_permission: bool = False
 ) -> None:
     company = get_company_from_request(None)
-
     if not len(items) or not company or not get_app_config("WIRE_EMBED_PERMISSIONS", True):
         return
 
@@ -390,6 +390,7 @@ def _get_associations_to_remove_or_disable(
 def _remove_or_disable_item_media(
     item: dict, company: CompanyResource, permitted_products: set[str], use_download_as_view_permission: bool = False
 ) -> None:
+    app = get_current_wsgi_app()
     disable_display, disable_download = _get_associations_to_remove_or_disable(item, company, permitted_products)
     if use_download_as_view_permission:
         disable_display |= disable_download
@@ -431,6 +432,31 @@ def _remove_or_disable_item_media(
                     else:
                         elem.attrib["data-disable-download"] = "false"
                         elem.attrib["data-item-id"] = item.get("_id")
+
+                    # Suppress preload For the wire lists but not for download
+                    if not use_download_as_view_permission:
+                        elem.attrib["preload"] = "none"
+                    else:
+                        elem.attrib.pop("preload", None)
+
+                    # If the src is not a local/relative media URL, resolve its associated media item ID
+                    # and replace the src attribute with the upload system URL.
+                    # This corresponds to _updateImageEmbedSources in ArticleBodyHtml.tsx
+                    src = elem.attrib.get("src")
+                    media_prefix = (get_app_config("MEDIA_PREFIX") or "").rstrip("/")
+                    if src and media_prefix and not src.startswith(media_prefix):
+                        assoc_item = (item.get("associations") or {}).get(editor_id) or {}
+                        media_id = assoc_item.get("renditions", {}).get("original", {}).get("media")
+                        if media_id:
+                            try:
+                                relative_src = app.upload_url(media_id)
+                                if relative_src:
+                                    elem.attrib["src"] = relative_src
+                            except Exception as e:
+                                logger.warning(
+                                    f"Failed to resolve upload_url for media '{media_id} item {item.get('_id')}': {e}"
+                                )
+
                 if elem.text and " EMBED END " in elem.text:
                     break
             html_updated = True
