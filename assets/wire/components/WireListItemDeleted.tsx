@@ -12,6 +12,7 @@ export default function WireListItemDeleted({item, contextName}: any) {
 
     return (
         <article key={item._id}
+            role="listitem"
             className="wire-articles__item-wrap col-12 wire-item item--deleted"
             tabIndex={0}
         >

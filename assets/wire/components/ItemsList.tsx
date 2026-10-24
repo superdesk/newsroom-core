@@ -173,7 +173,15 @@ class ItemsList extends React.Component<any, any> {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown} onScroll={this.props.onScroll} ref={(elem: any) => this.elem = elem}>
+            <div
+                className={listClassName}
+                role={articles.length ? 'list' : undefined}
+                aria-label={articles.length ? gettext('Items') : undefined}
+                aria-busy={this.props.isLoading === true}
+                onKeyDown={this.onKeyDown}
+                onScroll={this.props.onScroll}
+                ref={(elem: any) => this.elem = elem}
+            >
                 {articles}
                 {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">

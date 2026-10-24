@@ -128,6 +128,14 @@ class WireListItem extends React.Component<IProps, IState> {
             this.props.toggleSelected();
             break;
 
+        case 'Enter': // the item box itself, not the buttons and links inside it
+            if (event.target !== event.currentTarget.querySelector('.wire-articles__item')) {
+                return;
+            }
+
+            this.props.onClick(this.props.item);
+            break;
+
         default:
             return;
         }
@@ -193,6 +201,7 @@ class WireListItem extends React.Component<IProps, IState> {
         return (
             <article
                 key={item._id}
+                role="listitem"
                 className={cardClassName}
                 ref={(elem: any) => this.dom.article = elem}
                 onClick={() => onClick(item)}
@@ -202,7 +211,7 @@ class WireListItem extends React.Component<IProps, IState> {
                 data-test-value={item._id}
             >
                 <UrgencyItemBorder item={item} listConfig={listConfig} />
-                <div className={wrapClassName} tabIndex={0}>
+                <div className={wrapClassName} tabIndex={-1}>
                     <div className="wire-articles__item-text-block">
                         <h4 className="wire-articles__item-headline">
                             <div
@@ -213,6 +222,7 @@ class WireListItem extends React.Component<IProps, IState> {
                                     <input
                                         type="checkbox"
                                         className="css-checkbox"
+                                        aria-label={gettext('Select {{headline}}', {headline: item.headline})}
                                         checked={this.props.isSelected}
                                         onChange={this.props.toggleSelected}
                                     />
@@ -229,9 +239,22 @@ class WireListItem extends React.Component<IProps, IState> {
                                 <Embargo item={item} isCard/>
                                 <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
                                 <WireLabel item={item}/>
-                                {item.es_highlight && item.es_highlight.headline ? <div
-                                    dangerouslySetInnerHTML={({__html: item.es_highlight.headline && item.es_highlight.headline[0]})}
-                                /> : item.headline}
+                                <a
+                                    href={`?item=${encodeURIComponent(item._id)}`}
+                                    className="wire-articles__item-headline-link"
+                                    onClick={(event) => {
+                                        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+                                            // let the browser open the item in a new tab or window
+                                            event.stopPropagation();
+                                        } else {
+                                            event.preventDefault();
+                                        }
+                                    }}
+                                >
+                                    {item.es_highlight && item.es_highlight.headline ? <span
+                                        dangerouslySetInnerHTML={({__html: item.es_highlight.headline && item.es_highlight.headline[0]})}
+                                    /> : item.headline}
+                                </a>
                             </div>
                         </h4>
 

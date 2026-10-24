@@ -1,4 +1,5 @@
 import React from 'react';
+import {gettext} from 'utils';
 import {IconButton, IPropsSize, IPropsVariant} from './IconButton';
 
 interface IProps {
@@ -17,6 +18,9 @@ class ActionButton extends React.Component<IProps> {
     render() {
         const {item, group, plan, action, disabled} = this.props;
         const tooltip = this.props.action.tooltip ?? this.props.action.name;
+        const ariaLabel = item?.headline ?
+            gettext('{{action}}: {{headline}}', {action: tooltip, headline: item.headline}) :
+            tooltip;
 
         return (
             <IconButton
@@ -36,7 +40,7 @@ class ActionButton extends React.Component<IProps> {
                     }
                 }
                 tooltip={tooltip}
-                ariaLabel={tooltip}
+                ariaLabel={ariaLabel}
             />
         );
     }

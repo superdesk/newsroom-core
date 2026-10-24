@@ -26,10 +26,14 @@ class ActionMenu extends React.Component<any, any> {
                 <button
                     ref={(elem: any) => this.referenceElem = elem}
                     className="icon-button icon-button--secondary"
-                    aria-label={gettext('More Actions')}
+                    aria-label={item?.headline ?
+                        gettext('More Actions: {{headline}}', {headline: item.headline}) :
+                        gettext('More Actions')
+                    }
+                    aria-expanded={showActions === true}
                     onClick={(event: any) => onActionList(event, item, group, plan)}
                 >
-                    <i className='icon--more' />
+                    <i className='icon--more' aria-hidden="true" />
                 </button>
                 {this.referenceElem && (
                     <Popover
