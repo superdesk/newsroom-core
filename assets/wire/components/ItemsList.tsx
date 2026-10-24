@@ -172,23 +172,37 @@ class ItemsList extends React.Component<any, any> {
             'wire-articles--list-compact': !isExtended,
         });
 
+        // Loading more items on scroll keeps `totalItems`, so only a new search is announced.
+        let status = '';
+
+        if (this.props.totalItems == null) {
+            status = this.props.isLoading ? gettext('Loading') : '';
+        } else {
+            status = this.props.totalItems === 1 ?
+                gettext('1 result') :
+                gettext('{{ count }} results', {count: this.props.totalItems});
+        }
+
         return (
-            <div
-                className={listClassName}
-                role={articles.length ? 'list' : undefined}
-                aria-label={articles.length ? gettext('Items') : undefined}
-                aria-busy={this.props.isLoading === true}
-                onKeyDown={this.onKeyDown}
-                onScroll={this.props.onScroll}
-                ref={(elem: any) => this.elem = elem}
-            >
-                {articles}
-                {!articles.length &&
+            <React.Fragment>
+                <div className="a11y-only" role="status" aria-atomic="true">{status}</div>
+                <div
+                    className={listClassName}
+                    role={articles.length ? 'list' : undefined}
+                    aria-label={articles.length ? gettext('Items') : undefined}
+                    aria-busy={this.props.isLoading === true}
+                    onKeyDown={this.onKeyDown}
+                    onScroll={this.props.onScroll}
+                    ref={(elem: any) => this.elem = elem}
+                >
+                    {articles}
+                    {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>
-                }
-            </div>
+                    }
+                </div>
+            </React.Fragment>
         );
     }
 }
@@ -216,6 +230,7 @@ ItemsList.propTypes = {
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
+    totalItems: PropTypes.number,
     previewConfig: PropTypes.object,
     listConfig: PropTypes.object,
     contextName: PropTypes.string,
@@ -241,6 +256,7 @@ const mapStateToProps = (state: any) => ({
     activeNavigation: searchNavigationSelector(state),
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
+    totalItems: state.totalItems,
     previewConfig: previewConfigSelector(state),
     listConfig: listConfigSelector(state),
     contextName: getContextName(state),

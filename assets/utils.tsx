@@ -346,12 +346,48 @@ export function formatMonth(dateString: any) {
 }
 
 /**
- * Wrapper for alertifyjs
+ * Read a message out to screen reader users through the page's polite (`status`) or assertive (`alert`) live region.
+ * The regions are rendered by `base_layout.html`; pages without them get one created on first use.
+ */
+export function announce(message: string, assertive = false): void {
+    const id = assertive ? 'a11y-alert' : 'a11y-status';
+    let region = document.getElementById(id);
+
+    if (region == null) {
+        region = document.createElement('div');
+        region.id = id;
+        region.className = 'a11y-only';
+        region.setAttribute('role', assertive ? 'alert' : 'status');
+        region.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(region);
+    }
+
+    const liveRegion = region;
+    const text = new DOMParser().parseFromString(message, 'text/html').body.textContent ?? '';
+
+    // Clearing first and setting the text a moment later makes a repeated message announced again.
+    liveRegion.textContent = '';
+    window.setTimeout(() => {
+        liveRegion.textContent = text;
+    }, 100);
+}
+
+/**
+ * Wrapper for alertifyjs, which does not expose its notifications to screen readers
  */
 export const notify = {
-    success: (message: any) => alertify.success(message),
-    error: (message: any) => alertify.error(message),
-    warning: (message: any) => alertify.warning(message),
+    success: (message: any) => {
+        announce(String(message));
+        return alertify.success(message);
+    },
+    error: (message: any) => {
+        announce(String(message), true);
+        return alertify.error(message);
+    },
+    warning: (message: any) => {
+        announce(String(message));
+        return alertify.warning(message);
+    },
 };
 
 /**
