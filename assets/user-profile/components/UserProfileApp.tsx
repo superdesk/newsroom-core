@@ -199,6 +199,7 @@ class UserProfileApp extends React.Component<any, any> {
             <ProfileToggle key="toggle"
                 user={this.props.user}
                 onClick={this.props.toggleDropdown}
+                expanded={this.props.dropdown === true}
             />,
             dropdown,
             profile,

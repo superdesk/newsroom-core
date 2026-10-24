@@ -80,7 +80,7 @@ class NotificationList extends React.Component<IProps, IState> {
             <div className="navbar-notifications__inner">
                 <h3 className="a11y-only">{gettext('Notifications')}</h3>
                 {this.props.count > 0 &&
-                    <div className="navbar-notifications__badge">
+                    <div className="navbar-notifications__badge" aria-hidden="true">
                         {this.props.count}
                     </div>
                 }
@@ -92,9 +92,22 @@ class NotificationList extends React.Component<IProps, IState> {
                     )}
                     ref={(elem: any) => this.elem = elem}
                     title={gettext('Notifications')}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={this.props.count > 0 ?
+                        gettext('Notifications ({{count}})', {count: this.props.count}) :
+                        gettext('Notifications')
+                    }
+                    aria-expanded={this.state.displayItems}
+                    onClick={this.toggleDisplay}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            this.toggleDisplay();
+                        }
+                    }}
                 >
-                    <h3 className="a11y-only">{gettext('Notifications')}</h3>
-                    <i className='icon--alert' onClick={this.toggleDisplay} />
+                    <i className='icon--alert' aria-hidden="true" />
                 </span>
 
                 {this.state.displayItems === true && (

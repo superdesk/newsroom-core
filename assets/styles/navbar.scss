@@ -578,3 +578,14 @@ nav.search {
         }
     }
 }
+
+.header-profile,
+.navbar-notifications__inner-circle {
+    &:focus {
+        outline: none;
+    }
+    &:focus-visible {
+        outline: 2px solid var(--top-bar-color-fg);
+        outline-offset: 2px;
+    }
+}

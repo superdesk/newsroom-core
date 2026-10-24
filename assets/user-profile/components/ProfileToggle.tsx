@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Tooltip} from 'bootstrap';
 
-import {isTouchDevice} from '../../utils';
+import {gettext, isTouchDevice} from '../../utils';
 
 class ProfileToggle extends React.Component<any, any> {
     static propTypes: any;
@@ -30,11 +30,24 @@ class ProfileToggle extends React.Component<any, any> {
         const initials = this.props.user.first_name[0].toLocaleUpperCase() + this.props.user.last_name[0].toLocaleUpperCase();
 
         return (
-            <div className="header-profile" onClick={(event: any) => {
-                event.preventDefault();
-                this.props.onClick();
-            }}>
-                <figure className="header-profile__avatar">
+            <div
+                className="header-profile"
+                role="button"
+                tabIndex={0}
+                aria-expanded={this.props.expanded}
+                aria-label={gettext('User menu for {{name}}', {name: `${this.props.user.first_name} ${this.props.user.last_name}`})}
+                onClick={(event: any) => {
+                    event.preventDefault();
+                    this.props.onClick();
+                }}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.props.onClick();
+                    }
+                }}
+            >
+                <figure className="header-profile__avatar" aria-hidden="true">
                     <span className="header-profile__characters"
                         ref={(elem: any) => this.elem = elem}
                         title={`${this.props.user.first_name} ${this.props.user.last_name}`}
@@ -52,6 +65,7 @@ ProfileToggle.propTypes = {
         last_name: PropTypes.string,
     }).isRequired,
     onClick: PropTypes.func.isRequired,
+    expanded: PropTypes.bool,
 };
 
 export default ProfileToggle;
