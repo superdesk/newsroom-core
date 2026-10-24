@@ -144,7 +144,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     return (
         <div
             data-test-id="edit-user-form"
-            className='list-item__preview' role={gettext('dialog')}
+            className='list-item__preview' role="dialog"
             aria-label={gettext('Edit User')}
         >
             <div className='list-item__preview-header'>

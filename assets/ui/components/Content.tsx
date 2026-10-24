@@ -4,7 +4,7 @@ import {gettext} from 'utils';
 
 export default function Content(props: any) {
     return (
-        <div className={'content--' + props.type} role={gettext('dialog')} aria-label={gettext('Item Detail')}>
+        <div className={'content--' + props.type} role="dialog" aria-label={gettext('Item Detail')}>
             <h3 className="a11y-only">{gettext('Item Detail')}</h3>
             {props.children}
         </div>

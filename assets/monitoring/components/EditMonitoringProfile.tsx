@@ -79,7 +79,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
         const getError = (field: any) => errors ? errors[field] : null;
 
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
+            <div className='list-item__preview' role="dialog" aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit {{monitoring}} Profile', window.sectionNames) }</h3>
                     <CloseButton onClick={onClose} />

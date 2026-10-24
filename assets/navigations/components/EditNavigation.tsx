@@ -44,7 +44,7 @@ class EditNavigation extends React.Component<any, any> {
         );
 
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Navigation')}>
+            <div className='list-item__preview' role="dialog" aria-label={gettext('Edit Navigation')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.navigation.name}</h3>
                     <CloseButton onClick={this.props.onClose} />

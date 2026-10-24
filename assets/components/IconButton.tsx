@@ -17,7 +17,6 @@ interface IProps {
     className?: string;
     tooltip?: string;
     ariaLabel?: string;
-    ariaHidden?: boolean;
     'data-test-id'?: string;
     'data-bs-toggle'?: string;
     'data-bs-dismiss'?: string;
@@ -66,7 +65,7 @@ class IconButtonComponent extends React.PureComponent<IProps> {
                 disabled={this.props.disabled}
                 onClick={this.props.onClick}
             >
-                <Icon name={this.props.icon} aria-hidden={this.props.ariaHidden} />
+                <Icon name={this.props.icon} />
             </button>
         );
     }

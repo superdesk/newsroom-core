@@ -15,7 +15,6 @@ class CloseButton extends React.Component<IProps> {
                 id='hide-sidebar'
                 data-bs-dismiss='modal'
                 ariaLabel={gettext('Close')}
-                ariaHidden={true}
                 disabled={this.props.disabled}
                 onClick={this.props.onClick}
             />

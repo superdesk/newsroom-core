@@ -30,6 +30,7 @@ interface IState {
 class Modal extends React.Component<IProps, IState> {
     modal: any;
     elem: any;
+    returnFocusTo: Element | null = null;
     constructor(props: any) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
@@ -38,6 +39,7 @@ class Modal extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
+        this.returnFocusTo = document.activeElement;
         const options: any = {};
 
         if (this.props.clickOutsideToClose !== true) {
@@ -56,6 +58,10 @@ class Modal extends React.Component<IProps, IState> {
     componentWillUnmount() {
         if (this.elem && this.modal) {
             this.modal.hide();
+        }
+
+        if (this.returnFocusTo instanceof HTMLElement && this.returnFocusTo.isConnected) {
+            this.returnFocusTo.focus();
         }
     }
 
@@ -90,7 +96,7 @@ class Modal extends React.Component<IProps, IState> {
                         </div>
                         <div className="modal-body">
                             {this.props.children}
-                        </div>\
+                        </div>
                         {this.props.footer != null ? this.props.footer() : (
                             <div className="modal-footer">
                                 <Button

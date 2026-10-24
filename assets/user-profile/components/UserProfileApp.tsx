@@ -112,7 +112,7 @@ class UserProfileApp extends React.Component<any, any> {
             <div
                 data-test-id="profile-container"
                 className="profile-container"
-                role={gettext('dialog')}
+                role="dialog"
                 aria-label={links.find((link: any) => link.active).label}
             >
                 <div className="profileWrap">

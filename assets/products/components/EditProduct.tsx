@@ -81,7 +81,7 @@ class EditProduct extends React.Component<any, any> {
 
     render() {
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Product')}>
+            <div className='list-item__preview' role="dialog" aria-label={gettext('Edit Product')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.product.name}</h3>
                     <CloseButton onClick={this.props.onClose} />

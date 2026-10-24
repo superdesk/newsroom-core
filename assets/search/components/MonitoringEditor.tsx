@@ -124,7 +124,7 @@ class MonitoringEditor extends React.Component<any, any> {
         const subscribed = (get(this.state, 'profile.users') || []).includes(user);
 
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
+            <div className='list-item__preview' role="dialog" aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className="list-item__preview-header">
                     <h3>{get(item, 'name')}</h3>
                     <CloseButton onClick={this.props.cancelEdit} disabled={this.state.saving} />

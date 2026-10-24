@@ -5,7 +5,6 @@ interface IProps {
     name: string;
     size?: 'small' | 'medium'; // defaults to 'medium'
     className?: string;
-    ariaHidden?: boolean;
 }
 
 export class Icon extends React.PureComponent<IProps> {
@@ -15,11 +14,7 @@ export class Icon extends React.PureComponent<IProps> {
         });
 
         return (
-            <i
-                className={classes}
-                aria-label={this.props.name}
-                aria-hidden={this.props.ariaHidden}
-            />
+            <i className={classes} aria-hidden="true" />
         );
     }
 }

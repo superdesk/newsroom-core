@@ -164,7 +164,7 @@ class EditCompany extends React.Component<IProps, IState> {
                     'list-item__preview',
                     {'list-item__preview--large': this.props.apiEnabled}
                 )}
-                role={gettext('dialog')}
+                role="dialog"
                 aria-label={gettext('Edit Company')}
             >
                 <div className='list-item__preview-header'>
