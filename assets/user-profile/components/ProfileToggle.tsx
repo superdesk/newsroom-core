@@ -35,7 +35,10 @@ class ProfileToggle extends React.Component<any, any> {
                 role="button"
                 tabIndex={0}
                 aria-expanded={this.props.expanded}
-                aria-label={gettext('User menu for {{name}}', {name: `${this.props.user.first_name} ${this.props.user.last_name}`})}
+                aria-label={gettext('{{initials}}: user menu for {{name}}', {
+                    initials,
+                    name: `${this.props.user.first_name} ${this.props.user.last_name}`,
+                })}
                 onClick={(event: any) => {
                     event.preventDefault();
                     this.props.onClick();
