@@ -183,7 +183,8 @@ $container-max-widths: (
     --color-home-section-heading: var(--color-primary);
     --color-text--slugline: hsl(201, 62%, 30%);
     //--color-text-link: var(--color-primary);
-    --color-text-link--navbar: var(--color-primary);
+    // Links sit on the dark top bar (`--top-bar-color-bg`), so they need a light tone to reach 4.5:1.
+    --color-text-link--navbar: hsl(var(--color-interactive-focus-base), 70%);
     --color-icon-font: var(--color-text--muted);
 
     // --------------------------------------------------------------------
@@ -601,6 +602,7 @@ $container-max-widths: (
     --footer-size--height: 32px;
     --footer-color-bg: hsl(0, 0%, 90%);
     --footer-color-fg: var(--color-text);
+    --footer-color-link: var(--color-text-link-hover);
     --footer-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.3);
 
     // COMPONENT: MULTI ACTION BAR

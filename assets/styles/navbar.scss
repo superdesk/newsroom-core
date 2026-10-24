@@ -469,6 +469,17 @@
                 color: var(--color-text-link--navbar);
             }
         }
+
+        @include xxsm {
+            flex-shrink: 1;
+            min-width: 0;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+
+            .nav-link {
+                padding-inline: 0.5rem;
+            }
+        }
        
         @include sm {
             padding-inline-end: 1rem;

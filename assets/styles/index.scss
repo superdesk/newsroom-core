@@ -409,6 +409,10 @@ article.list {
     margin: 0;
     transition: margin var(--transition-base);
 
+    a {
+        color: var(--footer-color-link);
+    }
+
     @include xxsm {
         justify-content: space-between;
         padding: 0;
@@ -651,7 +655,7 @@ article.list {
     }
     &.active {
         background-color: #f1f1f1;
-        color: var(--color-primary);
+        color: var(--color-text-link-hover);
     }
     @include sm {
         padding: 20px;
