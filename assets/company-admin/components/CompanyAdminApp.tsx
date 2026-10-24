@@ -197,6 +197,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                         'toggle-button',
                                         {'toggle-button--active': this.props.sectionId === 'my_company'}
                                     )}
+                                    aria-pressed={this.props.sectionId === 'my_company'}
                                     data-test-id="company-admin--companies-btn"
                                 >
                                     {gettext('My Company')}
@@ -211,6 +212,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                         'toggle-button',
                                         {'toggle-button--active': this.props.sectionId === 'users'}
                                     )}
+                                    aria-pressed={this.props.sectionId === 'users'}
                                     data-test-id="company-admin--users-btn"
                                 >
                                     {gettext('Users')}

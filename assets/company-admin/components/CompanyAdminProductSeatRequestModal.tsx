@@ -110,17 +110,19 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
                             data-bs-toggle="dropdown"
                             aria-haspopup='true'
                             aria-expanded="false"
-                            aria-label="Add Product"
+                            aria-label={gettext('Add Product')}
                         >
-                            <i className="icon--plus"></i>
+                            <i className="icon--plus" aria-hidden="true"></i>
                         </button>
                         <ul className="dropdown-menu">
                             {sectionProducts.map((section: any, index: any) => (
                                 <React.Fragment key={section._id}>
-                                    <h6 className="dropdown-menu__header">
-                                        {section.name}
-                                    </h6>
-                                    <div className="dropdown-divider" />
+                                    <li>
+                                        <h6 className="dropdown-menu__header">
+                                            {section.name}
+                                        </h6>
+                                    </li>
+                                    <li aria-hidden="true"><div className="dropdown-divider" /></li>
                                     {section.products.map((product: any) => (
                                         <li key={product._id}>
                                             <button
@@ -133,7 +135,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
                                         </li>
                                     ))}
                                     {index >= (sectionProducts.length - 1) ? null : (
-                                        <div className="dropdown-divider" />
+                                        <li aria-hidden="true"><div className="dropdown-divider" /></li>
                                     )}
                                 </React.Fragment>
                             ))}
