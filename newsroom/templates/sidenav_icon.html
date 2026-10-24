@@ -1,7 +1,7 @@
 <li class="sidenav__item {% if request.endpoint == nav.endpoint or request.endpoint in nav.secondary_endpoints %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
     <a href="{{ url_for(nav.endpoint) if nav.endpoint else nav.url }}" title="{{  gettext(nav.name) }}"
         data-test-id="sidenav-link-{{ nav.name.lower().replace('/', '_').replace(' ', '_') }}"
-        role="button"
+        {% if request.endpoint == nav.endpoint or request.endpoint in nav.secondary_endpoints %}aria-current="page"{% endif %}
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}
@@ -12,11 +12,11 @@
             {% block navurl %}
             {% if nav.url %}
             <span class="sidenav__helper-icon">
-                <i class="icon-small--external"></i>
+                <i class="icon-small--external" aria-hidden="true"></i>
             </span>
             {% endif %}
             {% endblock %}
-            <i class="icon--{{ nav.icon }}"></i>
+            <i class="icon--{{ nav.icon }}" aria-hidden="true"></i>
         </span>
         <span class="sidenav__item-title">{{  gettext(nav.name) }}</span>
     </a>

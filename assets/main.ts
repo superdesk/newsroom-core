@@ -27,9 +27,13 @@ function handleNavToggle() {
         sessionStorage.removeItem('navigation-pinned');
         navigation.classList.remove('nav-block--pinned');
         pinButton.setAttribute('title', gettext('Expand'));
+        pinButton.setAttribute('aria-label', gettext('Expand'));
+        pinButton.setAttribute('aria-expanded', 'false');
     } else {
         sessionStorage.setItem('navigation-pinned', 'true');
         navigation.classList.add('nav-block--pinned');
         pinButton.setAttribute('title', gettext('Collapse'));
+        pinButton.setAttribute('aria-label', gettext('Collapse'));
+        pinButton.setAttribute('aria-expanded', 'true');
     }
 }
