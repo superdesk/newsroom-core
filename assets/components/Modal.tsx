@@ -85,6 +85,7 @@ class Modal extends React.Component<IProps, IState> {
                 })}
                 ref={(elem: HTMLDivElement) => this.elem = elem}
                 role="dialog"
+                tabIndex={-1}
                 aria-label={this.props.title}
             >
                 <h3 className="a11y-only">{this.props.title}</h3>

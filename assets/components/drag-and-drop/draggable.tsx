@@ -26,7 +26,8 @@ export function Draggable(props: IProps) {
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes} data-test-id={props.dataTestId}>
+        // `group` instead of the default `button` role: the draggable cards contain their own buttons.
+        <div ref={setNodeRef} style={style} {...listeners} {...attributes} role="group" data-test-id={props.dataTestId}>
             {props.children}
         </div>
     );

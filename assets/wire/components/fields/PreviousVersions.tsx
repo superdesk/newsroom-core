@@ -24,12 +24,12 @@ export function PreviousVersions({item, isItemDetail, inputRef}: IProps) {
 
     return (
         <span>
-            <div className="versions-link" onClick={onClick}>
+            <button type="button" className="versions-link button__reset-styles" onClick={onClick}>
                 {gettext('{{ count }} previous {{ versionsLabel }}', {
                     count: numVersions,
                     versionsLabel: versionLabelText,
                 })}
-            </div>
+            </button>
         </span>
     );
 }
