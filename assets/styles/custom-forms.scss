@@ -221,3 +221,8 @@ select.form-control {
         padding: 0;
     }
 }
+
+.form-check-input:focus-visible {
+    outline: 2px solid var(--color-interactive-focus);
+    outline-offset: 2px;
+}
