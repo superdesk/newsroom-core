@@ -35,7 +35,6 @@ export class ListSearchOptions extends React.PureComponent<any, any> {
                     id="listSearchOptionsButton"
                     className="content-bar__menu"
                     data-bs-toggle="dropdown"
-                    aria-haspopup="menu"
                     aria-expanded={this.state.isOpen}
                     aria-label={gettext('Search Options')}
                     role="button"
@@ -51,14 +50,14 @@ export class ListSearchOptions extends React.PureComponent<any, any> {
                         {this.props.hideSearchAllVersions ? null : (
                             <div className="form-group d-flex align-items-center">
                                 <Toggle
-                                    id="all-versions"
+                                    id="search-options-all-versions"
                                     checked={this.props.searchAllVersions}
                                     className="toggle-background"
                                     icons={false}
                                     onChange={this.props.toggleSearchAllVersions}
                                 />
                                 <label
-                                    htmlFor="all-versions"
+                                    htmlFor="search-options-all-versions"
                                     className="mb-0 ms-2"
                                 >
                                     {gettext('All Versions')}
@@ -69,14 +68,14 @@ export class ListSearchOptions extends React.PureComponent<any, any> {
                         {this.props.hideNewsOnly ? null : (
                             <div className="form-group d-flex align-items-center">
                                 <Toggle
-                                    id="news-only"
+                                    id="search-options-news-only"
                                     checked={this.props.newsOnly}
                                     className="toggle-background"
                                     icons={false}
                                     onChange={this.props.toggleNews}
                                 />
                                 <label
-                                    htmlFor="news-only"
+                                    htmlFor="search-options-news-only"
                                     className="mb-0 ms-2"
                                 >
                                     {gettext('News Only')}

@@ -240,11 +240,16 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
         return null;
     }
 
-    componentDidUpdate(nextProps: any) {
+    componentDidUpdate(nextProps: any, prevState: any) {
         if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery) && this.dom.list != null) {
             this.dom.list.scrollTop = 0;
         }
         this.initTooltips();
+
+        // The open and close filter panel buttons replace each other, so focus has to move to the one now rendered.
+        if (prevState != null && prevState.withSidebar !== this.state.withSidebar) {
+            (this.state.withSidebar ? this.dom.open : this.dom.close)?.focus();
+        }
     }
 
     renderPageContent() {

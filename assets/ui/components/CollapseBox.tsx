@@ -40,8 +40,15 @@ export class CollapseBox extends React.Component<IProps, IState> {
                         role="button"
                         aria-expanded={this.state.open}
                         aria-controls={contentId}
+                        tabIndex={0}
                         onClick={() => {
                             this.setState({open: !this.state.open});
+                        }}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                this.setState({open: !this.state.open});
+                            }
                         }}>
                         <div className="nh-collapsible-panel__caret">
                             <i className="icon--arrow-right" />

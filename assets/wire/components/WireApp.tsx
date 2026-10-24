@@ -163,6 +163,8 @@ class WireApp extends SearchBase<any> {
                                 ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
                                 aria-label={gettext('Close filter panel')}
+                                aria-expanded={true}
+                                aria-controls="wire-filter-panel"
                                 data-test-id="toggle-filter-panel"
                                 onClick={this.toggleSidebar}
                             >
@@ -180,6 +182,8 @@ class WireApp extends SearchBase<any> {
                                 ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
                                 aria-label={gettext('Open filter panel')}
+                                aria-expanded={false}
+                                aria-controls="wire-filter-panel"
                                 data-test-id="toggle-filter-panel"
                                 onClick={this.toggleSidebar}
                             >
@@ -197,7 +201,7 @@ class WireApp extends SearchBase<any> {
                 </section>,
                 <section key="contentMain" className='content-main'>
                     <div className='wire-column--3'>
-                        <div className={`wire-column__nav ${this.state.withSidebar ? 'wire-column__nav--open' : ''}`}>
+                        <div id="wire-filter-panel" className={`wire-column__nav ${this.state.withSidebar ? 'wire-column__nav--open' : ''}`}>
                             <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar &&
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />

@@ -36,11 +36,14 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters
         setCreatedFilter({...createdFilter, ...newValue});
     };
 
+    const groupLabel = context === 'agenda' ? gettext('Event Date') : gettext('Published By');
+
     return (
-        <NavGroup label={context === 'agenda' ? gettext('Event Date') : gettext('Published By')}>
+        <NavGroup label={groupLabel}>
             <div className="formGroup mb-2">
                 <select
                     id="date-filter"
+                    aria-label={groupLabel}
                     className="form-control"
                     value={showCustomRange ? 'custom_date' : createdFilter.date_filter || ''}
                     onChange={onDateFilterChange}

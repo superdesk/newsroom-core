@@ -61,13 +61,15 @@ class ListViewOptions extends React.PureComponent<any, any> {
     render() {
         return (
             <div ref={(elem) => this.elem = elem}>
-                <a
-                    className="icon-link--plain"
+                <button
+                    type="button"
+                    className="icon-link--plain button__reset-styles"
+                    aria-expanded={this.state.isOpen}
                     onClick={this.toggleOpen}
                 >
                     <span className="icon-link__text">{gettext('Change view')}</span>
-                    <i className={`icon--${this.props.activeView}`} />
-                </a>
+                    <i className={`icon--${this.props.activeView}`} aria-hidden="true" />
+                </button>
                 {this.state.isOpen && (
                     <div className='dropdown-menu dropdown-menu-right show'>
                         <h6 className='dropdown-menu__header'>{gettext('Change view')}</h6>
@@ -76,10 +78,10 @@ class ListViewOptions extends React.PureComponent<any, any> {
                                 key={view.type}
                                 className='dropdown-item'
                                 onClick={() => this.setView(view)}
-                                aria-label={view.label}
+                                aria-pressed={this.props.activeView === view.type}
                                 type='button'
                             >
-                                <i className={`icon--${view.type}`} />
+                                <i className={`icon--${view.type}`} aria-hidden="true" />
                                 {' '}{view.label}
                             </button>
                         ))}
