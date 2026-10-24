@@ -13,13 +13,22 @@ export default function Preview(props: any) {
     }, []);
 
     const close = (event: React.SyntheticEvent) => {
-        const target = returnFocusTo.current;
+        const opener = returnFocusTo.current;
+
+        // A preview opened by clicking a wire card leaves focus on the card, which has no name; its headline link has.
+        const target = opener?.classList.contains('wire-articles__item') ?
+            opener.querySelector('.wire-articles__item-headline-link') ?? opener :
+            opener;
 
         props.onCloseClick(event);
 
-        if (target instanceof HTMLElement && target.isConnected) {
-            target.focus();
-        }
+        // Focus moves once the preview has left the DOM. Moved while the preview is still there, NVDA's browse mode
+        // cursor is then pushed out of the removed preview onto the control before it and reads that instead.
+        window.setTimeout(() => {
+            if (target instanceof HTMLElement && target.isConnected) {
+                target.focus();
+            }
+        });
     };
 
     return (
