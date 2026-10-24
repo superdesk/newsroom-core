@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
 
-import {gettext, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
+import {announce, gettext, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
 import WireListItem from './WireListItem';
 import {setActive, previewItem, toggleSelected, openItem} from '../actions';
 import {EXTENDED_VIEW} from '../defaults';
@@ -131,10 +131,23 @@ class ItemsList extends React.Component<any, any> {
           (!action.when || action.when(this.props, item)));
     }
 
-    componentDidUpdate(nextProps: any) {
-        if (!isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
-            (!nextProps.searchInitiated && this.props.searchInitiated)) {
+    componentDidUpdate(prevProps: any) {
+        if (!isEqual(prevProps.activeNavigation, this.props.activeNavigation) ||
+            (!prevProps.searchInitiated && this.props.searchInitiated)) {
             this.elem.scrollTop = 0;
+        }
+
+        // A new search resets `totalItems`; loading more items on scroll keeps it, so only a new search is announced.
+        // The count goes to the page-wide status region after the results have rendered: changed in the same update
+        // that replaced the list, it was not read by NVDA.
+        if (this.props.totalItems == null) {
+            if (this.props.isLoading && !(prevProps.isLoading && prevProps.totalItems == null)) {
+                announce(gettext('Loading'));
+            }
+        } else if (prevProps.totalItems == null) {
+            announce(this.props.totalItems === 1 ?
+                gettext('1 result') :
+                gettext('{{ count }} results', {count: this.props.totalItems}));
         }
     }
 
@@ -172,37 +185,23 @@ class ItemsList extends React.Component<any, any> {
             'wire-articles--list-compact': !isExtended,
         });
 
-        // Loading more items on scroll keeps `totalItems`, so only a new search is announced.
-        let status = '';
-
-        if (this.props.totalItems == null) {
-            status = this.props.isLoading ? gettext('Loading') : '';
-        } else {
-            status = this.props.totalItems === 1 ?
-                gettext('1 result') :
-                gettext('{{ count }} results', {count: this.props.totalItems});
-        }
-
         return (
-            <React.Fragment>
-                <div className="a11y-only" role="status" aria-atomic="true">{status}</div>
-                <div
-                    className={listClassName}
-                    role={articles.length ? 'list' : undefined}
-                    aria-label={articles.length ? gettext('Items') : undefined}
-                    aria-busy={this.props.isLoading === true}
-                    onKeyDown={this.onKeyDown}
-                    onScroll={this.props.onScroll}
-                    ref={(elem: any) => this.elem = elem}
-                >
-                    {articles}
-                    {!articles.length &&
+            <div
+                className={listClassName}
+                role={articles.length ? 'list' : undefined}
+                aria-label={articles.length ? gettext('Items') : undefined}
+                aria-busy={this.props.isLoading === true}
+                onKeyDown={this.onKeyDown}
+                onScroll={this.props.onScroll}
+                ref={(elem: any) => this.elem = elem}
+            >
+                {articles}
+                {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>
-                    }
-                </div>
-            </React.Fragment>
+                }
+            </div>
         );
     }
 }

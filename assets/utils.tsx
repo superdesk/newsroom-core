@@ -345,6 +345,8 @@ export function formatMonth(dateString: any) {
     return parseDate(dateString).format('MMMM');
 }
 
+const pendingAnnouncements: {[regionId: string]: number} = {};
+
 /**
  * Read a message out to screen reader users through the page's polite (`status`) or assertive (`alert`) live region.
  * The regions are rendered by `base_layout.html`; pages without them get one created on first use.
@@ -366,8 +368,10 @@ export function announce(message: string, assertive = false): void {
     const text = new DOMParser().parseFromString(message, 'text/html').body.textContent ?? '';
 
     // Clearing first and setting the text a moment later makes a repeated message announced again.
+    // A newer message replaces one still waiting, so a quick "Loading" never lands after the result.
+    window.clearTimeout(pendingAnnouncements[id]);
     liveRegion.textContent = '';
-    window.setTimeout(() => {
+    pendingAnnouncements[id] = window.setTimeout(() => {
         liveRegion.textContent = text;
     }, 100);
 }
