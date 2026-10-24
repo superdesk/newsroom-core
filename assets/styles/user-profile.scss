@@ -290,3 +290,7 @@
         display: none !important;
     }
 }
+
+.profile-container:focus {
+    outline: none;
+}

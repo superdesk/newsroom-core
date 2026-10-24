@@ -8,7 +8,7 @@ function UserProfileMenu({links, onClick}: any) {
                 <a key={link.name}
                     href="#"
                     className={`nh-button w-100 nh-button--${link.active ? 'primary' : 'secondary'}`}
-                    title={link.name}
+                    aria-current={link.active ? 'page' : undefined}
                     onClick={(event) => onClick(event, link.name)}
                 >{link.label}</a>
             ))}

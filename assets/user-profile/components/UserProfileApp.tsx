@@ -77,6 +77,12 @@ class UserProfileApp extends React.Component<any, any> {
         }
     }
 
+    componentDidUpdate(prevProps: any) {
+        if (this.props.displayModal && !prevProps.displayModal) {
+            (document.querySelector('[data-test-id="profile-container"]') as HTMLElement | null)?.focus();
+        }
+    }
+
     isSectionEnabled(name: any) {
         return !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
     }
@@ -113,6 +119,7 @@ class UserProfileApp extends React.Component<any, any> {
                 data-test-id="profile-container"
                 className="profile-container"
                 role="dialog"
+                tabIndex={-1}
                 aria-label={links.find((link: any) => link.active).label}
             >
                 <div className="profileWrap">
