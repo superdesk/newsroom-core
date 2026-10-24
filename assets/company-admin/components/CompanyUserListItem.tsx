@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {gettext, fullDate} from 'utils';
+import {gettext, fullDate, onActivationKey} from 'utils';
 import {Label} from 'components/Label';
 
 export function getUserStateLabelDetails(user: any) {
@@ -38,6 +38,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
         <tr
             data-test-id={`user-list-item--${user._id}`}
             onClick={onClick}
+            onKeyDown={onActivationKey(onClick)}
             className={!selected ? undefined : 'table--selected'}
             tabIndex={0}
         >

@@ -15,7 +15,7 @@ export function CompanyDetailsProductRow({product, onNameClicked, showSeatReques
     return (
         <tr>
             <td className={textClassName}>
-                <a className="text-link text-link--text-color" onClick={onNameClicked}>{product.name}</a>
+                <button type="button" className="text-link text-link--text-color" onClick={onNameClicked}>{product.name}</button>
             </td>
             {getConfig('allow_companies_to_manage_products') && (
                 <td className={textClassName}>

@@ -52,6 +52,13 @@ a {
     }
 }
 
+button.text-link {
+    background: none;
+    padding: 0;
+    border-width: 0 0 1px;
+    font: inherit;
+}
+
 .home-section__header {
     display: flex;
     align-items: center;

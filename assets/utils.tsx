@@ -373,6 +373,19 @@ export function announce(message: string, assertive = false): void {
 }
 
 /**
+ * Keyboard handler for elements that act as buttons (for example clickable table rows): runs `callback` on Enter or
+ * Space pressed on the element itself, not on controls inside it.
+ */
+export function onActivationKey(callback: () => void) {
+    return (event: React.KeyboardEvent) => {
+        if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            callback();
+        }
+    };
+}
+
+/**
  * Wrapper for alertifyjs, which does not expose its notifications to screen readers
  */
 export const notify = {

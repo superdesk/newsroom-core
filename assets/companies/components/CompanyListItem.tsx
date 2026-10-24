@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import {gettext, shortDate, isInPast} from 'utils';
+import {gettext, shortDate, isInPast, onActivationKey} from 'utils';
 import {getCountryLabel} from '../utils';
 import {ICompany, ICountry} from 'interfaces';
 
@@ -18,6 +18,7 @@ export default function CompanyListItem({company, type, isActive, onClick, showS
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
             onClick={() => onClick(company._id)}
+            onKeyDown={onActivationKey(() => onClick(company._id))}
             tabIndex={0}
             data-test-id={`company-list-item--${company._id}`}
         >

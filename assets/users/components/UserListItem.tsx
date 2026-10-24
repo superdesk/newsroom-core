@@ -1,5 +1,5 @@
 import React from 'react';
-import {gettext, shortDate, fullDate} from 'utils';
+import {gettext, shortDate, fullDate, onActivationKey} from 'utils';
 import {getUserLabel} from '../utils';
 import {ICompany, IUser} from 'interfaces';
 
@@ -21,6 +21,7 @@ function UserListItem({user, isActive, onClick, companiesById}: IProps) {
                 ${isCompanyUserNotEnabled || isUserNotEnabled ? 'table-secondary' : ''}`
             }
             onClick={() => onClick(user._id)}
+            onKeyDown={onActivationKey(() => onClick(user._id))}
             tabIndex={0}
             data-test-id={`user-list-item--${user._id}`}
         >
