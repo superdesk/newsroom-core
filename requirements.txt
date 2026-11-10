@@ -8,7 +8,7 @@ xhtml2pdf>=0.2.4
 python3-saml>=1.15,<1.17
 
 quart-wtforms>=1.0.3,<1.1
-quart-rate-limiter>=0.10.0,<0.13
+quart-rate-limiter>=0.12.1,<0.13
 
 # Fix issue with xhtml2pdf not working with python-bidi>=0.5
 python-bidi<0.5
