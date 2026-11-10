@@ -292,6 +292,7 @@ class NewsroomWebApp(BaseNewsroomApp):
 
 def get_app(config=None, **kwargs) -> NewsroomWebApp:
     app = NewsroomWebApp(__name__, config=config, **kwargs)
+    app.configure_proxy_scheme()
 
     # register newsroom commands group
     app.register_blueprint(commands_blueprint)

@@ -230,6 +230,7 @@ EMAIL_DELIVERY_MONITOR_EXPIRES = int(
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
 PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "https://" in CLIENT_URL else "http")
+PROXY_FIX_TRUSTED_HOPS = int(os.environ.get("PROXY_FIX_TRUSTED_HOPS", "1"))
 
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
