@@ -4,13 +4,14 @@ on: [push, pull_request]
 
 jobs:
   e2e:
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
+        os: ['ubuntu-24.04']
         python-version: ['3.10']
         node-version: ['22']
+
+    runs-on: ${{ matrix.os }}
 
     services:
       redis:
@@ -44,9 +45,7 @@ jobs:
       - name: Install APT packages
         run: |
              sudo apt-get update
-             sudo apt-get install pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl
-      - name: Upgrade python tools
-        run: pip install --upgrade pip wheel setuptools
+             sudo apt-get install pkg-config libxml2-dev libxmlsec1-dev
       - name: Install python modules
         run: pip install -e .
       - name: Install CypressIO
