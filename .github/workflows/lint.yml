@@ -5,7 +5,7 @@ on: [ push, pull_request ]
 jobs:
 
   flake8:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7.0.0
@@ -16,7 +16,7 @@ jobs:
       - run: flake8
 
   mypy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7.0.0
@@ -27,7 +27,7 @@ jobs:
       - run: mypy .
 
   black:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7.0.0
