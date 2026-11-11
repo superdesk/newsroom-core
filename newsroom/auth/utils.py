@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from bson import ObjectId
 import werkzeug
-from quart_babel import gettext
+from quart_babel import gettext, lazy_gettext
 from uuid import uuid4
 
 from superdesk.core import get_current_app, get_current_async_app, get_app_config, get_current_auth
@@ -125,11 +125,13 @@ def get_current_request() -> Request:
 def get_user_from_request(request: Request | None) -> UserResourceModel:
     request = request or get_current_request()
     if request.user is None:
-        raise AuthorizationError(401, gettext("Not logged in"))
+        # use lazy_gettext because it's used inside get_session_locale
+        # and it would do infinite loop
+        raise AuthorizationError(401, lazy_gettext("Not logged in"))
     elif isinstance(request.user, str):
         # TODO-ASYNC: Fix this, the NewsAPI is setting the token on request.user
         # which is an invalid type
-        raise AuthorizationError(401, gettext("Invalid user instance"))
+        raise AuthorizationError(401, lazy_gettext("Invalid user instance"))
 
     return cast(UserResourceModel, request.user)
 
