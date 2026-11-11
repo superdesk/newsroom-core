@@ -12,6 +12,7 @@ import importlib
 
 from flask_mail import Mail
 from elasticapm.contrib.flask import ElasticAPM
+from hypercorn.middleware import ProxyFixMiddleware
 from pydantic import ValidationError
 
 from superdesk.flask import jsonify, request, render_template, g
@@ -279,6 +280,16 @@ class BaseNewsroomApp(SuperdeskEve):
             self.config["DOMAIN"][resource]["url"] = settings["regex_url"]
         elif "<regex(" in settings.get("url"):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
+
+    def configure_proxy_scheme(self):
+        if "https://" not in self.config["CLIENT_URL"]:
+            return
+
+        trusted_hops = self.config["PROXY_FIX_TRUSTED_HOPS"]
+        if not isinstance(trusted_hops, int) or trusted_hops < 0:
+            raise ValueError("PROXY_FIX_TRUSTED_HOPS must be a non-negative integer")
+
+        self.asgi_app = ProxyFixMiddleware(self.asgi_app, mode="legacy", trusted_hops=trusted_hops)
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):

@@ -77,6 +77,22 @@ After fetching latest code run the following commands:
 
 It will run database migrations when needed.
 
+### HTTPS reverse proxy
+
+When `CLIENT_URL` uses HTTPS, the web app and News API use Hypercorn's
+`ProxyFixMiddleware` in legacy mode. The `PROXY_FIX_TRUSTED_HOPS` app setting
+is read from the environment and defaults to `1`; set it to `0` to disable
+forwarded-header trust. Configure the
+proxy to overwrite `X-Forwarded-Proto` with the original external scheme.
+The middleware also trusts `X-Forwarded-For` and `X-Forwarded-Host`, so the proxy
+must sanitize those headers and the application must not be directly accessible
+to untrusted clients. Deployments with multiple forwarding proxies must set
+`PROXY_FIX_TRUSTED_HOPS` to the number of proxies setting these headers
+(for example, `PROXY_FIX_TRUSTED_HOPS=2`). Negative values are rejected.
+
+Without `X-Forwarded-Proto`, the incoming request scheme is preserved; HTTPS
+`CLIENT_URL` alone does not force HTTPS links during a request.
+
 
 ## Setup Superdesk to publish news items to Newshub
 

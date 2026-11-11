@@ -7,6 +7,7 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     CLIENT_URL,
+    PROXY_FIX_TRUSTED_HOPS,
     AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
     LOG_CONFIG_FILE,
     CACHE_REDIS_URL,
