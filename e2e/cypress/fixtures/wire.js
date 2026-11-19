@@ -66,7 +66,7 @@ function segment(index, {ancestors, nextversion}) {
         _id: `${SEGMENT_ROOT}.${index}`,
         type: 'text',
         version: index + 1,
-        versioncreated: `2026-08-24T0${index}:00:00+0000`,
+        versioncreated: moment().subtract(2 - index, 'hours'),
         headline: `RDI segment wire #${index + 1}`,
         slugline: 'rdi-segment wire',
         body_html: `<p>Distinct body of segment ${index + 1} of 3.</p>`,
