@@ -267,17 +267,21 @@ async def send_user_email(
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
     **kwargs: Unpack[EmailKwargs],
-) -> None:
-    """Send an email to Newsroom user, respecting user's email preferences."""
+) -> bool:
+    """Return whether the email send call completed, or False if the user was skipped.
+
+    Completion does not confirm delivery; the configured mail transport may suppress sending.
+    """
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
 
     if (not user_dict.get("receive_email") and not ignore_preferences) or (not user_dict.get("is_enabled")):
         # skip user if has emails disabled or the user is not enabled
-        return
+        return False
 
     language = user_dict.get("locale") or get_app_config("DEFAULT_LANGUAGE")
     timezone = get_user_timezone(user_dict)
     await _send_localized_email([user_dict["email"]], template, language, timezone, template_kwargs or {}, kwargs)
+    return True
 
 
 async def send_template_email(

@@ -1,7 +1,10 @@
 import logging
+from collections import Counter
 from bson import ObjectId
 from datetime import datetime, timedelta
+from time import monotonic
 from typing import Any, TypedDict
+from uuid import uuid4
 
 from newsroom.users.service import UsersService
 from superdesk.core import get_app_config
@@ -45,28 +48,56 @@ TopicMatchTable = dict[str, list[tuple[str, int]]]
 
 
 class SendScheduledNotificationEmails:
+    def __init__(self):
+        self.log_msg = f"Scheduled Notifications: run_id={uuid4().hex}"
+        self.stats: Counter[str] = Counter()
+
     async def run(self, force: bool = False):
         """
         Initiates the process to send scheduled notification emails. Acquires a lock
         to ensure no concurrent execution and invokes the schedule runner.
         """
 
-        self.log_msg = "Scheduled Notifications: {}".format(utcnow())
-        logger.info(f"{self.log_msg} Starting to send scheduled notifications")
+        self.log_msg = f"Scheduled Notifications: run_id={uuid4().hex}"
+        self.stats.clear()
+        started = monotonic()
+        logger.info(
+            "%s Starting to send scheduled notifications now_utc=%s force=%s mail_suppress_send=%s testing=%s",
+            self.log_msg,
+            utcnow(),
+            force,
+            get_app_config("MAIL_SUPPRESS_SEND", None),
+            get_app_config("TESTING", False),
+        )
 
         lock_name = get_lock_id("newsroom", "send_scheduled_notifications")
         if not lock(lock_name, expire=610):
-            logger.error("Send scheduled notifications task already running")
+            logger.error("%s Skipping run reason=already_running", self.log_msg)
             return
 
         try:
             await self.run_schedules(force)
-        except Exception as e:
-            logger.exception("Error occurred while running scheduled notifications: %s", e)
+        except Exception:
+            self.stats["failures"] += 1
+            logger.exception("%s Error occurred while running scheduled notifications", self.log_msg)
         finally:
             unlock(lock_name)
 
-        logger.info(f"{self.log_msg} Completed sending scheduled notifications")
+        logger.info(
+            "%s Completed scheduled notification run status=%s queues_examined=%s users_due=%s "
+            "send_completed=%s skipped_not_due=%s skipped_inactive_or_missing=%s skipped_email=%s "
+            "failures=%s duration_seconds=%.3f",
+            self.log_msg,
+            "completed_with_errors" if self.stats["failures"] else "completed",
+            self.stats["queues_examined"],
+            self.stats["users_due"],
+            self.stats["send_completed"],
+            self.stats["skipped_not_due"],
+            self.stats["skipped_inactive_or_missing"],
+            self.stats["skipped_email"],
+            self.stats["failures"],
+            monotonic() - started,
+        )
 
     async def run_schedules(self, force: bool):
         """
@@ -84,19 +115,31 @@ class SendScheduledNotificationEmails:
 
             schedules_cursor = await notification_queue_service.search({})
             schedules = await schedules_cursor.to_list()
-        except Exception as e:
-            logger.exception(e)
-            logger.error("Failed to retrieve data to run schedules")
+        except Exception:
+            self.stats["failures"] += 1
+            logger.exception("%s Failed to retrieve data to run schedules", self.log_msg)
             return
 
         for schedule in schedules:
+            self.stats["queues_examined"] += 1
             try:
                 user = users.get(schedule.user)
 
                 if not user:
+                    self.stats["skipped_inactive_or_missing"] += 1
+                    logger.info(
+                        "%s Skipping user=%s reason=user_missing_or_user_company_inactive_or_expired",
+                        self.log_msg,
+                        schedule.user,
+                    )
                     # User not found, this account might be disabled
                     # Reset the queue for this user, so it does not get checked on future runs
                     await notification_queue_service.reset_queue(schedule.user)
+                    logger.info(
+                        "%s Queue cleared user=%s reason=user_missing_or_user_company_inactive_or_expired",
+                        self.log_msg,
+                        schedule.user,
+                    )
                     continue
 
                 if not user.notification_schedule:
@@ -113,9 +156,9 @@ class SendScheduledNotificationEmails:
 
                 company = companies.get(user.company) if user.company else None
                 await self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user.id) or {}, force)
-            except Exception as e:
-                logger.exception(e)
-                logger.error("Failed to run schedule for user %s", schedule.user)
+            except Exception:
+                self.stats["failures"] += 1
+                logger.exception("%s Failed to run schedule for user=%s", self.log_msg, schedule.user)
 
     async def process_schedule(
         self,
@@ -140,8 +183,19 @@ class SendScheduledNotificationEmails:
         if not user.notification_schedule or not self.is_scheduled_to_run_for_user(
             user.notification_schedule, now_local, force
         ):
+            self.stats["skipped_not_due"] += 1
+            logger.debug(
+                "%s Skipping user=%s reason=schedule_not_due timezone=%s now_local=%s times=%s last_run_time=%s",
+                self.log_msg,
+                user.id,
+                timezone,
+                now_local,
+                user.notification_schedule.times if user.notification_schedule else [],
+                user.notification_schedule.last_run_time if user.notification_schedule else None,
+            )
             return
 
+        self.stats["users_due"] += 1
         # Set the timezone on the session, so Babel is able to get the timezone for this user
         # when rendering the email, otherwise it uses the system default
         set_session_timezone(timezone)
@@ -159,21 +213,43 @@ class SendScheduledNotificationEmails:
 
         if not len(topic_entries["wire"]) and not len(topic_entries["agenda"]):
             # No item's matched this topic queue, send an email indicating no matches
-            await send_user_email(
-                user,
-                template="scheduled_notification_no_matches_email",
-                template_kwargs=template_kwargs,
-            )
+            template = "scheduled_notification_no_matches_email"
         else:
             # Items matched this topic queue, send an email indicated matches
-            await send_user_email(
-                user,
-                template="scheduled_notification_topic_matches_email",
-                template_kwargs=template_kwargs,
+            template = "scheduled_notification_topic_matches_email"
+
+        logger.info(
+            "%s Email send attempt user=%s template=%s queued_items=%s wire_entries=%s agenda_entries=%s timezone=%s",
+            self.log_msg,
+            user.id,
+            template,
+            sum(len(topic.items) for topic in schedule.topics),
+            len(topic_entries["wire"]),
+            len(topic_entries["agenda"]),
+            timezone,
+        )
+        send_completed = await send_user_email(user, template=template, template_kwargs=template_kwargs)
+        if send_completed:
+            self.stats["send_completed"] += 1
+            logger.info("%s Email send call completed user=%s template=%s", self.log_msg, user.id, template)
+        else:
+            self.stats["skipped_email"] += 1
+            logger.info(
+                "%s Email skipped user=%s template=%s reason=%s",
+                self.log_msg,
+                user.id,
+                template,
+                "user_disabled" if not user.is_enabled else "email_disabled",
             )
 
         # Now clear the topic match queue
         await self._clear_user_notification_queue(user)
+        logger.info(
+            "%s Queue cleared and last_run_time updated user=%s reason=%s",
+            self.log_msg,
+            user.id,
+            "send_call_completed" if send_completed else "email_skipped",
+        )
 
     def is_scheduled_to_run_for_user(
         self, schedule: NotificationScheduleModel, now_local: datetime, force: bool
