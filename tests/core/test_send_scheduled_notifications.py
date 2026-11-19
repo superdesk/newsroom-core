@@ -4,6 +4,7 @@ from bson import ObjectId
 from datetime import datetime, timedelta, timezone
 
 from newsroom.topics.topics_async import TopicService
+from newsroom.users import UsersService
 from superdesk.utc import utcnow, utc_to_local
 from newsroom.types import (
     NotificationQueue,
@@ -247,49 +248,78 @@ async def test_is_scheduled_to_run_for_user():
         assert command.is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
 
 
-async def test_scheduled_notification_run_logging(user, mocker, caplog):
+async def test_scheduled_notification_run_logging(app, mocker, caplog):
     now = datetime(2026, 11, 17, 15, tzinfo=timezone.utc)
-    users = []
-    for receive_email, scheduled_time in [(True, "15:00"), (False, "15:00"), (True, "16:00"), (True, "15:00")]:
-        data = {
-            **user,
-            "_id": ObjectId(),
-            "receive_email": receive_email,
-            "notification_schedule": {"timezone": "UTC", "times": [scheduled_time]},
-        }
-        users.append(UserResourceModel.from_dict(data))
+    users = await UsersService().create(
+        [
+            {
+                "first_name": "Scheduled",
+                "last_name": "User",
+                "email": f"scheduled-{index}@example.com",
+                "user_type": "administrator",
+                "receive_email": receive_email,
+                "is_enabled": is_enabled,
+                "notification_schedule": {"timezone": "UTC", "times": [scheduled_time]},
+            }
+            for index, (receive_email, scheduled_time, is_enabled) in enumerate(
+                [
+                    (True, "15:00", True),
+                    (False, "15:00", True),
+                    (True, "16:00", True),
+                    (True, "15:00", True),
+                    (True, "15:00", False),
+                ]
+            )
+        ]
+    )
+    topic = (
+        await TopicService().create(
+            [
+                {
+                    "label": "Cheesy Stuff",
+                    "query": "cheese",
+                    "topic_type": "wire",
+                    "subscribers": [{"user_id": u.id, "notification_type": "scheduled"} for u in users],
+                }
+            ]
+        )
+    )[0]
+    item = {
+        "_id": "scheduled-cheese-item",
+        "type": "text",
+        "headline": "Demo cheese article",
+        "body_html": "<p>A story about cheese.</p>",
+        "versioncreated": now,
+    }
+    await create_entries_for("items", [item])
+    service = NotificationQueueService()
+    for user in users:
+        await service.add_item_to_queue(user.id, "wire", topic.id, item)
 
-    missing_user = ObjectId()
-    queues = [NotificationQueue(user=user_id, topics=[]) for user_id in [*(u.id for u in users), missing_user]]
-    service = mocker.Mock()
-    service.search = mocker.AsyncMock(return_value=mocker.Mock(to_list=mocker.AsyncMock(return_value=queues)))
-    service.reset_queue = mocker.AsyncMock()
-    mocker.patch("newsroom.notifications.commands.NotificationQueueService", return_value=service)
     mocker.patch("newsroom.notifications.commands.utcnow", return_value=now)
-    mocker.patch("newsroom.notifications.commands.lock", return_value=True)
-    unlock = mocker.patch("newsroom.notifications.commands.unlock")
-    mocker.patch("newsroom.notifications.commands.get_user_dict_async", return_value={u.id: u for u in users})
-    mocker.patch("newsroom.notifications.commands.get_company_dict_async", return_value={})
-    mocker.patch("newsroom.notifications.commands.get_user_id_to_topic_for_subscribers", return_value={})
-    transport = mocker.patch(
-        "newsroom.email._send_localized_email",
-        side_effect=[None, RuntimeError("transport unavailable")],
-    )
+    send = app.mail.send
+
+    def send_with_failure(message):
+        if message.recipients == [users[3].email]:
+            raise RuntimeError("transport unavailable")
+        return send(message)
+
+    mocker.patch.object(app.mail, "send", side_effect=send_with_failure)
     command = SendScheduledNotificationEmails()
-    mocker.patch.object(
-        command,
-        "get_topic_entries_and_match_table",
-        return_value=({"wire": [], "agenda": []}, {"wire": [], "agenda": []}),
-    )
-    clear_queue = mocker.patch.object(command, "_clear_user_notification_queue")
-
     with caplog.at_level(logging.DEBUG, logger="newsroom.notifications.commands"):
-        await command.run()
+        with app.mail.record_messages() as outbox:
+            await command.run()
 
-    assert transport.await_count == 2
-    assert [call.args[0].id for call in clear_queue.await_args_list] == [users[0].id, users[1].id]
-    service.reset_queue.assert_awaited_once_with(missing_user)
-    unlock.assert_called_once()
+    assert len(outbox) == 1
+    assert outbox[0].recipients == [users[0].email]
+    assert "Demo cheese article" in outbox[0].body
+    remaining = await service.search({})
+    assert {queue.user for queue in await remaining.to_list()} == {users[2].id, users[3].id}
+    for index, user in enumerate(users):
+        saved = await UsersService().find_by_id(user.id)
+        assert saved is not None
+        assert saved.notification_schedule is not None
+        assert saved.notification_schedule.last_run_time == (now if index in (0, 1) else None)
     messages = [record.getMessage() for record in caplog.records if record.name == "newsroom.notifications.commands"]
     assert messages
     assert all(message.startswith(command.log_msg) for message in messages)
@@ -301,23 +331,20 @@ async def test_scheduled_notification_run_logging(user, mocker, caplog):
     assert "reason=user_missing_or_user_company_inactive_or_expired" in caplog.text
     assert f"Failed to run schedule for user={users[3].id}" in caplog.text
     assert "transport unavailable" in caplog.text
-    assert "template=scheduled_notification_no_matches_email queued_items=0" in caplog.text
+    assert "template=scheduled_notification_topic_matches_email queued_items=1 wire_entries=1" in caplog.text
     assert (
         "status=completed_with_errors queues_examined=5 users_due=3 send_completed=1 "
         "skipped_not_due=1 skipped_inactive_or_missing=1 skipped_email=1 failures=1 duration_seconds="
     ) in caplog.text
-    assert user["email"] not in caplog.text
+    assert all(user.email not in "\n".join(messages) for user in users)
 
 
 async def test_scheduled_notification_data_failure_logging(mocker, caplog):
-    mocker.patch("newsroom.notifications.commands.lock", return_value=True)
-    unlock = mocker.patch("newsroom.notifications.commands.unlock")
-    mocker.patch("newsroom.notifications.commands.get_company_dict_async", side_effect=RuntimeError("data unavailable"))
+    mocker.patch.object(NotificationQueueService, "search", side_effect=RuntimeError("data unavailable"))
 
     with caplog.at_level(logging.INFO, logger="newsroom.notifications.commands"):
         await SendScheduledNotificationEmails().run()
 
-    unlock.assert_called_once()
     assert "Failed to retrieve data to run schedules" in caplog.text
     assert "data unavailable" in caplog.text
     assert "status=completed_with_errors queues_examined=0 users_due=0 send_completed=0" in caplog.text
