@@ -1,4 +1,5 @@
 import pathlib
+import pytest
 from copy import deepcopy
 
 from quart import render_template_string, json, url_for
@@ -235,7 +236,9 @@ async def test_send_user_email(app):
     date = datetime(2024, 4, 9, 11, 0, 0)
     template_kwargs = dict(date=date, topic_match_table={"wire": [], "agenda": []}, entries={})
     with mock.patch("newsroom.email.send_email") as send_email_mock:
-        await send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
+        assert await send_user_email(
+            user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs
+        )
         assert send_email_mock.called
         assert "at 14:00 PM" in send_email_mock.call_args[1]["subject"]
         assert "sujet" not in send_email_mock.call_args[1]["text_body"]
@@ -252,6 +255,17 @@ async def test_send_user_email(app):
         user["notification_schedule"] = None
         await send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
         assert "at 13:00 PM" in send_email_mock.call_args[1]["subject"]  # default timezone Europe/Prague
+
+
+@pytest.mark.parametrize(
+    "receive_email,is_enabled,ignore_preferences,expected",
+    [(False, True, False, False), (True, False, False, False), (False, True, True, True), (False, False, True, False)],
+)
+async def test_send_user_email_skip_outcome(receive_email, is_enabled, ignore_preferences, expected):
+    user = User(email="foo@example.com", receive_email=receive_email, is_enabled=is_enabled)
+    with mock.patch("newsroom.email._send_localized_email", new_callable=mock.AsyncMock) as send:
+        assert await send_user_email(user, "test_template", ignore_preferences=ignore_preferences) is expected
+        assert send.await_count == int(expected)
 
 
 @markers.requires_async_celery

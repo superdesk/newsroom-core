@@ -93,6 +93,23 @@ to untrusted clients. Deployments with multiple forwarding proxies must set
 Without `X-Forwarded-Proto`, the incoming request scheme is preserved; HTTPS
 `CLIENT_URL` alone does not force HTTPS links during a request.
 
+### Debugging scheduled notification emails
+
+The `newsroom.notifications.commands` logger records each scheduled run with a
+`run_id`. INFO messages include per-user email attempts, template names, queued
+item counts, send-call outcomes, queue clearing, and a summary of examined queues,
+due users, completed send calls, skips, failures, and duration. User IDs are logged,
+not recipient addresses or message bodies. Enable DEBUG for this logger to see
+schedule-not-due skips with the user's timezone, configured times, and last run.
+
+`send_completed` means the email send call returned without an exception, not
+that a provider accepted or delivered the message. Check the run's
+`mail_suppress_send` and `testing` settings; `mail_suppress_send=None` means it was
+not explicitly configured, so the mail library's default applies. The mail
+interface does not expose a provider message ID; use transport/provider logs to
+confirm delivery. Existing behavior is unchanged: queues are also cleared when
+user email preferences prevent sending, now explicitly logged as `email_skipped`.
+
 
 ## Setup Superdesk to publish news items to Newshub
 
