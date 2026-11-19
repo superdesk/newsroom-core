@@ -75,7 +75,9 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         const times = [...this.state.times];        
 
         if (props.type === 'add') {
-            times.push(this.state.times[this.state.times.length - 1]);
+            times.push(
+                times[times.length - 1] ?? getScheduledNotificationConfig().default_times[0] ?? '00:00'
+            );
         } else {
             times.splice(props.index, 1);
         }
