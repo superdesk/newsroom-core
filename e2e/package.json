@@ -16,7 +16,7 @@
     "cypress-ui": "cypress open",
     "cypress-ci": "cypress run",
     "build": "webpack --mode production --progress",
-    "start": "webpack-dev-server --mode development --progress --host 0.0.0.0",
+    "start": "webpack-dev-server --mode development --progress --host 0.0.0.0 --no-client-overlay",
     "start-client-server": "http-server dist -p 8080 -s"
   },
   "volta": {
