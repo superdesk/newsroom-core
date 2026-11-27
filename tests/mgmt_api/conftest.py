@@ -3,7 +3,8 @@ import time
 from pathlib import Path
 from authlib.jose import jwt
 from pytest import fixture
-from newsroom.tests.conftest import drop_mongo, update_config, reset_elastic
+from newsroom.tests.db import drop_mongo, reset_elastic
+from newsroom.tests.app import get_test_config
 
 root = (Path(__file__).parent / "..").resolve()
 sys.path.insert(0, str(root))
@@ -33,12 +34,9 @@ async def init_items():
 
 @fixture
 async def app():
-    from quart import Config
     from newsroom.mgmt_api.factory import NewsroomMGMTAPI
 
-    cfg = Config(root)
-    cfg.from_object("newsroom.mgmt_api.default_settings")
-    update_config(cfg)
+    cfg = get_test_config(config_path="newsroom.mgmt_api.default_settings")
     cfg["AUTH_SERVER_SHARED_SECRET"] = AUTH_SECRET
     drop_mongo(cfg)
     app = NewsroomMGMTAPI(config=cfg, testing=True)

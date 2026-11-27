@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
 from pytest import fixture
-from newsroom.tests.conftest import drop_mongo, update_config, reset_elastic
+from newsroom.tests.db import drop_mongo, reset_elastic
+from newsroom.tests.app import get_test_config
 
 root = (Path(__file__).parent / "..").resolve()
 sys.path.insert(0, str(root))
@@ -29,12 +30,9 @@ async def init_items():
 
 @fixture
 async def app():
-    from quart import Config
     from newsroom.news_api.factory import NewsroomNewsAPI
 
-    cfg = Config(root)
-    cfg.from_object("newsroom.news_api.default_settings")
-    update_config(cfg)
+    cfg = get_test_config(config_path="newsroom.news_api.default_settings")
     drop_mongo(cfg)
     app = NewsroomNewsAPI(config=cfg, testing=True)
 

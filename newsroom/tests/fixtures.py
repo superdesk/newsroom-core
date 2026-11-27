@@ -1,4 +1,4 @@
-from typing import List
+from copy import deepcopy
 from pytz import utc
 from bson import ObjectId
 from pytest import fixture
@@ -261,6 +261,37 @@ agenda_items = [
     },
 ]
 
+PRODUCTS: list[Product] = [
+    {
+        "_id": PRODUCT_1_ID,
+        "name": "product test",
+        "query": "headline:more",
+        "is_enabled": True,
+        "product_type": "wire",
+    },
+    {
+        "_id": PRODUCT_2_ID,
+        "name": "product test 2",
+        "query": "headline:Weather",
+        "is_enabled": True,
+        "product_type": "wire",
+    },
+    {
+        "_id": PRODUCT_3_ID,
+        "name": "all content",
+        "query": "*:*",
+        "is_enabled": True,
+        "product_type": "wire",
+    },
+    {
+        "_id": PRODUCT_ALL_AGENDA_ID,
+        "name": "all agenda",
+        "query": "*:*",
+        "is_enabled": True,
+        "product_type": "agenda",
+    },
+]
+
 
 @fixture(autouse=True)
 async def init_items(request, app):
@@ -312,6 +343,7 @@ async def init_auth(app, auth_users):
 
 
 async def setup_user_company(app):
+    await create_company_products()
     await create_entries_for(
         "companies",
         [
@@ -430,37 +462,9 @@ async def restrict_user(app, init_company):
 
 @fixture
 async def company_products(app):
-    _products: List[Product] = [
-        {
-            "_id": PRODUCT_1_ID,
-            "name": "product test",
-            "query": "headline:more",
-            "is_enabled": True,
-            "product_type": "wire",
-        },
-        {
-            "_id": PRODUCT_2_ID,
-            "name": "product test 2",
-            "query": "headline:Weather",
-            "is_enabled": True,
-            "product_type": "wire",
-        },
-        {
-            "_id": PRODUCT_3_ID,
-            "name": "all content",
-            "query": "*:*",
-            "is_enabled": True,
-            "product_type": "wire",
-        },
-        {
-            "_id": PRODUCT_ALL_AGENDA_ID,
-            "name": "all agenda",
-            "query": "*:*",
-            "is_enabled": True,
-            "product_type": "agenda",
-        },
-    ]
+    await create_company_products()
 
-    await create_entries_for("products", _products)
 
-    return _products
+async def create_company_products():
+    await create_entries_for("products", deepcopy(PRODUCTS))
+    return PRODUCTS

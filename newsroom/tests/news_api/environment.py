@@ -1,61 +1,31 @@
-import asyncio
-from superdesk.tests import setup as setup_app
 from superdesk.tests.environment import setup_before_all
-import logging
+from superdesk.tests.utils import set_use_eve
 
 from newsroom.news_api.factory import get_app
-from newsroom.news_api.default_settings import CORE_APPS, MODULES
+from newsroom.tests.app import get_test_config
 
 
-logger = logging.getLogger(__name__)
+def _get_app(config: dict):
+    app = get_app(config)
+    set_use_eve(app.async_app, False)
+    return app
 
 
 def before_all(context):
-    config = {
-        "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
-        "MODULES": MODULES,
-        "INSTALLED_APPS": [],
-        "ELASTICSEARCH_FORCE_REFRESH": True,
-        "NEWS_API_ENABLED": True,
-        "NEWS_API_TIME_LIMIT_DAYS": 100,
-        "SITE_NAME": "Newsroom",
-        "CACHE_TYPE": "null",
-    }
-    setup_before_all(context, config, app_factory=get_app)
+    config = get_test_config(
+        {"BEHAVE": True, "NEWS_API_ENABLED": True, "NEWS_API_TIME_LIMIT_DAYS": 100},
+        config_path="newsroom.news_api.default_settings",
+        test_name="behave",
+    )
+    setup_before_all(context, config, app_factory=_get_app, before_test=before_test)
 
 
-def before_scenario(context, scenario):
-    if "skip" in scenario.tags:
-        scenario.skip("Marked with @skip")
-        return
-
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(before_scenario_async(context, scenario))
-    except Exception as e:
-        # Make sure exceptions raised are printed to the console
-        logger.exception(e)
-        raise e
-
-
-async def before_scenario_async(context, scenario):
-    config = {
-        "BEHAVE": True,
-        "CORE_APPS": CORE_APPS,
-        "MODULES": MODULES,
-        "INSTALLED_APPS": [],
-        "ELASTICSEARCH_FORCE_REFRESH": True,
-        "NEWS_API_ENABLED": True,
-        "NEWS_API_TIME_LIMIT_DAYS": 100,
-        "SITE_NAME": "Newsroom",
-        "CACHE_TYPE": "null",
-        "ASYNC_AUTH_CLASS": "newsroom.news_api.api_tokens.auth:CompanyTokenAuth",
-    }
-
+async def before_test(context, scenario):
     if "rate_limit" in scenario.tags:
-        config["RATE_LIMIT_PERIOD"] = 300  # 5 minutes
-        config["RATE_LIMIT_REQUESTS"] = 2
+        context.app.config["RATE_LIMIT_PERIOD"] = 300  # 5 minutes
+        context.app.config["RATE_LIMIT_REQUESTS"] = 2
+    else:
+        context.app.config.pop("RATE_LIMIT_PERIOD", None)
+        context.app.config.pop("RATE_LIMIT_REQUESTS", None)
 
-    await setup_app(context, config, app_factory=get_app, reset=True)
     context.headers = []
