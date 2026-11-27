@@ -10,8 +10,6 @@ import re
 import pathlib
 import importlib
 
-from flask_mail import Mail
-from elasticapm.contrib.flask import ElasticAPM
 from pydantic import ValidationError
 
 from superdesk.flask import jsonify, request, render_template, g
@@ -58,7 +56,6 @@ class BaseNewsroomApp(SuperdeskEve):
         self.mail = None
         self.cache = None
         self.static_folder = None
-        self.apm = None
         self.__self__ = self
         self.__func__ = None
         self._superdesk_cache = None
@@ -86,7 +83,6 @@ class BaseNewsroomApp(SuperdeskEve):
 
         self.setup_error_handlers()
         self.setup_sentry()
-        self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
         self.setup_apps(self.config["CORE_APPS"])
@@ -95,7 +91,6 @@ class BaseNewsroomApp(SuperdeskEve):
             self.setup_apps(self.config.get("INSTALLED_APPS", []))
         # load blueprints after apps just in case some views are added by apps
         self.setup_blueprints(self.config["BLUEPRINTS"])
-        self.setup_email()
         self.setup_cache()
 
         if not self.config.get("TESTING"):
@@ -167,9 +162,6 @@ class BaseNewsroomApp(SuperdeskEve):
             if hasattr(mod, "init_app"):
                 mod.init_app(self)
 
-    def setup_email(self):
-        self.mail = Mail(self)
-
     def setup_cache(self):
         cache_backend.init_app(self)
         self.cache = NewshubCache(self)
@@ -226,6 +218,7 @@ class BaseNewsroomApp(SuperdeskEve):
             else:
                 return await render_template("500.html"), 500
 
+        # TODO-PR: Check this
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
@@ -258,32 +251,9 @@ class BaseNewsroomApp(SuperdeskEve):
         if g:  # reset settings cache
             g.settings = None
 
-    def setup_apm(self):
-        if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
-            self.config["ELASTIC_APM"] = {
-                "DEBUG": self.debug,
-                "ENVIRONMENT": self._get_apm_environment(),
-                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME")
-                or self.config.get("SITE_NAME")
-                or self.SERVICE_NAME,
-                "SERVER_URL": self.config["APM_SERVER_URL"],
-                "SECRET_TOKEN": self.config["APM_SECRET_TOKEN"],
-                "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS"],
-            }
-
-            self.apm = ElasticAPM(self)
-
     def register_resource(self, resource, settings):
         super().register_resource(resource, settings)
         if settings.get("regex_url"):  # fix hateoas
             self.config["DOMAIN"][resource]["url"] = settings["regex_url"]
         elif "<regex(" in settings.get("url"):
             self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
-
-    def _get_apm_environment(self):
-        if self.config.get("CLIENT_URL"):
-            if re.search(r"-(dev|demo|test|staging)", self.config["CLIENT_URL"]):
-                return "staging"
-            if "localhost" in self.config["CLIENT_URL"] or self.debug:
-                return "testing"
-        return "production"
