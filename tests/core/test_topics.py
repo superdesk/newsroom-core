@@ -16,7 +16,7 @@ from ..fixtures import (  # noqa: F401
     TEST_USER_ID,
     COMPANY_1_ID,
 )
-from ..utils import mock_send_email, get_resource_by_id  # noqa
+from ..utils import get_resource_by_id  # noqa
 from tests import utils
 from tests.core.utils import create_entries_for
 from newsroom.topics.topics_async import TopicService
@@ -134,7 +134,6 @@ async def test_delete_topic(client, navigation_items):
     assert 0 == len(data["_items"])
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_wire_topics(client, app, navigation_items):
     topic = deepcopy(base_topic)
     topic_ids = await create_entries_for("topics", [topic])
@@ -153,7 +152,7 @@ async def test_share_wire_topics(client, app, navigation_items):
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["test@bar.com"]
+        assert outbox[0].recipients == "test@bar.com"
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "From Newshub: %s" % topic["label"]
         assert "Hi Test Bar" in outbox[0].body
@@ -163,7 +162,6 @@ async def test_share_wire_topics(client, app, navigation_items):
         assert "/wire" in outbox[0].body
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_agenda_topics(client, app, navigation_items):
     topic_ids = await create_entries_for("topics", [agenda_topic])
     agenda_topic["_id"] = topic_ids[0]
@@ -181,7 +179,7 @@ async def test_share_agenda_topics(client, app, navigation_items):
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["test@bar.com"]
+        assert outbox[0].recipients == "test@bar.com"
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "From Newshub: %s" % agenda_topic["label"]
         assert "Hi Test Bar" in outbox[0].body

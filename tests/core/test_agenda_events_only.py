@@ -16,9 +16,8 @@ from tests.fixtures import (  # noqa: F401
     PUBLIC_USER_NAME,
     COMPANY_1_ID,
 )
-from tests.utils import post_json, mock_send_email, login_public
+from tests.utils import post_json, login_public
 from .test_push_events import test_event, test_planning
-from unittest import mock
 
 NAV_1 = ObjectId("5e65964bf5db68883df561c0")
 NAV_2 = ObjectId("5e65964bf5db68883df561c1")
@@ -145,7 +144,6 @@ async def set_watch_products(app):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
@@ -184,7 +182,6 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     await set_watch_products(app)
@@ -217,7 +214,6 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
     assert notifications[0]["user"] == PUBLIC_USER_ID
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
@@ -239,7 +235,6 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
     push_mock.assert_not_called()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -265,7 +260,6 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
     push_mock.assert_not_called()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)

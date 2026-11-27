@@ -8,7 +8,7 @@ from newsroom.wire import WIRE_NESTED_SEARCH_FIELDS
 from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import deep_get
-from newsroom.tests.conftest import reset_elastic
+from newsroom.tests.db import reset_elastic
 
 
 test_event_1 = {

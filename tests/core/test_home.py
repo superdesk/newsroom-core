@@ -9,7 +9,7 @@ from newsroom.tests.fixtures import PUBLIC_USER_ID
 from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 
-async def test_personal_dashboard_data(client, app, company_products):
+async def test_personal_dashboard_data(client, app):
     user = await find_one_by_id("users", PUBLIC_USER_ID)
     assert user
 
@@ -46,7 +46,7 @@ async def test_personal_dashboard_data(client, app, company_products):
     assert topic_items[0]["items"][0]["_access"]
 
 
-async def test_dashboard_data(client, app, company_products):
+async def test_dashboard_data(client, app):
     app.config["PERMISSION_DASHBOARD_CARDS"] = True
     user = await find_one_by_id("users", PUBLIC_USER_ID)
     assert user
@@ -55,22 +55,6 @@ async def test_dashboard_data(client, app, company_products):
     wire_product_id = ObjectId()
     wire_product_restrictive_id = ObjectId()
     card_id = ObjectId()
-
-    await create_entries_for(
-        "companies",
-        [
-            {
-                "_id": company_id,
-                "name": "Test Company",
-                "is_enabled": True,
-                "products": [
-                    {"_id": wire_product_restrictive_id, "section": SectionEnum.WIRE.value},
-                ],
-                "sections": {"wire": True},
-            }
-        ],
-    )
-    await update_entries_for("users", user["_id"], {"company": company_id, "user_type": UserRole.PUBLIC.value}, user)
 
     await create_entries_for(
         "products",
@@ -91,6 +75,21 @@ async def test_dashboard_data(client, app, company_products):
             },
         ],
     )
+    await create_entries_for(
+        "companies",
+        [
+            {
+                "_id": company_id,
+                "name": "Test Company",
+                "is_enabled": True,
+                "products": [
+                    {"_id": wire_product_restrictive_id, "section": SectionEnum.WIRE.value},
+                ],
+                "sections": {"wire": True},
+            }
+        ],
+    )
+    await update_entries_for("users", user["_id"], {"company": company_id, "user_type": UserRole.PUBLIC.value}, user)
 
     card = await CardsResourceService().create(
         [

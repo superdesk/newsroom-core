@@ -76,7 +76,7 @@ async def test_delete_card_succeeds(client):
 async def test_validate_create_card(client):
     card = dict()
     response = await client.post("/cards/new", form=dict(card=json.dumps(card)))
-    assert response.status_code == 400
+    assert response.status_code == 400, await response.get_data(as_text=True)
     data = await response.get_json()
     assert "required" in data["label"]
     assert "required" in data["type"]
@@ -86,7 +86,7 @@ async def test_validate_create_card(client):
         type=DashboardCardType.PIC_TEXT_4,
     )
     response = await client.post("/cards/new", form=dict(card=json.dumps(card)))
-    assert response.status_code == 400
+    assert response.status_code == 400, await response.get_data(as_text=True)
     data = await response.get_json()
     assert "label" in data
     assert "type" not in data
@@ -96,14 +96,14 @@ async def test_validate_create_card(client):
         type="foo_bar_types",
     )
     response = await client.post("/cards/new", form=dict(card=json.dumps(card)))
-    assert response.status_code == 400
+    assert response.status_code == 400, await response.get_data(as_text=True)
     data = await response.get_json()
     assert "label" not in data
     assert "type" in data
 
     card = dict(label="Local News", type=DashboardCardType.PIC_TEXT_4)
     response = await client.post("/cards/new", form=dict(card=json.dumps(card)))
-    assert response.status_code == 201
+    assert response.status_code == 201, await response.get_data(as_text=True)
 
 
 async def test_validate_update_card(client):

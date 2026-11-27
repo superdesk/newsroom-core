@@ -34,11 +34,11 @@ async def init(app):
     global service
     service = BaseSearchService()
 
+    await create_entries_for("products", PRODUCTS)
+    await create_entries_for("navigations", NAVIGATIONS)
+    await create_entries_for("section_filters", SECTION_FILTERS)
     await create_entries_for("companies", COMPANIES)
     await create_entries_for("auth_user", USERS)
-    await create_entries_for("navigations", NAVIGATIONS)
-    await create_entries_for("products", PRODUCTS)
-    await create_entries_for("section_filters", SECTION_FILTERS)
 
 
 async def test_apply_section_filter(client, app):

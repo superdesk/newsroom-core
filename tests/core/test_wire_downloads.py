@@ -172,7 +172,7 @@ async def _setup_company_user_products(client, app) -> bson.ObjectId:
         "products",
         [
             {
-                "name": "product test",
+                "name": "product test a",
                 "sd_product_id": "123",
                 "companies": [company_id],
                 "is_enabled": True,

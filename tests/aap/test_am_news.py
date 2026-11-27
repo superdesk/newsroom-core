@@ -6,7 +6,7 @@ from tests.fixtures import (  # noqa: F401
     init_company,
     PUBLIC_USER_ID,
 )
-from tests.utils import json, get_json, get_admin_user_id, mock_send_email
+from tests.utils import json, get_json, get_admin_user_id
 from tests.core.test_download import wire_formats, item_ids, setup_image
 from tests.core.test_push import get_signature_headers
 from newsroom.tests.users import ADMIN_USER_ID
@@ -415,7 +415,6 @@ def test_company_type_filter(client, app):
     assert "WEATHER" != data["_items"][0]["slugline"]
 
 
-@mock.patch("newsroom.wire.views.send_email", mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert(
         "users",
@@ -443,7 +442,7 @@ def test_share_items(client, app):
 
         assert resp.status_code == 201, resp.get_data().decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["foo@bar.com"]
+        assert outbox[0].recipients == "foo@bar.com"
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "From AAP Newsroom: %s" % items[0]["headline"]
         assert "Hi Foo Bar" in outbox[0].body
@@ -482,7 +481,6 @@ def test_download(client, app):
     assert history[0].get("section") == "am_news"
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert(
         "companies",
@@ -537,7 +535,6 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     assert "http://localhost:5050/am_news?item=bar" in outbox[0].body
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert(
         "section_filters",

@@ -8,8 +8,8 @@ from newsroom.types import CompanyType, Country, SectionEnum, CompanyProduct
 from newsroom.users import UsersAuthService
 from newsroom.companies.companies_async import CompanyService
 
-from tests.utils import get_user_by_email, mock_send_email
-from tests.core.utils import create_entries_for, find_one_for
+from tests.utils import get_user_by_email
+from tests.core.utils import create_entries_for, find_one_for, delete_entries_for
 
 
 def _extract_reset_token(body: str) -> str:
@@ -18,12 +18,12 @@ def _extract_reset_token(body: str) -> str:
     return match.group(1)
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_new_user_signup_sends_email(app, client):
     company_service = CompanyService()
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
+    await delete_entries_for("products")
     product_ids = await create_entries_for(
         "products", [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
     )
@@ -46,7 +46,7 @@ async def test_new_user_signup_sends_email(app, client):
         assert response.status_code == 200
 
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["admin@bar.com"]
+        assert outbox[0].recipients == "admin@bar.com"
         assert outbox[0].subject == "A new Newshub signup request"
         assert "newuser@abc.org" in outbox[0].body
         assert "John" in outbox[0].body
@@ -122,7 +122,6 @@ async def test_new_user_signup_fails_if_fields_not_provided(client, app):
     assert "occupation: This field is required" in txt
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_approve_company_and_users(app, client):
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
@@ -174,7 +173,7 @@ async def test_approve_company_and_users(app, client):
         # Test that the account activation email was sent
         auth_user = await UsersAuthService().get_by_email("john@doe.org")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["john@doe.org"]
+        assert outbox[0].recipients == "john@doe.org"
         assert outbox[0].subject == "Newshub account created"
         assert auth_user is not None
         emailed_token = _extract_reset_token(outbox[0].body)
@@ -220,7 +219,7 @@ async def test_approve_company_and_users(app, client):
         # Test that the account activation email was sent
         auth_user = await UsersAuthService().get_by_email("jane@doe.org")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["jane@doe.org"]
+        assert outbox[0].recipients == "jane@doe.org"
         assert outbox[0].subject == "Newshub account created"
         assert auth_user is not None
         emailed_token = _extract_reset_token(outbox[0].body)

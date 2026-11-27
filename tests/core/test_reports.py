@@ -3,7 +3,7 @@ from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
 from newsroom.tests.fixtures import COMPANY_1_ID
-from tests.core.utils import create_entries_for, update_entries_for
+from tests.core.utils import create_entries_for, update_entries_for, delete_entries_for
 from ..fixtures import items
 
 
@@ -37,6 +37,7 @@ async def init(app):
             },
         ],
     )
+    await delete_entries_for("products")
     await create_entries_for(
         "products",
         [

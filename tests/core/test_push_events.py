@@ -20,7 +20,7 @@ from newsroom.tests import markers
 from newsroom.utils import parse_date_str
 
 from .test_push import get_signature_headers
-from tests.utils import post_json, get_json, mock_send_email, login
+from tests.utils import post_json, get_json, login
 from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
 
@@ -425,7 +425,6 @@ async def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app)
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     event = deepcopy(test_event)
     await client.post("/push", json=event)
@@ -471,7 +470,6 @@ async def test_notify_topic_matches_for_new_event_item(client, app, mocker):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     event = deepcopy(test_event)
     await client.post("/push", json=event)
@@ -521,7 +519,6 @@ async def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     # remove event link from planning item
     planning = deepcopy(test_planning)
@@ -572,7 +569,6 @@ async def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     company_ids = await create_entries_for(
         "companies",
@@ -630,7 +626,6 @@ async def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, moc
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     company_ids = await create_entries_for(
         "companies",
@@ -683,7 +678,6 @@ async def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     event = deepcopy(test_event)
     await client.post("/push", json=event)
@@ -742,7 +736,6 @@ async def test_notify_user_matches_for_new_planning_in_history(client, app, mock
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     event = deepcopy(test_event)
     await client.post("/push", json=event)
@@ -829,7 +822,6 @@ async def test_push_event_with_files(client, app):
     assert b"foo" == await resp.get_data()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_push_story_wont_notify_for_first_publish(client, app, mocker):
     test_item = {
         "type": "text",
@@ -875,7 +867,6 @@ async def assign_active_company(app):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
@@ -911,7 +902,6 @@ async def test_watched_event_sends_notification_for_event_update(client, app, mo
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -945,7 +935,6 @@ async def test_watched_event_sends_notification_for_unpost_event(client, app, mo
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     await post_json(client, "/push", event)
@@ -978,7 +967,6 @@ async def test_watched_event_sends_notification_for_added_planning(client, app, 
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -998,8 +986,8 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
 
     assert len(outbox) == 1
     assert "Subject: Prime minister press conference - Coverage updated" in str(outbox[0])
-    assert "! Text coverage 'Vivid Text Explainer' has been cancelled.\r\nNote: ed note here" in str(outbox[0])
-    assert "! Picture coverage 'Vivid Photos' has been cancelled.\r\nNote: ed note here" in str(outbox[0])
+    assert "! Text coverage 'Vivid Text Explainer' has been cancelled.\nNote: ed note here" in str(outbox[0].body)
+    assert "! Picture coverage 'Vivid Photos' has been cancelled.\nNote: ed note here" in str(outbox[0].body)
 
     assert push_mock.call_args[0][0] == "new_notifications"
     assert str(user_id) in push_mock.call_args[1]["counts"].keys()
@@ -1013,7 +1001,6 @@ async def test_watched_event_sends_notification_for_cancelled_planning(client, a
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)

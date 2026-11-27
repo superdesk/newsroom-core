@@ -8,10 +8,9 @@ from newsroom.companies import CompanyServiceAsync
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 
 from tests.core.utils import create_entries_for
-from ..utils import post_json, mock_send_email
+from ..utils import post_json
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_company_expiry_alerts(client, app):
     now = utcnow()
     await create_entries_for(
@@ -52,10 +51,7 @@ async def test_company_expiry_alerts(client, app):
         async with app.app_context():
             await CompanyExpiryAlerts().send_alerts()
             assert len(outbox) == 1
-            assert outbox[0].recipients == [
-                "admin@localhost.com",
-                " notanadmin@localhost.com",
-            ]
+            assert outbox[0].recipients == "admin@localhost.com, notanadmin@localhost.com"
             assert outbox[0].subject == "Companies expired or due to expire within the next 7 days ({})".format(
                 expiry_time.strftime("%d-%m-%Y")
             )

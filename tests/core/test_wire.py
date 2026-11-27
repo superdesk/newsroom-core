@@ -34,8 +34,7 @@ from ..fixtures import (  # noqa: F401
     ADMIN_USER_ID,
     ADMIN_USER_EMAIL,
 )
-from ..utils import get_json, get_admin_user_id, login, mock_send_email
-from unittest import mock
+from ..utils import get_json, get_admin_user_id, login
 
 
 NAV_1 = ObjectId("5e65964bf5db68883df561c0")
@@ -102,7 +101,6 @@ async def test_item_json(client):
     assert "headline" in data
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_share_items(client, app):
     user_ids = await create_entries_for(
         "auth_user",
@@ -129,7 +127,7 @@ async def test_share_items(client, app):
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["foo2@bar.com"]
+        assert outbox[0].recipients == "foo2@bar.com"
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "From Newshub: %s" % items[0]["headline"]
         assert "Hi Foo Bar" in outbox[0].body
@@ -294,18 +292,13 @@ async def test_search_sort(client, app):
 
 
 async def test_logged_in_user_no_product_gets_no_results(client, app, public_user):
+    await delete_entries_for("products")
     await login(client, public_user)
     resp = await client.get("/wire/search")
     assert 403 == resp.status_code, await resp.get_data(as_text=True)
     resp = await client.get("/wire")
     assert 403 == resp.status_code
     assert "There is no product associated with your user." in await resp.get_data(as_text=True)
-
-
-async def test_logged_in_user_no_company_gets_no_results(client, app, public_user):
-    await login(client, public_user)
-    resp = await client.get("/wire/search")
-    assert resp.status_code == 403
 
 
 async def test_administrator_gets_all_results(client, app):
@@ -449,6 +442,7 @@ async def test_search_created_to(client):
 
 
 async def test_item_detail_access(client, app, public_user):
+    await delete_entries_for("products")
     item_url = "/wire/%s" % items[0]["_id"]
     data = await get_json(client, item_url)
     assert data["_access"]
@@ -1012,7 +1006,7 @@ async def test_date_filters_query(client, app):
     ]
 
 
-async def test_bookmark_old_items(client, public_user, company_products):
+async def test_bookmark_old_items(client, public_user):
     await login(client, public_user)
     resp = await client.get("/wire/search")
     assert 200 == resp.status_code

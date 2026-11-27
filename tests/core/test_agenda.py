@@ -20,7 +20,6 @@ from tests.utils import (
     delete_json,
     get_json,
     get_admin_user_id,
-    mock_send_email,
 )
 from tests.utils import login
 from tests.fixtures import ADMIN_USER_ID, PUBLIC_USER_ID, PUBLIC_USER_EMAIL, COMPANY_1_ID
@@ -192,8 +191,7 @@ async def test_item_copy(client, app):
     assert str(user_id) in data["copies"]
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_share_items(client, app, mocker):
+async def test_share_items(client, app):
     user_ids = await create_entries_for(
         "users",
         [
@@ -202,6 +200,7 @@ async def test_share_items(client, app, mocker):
                 "first_name": "Foo",
                 "last_name": "Bar",
                 "receive_email": True,
+                "user_type": "administrator",
             }
         ],
     )
@@ -218,7 +217,7 @@ async def test_share_items(client, app, mocker):
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["foo2@bar.com"]
+        assert outbox[0].recipients == "foo2@bar.com"
         assert outbox[0].subject == "From Newshub: test headline"
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
@@ -288,7 +287,6 @@ async def test_agenda_search_filtered_by_query_product(client, app, public_compa
     assert "_aggregations" in data
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_coverage_request(client, app):
     # enable config to include current user in CC
     app.config["COVERAGE_REQUEST_EMAIL_CC_CURRENT_USER"] = True
@@ -309,8 +307,8 @@ async def test_coverage_request(client, app):
 
         assert resp.status_code == 201, (await resp.get_data()).decode("utf-8")
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["admin@bar.com"]
-        assert outbox[0].cc == ["admin@sourcefabric.org"]
+        assert outbox[0].recipients == "admin@bar.com"
+        assert outbox[0].cc == "admin@sourcefabric.org"
         assert outbox[0].subject == "Coverage inquiry: Conference Planning"
         assert "admin admin" in outbox[0].body
         assert "admin@sourcefabric.org" in outbox[0].body

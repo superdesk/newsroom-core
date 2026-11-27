@@ -11,15 +11,12 @@ from superdesk.utc import utcnow
 from newsroom.users import UsersService
 from newsroom.companies import CompanyServiceAsync
 from newsroom.notifications import NotificationsService
-from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID
+from newsroom.tests.fixtures import COMPANY_1_ID, PUBLIC_USER_ID, PRODUCTS
 from newsroom.tests.users import ADMIN_USER_ID
 from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 
-from ..utils import mock_send_email
 
-
-@mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_realtime_notifications_wire(app, mocker, company_products):
+async def test_realtime_notifications_wire(app, mocker):
     user = await UsersService().find_by_id(PUBLIC_USER_ID)
 
     navigations = [
@@ -39,7 +36,7 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
 
     await create_entries_for("navigations", navigations)
 
-    for product in company_products:
+    for product in PRODUCTS:
         if "*" in product["query"]:
             # we want only products which will filter out everything
             continue
@@ -147,7 +144,6 @@ async def test_realtime_notifications_wire(app, mocker, company_products):
 
 
 @pytest.mark.skip(reason="Will fix this when Agenda resource is upgraded to async")
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_realtime_notifications_agenda(app, mocker):
     await create_entries_for(
         "topics",
@@ -348,8 +344,7 @@ async def test_notify_new_agenda_item_lock_conflict_returns_early():
 
 
 # @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_pause_notifications(app, mocker, company_products):
+async def test_pause_notifications(app, mocker):
     user = await find_one_by_id("users", PUBLIC_USER_ID)
     updates = {
         "notification_schedule": dict(
@@ -430,8 +425,7 @@ async def test_pause_notifications(app, mocker, company_products):
         push_mock.assert_not_called()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_realtime_notifications_with_an_invalid_user(app, mocker, company_products):
+async def test_realtime_notifications_with_an_invalid_user(app, mocker):
     user = await UsersService().find_by_id(PUBLIC_USER_ID)
 
     await create_entries_for(

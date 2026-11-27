@@ -114,21 +114,6 @@ async def test_product_search(client, app):
     api_product_id = ObjectId()
     wire_product_id = ObjectId()
     await create_entries_for(
-        "companies",
-        [
-            {
-                "_id": company_id,
-                "name": "Test Company",
-                "is_enabled": True,
-                "products": [
-                    {"_id": api_product_id, "section": SectionEnum.NEWS_API},
-                    {"_id": wire_product_id, "section": SectionEnum.WIRE.value},
-                ],
-                "sections": {"news_api": True, "wire": True},
-            }
-        ],
-    )
-    await create_entries_for(
         "products",
         [
             {
@@ -145,6 +130,21 @@ async def test_product_search(client, app):
                 "product_type": SectionEnum.WIRE,
                 "query": "*",
             },
+        ],
+    )
+    await create_entries_for(
+        "companies",
+        [
+            {
+                "_id": company_id,
+                "name": "Test Company",
+                "is_enabled": True,
+                "products": [
+                    {"_id": api_product_id, "section": SectionEnum.NEWS_API},
+                    {"_id": wire_product_id, "section": SectionEnum.WIRE.value},
+                ],
+                "sections": {"news_api": True, "wire": True},
+            }
         ],
     )
     await create_entries_for("news_api_tokens", [{"company": company_id, "enabled": True}])

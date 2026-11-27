@@ -3,10 +3,9 @@ from os import path
 from quart.testing import QuartClient
 
 from newsroom.users.service import UsersService
-from superdesk.core import get_current_app, get_app_config, json
+from superdesk.core import get_current_app, json
 from superdesk.flask import url_for
 from superdesk import get_resource_service
-from superdesk.emails import SuperdeskMessage
 
 from tests.fixtures import ADMIN_USER_EMAIL, PUBLIC_USER_EMAIL
 
@@ -27,10 +26,10 @@ async def patch_json(client: QuartClient, url, data):
     resp = await client.patch(url, json=data, headers=headers)
     assert resp.status_code in (200, 201), "error {}: {} on patch to {}".format(
         resp.status_code,
-        resp.data,
+        await resp.get_data(),
         url,
     )
-    return resp.json
+    return await resp.json
 
 
 async def delete_json(client: QuartClient, url, data=None):
@@ -67,28 +66,6 @@ def get_admin_user_id(app):
     from newsroom.tests.users import ADMIN_USER_ID
 
     return (get_resource_service("users").find_one(req=None, _id=ADMIN_USER_ID) or {}).get("_id")
-
-
-async def mock_send_email(
-    to, subject, text_body, cc=None, html_body=None, sender=None, sender_name=None, attachments_info=[]
-):
-    if sender is None:
-        sender = get_app_config("MAIL_DEFAULT_SENDER")
-
-    if cc is None:
-        cc = []
-
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, cc=cc)
-    msg.body = text_body
-    msg.html = html_body
-    msg.attachments = [a["file_name"] for a in attachments_info]
-
-    _app = get_current_app().as_any()._get_current_object()
-    with _app.mail.connect() as connection:
-        if connection:
-            return connection.send(msg)
-
-        return _app.mail.send(msg)
 
 
 async def logout(client: QuartClient):

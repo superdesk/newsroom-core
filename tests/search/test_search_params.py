@@ -39,10 +39,10 @@ async def init(app):
     global service
     service = BaseSearchService()
 
+    await create_entries_for("products", PRODUCTS)
+    await create_entries_for("navigations", NAVIGATIONS)
     await create_entries_for("companies", COMPANIES)
     await create_entries_for("auth_user", USERS)
-    await create_entries_for("navigations", NAVIGATIONS)
-    await create_entries_for("products", PRODUCTS)
 
 
 def get_search_instance(args=None, lookup=None):

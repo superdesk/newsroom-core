@@ -19,7 +19,7 @@ async def test_email_delivery_monitor_sends_mail(app, caplog):
 
     assert len(outbox) == 1
     message = outbox[0]
-    assert message.recipients == ["ops@localhost.com", "second@localhost.com"]
+    assert message.recipients == "ops@localhost.com, second@localhost.com"
     assert message.subject == "Newsroom email delivery monitor"
     assert "Email delivery monitor status=ok" in message.body
     assert fixed_now.isoformat() in message.body

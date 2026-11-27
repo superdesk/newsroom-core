@@ -14,7 +14,7 @@ from newsroom.wire.filters import _get_wire_aggregations
 from newsroom.search.config import init_nested_aggregation
 from newsroom.commands import fix_topic_nested_filters
 
-from newsroom.tests.conftest import reset_elastic
+from newsroom.tests.db import reset_elastic
 from ..fixtures import items, init_items, init_auth, init_company  # noqa
 from tests.core.utils import create_entries_for, delete_entries_for, find_one_by_id
 

@@ -20,7 +20,7 @@ from newsroom.tests import markers
 from tests.core.utils import add_company_products, create_entries_for, update_entries_for, find_one_by_id
 from tests.utils import login
 from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
-from ..utils import mock_send_email, get_json
+from ..utils import get_json
 
 
 def get_signature_headers(data, key):
@@ -346,7 +346,6 @@ async def test_notify_topic_matches_for_new_item(client, app, mocker):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = await create_entries_for(
         "companies",
@@ -426,7 +425,6 @@ async def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = await create_entries_for(
         "companies",
@@ -488,7 +486,6 @@ async def test_notify_user_matches_for_killed_item_in_history(client, app, mocke
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     user = {
         "email": "foo2@bar.com",
@@ -617,8 +614,7 @@ async def test_do_not_notify_disabled_user(client, app, mocker):
     assert push_mock.call_args[1]["_items"][0]["_id"] == "foo"
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
-async def test_notify_checks_service_subscriptions(client, app, mocker):
+async def test_notify_checks_service_subscriptions(client, app):
     company_id = ObjectId()
     await create_entries_for(
         "companies",
@@ -673,7 +669,6 @@ async def test_notify_checks_service_subscriptions(client, app, mocker):
 
 
 @markers.requires_async_celery
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_notification_emails(client, app):
     user_ids = await create_entries_for(
         "auth_user",

@@ -10,13 +10,14 @@ from newsroom.tests.users import test_login_succeeds_for_admin
 from datetime import datetime
 
 from newsroom.users.service import UsersService
-from tests.core.utils import create_entries_for
+from tests.core.utils import create_entries_for, delete_entries_for
 
 from .. import utils
 
 
 @fixture(autouse=True)
 async def product(app):
+    await delete_entries_for("products")
     _product = {
         "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
         "name": "Sport",
@@ -106,7 +107,6 @@ async def test_update_products(client):
 
 async def test_delete_product(client):
     await test_login_succeeds_for_admin(client)
-
     await client.post(
         "/products/new",
         json={

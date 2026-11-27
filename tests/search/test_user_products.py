@@ -16,9 +16,9 @@ from .fixtures import (
 
 @pytest.fixture(autouse=True)
 async def init(app):
+    await create_entries_for("products", PRODUCTS)
     await create_entries_for("companies", COMPANIES)
     await create_entries_for("users", USERS)
-    await create_entries_for("products", PRODUCTS)
 
 
 @pytest.fixture
@@ -137,7 +137,7 @@ async def test_user_sections(app, client, manager, product):
     )
 
     # works now with company product
-    data = utils.get_json(client, "/agenda/search")
+    data = await utils.get_json(client, "/agenda/search")
     assert data
 
     # section not enabled
@@ -153,7 +153,7 @@ async def test_user_sections(app, client, manager, product):
         },
     )
 
-    data = utils.get_json(client, "/agenda/search")
+    data = await utils.get_json(client, "/agenda/search")
     assert data
 
     company = await find_one_by_id("companies", manager["company"])

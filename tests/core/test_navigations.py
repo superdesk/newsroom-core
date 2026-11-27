@@ -9,7 +9,7 @@ from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations import get_navigations
 from newsroom.types import ProductResourceModel, SectionEnum
-from tests.core.utils import add_company_products, create_entries_for, find_one_by_id
+from tests.core.utils import add_company_products, create_entries_for, find_one_by_id, delete_entries_for
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
 AGENDA_NAV_ID = ObjectId()
@@ -87,7 +87,7 @@ async def test_update_navigation(client):
 
 async def test_delete_navigation_removes_references(client):
     await test_login_succeeds_for_admin(client)
-
+    await delete_entries_for("products")
     await client.post(
         "/products/new",
         json={

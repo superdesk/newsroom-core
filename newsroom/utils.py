@@ -131,7 +131,7 @@ def parse_validation_error(error: ValidationError) -> dict[str, str]:
     Parses pydantic model validation error and returns a key -> value dict from it
     """
     return {
-        field: list(err.values())[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
+        field: list(err.values() if isinstance(err, dict) else err or "")[0] for field, err in get_field_errors_from_pydantic_validation_error(error).items()
     }
 
 

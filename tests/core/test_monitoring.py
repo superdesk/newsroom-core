@@ -7,7 +7,7 @@ from bson import ObjectId
 from tests.core.utils import create_entries_for, update_entries_for, find_one_by_id
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
-from tests.utils import mock_send_email, post_json, login_public
+from tests.utils import post_json, login_public
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from datetime import timedelta
 
@@ -174,7 +174,7 @@ async def test_post_monitoring(client):
             "schedule": {"interval": "immediate"},
         },
     )
-    assert response.status_code == 201
+    assert response.status_code == 201, await response.get_data(as_text=True)
     response = await client.get("/monitoring/all")
     assert response.status_code == 200
     items = json.loads(await response.get_data())
@@ -248,7 +248,6 @@ async def test_get_companies_with_monitoring_schedules(client):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_immediate_alerts(client, app):
     await create_entries_for(
         "items",
@@ -276,19 +275,18 @@ async def test_send_immediate_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
 def assert_recipients(outbox, recipients: List[str]):
     outbox_recipients = []
     for o in outbox:
-        outbox_recipients.extend(o.recipients)
+        outbox_recipients.extend(r.strip() for r in o.recipients.split(","))
     assert len(outbox_recipients) == len(recipients)
     for recipient in recipients:
         assert recipient in outbox_recipients
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_one_hour_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -333,10 +331,9 @@ async def test_send_one_hour_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_two_hour_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -381,10 +378,9 @@ async def test_send_two_hour_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_four_hour_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -429,10 +425,9 @@ async def test_send_four_hour_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_daily_alerts(client, app):
     now = utcnow()
     now = utc_to_local(app.config["DEFAULT_TIMEZONE"], now)
@@ -495,10 +490,9 @@ async def test_send_daily_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_weekly_alerts(client, app):
     now = utcnow()
     now = utc_to_local(app.config["DEFAULT_TIMEZONE"], now)
@@ -562,10 +556,9 @@ async def test_send_weekly_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_alerts_respects_last_run_time(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -610,7 +603,7 @@ async def test_send_alerts_respects_last_run_time(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
 
     with app.mail.record_messages() as newoutbox:
         # async with app.app_context():
@@ -624,7 +617,6 @@ async def test_send_alerts_respects_last_run_time(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_disabled_profile_wont_send_immediate_alerts(client, app):
     await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"is_enabled": False})
     await create_entries_for(
@@ -643,7 +635,6 @@ async def test_disabled_profile_wont_send_immediate_alerts(client, app):
         assert len(outbox) == 0
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_disabled_profile_wont_send_scheduled_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -681,7 +672,6 @@ async def test_disabled_profile_wont_send_scheduled_alerts(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_always_send_immediate_alerts_wiont_send_default_email(client, app):
     await MonitoringProfileService().update("5db11ec55f627d8aa0b545fb", {"always_send": True})
     await create_entries_for(
@@ -700,7 +690,6 @@ async def test_always_send_immediate_alerts_wiont_send_default_email(client, app
         assert len(outbox) == 0
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_always_send_schedule_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     await update_entries_for(
@@ -726,7 +715,6 @@ async def test_always_send_schedule_alerts(client, app):
         assert "No content has matched the monitoring profile for this schedule." in outbox[0].body
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_disable_always_send_schedule_alerts(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     await update_entries_for(
@@ -752,7 +740,6 @@ async def test_disable_always_send_schedule_alerts(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_always_send_immediate_alerts(client, app):
     await MonitoringProfileService().update(ObjectId("5db11ec55f627d8aa0b545fb"), {"always_send": False})
     await create_entries_for(
@@ -772,7 +759,6 @@ async def test_always_send_immediate_alerts(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_always_updated_with_matching_content_immediate(client, app):
     await create_entries_for(
         "items",
@@ -797,14 +783,13 @@ async def test_last_run_time_always_updated_with_matching_content_immediate(clie
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
         w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
         assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=15))
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_always_updated_with_matching_content_scheduled(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -848,7 +833,7 @@ async def test_last_run_time_always_updated_with_matching_content_scheduled(clie
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.pdf" in outbox[0].attachments[0]
+        assert "monitoring-export.pdf" in outbox[0].attachments[0].get_filename()
         w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
         assert w is not None
         assert w.get("last_run_time") is not None
@@ -857,7 +842,6 @@ async def test_last_run_time_always_updated_with_matching_content_scheduled(clie
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_does_not_update_with_no_matching_content_immediate(client, app):
     await create_entries_for(
         "items",
@@ -878,7 +862,6 @@ async def test_last_run_time_does_not_update_with_no_matching_content_immediate(
         assert w.get("last_run_time") is not None
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_always_updated_with_no_matching_content_scheduled(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -909,7 +892,6 @@ async def test_last_run_time_always_updated_with_no_matching_content_scheduled(c
         assert w["last_run_time"] > (last_run_time - timedelta(minutes=5))
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_always_updated_with_no_users_immediate(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     await update_entries_for("monitoring", ObjectId("5db11ec55f627d8aa0b545fb"), {"users": []}, w)
@@ -934,7 +916,6 @@ async def test_last_run_time_always_updated_with_no_users_immediate(client, app)
         assert w["last_run_time"] > (mock_utcnow() - timedelta(minutes=5))
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_last_run_time_always_updated_with_no_users_scheduled(client, app):
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
     assert w is not None
@@ -965,7 +946,6 @@ async def test_last_run_time_always_updated_with_no_users_scheduled(client, app)
         assert w["last_run_time"] > (last_run_time - timedelta(minutes=5))
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_will_send_one_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
@@ -1003,7 +983,6 @@ async def test_will_send_one_hour_alerts_on_odd_hours(client, app):
         assert len(outbox) > 0
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
@@ -1041,7 +1020,6 @@ async def test_wont_send_two_hour_alerts_on_odd_hours(client, app):
         assert len(outbox) == 0
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
     now = even_now.replace(hour=3, minute=0)
     w = await find_one_by_id("monitoring", "5db11ec55f627d8aa0b545fb")
@@ -1080,7 +1058,6 @@ async def test_wont_send_four_hour_alerts_on_odd_hours(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_immediate_rtf_attachment_alerts(client, app):
     await post_json(
         client,
@@ -1125,11 +1102,10 @@ async def test_send_immediate_rtf_attachment_alerts(client, app):
         assert outbox[0].sender == "newsroom@localhost"
         assert outbox[0].subject == "Monitoring Subject"
         assert "Newsroom Monitoring: W1" in outbox[0].body
-        assert "monitoring-export.rtf" in outbox[0].attachments[0]
+        assert "monitoring-export.rtf" in outbox[0].attachments[0].get_filename()
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_immediate_headline_subject_alerts(client, app):
     await create_entries_for(
         "items",
@@ -1165,7 +1141,6 @@ async def test_send_immediate_headline_subject_alerts(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_immediate_email_alerts(client, app):
     await post_json(
         client,
@@ -1220,7 +1195,6 @@ async def test_send_immediate_email_alerts(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_dont_send_immediate_email_alerts_twice(client, app):
     await post_json(
         client,
@@ -1263,7 +1237,6 @@ async def test_dont_send_immediate_email_alerts_twice(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_dont_send_email_to_disabled_users(client, app):
     await create_entries_for(
         "users",
@@ -1310,7 +1283,7 @@ async def test_dont_send_email_to_disabled_users(client, app):
     with app.mail.record_messages() as outbox:
         await MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
-        assert len(outbox[0].recipients) == 1
+        assert len(outbox[0].recipients.split(",")) == 1
         assert_recipients(
             outbox,
             ["ringin@bar.com"],
@@ -1318,7 +1291,6 @@ async def test_dont_send_email_to_disabled_users(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_dont_send_email_to_disabled_companies(client, app):
     await create_entries_for(
         "items",
@@ -1357,7 +1329,6 @@ async def test_save_only_users_belonging_to_company(client, app):
 
 
 @mock.patch("newsroom.monitoring.email_alerts.utcnow", mock_utcnow)
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_send_profile_email(client, app):
     await post_json(
         client, "/settings/general_settings", {"monitoring_report_logo_path": get_fixture_path("thumbnail.jpg")}

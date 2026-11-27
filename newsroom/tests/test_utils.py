@@ -47,10 +47,16 @@ async def get_all(resource: str) -> list[Any]:
         return [item for item in app.data.find(resource, {})]
 
 
-async def add_company_products(app, company_id, products):
+async def add_company_products(app, company_id, products, clear_current_products: bool = True):
     company = await find_one_by_id("companies", company_id)
+
+    if clear_current_products:
+        await delete_entries_for("products")
+        company_products = []
+    else:
+        company_products = company["products"] or []
+
     await create_entries_for("products", products)
-    company_products = company["products"] or []
 
     for product in products:
         company_products.append({"_id": product["_id"], "section": product["product_type"], "seats": 0})

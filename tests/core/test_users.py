@@ -22,7 +22,7 @@ from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
 from tests.core.utils import create_entries_for
-from tests.utils import get_user_by_email, mock_send_email, login, login_public, logout
+from tests.utils import get_user_by_email, login, login_public, logout
 
 
 def _extract_reset_token(body: str) -> str:
@@ -155,7 +155,6 @@ async def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
     assert "Email address is already in use" in await response.get_data(as_text=True)
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
 async def test_create_new_user_succeeds(app, client):
     company_ids = await create_entries_for(
         "companies",
@@ -189,7 +188,7 @@ async def test_create_new_user_succeeds(app, client):
         )
         assert response.status_code == 201
         assert len(outbox) == 1
-        assert outbox[0].recipients == ["New.User@abc.org"]
+        assert outbox[0].recipients == "New.User@abc.org"
         assert "account created" in outbox[0].subject
         reset_token = _extract_reset_token(outbox[0].body)
 

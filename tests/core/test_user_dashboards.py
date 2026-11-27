@@ -11,7 +11,7 @@ from datetime import datetime
 from tests.core.utils import create_entries_for, delete_entries_for, update_entries_for
 
 
-async def test_user_dashboards(app, client, public_user, public_company, company_products):
+async def test_user_dashboards(app, client, public_user, public_company):
     topics = [{"label": "test", "user": public_user["_id"], "query": "bar", "topic_type": "agenda"}]
     topic_id = (await create_entries_for("topics", topics))[0]
     topic = await TopicService().find_by_id(topic_id)
