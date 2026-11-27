@@ -152,6 +152,8 @@ Feature: Agenda Search - Filter Locations Based on State
                     "type": "country"
                 }
             ],
-            "places": []
+            "places": [
+                "Sydney Harbour Bridge"
+            ]
         }
         """

@@ -13,6 +13,7 @@ Feature: News API News Feed
     Given "products"
         """
         [{
+            "_id": "5e4cade4d69954b6d55ac09a",
             "name": "A fishy product",
             "description": "A product for those interested in fish",
             "companies": ["#companies._id#"],
@@ -25,13 +26,6 @@ Feature: News API News Feed
     Given "products"
         """
         [{
-            "_id": "5e4cade4d69954b6d55ac09a",
-            "name": "A fishy product",
-            "description": "A product for those interested in fish",
-            "companies": ["#companies._id#"],
-            "query": "fish",
-            "product_type": "news_api"
-        }, {
             "_id": "5e4cade4d69954b6d55ac09b",
             "name": "An aardvark product",
             "description": "A product for those interested in aardvarks",
@@ -78,13 +72,6 @@ Feature: News API News Feed
     Given "products"
         """
         [{
-            "_id": "5e4cade4d69954b6d55ac09a",
-            "name": "A fishy product",
-            "description": "A product for those interested in fish",
-            "companies": ["#companies._id#"],
-            "query": "fish",
-            "product_type": "news_api"
-        }, {
             "_id": "5e4cade4d69954b6d55ac09b",
             "name": "An aardvark product",
             "description": "A product for those interested in aardvarks",

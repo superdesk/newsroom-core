@@ -149,7 +149,7 @@ Feature: News API Item
     Given "companies"
     """
     [{
-      "name": "Test Company", "is_enabled": true,
+      "name": "Test Company 2", "is_enabled": true,
       "embed_permissions": {
         "sd_product": ["display", "download"]
       }

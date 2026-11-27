@@ -39,7 +39,6 @@ Feature: News API Authorization
     Then we get response code 401
 
 
-    @wip
   Scenario: Proxy forward situation is handled appropirately
     Given "items"
         """

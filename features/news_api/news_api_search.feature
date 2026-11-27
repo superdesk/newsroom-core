@@ -216,9 +216,9 @@ Feature: News API News Search
   Scenario: exclude fields
     Given "items"
         """
-        [{"body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "pubstatus": "usable1" },
-        {"body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "pubstatus": "usable2"  },
-        {"body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "pubstatus": "usable3"  }]
+        [{"_id": "urn:newsml:test:1", "body_html": "<p>Three</p>", "versioncreated": "#DATE-3#", "pubstatus": "usable"},
+        {"_id": "urn:newsml:test:2", "body_html": "<p>Five</p>", "versioncreated": "#DATE-5#", "pubstatus": "usable"},
+        {"_id": "urn:newsml:test:3", "body_html": "<p>One</p>", "versioncreated": "#DATE-1#", "pubstatus": "usable"}]
         """
     Given "products"
         """
@@ -235,9 +235,9 @@ Feature: News API News Search
     Then we get list with 3 items
     """
      {"_items": [
-        {"pubstatus": "usable1", "versioncreated": "__no_value__"},
-        {"pubstatus": "usable2", "versioncreated": "__no_value__"},
-        {"pubstatus": "usable3", "versioncreated": "__no_value__"}
+        {"_id": "urn:newsml:test:1", "versioncreated": "__no_value__"},
+        {"_id": "urn:newsml:test:2", "versioncreated": "__no_value__"},
+        {"_id": "urn:newsml:test:3", "versioncreated": "__no_value__"}
      ]}
      """
 
@@ -547,12 +547,42 @@ Feature: News API News Search
         """
         {"code": 400, "message": "Bad parameter value for Parameter (timezone)"}
         """
+    When we get "/news/search?page_size=0"
+    Then we get error 400
+        """
+        {"code": 400, "message": "One or more fields did not pass validation."}
+        """
+    When we get "/news/search?page_size=101"
+    Then we get error 400
+        """
+        {"code": 400, "message": "Requested maximum number of results exceeds 100"}
+        """
+    When we get "/news/search?page=0"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?page=one"
+    Then we get error 400
+      """
+      {"code": 400, "message": "One or more fields did not pass validation."}
+      """
+    When we get "/news/search?from=1"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): from"}
+      """
+    When we get "/news/search?size=10"
+    Then we get error 400
+      """
+      {"code": 400, "message": "Unexpected parameter(s): size"}
+      """
 
   Scenario: Search request response restricted by featured image product
     Given "companies"
       """
       [{
-        "name": "Test Company", "is_enabled" : true,
+        "name": "Test Company 2", "is_enabled" : true,
         "embed_permissions": {
           "sd_product": ["display", "download"]
         }
@@ -688,16 +718,16 @@ Feature: News API News Search
     Given "products"
         """
         [{
-            "_id": "111111111111111111111111",
-            "name": "A Product",
+            "_id": "5e4cade4d69954b6d55ac090",
+            "name": "Product A",
             "decsription": "a product for text",
             "companies" : ["#companies._id#"],
             "query": "NOT aardvark",
             "product_type": "news_api"
         },
         {
-            "_id": "222222222222222222222222",
-            "name": "A Product",
+            "_id": "5e4cade4d69954b6d55ac091",
+            "name": "Product B",
             "decsription": "a product for text",
             "companies" : ["#companies._id#"],
             "query": "aardvark",
@@ -712,7 +742,7 @@ Feature: News API News Search
             "headline": "Headline 1"
         }]
         """
-    When we get "news/search?start_date=now-10d&products=222222222222222222222222,111111111111111111111111"
+    When we get "news/search?start_date=now-10d&products=5e4cade4d69954b6d55ac091,5e4cade4d69954b6d55ac090"
     Then we get OK response
     Then we get list with 1 items
 
@@ -825,36 +855,4 @@ Feature: News API News Search
         }
         }
       }
-      """
-
-  Scenario: Parameter validation
-    When we get "/news/search?page_size=0"
-    Then we get error 400
-        """
-        {"code": 400, "message": "One or more fields did not pass validation."}
-        """
-    When we get "/news/search?page_size=101"
-    Then we get error 400
-        """
-        {"code": 400, "message": "Requested maximum number of results exceeds 100"}
-        """
-    When we get "/news/search?page=0"
-    Then we get error 400
-      """
-      {"code": 400, "message": "One or more fields did not pass validation."}
-      """
-    When we get "/news/search?page=one"
-    Then we get error 400
-      """
-      {"code": 400, "message": "One or more fields did not pass validation."}
-      """
-    When we get "/news/search?from=1"
-    Then we get error 400
-      """
-      {"code": 400, "message": "Unexpected parameter(s): from"}
-      """
-    When we get "/news/search?size=10"
-    Then we get error 400
-      """
-      {"code": 400, "message": "Unexpected parameter(s): size"}
       """
