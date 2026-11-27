@@ -1,12 +1,12 @@
 import logging
 
 from superdesk.celery_task_utils import get_lock_id
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_config, get_current_app
+from superdesk.core.emails import EmailFactory, EmailRequest
 from superdesk.lock import lock, unlock
 from superdesk.utc import utcnow
 
 from newsroom.celery_app import celery
-from newsroom.email import send_email
 
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class EmailDeliveryMonitor:
         self.log_msg = "Email delivery monitor"
 
     def get_recipients(self) -> list[str]:
-        recipients = get_app_config("EMAIL_DELIVERY_MONITOR_RECIPIENTS")
+        recipients = get_config(str, "EMAIL_DELIVERY_MONITOR_RECIPIENTS")
         if not recipients:
             return []
 
@@ -70,7 +70,10 @@ class EmailDeliveryMonitor:
                 f"timestamp={timestamp.isoformat()}\n"
                 f"recipients={', '.join(recipients)}"
             )
-            await send_email(to=recipients, subject=subject, text_body=text_body)
+            await EmailFactory().send(
+                EmailRequest(recipients=recipients, subject=subject, text_body=text_body, use_celery=False),
+                raise_exceptions=True,
+            )
 
             self.record_status("sent", timestamp, recipients)
             logger.info("%s status=sent timestamp=%s recipients=%s", self.log_msg, timestamp.isoformat(), recipients)

@@ -7,7 +7,7 @@ from werkzeug.exceptions import NotFound
 from bson.errors import InvalidId
 
 from superdesk.core import get_app_config
-from superdesk.core.types import BaseModel, Request, Response
+from superdesk.core.types import BaseModel, Request, Response, EmailAttachment
 from superdesk.core.resources.fields import ObjectId
 from superdesk.flask import send_file, render_template
 from superdesk.logging import logger
@@ -165,6 +165,7 @@ async def create(request: Request) -> Response:
     form = await MonitoringForm.create_form()
     if await form.validate():
         new_data = form.data
+        new_data.pop("id", None)
         if form.company.data:
             new_data["company"] = ObjectId(form.company.data)
             company_users = await UsersService().search({"company": new_data["company"]})
@@ -353,14 +354,13 @@ async def share(request: Request) -> Response:
             user,
             template="share_items",
             template_kwargs=template_kwargs,
-            attachments_info=[
-                {
-                    "file": attachment,
-                    "file_name": formatter.format_filename(None),
-                    "content_type": "application/{}".format(formatter.FILE_EXTENSION),
-                    "file_desc": "Monitoring Report",
-                    "headers": {},
-                }
+            attachments=[
+                EmailAttachment(
+                    data=attachment,
+                    filename=formatter.format_filename(None),
+                    content_type="application/{}".format(formatter.FILE_EXTENSION),
+                    description="Monitoring Report",
+                )
             ],
         )
 

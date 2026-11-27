@@ -1,25 +1,17 @@
-import base64
-import email.policy as email_policy
-
-from lxml import etree
-from typing_extensions import Unpack
 from typing import List, Optional, Dict, Any, Union, TypedDict
 
-from quart import has_request_context
 from quart_babel import gettext
-from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
-from superdesk.logging import logger
 from superdesk import get_resource_service
-from superdesk.core import get_app_config, get_current_app
+from superdesk.core import get_config, get_current_app
 from superdesk.core.resources import ResourceModel
+from superdesk.core.emails import EmailFactory, EmailAttachment, EmailRequest, EmailAddress
 from superdesk.flask import render_template, url_for
 
 from newsroom.gettext import get_user_timezone
 from newsroom.types import Company, User, Country, CompanyType, UserResourceModel
 from newsroom.formatters import get_formatter
-from newsroom.celery_app import celery
 from newsroom.template_loaders import template_locale
 from newsroom.utils import (
     get_agenda_dates,
@@ -31,125 +23,10 @@ from newsroom.utils import (
 from newsroom.template_filters import is_admin_or_internal
 
 
-class NewsroomMessage(Message):
-    def _message(self):
-        msg = super()._message()
-        msg.policy = email_policy.SMTP
-        return msg
-
-
 class EmailGroup(TypedDict):
     html_template: str
     text_template: str
     emails: List[str]
-
-
-MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentation
-
-
-def handle_long_lines_text(text, limit=MAX_LINE_LENGTH):
-    if not text:
-        return ""
-    output = []
-    lines = text.splitlines()
-    for line in lines:
-        if len(line) < limit:
-            output.append(line)
-        else:
-            next_line = ""
-            words = line.split()
-            for word in words:
-                if len(next_line) + len(word) > limit:
-                    output.append(next_line)
-                    next_line = word
-                else:
-                    next_line += (" " if len(next_line) else "") + word
-
-            if next_line:
-                output.append(next_line)
-    return "\n".join(output)
-
-
-def handle_long_lines_html(html):
-    lines = html.splitlines()
-    if not any([len(line) > MAX_LINE_LENGTH for line in lines]):
-        return html
-    parsed = etree.fromstring(html, parser=etree.HTMLParser())
-    etree.indent(parsed, space=" ")  # like pretty print but upfront
-    for elem in parsed.iter("*"):
-        if elem.text is not None and len(elem.text) > 100:
-            elem.text = handle_long_lines_text(elem.text, 100) + "\n"
-        if elem.tail is not None and len(elem.tail) > 100:
-            elem.tail = handle_long_lines_text(elem.tail, 100) + "\n"
-    return etree.tostring(parsed, method="html", encoding="unicode")
-
-
-@celery.task(soft_time_limit=120)
-def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None):
-    if attachments_info is None:
-        attachments_info = []
-
-    if sender is None:
-        sender = get_app_config("MAIL_DEFAULT_SENDER")
-
-    if cc is None:
-        cc = []
-
-    if sender_name is not None:
-        sender = (sender_name, sender)
-
-    decoded_attachments = []
-    for a in attachments_info:
-        try:
-            content = base64.b64decode(a["file"])
-            decoded_attachments.append(
-                Attachment(a["file_name"], a["content_type"], headers=a.get("headers"), data=content)
-            )
-        except Exception as e:
-            logger.error("Error attaching {} file to mail. Receipient(s): {}. Error: {}".format(a["file_desc"], to, e))
-
-    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, cc=cc, attachments=decoded_attachments)
-    msg.body = text_body
-    msg.html = html_body
-    app = get_current_app().as_any()
-    return app.mail.send(msg)
-
-
-def format_subject(subject: Optional[str]) -> str:
-    """Only use first line of subject, otherwise it raises validation error."""
-    if subject is None:
-        return ""
-    return subject.split("\n")[0].strip()
-
-
-async def send_email(
-    to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None, cc=None
-):
-    """
-    Sends the email
-    :param to: List of recipients
-    :param subject: Subject text
-    :param text_body: Text Body
-    :param html_body: Html Body
-    :param sender: Sender
-    :return:
-    """
-
-    kwargs = {
-        "to": to,
-        "cc": cc,
-        "subject": format_subject(subject),
-        "text_body": handle_long_lines_text(text_body) if text_body else None,
-        "html_body": handle_long_lines_html(html_body) if html_body else None,
-        "sender": sender,
-        "sender_name": sender_name or get_app_config("EMAIL_DEFAULT_SENDER_NAME"),
-        "attachments_info": attachments_info,
-    }
-
-    if has_request_context():  # don't block request
-        await _send_email.apply_async(kwargs=kwargs)
-    else:  # running in celery worker already
-        await _send_email(**kwargs)
 
 
 async def send_new_signup_email(company: Company, user: User, is_new_company: bool):
@@ -174,14 +51,14 @@ async def send_new_signup_email(company: Company, user: User, is_new_company: bo
             country_name = country["text"]
 
     company_type_name = company.get("company_type") or ""
-    company_types: List[CompanyType] = get_app_config("COMPANY_TYPES") or []
+    company_types: List[CompanyType] = get_config(list[CompanyType], "COMPANY_TYPES", [])
     if len(company_type_name) and len(company_types):
         company_type: Optional[CompanyType] = next((t for t in company_types if t["id"] == company_type_name), None)
         if company_type is not None:
             company_type_name = company_type["name"]
 
     await send_template_email(
-        to=get_app_config("SIGNUP_EMAIL_RECIPIENTS").split(","),
+        to=get_config(str, "SIGNUP_EMAIL_RECIPIENTS").split(","),
         template="signup_request_email",
         template_kwargs=dict(
             url=url_for("settings.settings_app", **url_kwargs),
@@ -198,7 +75,7 @@ def map_email_recipients_by_language(
     emails: List[str], template_name: str, ignore_preferences=False
 ) -> Dict[str, EmailGroup]:
     users = {user["email"]: user for user in get_resource_service("users").find(where={"email": {"$in": emails}}) or []}
-    default_language = get_app_config("DEFAULT_LANGUAGE")
+    default_language = get_config(str, "DEFAULT_LANGUAGE")
     groups: Dict[str, EmailGroup] = {}
     default_html_template = get_language_template_name(template_name, default_language, "html")
     default_txt_template = get_language_template_name(template_name, default_language, "txt")
@@ -244,19 +121,6 @@ def get_language_template_name(template_name: str, language: str, extension: str
     return fallback_template_name
 
 
-class EmailAttachment(TypedDict):
-    file: Any
-    file_name: str
-    content_type: str
-    file_desc: str
-    headers: Dict[str, str]
-
-
-class EmailKwargs(TypedDict, total=False):
-    sender: str | tuple[str, str] | None
-    attachments_info: list[EmailAttachment] | None
-
-
 TemplateKwargs = Dict[str, Any]
 
 
@@ -266,7 +130,8 @@ async def send_user_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
-    **kwargs: Unpack[EmailKwargs],
+    sender: EmailAddress | None = None,
+    attachments: list[EmailAttachment] | None = None,
 ) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
     user_dict: User = user.to_dict() if isinstance(user, ResourceModel) else user
@@ -275,9 +140,9 @@ async def send_user_email(
         # skip user if has emails disabled or the user is not enabled
         return
 
-    language = user_dict.get("locale") or get_app_config("DEFAULT_LANGUAGE")
+    language = user_dict.get("locale") or get_config(str, "DEFAULT_LANGUAGE")
     timezone = get_user_timezone(user_dict)
-    await _send_localized_email([user_dict["email"]], template, language, timezone, template_kwargs or {}, kwargs)
+    await _send_localized_email([user_dict["email"]], template, language, timezone, template_kwargs or {}, sender, attachments)
 
 
 async def send_template_email(
@@ -285,12 +150,13 @@ async def send_template_email(
     template: str,
     template_kwargs: Optional[TemplateKwargs] = None,
     cc: Optional[List[str]] = None,
-    **kwargs: Unpack[EmailKwargs],
+    sender: EmailAddress | None = None,
+    attachments: list[EmailAttachment] | None = None,
 ) -> None:
     """Send email to list of recipients using default locale."""
-    language = get_app_config("DEFAULT_LANGUAGE")
-    timezone = get_app_config("DEFAULT_TIMEZONE")
-    await _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs, cc)
+    language = get_config(str, "DEFAULT_LANGUAGE")
+    timezone = get_config(str, "DEFAULT_TIMEZONE")
+    await _send_localized_email(to, template, language, timezone, template_kwargs or {}, sender, attachments, cc)
 
 
 async def _send_localized_email(
@@ -299,7 +165,8 @@ async def _send_localized_email(
     language: str,
     timezone: str,
     template_kwargs: TemplateKwargs,
-    email_kwargs: EmailKwargs,
+    sender: EmailAddress | None = None,
+    attachments: list[EmailAttachment] | None = None,
     cc: Optional[List[str]] = None,
 ) -> None:
     language = to_email_language(language)
@@ -314,20 +181,23 @@ async def _send_localized_email(
         text_body = await render_template(text_template, **template_kwargs)
         html_body = await render_template(html_template, **template_kwargs)
 
-        await send_email(
-            to=to,
-            cc=cc,
-            subject=subject,
-            text_body=text_body,
-            html_body=html_body,
-            sender_name=get_sender_name(language),
-            **email_kwargs,
+        mail = EmailFactory()
+        await mail.send(
+            EmailRequest(
+                subject=subject,
+                sender=mail.get_address(sender, get_sender_name(language)) if isinstance(sender, str) else sender,
+                recipients=to,
+                cc=cc,
+                text_body=text_body,
+                html_body=html_body,
+                attachments=attachments,
+            )
         )
 
 
 def get_sender_name(language: str) -> Optional[str]:
     try:
-        return get_app_config("EMAIL_SENDER_NAME_LANGUAGE_MAP")[language]
+        return get_config(dict[str, str], "EMAIL_SENDER_NAME_LANGUAGE_MAP", {})[language]
     except (KeyError, TypeError):
         return None
 
@@ -340,9 +210,9 @@ async def send_validate_account_email(user: User, token: str) -> None:
     :param token: token string
     :return:
     """
-    app_name = get_app_config("SITE_NAME")
+    app_name = get_config(str, "SITE_NAME")
     url = url_for("auth.validate_account", token=token, _external=True)
-    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
+    hours = get_config(int, "VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user,
@@ -365,9 +235,9 @@ async def send_new_account_email(user: User, token: str) -> None:
     :param token: token string
     :return:
     """
-    app_name = get_app_config("SITE_NAME")
+    app_name = get_config(str, "SITE_NAME")
     url = url_for("auth.reset_password", token=token, _external=True)
-    hours = get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
+    hours = get_config(int, "VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user,
@@ -390,9 +260,9 @@ async def send_reset_password_email(user: User, token: str) -> None:
     :param token: token string
     :return:
     """
-    app_name = get_app_config("SITE_NAME")
+    app_name = get_config(str, "SITE_NAME")
     url = url_for("auth.reset_password", token=token, _external=True)
-    hours = get_app_config("RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS")
+    hours = get_config(int, "RESET_PASSWORD_TOKEN_TIME_TO_LIVE_HOURS")
 
     await send_user_email(
         user=user,
@@ -426,7 +296,7 @@ async def _send_new_wire_notification_email(
 
     url = url_for("wire.item", item_id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
-        app_name=get_app_config("SITE_NAME"),
+        app_name=get_config(str, "SITE_NAME"),
         is_topic=True,
         topic_name=topic_name,
         name=user_dict.get("first_name"),
@@ -462,7 +332,7 @@ async def _send_new_agenda_notification_email(user: User | UserResourceModel, to
     _remove_restricted_coverage_info(item)
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
-        app_name=get_app_config("SITE_NAME"),
+        app_name=get_config(str, "SITE_NAME"),
         is_topic=True,
         topic_name=topic_name,
         name=user_dict.get("first_name"),
@@ -494,7 +364,7 @@ async def send_history_match_notification_email(user: UserResourceModel, item: d
 async def _send_history_match_wire_notification_email(
     user: UserResourceModel, item: dict[str, Any], section: str
 ) -> None:
-    app_name = get_app_config("SITE_NAME")
+    app_name = get_config(str, "SITE_NAME")
     url = url_for("wire.item", item_id=item.get("guid") or item["_id"], _external=True)
     template_kwargs = dict(
         app_name=app_name,
@@ -514,7 +384,7 @@ async def _send_history_match_wire_notification_email(
 
 async def _send_history_match_agenda_notification_email(user: UserResourceModel, item: dict[str, Any]):
     _remove_restricted_coverage_info(item)
-    app_name = get_app_config("SITE_NAME")
+    app_name = get_config(str, "SITE_NAME")
     url = url_for_agenda(item, _external=True)
     template_kwargs = dict(
         app_name=app_name,
@@ -550,16 +420,20 @@ async def _send_wire_killed_notification_email(user: UserResourceModel, item: di
     subject = gettext("Kill/Takedown notice")
     text_body = to_text(await formatter.format_item(item))
 
-    await send_email(to=recipients, subject=subject, text_body=text_body)
+    await EmailFactory().send(
+        EmailRequest(subject=subject, recipients=recipients, text_body=text_body)
+    )
 
 
 async def _send_agenda_killed_notification_email(user: UserResourceModel, item: dict[str, Any]) -> None:
     formatter = get_formatter("text")
     recipients = [user.email]
-    subject = gettext("%(section)s cancelled notice", section=get_app_config("AGENDA_SECTION"))
+    subject = gettext("%(section)s cancelled notice", section=get_config(str, "AGENDA_SECTION"))
     text_body = to_text(await formatter.format_item(item, item_type="agenda"))
 
-    await send_email(to=recipients, subject=subject, text_body=text_body)
+    await EmailFactory().send(
+        EmailRequest(subject=subject, recipients=recipients, text_body=text_body)
+    )
 
 
 def to_text(output: Union[str, bytes]) -> str:

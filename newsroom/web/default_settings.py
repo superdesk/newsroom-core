@@ -56,6 +56,11 @@ from superdesk.default_settings import (  # noqa
     CACHE_URL,
     CACHE_REDIS_TIMEOUT,
     CACHE_REDIS_CONNECT_TIMEOUT,
+    CELERY_ASYNC_PREFETCH_MULTIPLIER,
+    CELERY_ASYNC_THREAD_MAX_TASKS,
+    CELERY_ASYNC_THREAD_RESTART_TASKS,
+    CELERY_ASYNC_THREAD_BLOCK_SLEEP,
+    MAIL_USE_CELERY,
 )
 
 from newsroom.types import AuthProviderConfig, AuthProviderType
@@ -427,6 +432,7 @@ CELERY_WORKER_TASK_TIME_LIMIT = 600
 
 WEBSOCKET_EXCHANGE = celery_queue("newsroom_notification")
 
+CELERY_USE_ASYNC_WORKER = True
 CELERY_TASK_DEFAULT_QUEUE = celery_queue("newsroom")
 CELERY_TASK_QUEUES = (
     Queue(
@@ -439,6 +445,11 @@ CELERY_TASK_QUEUES = (
         Exchange(celery_queue("newsroom.push")),
         routing_key="newsroom.push",
     ),
+    Queue(
+        celery_queue("newsroom.emails"),
+        Exchange(celery_queue("newsroom.emails")),
+        routing_key="newsroom.emails",
+    ),
 )
 
 CELERY_TASK_ROUTES = {
@@ -446,9 +457,9 @@ CELERY_TASK_ROUTES = {
         "queue": celery_queue("newsroom.push"),
         "routing_key": "newsroom.push",
     },
-    "newsroom.email.*": {
-        "queue": celery_queue("newsroom.push"),
-        "routing_key": "newsroom.push",
+    "superdesk.core.emails*": {
+        "queue": celery_queue("newsroom.emails"),
+        "routing_key": "newsroom.emails",
     },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),

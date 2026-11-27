@@ -18,6 +18,7 @@ from typing import Dict, Any, List
 
 from superdesk.core import get_app_config, get_current_app, get_current_async_app
 from superdesk.core.resources.cursor import ResourceCursorAsync
+from superdesk.core.types import EmailAttachment
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
@@ -25,7 +26,7 @@ from superdesk.lock import lock, unlock
 from newsroom.types import MonitoringProfileResourceModel, UserResourceModel
 from newsroom.formatters import get_formatter
 from newsroom.celery_app import celery
-from newsroom.email import send_user_email, send_template_email, EmailAttachment, EmailKwargs
+from newsroom.email import send_user_email, send_template_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.utils import parse_date_str
 from newsroom.search.types import NewshubSearchRequest
@@ -75,25 +76,27 @@ async def send_email_alert(
     }
 
     # Attach logo to email if defined
-    kwargs: EmailKwargs = {}
+    attachments: list[EmailAttachment] | None = None
     if general_settings and general_settings["values"].get("monitoring_report_logo_path"):
         image_filename = general_settings["values"].get("monitoring_report_logo_path")
         if os.path.exists(image_filename):
             with open(image_filename, "rb") as img:
                 bts = base64.b64encode(img.read())
-                logo: EmailAttachment = {
-                    "file": bts,
-                    "file_name": "logo{}".format(os.path.splitext(image_filename)[1]),
-                    "file_desc": "Logo",
-                    "content_type": "image/{}".format(os.path.splitext(image_filename)[1].replace(".", "")),
-                    "headers": {"Content-ID": "logo"},
-                }
-                kwargs["attachments_info"] = [logo]
+                attachments = [
+                    EmailAttachment(
+                        data=bts,
+                        filename="logo{}".format(os.path.splitext(image_filename)[1]),
+                        description="Logo",
+                        content_type="image/{}".format(os.path.splitext(image_filename)[1].replace(".", "")),
+                        cid="logo"
+                    )
+                ]
+
     if monitoring_profile.email:
         to_list = [t.strip() for t in monitoring_profile.email.split(",")]
-        await send_template_email(to=to_list, template="monitoring_export", template_kwargs=data, cc=None, **kwargs)
+        await send_template_email(to=to_list, template="monitoring_export", template_kwargs=data, cc=None, attachments=attachments)
     for user in users:
-        await send_user_email(user, template="monitoring_export", template_kwargs=data, **kwargs)
+        await send_user_email(user, template="monitoring_export", template_kwargs=data, attachments=attachments)
 
 
 class MonitoringEmailAlerts:
@@ -409,20 +412,20 @@ class MonitoringEmailAlerts:
                         if monitoring_data.format_type == "monitoring_email":
                             await send_email_alert(items, monitoring_data, users, general_settings)
                         else:
-                            kwargs: EmailKwargs = {}
+
                             monitoring_file = await get_monitoring_file(monitoring_data, items)
                             attachment = base64.b64encode(monitoring_file.read())
                             formatter = get_formatter(monitoring_data.format_type)
-                            attachments_info: EmailAttachment = {
-                                "file": attachment,
-                                "file_name": formatter.format_filename(None),
-                                "content_type": "application/{}".format(formatter.FILE_EXTENSION),
-                                "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
-                                    monitoring_data.name
-                                ),
-                                "headers": {},
-                            }
-                            kwargs["attachments_info"] = [attachments_info]
+                            attachments = [
+                                EmailAttachment(
+                                    data=attachment,
+                                    filename=formatter.format_filename(None),
+                                    content_type="application/{}".format(formatter.FILE_EXTENSION),
+                                    description="Monitoring Report for Celery monitoring alerts for profile: {}".format(
+                                        monitoring_data.name
+                                    ),
+                                )
+                            ]
                             if monitoring_data.email:
                                 to_list = [t.strip() for t in monitoring_data.email.split(",")]
                                 await send_template_email(
@@ -430,14 +433,14 @@ class MonitoringEmailAlerts:
                                     template="monitoring_email",
                                     template_kwargs=template_kwargs,
                                     cc=None,
-                                    **kwargs,
+                                    attachments=attachments,
                                 )
                             for user in users:
                                 await send_user_email(
                                     user,
                                     template="monitoring_email",
                                     template_kwargs=template_kwargs,
-                                    **kwargs,
+                                    attachments=attachments,
                                 )
                         await HistoryService().create_history_record(
                             items,
