@@ -32,7 +32,7 @@ setup(
         ],
     },
     scripts=[],
-    python_requires=">=3.10",
+    python_requires=">=3.12",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
